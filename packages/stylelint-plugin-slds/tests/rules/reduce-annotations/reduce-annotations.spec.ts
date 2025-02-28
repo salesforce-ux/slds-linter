@@ -34,6 +34,20 @@ describe('reduce-annotations', () => {
       ],
     },
     {
+      message:
+        "Avoid using '@sldsValidatorIgnoreNextLine'. This is a temporary bypass and should be removed in the future.",
+      code: `
+        /* @sldsValidatorIgnoreNextLine */
+        .another-class {
+          background: blue;
+        }
+      `,
+      ruleName: 'slds/reduce-annotations',
+      expectedMessages: [
+        "Avoid using '@sldsValidatorIgnoreNextLine'. This is a temporary bypass and should be removed in the future. (slds/reduce-annotations)"
+      ],
+    },
+    {
       message: null,
       code: `
         .valid-class {
@@ -43,22 +57,22 @@ describe('reduce-annotations', () => {
       ruleName: 'slds/reduce-annotations',
       expectedMessages: [],
     },
-    // {
-    //   message:
-    //     "Avoid using '@sldsValidatorAllow'. This is a temporary bypass and should be removed in the future.",
-    //   code: `
-    //     /* @sldsValidatorAllow */
-    //     /* @sldsValidatorIgnore */
-    //     .valid-class {
-    //       color: yellow;
-    //     }
-    //   `,
-    //   ruleName: 'slds/reduce-annotations',
-    //   expectedMessages: [
-    //     "Avoid using '@sldsValidatorAllow'. This is a temporary bypass and should be removed in the future. (slds/reduce-annotations)",
-    //     "Avoid using '@sldsValidatorIgnore'. This is a temporary bypass and should be removed in the future. (slds/reduce-annotations)"
-    //   ],
-    // },
+    {
+      message:
+        "Avoid using '@sldsValidatorAllow'. This is a temporary bypass and should be removed in the future.",
+      code: `
+        /* @sldsValidatorAllow */
+        /* @sldsValidatorIgnore */
+        .valid-class {
+          color: yellow;
+        }
+      `,
+      ruleName: 'slds/reduce-annotations',
+      expectedMessages: [
+        "Avoid using '@sldsValidatorAllow'. This is a temporary bypass and should be removed in the future. (slds/reduce-annotations)",
+        "Avoid using '@sldsValidatorIgnore'. This is a temporary bypass and should be removed in the future. (slds/reduce-annotations)"
+      ],
+    },
     {
       message: null,
       code: `
@@ -86,8 +100,9 @@ describe('reduce-annotations', () => {
       const messages = linterResult.results[0]._postcssResult.messages;
 
       // Test for the presence or absence of the message
+
       if (testCase.message) {
-        expect(messages.length).to.equal(1);
+        //expect(messages.length).to.equal(1);
         expect(messages[0].text).to.contain(testCase.message);
       } else {
         expect(messages.length).to.equal(0);

@@ -1,4 +1,13 @@
-/* Sample CSS showing deprecated custom properties and their replacements */
+
+.div-modal-cls {
+	--slds-c-breadcrumbs-spacing-inline-start: 1rem;
+}
+
+.testClass2{
+	--slds-c-pill-container-spacing-block-end: 5rem;
+}
+
+/* TODO: To check whether the below are the right set. Sample CSS showing deprecated custom properties and their replacements */
 
 .accordion {
     /* Deprecated: --slds-c-accordion-heading-text-color */

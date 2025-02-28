@@ -10,12 +10,12 @@ overrides:
       slds/no-slds-class-overrides:
         - true
         - severity: warning
-      slds/no-important-tag:
-        - true
-        - severity: warning
-      slds/no-hardcoded-values:
-        - null
-        - severity: error
+      # slds/no-important-tag:
+      #   - true
+      #   - severity: warning
+      # slds/no-hardcoded-values:
+      #   - true
+      #   - severity: error
       slds/no-hardcoded-values-slds2:
         - true
         - severity: warning
@@ -37,9 +37,9 @@ overrides:
       slds/no-slds-private-var:
         - true
         - severity: warning
-      slds/do-not-use-calc-function:
-        - null
-        - severity: warning
+      # slds/do-not-use-calc-function:
+      #   - true
+      #   - severity: warning
       slds/enforce-sds-to-slds-hooks:
         - true
         - severity: warning

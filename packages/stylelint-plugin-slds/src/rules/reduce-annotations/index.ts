@@ -1,51 +1,36 @@
-import { Root } from 'postcss';
+import { Root, Comment } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 
-const { utils, createPlugin }: typeof stylelint = stylelint;
+const { utils, createPlugin } = stylelint;
+const ruleName = 'slds/reduce-annotations';
 
-const ruleName: string = 'slds/reduce-annotations';
-
-// Metadata for the rule
-const { severityLevel = 'warning', warningMsg = '', errorMsg = '', ruleDesc = 'This rule checks for temporary validation annotations like @sldsValidatorAllow and @sldsValidatorIgnore.' } = ruleMetadata(ruleName) || {};
-
-// List of annotations to check
+// Fetch metadata
+const { severityLevel = 'warning' } = ruleMetadata(ruleName) || {};
 const annotationList = [
   "@sldsValidatorAllow",
-  "@sldsValidatorIgnore"
+  "@sldsValidatorIgnore",
+  "@sldsValidatorIgnoreNextLine"
 ];
 
-
-// Main rule function
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
+// Rule function
+const rule = (primaryOptions, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkComments((comment) => {
-      const commentText = comment.text.trim();
-
-      // Check for any annotation in the annotation list
-      annotationList.forEach(annotation => {
-        if (commentText.includes(annotation)) {        
-          utils.report({
-            message: `Avoid using '${annotation}'. This is a temporary bypass and should be removed in the future.`,
-            node: comment,
-            result,
-            ruleName,
-            severity,
-          });
-
-          // Optionally fix by removing the annotation (if desired)
-          if (result.stylelint.config.fix) {
-            fix(comment);
-          }
+      if (annotationList.some(annotation => comment.text.trim().includes(annotation))) {
+        utils.report({
+          message: `Avoid using '${comment.text.trim()}'. This is a temporary bypass and should be removed in the future.`,
+          node: comment,
+          result,
+          ruleName,
+          severity,
+        });
+        if (result.stylelint.config.fix) {
+          comment.remove(); // Auto-fix by removing the comment
         }
-      });
+      }
     });
   };
-}
-
-// Implement the fix method (optional)
-function fix(comment: any): void {
-  comment.remove(); // Auto-remove the annotation comment
-}
+};
 
 export default createPlugin(ruleName, rule as unknown as Rule);

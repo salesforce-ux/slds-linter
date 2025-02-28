@@ -1,0 +1,33 @@
+/*Basic Arithmetic Operations*/
+.testClass1{
+    width: calc(100% - 50px);
+    height: calc(50vh + 20px);
+    margin-left: calc(10px * 2);
+    padding-right: calc(2rem / 2);
+}
+
+/*Nested Calc Operations*/
+
+.testClass2{
+    font-size: calc(1rem + calc(2px * 3));
+    line-height: calc(1.5em - calc(0.2em * 2));
+}
+
+/*Mixing Units (px, %, em, rem, vw, vh)*/
+.testClass3{
+    max-width: calc(50vw - 10%);
+    min-height: calc(100vh - 5rem);
+    padding: calc(2em + 10px);
+    border-radius: calc(5% + 3px);
+}
+
+/*Using var in calc*/
+:root {
+    --spacing: 10px;
+    --base-size: 16px;
+  }
+  
+.container {
+    padding: calc(var(--spacing) * 2);
+    font-size: calc(var(--base-size) + 2px);
+}

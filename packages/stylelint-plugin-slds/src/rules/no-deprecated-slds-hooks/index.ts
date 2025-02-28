@@ -17,15 +17,6 @@ const messages = utils.ruleMessages(ruleName, {
     replacePlaceholders(errorMsg, { oldToken, newToken }),
 });
 
-// Read the deprecated tokens file
-/* const isTestEnv = process.env.NODE_ENV === 'test';
-const tokenMappingPath = metadataFileUrl(
-  './public/metadata/deprecatedHooks.json'
-);
-
-const deprecatedHooks = JSON.parse(readFileSync(tokenMappingPath, 'utf8')); */
-
-
 function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {

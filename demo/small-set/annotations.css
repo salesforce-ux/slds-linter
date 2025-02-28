@@ -1,0 +1,27 @@
+/* @sldsValidatorAllow */
+.my-class {
+    color: red;
+}
+
+
+/* @sldsValidatorIgnore */
+.another-class {
+    background: blue;
+}
+
+/* @sldsValidatorAllow */
+/* @sldsValidatorIgnore */
+.valid-class {
+    color: yellow;
+}
+
+/* @sldsValidatorIgnoreNextLine */
+.another-class {
+    background: blue;
+}
+
+/* test class without any annotation */
+
+.testClass{
+    margin-top: auto;
+}

@@ -1,3 +1,12 @@
 .div-modal-cls {
 	--slds-c-breadcrumbs-spacing-inline-start: 1rem;
 }
+
+.testClass2{
+	--slds-c-pill-container-spacing-block-end: 5rem;
+}
+
+/*TODO: In the below we don't have a replacement but we know the user shouldn't use this hook. Currently we don't have a message so leaving it for now.*/
+.testClass{
+	--slds-c-pill-action-shadow: none;
+}
