@@ -8,7 +8,7 @@ import {
   DEFAULT_STYLELINT_CONFIG_PATH,
 } from "../services/config.resolver";
 import path from "path";
-import { execSync } from "child_process";
+import { copyFile } from 'fs/promises';
 
 export function registerEmitCommand(program: Command): void {
   program
@@ -30,16 +30,14 @@ export function registerEmitCommand(program: Command): void {
           normalizedOptions.directory,
           path.basename(normalizedOptions.configStyle)
         );
-        execSync(`cp ${normalizedOptions.configStyle} ${destStyleConfigPath}`);
+        await copyFile(normalizedOptions.configStyle, destStyleConfigPath);
         Logger.success(chalk.green(`Stylelint configuration created at:\n${destStyleConfigPath}\n`));
 
         const destESLintConfigPath = path.join(
           normalizedOptions.directory,
           path.basename(normalizedOptions.configEslint)
         );
-        execSync(
-          `cp ${normalizedOptions.configEslint} ${destESLintConfigPath}`
-        );
+        await copyFile(normalizedOptions.configEslint, destESLintConfigPath);
         Logger.success(chalk.green(`ESLint configuration created at:\n${destESLintConfigPath}\n`));
       } catch (error: any) {
         Logger.error(
