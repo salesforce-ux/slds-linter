@@ -1,10 +1,10 @@
 import { promises as fs } from "fs";
-import path from "path";
-import { glob, Path } from "glob";
 import { Logger } from "../utils/logger";
+import {globby} from 'globby';
+import {extname} from "path";
 
 export interface FilePattern {
-  include: string[];
+  extensions:string[];
   exclude?: string[];
 }
 
@@ -28,33 +28,23 @@ export class FileScanner {
   ): Promise<string[][]> {
     try {
       Logger.debug(`Scanning directory: ${directory}`);
-      Logger.debug(`Include patterns: ${options.patterns.include.join(", ")}`);
 
-      const allFiles: string[] = [];
-        // Process include patterns
-        for (const pattern of options.patterns.include) {
-          const files = await glob(`${directory}/${pattern}`, {
-            cwd: process.cwd(),
-            ignore: options.patterns.exclude,
-            withFileTypes: true,
-            dot: true, // Include .dot files
-          }).then((matches: Path[]) =>
-            matches
-              .filter((match) => match.isFile())
-              .map((match) => {
-                // Just use the fullpath directly as it's already relative to cwd
-                return match.fullpath();
-              })
-          );
-
-          allFiles.push(...files);
-        }
-
-      // Remove duplicates
-      const uniqueFiles = [...new Set(allFiles)];
+      const allFiles: string[] = await globby(directory, {
+        cwd: process.cwd(),
+        expandDirectories:true,
+        unique:true,
+        ignore: options.patterns.exclude,
+        onlyFiles: true,
+        dot: true, // Include.dot files
+        absolute: true,
+        gitignore:true
+      }).then(matches => matches.filter(match => {
+        const fileExt = extname(match).substring(1);
+        return options.patterns.extensions.includes(fileExt);
+      }));
 
       // Validate files exist and are readable
-      const validFiles = await this.validateFiles(uniqueFiles);
+      const validFiles = await this.validateFiles(allFiles);
 
       // Split into batches
       const batchSize = options.batchSize || this.DEFAULT_BATCH_SIZE;
