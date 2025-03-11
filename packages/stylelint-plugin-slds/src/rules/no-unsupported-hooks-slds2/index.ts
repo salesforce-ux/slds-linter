@@ -17,9 +17,9 @@ const {
 } = ruleMetadata(ruleName) || {};
 const messages = utils.ruleMessages(ruleName, {
   deprecated: (token: string) => replacePlaceholders(warningMsg, { token }),
-  replaced: (oldStylingHook: string, newStylingHook: string) =>
+  replaced: (token: string, newToken: string) =>
     // Replace deprecated hook ${oldStylingHook} with ${newStylingHook}
-    replacePlaceholders(errorMsg, { oldStylingHook, newStylingHook }),
+    replacePlaceholders(errorMsg, { token, newToken }),
 });
 
 function rule(

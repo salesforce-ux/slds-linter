@@ -11,7 +11,7 @@ const rulesMetadata = {
     name: "slds/modal-close-button-issue",
     severityLevel: "error",
     ruleDesc:
-      "Ensure SLDS modal compliance by enforcing correct button and icon attributes.",
+      "Update component attributes or CSS classes for the modal close button to comply with the modal component blueprint.",
   },
 
   "slds/no-deprecated-classes-slds2": {
@@ -169,7 +169,7 @@ const rulesMetadata = {
     warningMsg:
       "The ${token} styling hook isn’t present in SLDS 2 and there\'s no equivalent replacement. Remove it or replace it with a styling hook with a similar effect.",
     errorMsg:
-      "Replace deprecated ${oldStylingHook} styling hook with ${newStylingHook}.",
+      "The ${token} styling hook isn’t present in SLDS 2. Replace it with ${newToken}.",
     ruleDesc:
       "Replace deprecated --slds styling hooks. See lightningdesignsystem.com for more info.",
   },
