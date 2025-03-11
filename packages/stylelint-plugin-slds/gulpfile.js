@@ -4,6 +4,8 @@ import { series, watch } from 'gulp';
 import { task } from "gulp-execa";
 import { rimraf } from 'rimraf';
 
+const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE!=='release';
+
 /**
  * Clean all generated folder
  * @returns 
@@ -23,7 +25,7 @@ const compileTs = async ()=>{
     platform: "node",
     format:"esm",
     packages:'external',
-    sourcemap:true,
+    sourcemap:ENABLE_SOURCE_MAPS,
     plugins:[esbuildPluginFilePathExtensions({
       esmExtension:"js"
     })]

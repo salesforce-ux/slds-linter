@@ -26,7 +26,7 @@ async function generateTokensDataFile() {
       const importName = camelCase(fileNameParts.name);
       const importPath = relative("./src", filePath);
       namedExports.push(importName);
-      return `import ${importName} from "${importPath}" with {type:"json"};`;
+      return `const ${importName} = require(${JSON.stringify(importPath)});`;
     })
     .join("\n");
 
@@ -54,12 +54,12 @@ async function generateBundle() {
     outdir:"build",
     platform: "node",
     format:"esm",
+    minify:true,
     packages:'external',
-    sourcemap:true,
     plugins:[esbuildPluginFilePathExtensions({
       esmExtension:"js"
     })]
-  })  
+  })
 }
 
 /**

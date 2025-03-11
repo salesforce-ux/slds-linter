@@ -27,7 +27,7 @@ Follow the below instructions to integrate SLDS Linter into your project.
 SLDS Linter CLI tool works best with the [Active LTS](https://nodejs.org/en/about/previous-releases) version of Node.js.  
 
 #### **Minimum Required Node.js Version**  
-- The minimum supported Node.js version is **v20.18.3**.  
+- The minimum supported version is **v18.4.0**
 - We recommend using the latest **Active LTS** release for the best performance and compatibility.  
 - The tool verifies the Node.js version at the beginning of the process. If the Node.js requirements are met, the subsequent steps will proceed smoothly.
 

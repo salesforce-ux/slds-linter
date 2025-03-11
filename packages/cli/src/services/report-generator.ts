@@ -27,9 +27,7 @@ export class ReportGenerator {
       const runBuilder = new SarifRunBuilder().initSimple({
         toolDriverName: options.toolName,
         toolDriverVersion: options.toolVersion,
-        url: options.toolName === 'eslint' 
-          ? 'https://eslint.org' 
-          : 'https://stylelint.io'
+        url: 'https://github.com/salesforce-ux/slds-linter'
       });
 
       // Add rules

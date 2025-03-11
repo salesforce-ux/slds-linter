@@ -29,13 +29,9 @@ program
   .showHelpAfterError();
 
 function registerVersion(){
-  //TODO: Not an optimised way of doing. will review later
-  let pkg = {description:'', version:''};
-  try{
-    pkg = require("../package.json")
-  }catch(e){}
-  program.description(pkg.description)
-  .version(pkg.version);
+  // resolving version and description from env props. check gulp file
+  program.description(process.env.CLI_DESCRIPTION)
+  .version(process.env.CLI_VERSION);
 }
 
 registerLintStylesCommand(program);

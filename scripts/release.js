@@ -8,10 +8,10 @@ import chalk from 'chalk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, '..');
-const isDryRun = process.env.SLDS_DRY_RUN || false;
+const isDryRun = process.argv.includes('--dry-run') || false; // Skips publishing npm, git operations
+const skipCheck = process.argv.includes('--skip-check') || false; // Skips checking working directory git status
 
 async function getWorkspaceInfo() {
-  console.log(chalk.blue("Checking workspace information..."));
   try{
     const output = execSync('yarn workspaces info --json').toString();
     const matches = output.trim().replace(/\n/g, '').match(/\{(.*)\}/);
@@ -153,16 +153,30 @@ async function checkWorkingDirectory() {
   }
 }
 
+async function resetWorkingDirectory() {
+  try{
+    // Reset the working directory with orign
+    execSync('git reset --hard');  
+    console.log(chalk.green('Post-release checks passed successfully.'));
+  } catch (error) {
+    throw new Error(`Post-release check failed: ${error.message}`);
+  }
+}
+
 async function main() {
   try {
 
-    // Perform pre-release checks
-    await checkWorkingDirectory();
+    if(!skipCheck){
+      console.log(chalk.blue('Perform pre-release checks'));
+      await checkWorkingDirectory();
+    } else {
+      console.warn(chalk.yellow('Skipping pre-release checks'));
+    }
     
-    // Get workspace information
+    console.log(chalk.blue("Get workspace information"));
     const workspaceInfo = await getWorkspaceInfo();
     
-    // Prompt for version
+    console.log(chalk.blue("Prompt for version"));
     const { version } = await prompts({
       type: 'text',
       name: 'version',
@@ -170,7 +184,11 @@ async function main() {
       validate: validateVersion
     });
 
-    // Prompt for release type
+    if(!version){
+      throw new Error(`Input valid version. Skipping release.`);
+    }
+
+    console.log(chalk.blue("Prompt for release type"));
     const { releaseType } = await prompts({
       type: 'select',
       name: 'releaseType',
@@ -182,26 +200,33 @@ async function main() {
       ]
     });
 
-    // Handle version generation
+    if(!version || !releaseType){
+      throw new Error(`Input valid release type. Skipping release.`);
+    }
+
+    console.log(chalk.blue("Handle version generation"));
     let finalVersion = version;
     if (releaseType !== 'final') {
       finalVersion = await incrementPreReleaseVersion(version, releaseType);
     }
 
-    // Update all package versions
+    console.log(chalk.blue("Update all package versions"));
     await updatePackageVersions(finalVersion, workspaceInfo);
 
     if(isDryRun){
       console.log(chalk.yellow('Dry run. Skipping git operations'));
     } else {
-      // Git operations
+      console.log(chalk.blue("Git operations"));
       await gitOperations(finalVersion);
     }
 
-    // Publish packages and get slds-linter tarball path
+    console.log(chalk.blue("Building workspcae..."));
+    await execSync("CLI_BUILD_MODE=release yarn build");
+
+    console.log(chalk.blue("Publish packages and get slds-linter tarball path"));
     const sldsLinterTarball = await publishPackages(workspaceInfo, finalVersion, releaseType);
 
-    // Create GitHub release with slds-linter tarball as asset
+    console.log(chalk.blue("Create GitHub release with slds-linter tarball as asset"));
     if (sldsLinterTarball) {
       if(isDryRun){
         console.log(chalk.yellow('Skipping GitHub release creation due to dry run'));
@@ -211,6 +236,13 @@ async function main() {
     }
 
     console.log(chalk.green(`\nRelease ${finalVersion} completed successfully!`));
+
+    if(!skipCheck){
+      console.log(chalk.blue("Perform post-release checks"));
+      await resetWorkingDirectory();
+    } else {
+      console.warn(chalk.yellow('Skipping post-release checks'));
+    }
     
   } catch (error) {
     console.error(chalk.red('Error:'), chalk.red(error.message));

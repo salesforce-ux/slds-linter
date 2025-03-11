@@ -14,29 +14,31 @@
     "node": ">=20.18.3"
   },
   "scripts": {
+    "prepare": "husky install",
     "preinstall": "./scripts/validate-setup.sh",
     "test": "yarn workspaces run test",
     "build": "yarn workspaces run build",
-    "release": "node scripts/release.js"
+    "release": "node scripts/release.js",
+    "coverage": "yarn test --coverage && node ./scripts/mergeCoverage.mjs"
   },
   "devDependencies": {
-    "rimraf": "^6.0.1",
-    "@types/node": "^20.11.19",
     "@types/eslint": "^8.0.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.3.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
+    "@types/node": "^20.11.19",
+    "clean-pkg-json": "^1.2.0",
+    "esbuild": "^0.25.0",
+    "esbuild-plugin-file-path-extensions": "^2.1.4",
     "glob": "^11.0.1",
     "gulp": "^5.0.0",
     "gulp-clean-dir": "^1.0.2",
-    "clean-pkg-json": "^1.2.0",
     "gulp-execa": "^8.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.3.0",
     "prettier": "^3.4.2",
-    "esbuild": "^0.25.0",
-    "esbuild-plugin-file-path-extensions": "^2.1.4",
     "prompts": "^2.4.2",
-    "semver": "^7.7.1"
+    "rimraf": "^6.0.1",
+    "semver": "^7.7.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   },
   "repository": {
     "type": "git",

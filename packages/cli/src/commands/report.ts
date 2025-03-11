@@ -8,7 +8,7 @@ import { FileScanner } from '../services/file-scanner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
 import { LintRunner } from '../services/lint-runner';
 import { ReportGenerator } from '../services/report-generator';
-import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, ESLINT_VERSION, LINTER_CLI_VERSION, STYLELINT_VERSION } from '../services/config.resolver';
+import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
 
 export function registerReportCommand(program: Command): void {
   program

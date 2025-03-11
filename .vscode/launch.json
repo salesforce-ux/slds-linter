@@ -1,46 +1,47 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Run CLI Lint:Styles",
-        "request": "launch",
-        "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v18.20.6/bin/node",
-        "runtimeArgs": [
-          "${workspaceFolder}/packages/cli/build/index.js",
-          "lint:styles"
-        ],
-        "console": "integratedTerminal",
-        "skipFiles": [
-          "<node_internals>/**"
-        ],
-        "type": "node"
-      },
-      {
-        "name": "Run CLI Lint:Components",
-        "request": "launch",
-        "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v18.20.6/bin/node",
-        "runtimeArgs": [
-          "${workspaceFolder}/packages/cli/build/index.js",
-          "lint:components"
-        ],
-        "console": "integratedTerminal",
-        "skipFiles": [
-          "<node_internals>/**"
-        ],
-        "type": "node"
-      },{
-        "name": "Run CLI Report",
-        "request": "launch",
-        "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v18.20.6/bin/node",
-        "runtimeArgs": [
-          "${workspaceFolder}/packages/cli/build/index.js",
-          "report"
-        ],
-        "console": "integratedTerminal",
-        "skipFiles": [
-          "<node_internals>/**"
-        ],
-        "type": "node"
-      }      
-    ]
-  }
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run CLI Lint:Styles",
+      "request": "launch",
+      "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v20.18.3/bin/node",
+      "runtimeArgs": [
+        "${workspaceFolder}/packages/cli/build/index.js",
+        "lint:styles",
+        "-d",
+        "${workspaceFolder}/demo"
+      ],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
+      "name": "Run CLI Lint:Components",
+      "request": "launch",
+      "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v20.18.3/bin/node",
+      "runtimeArgs": [
+        "${workspaceFolder}/packages/cli/build/index.js",
+        "lint:components",
+        "-d",
+        "${workspaceFolder}/demo"
+      ],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
+      "name": "Run CLI Report",
+      "request": "launch",
+      "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v20.18.3/bin/node",
+      "runtimeArgs": [
+        "${workspaceFolder}/packages/cli/build/index.js",
+        "report",
+        "-d",
+        "${workspaceFolder}/demo"
+      ],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    }
+  ]
+}
