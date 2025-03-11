@@ -33,11 +33,11 @@ export class FileScanner {
       const allFiles: string[] = [];
 
       let directories = directory.split("_files_");
-      for (const directory_glob of directories) {
+      for (const dir of directories) {
         // Process include patterns
         for (const pattern of options.patterns.include) {
           const files = await glob(pattern, {
-            cwd: directory_glob,
+            cwd: dir,
             ignore: options.patterns.exclude,
             withFileTypes: true,
             dot: true, // Include .dot files

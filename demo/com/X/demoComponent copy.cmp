@@ -1,0 +1,40 @@
+<aura:component>
+    <!-- Component attributes -->
+    <aura:attribute name="title" type="String" default="Demo Component"/>
+    <aura:attribute name="records" type="List" default="[]"/>
+    
+    <!-- Main container using BEM naming and some (intentionally) deprecated classes -->
+    <div class="slds-card slds-card_empty">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title slds-text-heading_medium">{!v.title}</h2>
+                </div>
+                <div class="slds-no-flex">
+                    <lightning:button 
+                        label="New Record" 
+                        onclick="{!c.handleNewRecord}"
+                        class="slds-button_brand slds-button_small"/>
+                </div>
+            </header>
+        </div>
+        
+        <div class="slds-card__body">
+            <!-- List container -->
+            <ul class="slds-list_vertical slds-has-dividers_top-space">
+                <aura:iteration items="{!v.records}" var="record">
+                    <li class="slds-list__item slds-grid slds-grid_align-spread">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__body slds-text-heading_small">{!record.name}</div>
+                        </div>
+                        <lightning:buttonIcon 
+                            iconName="utility:delete"
+                            alternativeText="Delete"
+                            class="slds-button_icon-border"
+                            onclick="{!c.handleDelete}"/>
+                    </li>
+                </aura:iteration>
+            </ul>
+        </div>
+    </div>
+</aura:component> 
