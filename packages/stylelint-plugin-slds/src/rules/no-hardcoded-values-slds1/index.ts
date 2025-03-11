@@ -1,4 +1,4 @@
-import { valueToStylinghookSlds } from "@salesforce-ux/metadata-slds";
+import { valueToStylinghookSlds } from '@salesforce-ux/metadata-slds';
 import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import {
@@ -24,20 +24,25 @@ interface StylinghookData {
   };
 }
 
-const ruleName:string = 'slds/no-hardcoded-values-slds1';
+const ruleName: string = 'slds/no-hardcoded-values-slds1';
 
-const { severityLevel = 'error', warningMsg = '', errorMsg = '', ruleDesc = 'No description provided' } = ruleMetadata(ruleName) || {};
+const {
+  severityLevel = 'error',
+  warningMsg = '',
+  errorMsg = '',
+  ruleDesc = 'No description provided',
+} = ruleMetadata(ruleName) || {};
 
 const messages = utils.ruleMessages(ruleName, {
   rejected: (color: string, stylingHook: string) =>
-    replacePlaceholders(errorMsg, { color, stylingHook} ),
+    replacePlaceholders(errorMsg, { color, stylingHook }),
   suggested: (oldValue: string) =>
     `There’s no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
 });
 
 const isHardCodedDensifyValue = (cssValue: string): boolean => {
   // Regular expression to match number, number with px, or number with rem
-  const regex = /^\d+(\.\d+)?(px|rem)?$/;
+  const regex = /\b(?!0px\b)\d+px\b|\b\d+rem\b/g;
   return regex.test(cssValue);
 };
 
@@ -92,12 +97,14 @@ const findExactMatchStylingHook = (
   );
 };
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
+function rule(
+  primaryOptions: boolean,
+  { severity = severityLevel as RuleSeverity } = {}
+) {
   return async (root: Root, result: PostcssResult) => {
     const supportedStylinghooks = valueToStylinghookSlds; //await loadStylinghooksData(); // Await the loading of color data
 
     root.walkDecls((decl) => {
-      
       const cssProperty = decl.prop.toLowerCase();
       const colorProperties = [
         'color',
@@ -118,6 +125,7 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
         'top',
         'right',
         'left',
+        'box-shadow',
       ];
 
       const value = decl.value;
@@ -144,7 +152,7 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
               endIndex,
               result,
               ruleName,
-              severity
+              severity,
             });
           } else {
             utils.report({
@@ -154,7 +162,7 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
               endIndex,
               result,
               ruleName,
-              severity
+              severity,
             });
           }
         }
@@ -175,7 +183,7 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
             endIndex,
             result,
             ruleName,
-            severity
+            severity,
           });
         } else {
           utils.report({
@@ -185,7 +193,7 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
             endIndex,
             result,
             ruleName,
-            severity
+            severity,
           });
         }
       }

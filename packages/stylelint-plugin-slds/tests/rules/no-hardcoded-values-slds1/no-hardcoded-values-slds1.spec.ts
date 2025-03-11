@@ -20,6 +20,51 @@ describe('no-hardcoded-values-slds1', () => {
       expectedReplacement: '--slds-g-color-error-1',
     },
     {
+      description: 'Does not report for 0 as a value',
+      inputCss: `
+        .example {
+          width: 0;
+        }
+      `,
+      expectedMessage: null,
+    },
+    {
+      description: 'Does not report for 0px as a value',
+      inputCss: `
+        .example {
+          width: 0px;
+        }
+      `,
+      expectedMessage: null,
+    },
+    {
+      description: 'Does not report for 0.0 as a value',
+      inputCss: `
+        .example {
+          width: 0.0;
+        }
+      `,
+      expectedMessage: null,
+    },
+    {
+      description: 'Reports warning for hardcoded font-size value with replacement hook',
+      inputCss: `
+        .example {
+          font-size: 0.875rem;
+        }
+      `,
+      expectedMessage: "Replace the 0.875rem static value with an SLDS 1 styling hook: --slds-g-font-scale-1. (slds/no-hardcoded-values-slds1)",
+    },
+    {
+      description: 'Reports warning for hardcoded box-shadow value with replacement hook',
+      inputCss: `
+        .example {
+          box-shadow: 0 2px 8px -2px #18181814, 0 8px 12px -2px #18181828;
+        }
+      `,
+      expectedMessage: "Replace the 0 2px 8px -2px #18181814, 0 8px 12px -2px #18181828 static value with an SLDS 1 styling hook: --slds-g-shadow-2. (slds/no-hardcoded-values-slds1)"
+    },
+    {
       description:
         'Reports warning for hardcoded font size with replacement hook',
       inputCss: `
@@ -39,7 +84,7 @@ describe('no-hardcoded-values-slds1', () => {
         }
       `,
       expectedMessage:
-      'Replace the #123456 static value with an SLDS 1 styling hook: \n1. --slds-g-color-accent-container-3 \n2. --slds-g-color-surface-inverse-1 \n3. --slds-g-color-surface-container-inverse-1 \n4. --slds-g-color-surface-inverse-2 \n5. --slds-g-color-surface-container-inverse-2 \n. (slds/no-hardcoded-values-slds1)'
+        'Replace the #123456 static value with an SLDS 1 styling hook: \n1. --slds-g-color-accent-container-3 \n2. --slds-g-color-surface-inverse-1 \n3. --slds-g-color-surface-container-inverse-1 \n4. --slds-g-color-surface-inverse-2 \n5. --slds-g-color-surface-container-inverse-2 \n. (slds/no-hardcoded-values-slds1)',
     },
     {
       description:
@@ -83,7 +128,6 @@ describe('no-hardcoded-values-slds1', () => {
         const messages = linterResult.results[0].warnings.map(
           (warning) => warning.text
         );
-
         if (expectedMessage) {
           expect(messages[0]).to.include(expectedMessage);
         } else {

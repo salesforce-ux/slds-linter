@@ -22,6 +22,12 @@ const rulesMetadata = {
   },
 
   // CHECKED
+  "length-zero-no-unit": {
+    name: "length-zero-no-unit",
+    severityLevel: "warning",
+    ruleDesc: "Disallow units for zero lengths.",
+  },
+
   "slds/enforce-bem-usage": {
     name: "slds/enforce-bem-usage", // BEM - Double Dash to BEM Notation
     severityLevel: "warning",
