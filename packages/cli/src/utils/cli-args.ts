@@ -1,7 +1,6 @@
 import { CliOptions } from "../types";
 import path from "path";
 import { accessSync } from "fs";
-import { glob, globSync } from "glob";
 
 export function validateAndNormalizeDirPath(inputPath?: string): string {
     if (!inputPath) {
@@ -34,8 +33,7 @@ export function normalizeCliOptions(
   return {
     fix: false,
     editor: "vscode",
-    config: "",
-    configStyle: "",
+    configStylelint: "",
     configEslint: "",
     ...defultOptions,
     ...options,

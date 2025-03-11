@@ -1,8 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import path from 'path';
 import { CliOptions } from '../types';
-import { getEditorLink, createClickableLineCol } from '../utils/editorLinkUtil';
 import { printLintResults } from '../utils/lintResultsUtil';
 import { normalizeCliOptions } from '../utils/cli-args';
 import { Logger } from '../utils/logger';
@@ -15,9 +13,9 @@ export function registerLintCommand(program: Command): void {
   program
     .command('lint')
     .description('Run both style and component linting')
-    .option('-d, --directory <path>', 'Target directory to scan (defaults to current directory)')
+    .option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns')
     .option('--fix', 'Automatically fix problems')
-    .option('--config-style <path>', 'Path to stylelint config file')
+    .option('--config-stylelint <path>', 'Path to stylelint config file')
     .option('--config-eslint <path>', 'Path to eslint config file')
     .option('--editor <editor>', 'Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode', 'vscode')
     .action(async (options: CliOptions) => {
@@ -25,7 +23,7 @@ export function registerLintCommand(program: Command): void {
       try {
         Logger.info(chalk.blue('Starting lint process...'));
         const normalizedOptions = normalizeCliOptions(options, {
-          configStyle: DEFAULT_STYLELINT_CONFIG_PATH,
+          configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
           configEslint: DEFAULT_ESLINT_CONFIG_PATH
         });
 
@@ -41,7 +39,7 @@ export function registerLintCommand(program: Command): void {
         Logger.info(chalk.blue(`Running stylelint${normalizedOptions.fix?' with autofix':''}...`));
         const styleResults = await LintRunner.runLinting(styleFileBatches, 'style', {
           fix: normalizedOptions.fix,
-          configPath: normalizedOptions.configStyle,
+          configPath: normalizedOptions.configStylelint,
         });
 
         // Print detailed lint results only for files with issues

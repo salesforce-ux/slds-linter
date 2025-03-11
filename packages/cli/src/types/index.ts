@@ -1,9 +1,8 @@
 export interface CliOptions {
   directory?: string;
   output?: string;
-  fix?: boolean;
-  config?: string; // Used for stylelint config, eslint config when command is lint:styles or lint:components
-  configStyle?: string; // Used for stylelint config when command is lint
+  fix?: boolean;  
+  configStylelint?: string; // Used for stylelint config when command is lint
   configEslint?: string; // Used for eslint config when command is lint
   editor?: string;
 }

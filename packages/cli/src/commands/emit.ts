@@ -16,21 +16,21 @@ export function registerEmitCommand(program: Command): void {
     .description("Emits the configuration files used by slds-linter cli")
     .option(
       "-d, --directory <path>",
-      "Target directory to emit (defaults to current directory)"
+      "Target directory to emit (defaults to current directory). Support glob patterns"
     )
     .action(async (options: CliOptions) => {
       try {
         Logger.info(chalk.blue("Emitting configuration files..."));
         const normalizedOptions = normalizeCliOptions(options, {
-          configStyle: DEFAULT_STYLELINT_CONFIG_PATH,
+          configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
           configEslint: DEFAULT_ESLINT_CONFIG_PATH,
         });
 
         const destStyleConfigPath = path.join(
           normalizedOptions.directory,
-          path.basename(normalizedOptions.configStyle)
+          path.basename(normalizedOptions.configStylelint)
         );
-        await copyFile(normalizedOptions.configStyle, destStyleConfigPath);
+        await copyFile(normalizedOptions.configStylelint, destStyleConfigPath);
         Logger.success(chalk.green(`Stylelint configuration created at:\n${destStyleConfigPath}\n`));
 
         const destESLintConfigPath = path.join(
