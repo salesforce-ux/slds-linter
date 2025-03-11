@@ -97,39 +97,6 @@ const findExactMatchStylingHook = (
   );
 };
 
-const reportIssue = ({
-  value,
-  decl,
-  index,
-  endIndex,
-  closestHooks,
-  result,
-  ruleName,
-  severity,
-}) => {
-  if (closestHooks.length > 0) {
-    utils.report({
-      message: messages.rejected(value, generateTable(closestHooks)),
-      node: decl,
-      index,
-      endIndex,
-      result,
-      ruleName,
-      severity,
-    });
-  } else {
-    utils.report({
-      message: messages.suggested(value),
-      node: decl,
-      index,
-      endIndex,
-      result,
-      ruleName,
-      severity,
-    });
-  }
-};
-
 function rule(
   primaryOptions: boolean,
   { severity = severityLevel as RuleSeverity } = {}
