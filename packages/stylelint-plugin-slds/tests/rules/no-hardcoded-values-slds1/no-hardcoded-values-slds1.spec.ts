@@ -56,15 +56,6 @@ describe('no-hardcoded-values-slds1', () => {
       expectedMessage: "Replace the 0.875rem static value with an SLDS 1 styling hook: --slds-g-font-scale-1. (slds/no-hardcoded-values-slds1)",
     },
     {
-      description: 'Reports 1rem warning for hardcoded padding value with replacement hook',
-      inputCss: `
-        .example {
-          padding: 0 1rem;
-        }
-      `,
-      expectedMessage: "Replace the 1rem static value with an SLDS 1 styling hook: --slds-g-spacing-4. (slds/no-hardcoded-values-slds1)"
-    },
-    {
       description: 'Reports warning for hardcoded box-shadow value with replacement hook',
       inputCss: `
         .example {
