@@ -4,16 +4,11 @@ import { accessSync } from "fs";
 import { glob, globSync } from "glob";
 
 export function validateAndNormalizeDirPath(inputPath?: string): string {
-  try {
     if (!inputPath) {
       return process.cwd();
     }
-    //Checks whether it is a valid glob string else errors out.
-    if (glob.sync(inputPath)) return inputPath;
-
-  } catch (error) {
-    throw new Error(`Invalid glob path: ${inputPath}`);
-  }
+    //TODO: To check whether it is a valid glob string else error out.
+    return inputPath;
 }
 
 export function validateAndNormalizeOutputPath(inputPath?: string): string {
