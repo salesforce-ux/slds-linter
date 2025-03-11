@@ -31,7 +31,7 @@ export class FileScanner {
       Logger.debug(`Include patterns: ${options.patterns.include.join(", ")}`);
 
       const allFiles: string[] = [];
-      console.log("31", directory.split("_files_"));
+
       let directories = directory.split("_files_");
       for (const directory_glob of directories) {
         // Process include patterns

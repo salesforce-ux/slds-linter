@@ -7,9 +7,8 @@ export function validateAndNormalizePath(inputPath?: string): string {
   if (!inputPath) {
     return process.cwd();
   }
-  console.log("9", inputPath);
+
   const files = globSync(inputPath);
-  console.log(files);
   let normalizedPaths = [];
   files.forEach((filePath) => {
     const normalizedPath = path.resolve(filePath);
