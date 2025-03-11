@@ -45,7 +45,7 @@ describe('FileScanner', () => {
   it('should handle invalid files gracefully', async () => {
     const options: ScanOptions = {
       patterns: {
-        include: ['**/*.nonexistent'],
+        extensions: ['nonexistent'],
         exclude: []
       }
     };
