@@ -1,16 +1,25 @@
 import { ESLint } from 'eslint';
 import { BaseWorker } from './base.worker';
 import { WorkerConfig, WorkerResult } from '../types';
+import fs from "fs";
+import path from "path";
 
+const rootEslintConfig = path.resolve(process.cwd(), ".eslintrc.yml");
+  
+// Check if .eslintrc.yml exists in the root directory
+const useRootConfig = fs.existsSync(rootEslintConfig);
 class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
   private eslint: ESLint;
+
+
 
   constructor() {
     super();
     this.eslint = new ESLint({
       useEslintrc: true,
       fix: this.task.config.fix,
-      overrideConfigFile: this.task.config.configPath
+      //overrideConfigFile: this.task.config.configPath
+      ...(useRootConfig ? {} : { overrideConfigFile: this.task.config.configPath })
     });
   }
 
