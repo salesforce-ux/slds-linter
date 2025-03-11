@@ -72,7 +72,7 @@ In your project root directory, follow these steps.
 
 3. (Optional) To see lint errors only on CSS files, run `npx @salesforce-ux/slds-linter lint:styles` .
 4. (Optional) To see lint errors only on component markup files (componentName.html or componentName.cmp files), run `npx @salesforce-ux/slds-linter lint:components` . 
-5. (Optional) To run SLDS Linter on a specific folder, add the `-d` option to specify the directory to be linted: `npx @salesforce-ux/slds-linter -d [directory name]` .
+5. (Optional) To run SLDS Linter on a specific folder, add the `-d` option to specify the directory to be linted: `npx @salesforce-ux/slds-linter -d [directory name]` . This option accepts directories or folders using glob patterns, enabling flexible and efficient matching of multiple paths.
 6. To produce a SARIF report in your project root directory and specify an output directory, run  `npx @salesforce-ux/slds-linter report -o [output directory]`. The output file is named as `slds-linter-report.sarif`.
 7. Open the generated `.sarif` report file.
 8. Make a note of how many components SLDS Linter has identified that you must update.
@@ -103,7 +103,7 @@ These options are available on SLDS Linter commands.
 
 | **Option**              | **Description**                                                              | **Availability**                           |
 | ------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------ |
-| `-d, --directory <path>` | Target directory to scan (defaults to current directory)                     | `lint`, `lint:styles`, `lint:components`, `report` |
+| `-d, --directory <path>` | Target directory to scan (defaults to current directory). Accepts glob patterns.                     | `lint`, `lint:styles`, `lint:components`, `report` |
 | `-o, --output <path>`    | Output directory for reports (defaults to current directory)                 | `report`                                     |
 | `--fix`                  | Automatically fix problems                                                   | `lint`, `lint:styles`, `lint:components`         |
 | `--config <path>`        | Path to eslint/stylelint config file'         | `lint:styles`, `lint:components`               |

@@ -1,26 +1,36 @@
 import { CliOptions } from "../types";
 import path from "path";
 import { accessSync } from "fs";
-import { globSync } from "glob";
+import { glob, globSync } from "glob";
 
-export function validateAndNormalizePath(inputPath?: string): string {
+export function validateAndNormalizeDirPath(inputPath?: string): string {
+  try {
+    if (!inputPath) {
+      return process.cwd();
+    }
+    //Checks whether it is a valid glob string else errors out.
+    if (glob.sync(inputPath)) return inputPath;
+
+  } catch (error) {
+    throw new Error(`Invalid glob path: ${inputPath}`);
+  }
+}
+
+export function validateAndNormalizeOutputPath(inputPath?: string): string {
   if (!inputPath) {
     return process.cwd();
   }
 
-  const files = globSync(inputPath);
-  let normalizedPaths = [];
-  files.forEach((filePath) => {
-    const normalizedPath = path.resolve(filePath);
-    try {
-      // Check if path exists and is accessible
-      accessSync(normalizedPath);
-      normalizedPaths.push(normalizedPath);
-    } catch (error) {
-      throw new Error(`Invalid path: ${filePath}`);
-    }
-  });
-  return normalizedPaths.join("_files_");
+  const normalizedPath = path.resolve(inputPath);
+
+  try {
+    // Check if path exists and is accessible
+    accessSync(normalizedPath);
+    return normalizedPath;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(`Invalid path: ${inputPath}`);
+  }
 }
 
 export function normalizeCliOptions(
@@ -35,7 +45,7 @@ export function normalizeCliOptions(
     configEslint: "",
     ...defultOptions,
     ...options,
-    directory: validateAndNormalizePath(options.directory),
-    output: validateAndNormalizePath(options.output),
+    directory: validateAndNormalizeDirPath(options.directory),
+    output: validateAndNormalizeOutputPath(options.output),
   };
 }
