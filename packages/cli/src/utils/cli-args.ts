@@ -28,7 +28,6 @@ export function validateAndNormalizeOutputPath(inputPath?: string): string {
     accessSync(normalizedPath);
     return normalizedPath;
   } catch (error) {
-    console.log(error.message);
     throw new Error(`Invalid path: ${inputPath}`);
   }
 }
