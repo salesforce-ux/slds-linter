@@ -17,7 +17,7 @@
   /* Can be replaced with --slds-g-radius-border-2 */
   border-radius: 0.25rem;
   /* Can be replaced with --slds-g-spacing-4 */
-  padding: 0 1rem;
+  padding: 1rem;
 }
 
 .input-field {
