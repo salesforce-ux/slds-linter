@@ -1,9 +1,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import path from 'path';
 import { CliOptions } from '../types';
 import { printLintResults } from '../utils/lintResultsUtil';
-import { getEditorLink, createClickableLineCol } from '../utils/editorLinkUtil';
 import { normalizeCliOptions } from '../utils/cli-args';
 import { Logger } from '../utils/logger';
 import { FileScanner } from '../services/file-scanner';
@@ -15,16 +13,16 @@ export function registerLintStylesCommand(program: Command): void {
   program
     .command('lint:styles')
     .description('Run stylelint on all style files')
-    .option('-d, --directory <path>', 'Target directory to scan (defaults to current directory)')
+    .option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns')
     .option('--fix', 'Automatically fix problems')
-    .option('--config <path>', 'Path to stylelint config file')
+    .option('--config-stylelint <path>', 'Path to stylelint config file')
     .option('--editor <editor>', 'Editor to open files with (vscode, atom, sublime). Defaults to vscode', 'vscode')
     .action(async (options: CliOptions) => {
       const startTime = Date.now();
       try {
         Logger.info(chalk.blue('Starting linting of style files...'));
         const normalizedOptions = normalizeCliOptions(options, {
-          config: DEFAULT_STYLELINT_CONFIG_PATH
+          configStylelint: DEFAULT_STYLELINT_CONFIG_PATH
         });
 
         Logger.info(chalk.blue('Scanning for style files...'));
@@ -38,7 +36,7 @@ export function registerLintStylesCommand(program: Command): void {
         Logger.info(chalk.blue(`Running stylelint${normalizedOptions.fix?' with autofix':''}...`));
         const results = await LintRunner.runLinting(fileBatches, 'style', {
           fix: normalizedOptions.fix,
-          configPath: normalizedOptions.config,
+          configPath: normalizedOptions.configStylelint,
         });
 
         // Print detailed lint results only for files with issues

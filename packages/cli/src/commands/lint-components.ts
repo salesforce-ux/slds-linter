@@ -1,9 +1,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import path from 'path';
 import { CliOptions } from '../types';
 import { printLintResults } from '../utils/lintResultsUtil';
-import { getEditorLink, createClickableLineCol } from '../utils/editorLinkUtil';
 import { normalizeCliOptions } from '../utils/cli-args';
 import { Logger } from '../utils/logger';
 import { FileScanner } from '../services/file-scanner';
@@ -15,16 +13,16 @@ export function registerLintComponentsCommand(program: Command): void {
   program
     .command('lint:components')
     .description('Run eslint on all markup files')
-    .option('-d, --directory <path>', 'Target directory to scan (defaults to current directory)')
+    .option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns')
     .option('--fix', 'Automatically fix problems')
-    .option('--config <path>', 'Path to eslint config file')
+    .option('--config-eslint <path>', 'Path to eslint config file')
     .option('--editor <editor>', 'Editor to open files with (vscode, atom, sublime). Defaults to vscode', 'vscode')
     .action(async (options: CliOptions) => {
       const startTime = Date.now();
       try {
         Logger.info(chalk.blue('Starting linting of component files...'));
         const normalizedOptions = normalizeCliOptions(options, {
-          config: DEFAULT_ESLINT_CONFIG_PATH
+          configEslint: DEFAULT_ESLINT_CONFIG_PATH
         });
 
         Logger.info(chalk.blue('Scanning for files...'));
@@ -38,7 +36,7 @@ export function registerLintComponentsCommand(program: Command): void {
         Logger.info(chalk.blue(`Running linting${normalizedOptions.fix?' with autofix':''}...`));
         const results = await LintRunner.runLinting(fileBatches, 'component', {
           fix: normalizedOptions.fix,
-          configPath: normalizedOptions.config,
+          configPath: normalizedOptions.configEslint,
         });
 
         // Print results only for files with issues
