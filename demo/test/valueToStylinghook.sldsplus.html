@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLDS Plus Styling Examples</title>
+    <style>
+        .button-primary {
+            /* Can be replaced with --slds-g-color-accent-1 */
+            color: #066afe;
+            /* Can be replaced with --slds-s-button-sizing-border */
+            border-width: 1px;
+            /* Can be replaced with --slds-g-font-weight-6 */
+            font-weight: 600;
+            /* Can be replaced with --slds-s-button-shadow-focus */
+            box-shadow: 0 0 0 2px var(—slds-g-color-surface-2), 0 0 0 4px var(—slds-g-color-brand-base-15);
+            padding: 0.5rem 1rem;
+            border-style: solid;
+            cursor: pointer;
+        }
+
+        .table-header {
+            /* Can be replaced with --slds-s-table-header-color */
+            color: on-surface-1;
+            /* Can be replaced with --slds-s-table-header-color-background */
+            background-color: surface-container-2;
+            /* Can be replaced with --slds-s-table-header-font-weight */
+            font-weight: font-weight-6;
+            padding: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Using style tag defined classes -->
+    <button class="button-primary">Primary Button</button>
+
+    <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
+        <thead>
+            <tr class="table-header">
+                <th>Header 1</th>
+                <th>Header 2</th>
+            </tr>
+        </thead>
+    </table>
+
+    <!-- Using inline styles -->
+    <div style="
+        /* Can be replaced with either:
+           --slds-g-color-surface-1 (for primary surfaces)
+           --slds-g-color-surface-container-1 (for container surfaces)
+           --slds-s-container-footer-color-background (for footer backgrounds) */
+        background-color: #ffffff;
+        /* Can be replaced with either:
+           --slds-g-radius-border-2 (for small containers)
+           --slds-g-radius-border-3 (for medium containers)
+           --slds-s-input-radius-border (for input-like containers) */
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1rem;
+    ">
+        <a href="#" style="
+            /* Can be replaced with either:
+               --slds-g-color-accent-2 (for primary links)
+               --slds-s-link-color (for standard links)
+               --slds-g-color-brand-base-40 (for branded links) */
+            color: #0250d9;
+            /* Can be replaced with either:
+               --slds-g-font-scale-1 (for body text)
+               --slds-g-font-size-base (for base text size) */
+            font-size: 0.875rem;
+            text-decoration: none;
+        ">
+            Example Link
+        </a>
+    </div>
+
+    <!-- Success indicator example -->
+    <div style="
+        /* Can be replaced with either:
+           --slds-g-color-success-base-70 (for light success indicators)
+           --slds-g-color-success-base-60 (for medium success indicators)
+           --slds-g-color-success-base-50 (for dark success indicators) */
+        color: #01C3B3;
+        /* Can be replaced with either:
+           --slds-g-font-weight-6 (for emphasized text)
+           --slds-s-navigation-font-weight (for navigation text)
+           --slds-s-navigation-font-weight-active (for active navigation) */
+        font-weight: 600;
+        margin-top: 1rem;
+    ">
+        Success Message
+    </div>
+</body>
+</html> 

@@ -1,0 +1,55 @@
+/* Using proper BEM naming conventions and some (intentionally) deprecated classes */
+
+.THIS.slds-card {
+    /* Deprecated token: colorBackground */
+    /* Replace with: var(--lwc-colorBackground) */
+    background-color: var(--lwc-colorBackground);
+    
+    /* Using proper spacing token */
+    padding: var(--lwc-spacingMedium);
+}
+
+/* Intentionally using deprecated class */
+.THIS .slds-card_empty {
+    /* Deprecated class usage example */
+    border: 1px solid var(--lwc-colorBorder);
+}
+
+.THIS .slds-card__header {
+    /* Using proper BEM class structure */
+    border-bottom: 1px solid var(--lwc-colorBorderSeparator);
+    padding-bottom: var(--lwc-spacingSmall);
+}
+
+.THIS .slds-card__header-title {
+    /* Using proper font token */
+    font-size: var(--lwc-fontSizeHeadingMedium);
+    font-weight: var(--lwc-fontWeightBold);
+}
+
+/* Intentionally using deprecated class */
+.THIS .slds-button_small {
+    /* Deprecated button size class */
+    padding: var(--lwc-spacingXSmall) var(--lwc-spacingSmall);
+}
+
+.THIS .slds-list__item {
+    /* Using proper BEM structure */
+    background-color: var(--lwc-colorBackgroundRowHover);
+    padding: var(--lwc-spacingXSmall);
+    
+    /* Proper text color token */
+    color: var(--lwc-colorTextDefault);
+}
+
+/* Intentionally using deprecated media class */
+.THIS .slds-media_double {
+    /* Deprecated media class usage example */
+    margin: var(--lwc-spacingSmall) 0;
+}
+
+.THIS .slds-button_icon-border {
+    /* Using proper icon button styling */
+    color: var(--lwc-colorTextIconDefault);
+    border-radius: var(--lwc-borderRadiusMedium);
+} 
