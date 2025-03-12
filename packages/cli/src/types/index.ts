@@ -5,6 +5,7 @@ export interface CliOptions {
   configStylelint?: string; // Used for stylelint config when command is lint
   configEslint?: string; // Used for eslint config when command is lint
   editor?: string;
+  format?: string;
 }
 
 export interface LintResult {
