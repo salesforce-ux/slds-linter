@@ -32,7 +32,7 @@ export function printLintResults(results: LintResult[], editor: string): void {
     const absolutePath = result.filePath || '';
     const relativeFile = path.relative(process.cwd(), absolutePath) || 'Unknown file';
     // Print file name with a preceding new line for spacing.
-    Logger.info(`\n${chalk.bold(relativeFile)}`);
+    Logger.newLine().info(`${chalk.bold(relativeFile)}`);
 
     if (hasErrors) {
       result.errors.forEach((error: any) => {

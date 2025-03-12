@@ -1,6 +1,10 @@
 import chalk from 'chalk';
 
 export class Logger {
+  static newLine(){
+    console.log('\n');
+    return this;
+  }
   static info(message: string): void {
     console.log(chalk.blue('ℹ'), message);
   }

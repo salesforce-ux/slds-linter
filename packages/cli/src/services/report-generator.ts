@@ -22,7 +22,6 @@ export class ReportGenerator {
     results: LintResult[],
     options: ReportOptions
   ): Promise<void> {
-    try {
       const builder = new SarifBuilder();
       const runBuilder = new SarifRunBuilder().initSimple({
         toolDriverName: options.toolName,
@@ -65,13 +64,7 @@ export class ReportGenerator {
           .pipe(writeStream)
           .on('finish', resolve)
           .on('error', reject);
-      });
-
-      Logger.success(`SARIF report generated: ${options.outputPath}`);
-    } catch (error: any) {
-      Logger.error(`Failed to generate SARIF report: ${error.message}`);
-      throw error;
-    }
+      });      
   }
 
   /**
