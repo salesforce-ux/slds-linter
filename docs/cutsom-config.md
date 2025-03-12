@@ -42,9 +42,9 @@ To disable rule in `.eslintrc.yml` or `.stylelintrc.yml` file, you can simply co
 You can input custom configuration file to `lint` or `report` as below
 
 ```bash
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint --config-eslint .estlintrc.yml
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint --config-eslint .eslintrc.yml
 
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 report --config-eslint .estlintrc.yml
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 report --config-eslint .eslintrc.yml
 ```
 
 ### Examples
