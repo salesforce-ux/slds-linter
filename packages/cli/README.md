@@ -52,7 +52,7 @@ Options:
   -h, --help                    display help for command
 
 Commands:
-  lint [options] [directory]    Lint style and markup files
+  lint [options] [directory]    Run both style and component linting
   report [options] [directory]  Generate SARIF report from linting results
   emit [options]                Emits the configuration files used by slds-linter cli
   help [command]                display help for command
@@ -100,8 +100,8 @@ These options are available on SLDS Linter commands.
 | `-d, --directory <path>` | Target directory to scan (defaults to current directory). Supports glob patterns.                     | `lint`, `report` |
 | `-o, --output <path>`    | Output directory for reports (defaults to current directory)                 | `report`                                     |
 | `--fix`                  | Automatically fix problems                                                   | `lint`         |
-| `--config-stylelint <path>`  | Path to stylelint config file'             | `lint`, `report`|
-| `--config-eslint <path>` | Path to eslint config file'                    | `lint`, `report`|
+| `--config-stylelint <path>`  | Path to stylelint config file             | `lint`, `report`|
+| `--config-eslint <path>` | Path to eslint config file                    | `lint`, `report`|
 | `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode | `lint` |
 
 To view help for these options, add `--help` to each command. For example, run `npx @salesforce-ux/slds-linter lint --help` to see which options you can use with `lint`.

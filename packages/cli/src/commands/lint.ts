@@ -18,7 +18,7 @@ export function registerLintCommand(program: Command): void {
         return `${program.name()} lint [directory] [options]`
       }
     })
-    .description('Lint style and markup files')
+    .description('Run both style and component linting')
     .argument('[directory]', 'Target directory to scan (defaults to current directory). Support glob patterns')
     .addOption(new Option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns').hideHelp())
     .option('--fix', 'Automatically fix problems')
