@@ -11,7 +11,13 @@ import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../se
 
 export function registerLintCommand(program: Command): void {
   program
-    .command('lint')    
+    .command('lint')
+    .aliases(['lint:styles', 'lint:components'])
+    .configureHelp({
+      commandUsage: ()=>{
+        return `${program.name()} lint [directory] [options]`
+      }
+    })
     .description('Lint style and markup files')
     .argument('[directory]', 'Target directory to scan (defaults to current directory). Support glob patterns')
     .addOption(new Option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns').hideHelp())

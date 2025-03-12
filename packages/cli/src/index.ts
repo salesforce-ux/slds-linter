@@ -36,5 +36,10 @@ registerLintCommand(program);
 registerReportCommand(program);
 registerEmitCommand(program);
 registerVersion();
+program.configureHelp({  
+  subcommandTerm:(cmd)=>{
+    return cmd.name();
+  },
+})
 
 program.parse(process.argv); 
