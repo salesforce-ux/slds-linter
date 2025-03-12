@@ -1,4 +1,8 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Updated README.md file under cli
+./scripts/update-cli-readme.sh
+
+# Update coverage
 yarn coverage
