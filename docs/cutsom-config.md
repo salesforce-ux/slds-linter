@@ -39,12 +39,14 @@ To disable rule in `.eslintrc.yml` or `.stylelintrc.yml` file, you can simply co
 
 ### using custom config file
 
-You can input custom configuration file to `lint` or `report` as below
+You can input custom configuration file to `lint` or `report` by using 
+ - `--config-eslint` option to supply `.eslintrc.yml`
+ - `--config-stylelint` option to supply `.stylelintrc.yml`
 
 ```bash
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint --config-eslint .eslintrc.yml
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
 
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 report --config-eslint .eslintrc.yml
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 report --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
 ```
 
 ### Examples
@@ -55,7 +57,7 @@ To run SLDS Linter on a specific folder, input as argument. For example, `npx @s
 Recursively linting all style and markup files in the `aura` directory:
 
 ```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint aura
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint aura --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
 ```
 
 ### Example - multiple folders
@@ -63,7 +65,7 @@ npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint aura
 Recursively linting all style and markup files in the `aura` and `lwc` directory:
 
 ```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/{aura,lwc}/**"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/{aura,lwc}/**" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
 ```
 
 ### Example - lint style files
@@ -71,7 +73,7 @@ npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/{aura,lwc}/**"
 Recursively linting all `.css` files in the `aura` directory:
 
 ```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.css"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.css" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
 ```
 
 ### Example - multiple style file extensions
@@ -79,7 +81,7 @@ npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.css"
 Linting all `.css`, `.scss`, and `.sass` files:
 
 ```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/*.{css,scss,sass}"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/*.{css,scss,sass}" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
 ```
 
 ### Example - lint markeup files
@@ -87,7 +89,7 @@ npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/*.{css,scss,sass}"
 Recursively linting all `.html` files in the `aura` directory:
 
 ```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.html"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.html" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
 ```
 
 ### Example - multiple markup file extensions
@@ -95,5 +97,5 @@ npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.html"
 Linting all `.html` and `.cmp` files:
 
 ```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1lint "**/*.{html,cmp}"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1lint "**/*.{html,cmp}" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
 ```
