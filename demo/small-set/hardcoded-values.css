@@ -1,0 +1,156 @@
+/* For visually hiding elements with zero width
+   Possible util class: .slds-is-visually-empty */
+.test-cls1 {
+  visibility: hidden;
+  width: 0;
+}
+
+/* For setting width to 25% 
+   Possible util classes: 
+   .slds-size_2-of-8
+   .slds-size_3-of-12
+   .slds-small-size_2-of-8
+   .slds-large-size_2-of-8 */
+.test-cls2 {
+  width: 25%;
+}
+
+.test-cls2 {
+  width: 0px;
+}
+
+.test-cls2 {
+  width: 0;
+}
+
+.test-cls2 {
+  width: 0.000;
+}
+
+.test-cls2 {
+  padding: 0 1rem;
+}
+
+.test-cls2 {
+  font-size: 0.875rem;
+}
+
+.test-cls2 {
+  box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15);
+}
+
+.test-cls2 {
+  box-shadow: 0 2px 8px -2px #18181814, 0 8px 12px -2px #18181828;
+}
+
+/* For text truncation with ellipsis
+   Possible util class: .slds-line-clamp */
+.test-cls3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre-line;
+}
+
+/* For horizontal padding with small spacing
+   Possible util classes: 
+   .slds-col_padded
+   .slds-gutters .slds-col */
+.test-cls4 {
+  padding-right: $spacingSmall;
+  padding-left: $spacingSmall;
+}
+
+/* For flex container with center alignment
+   Possible util class: .slds-align-content-center */
+.test-cls5 {
+  flex: 1;
+  align-self: center;
+  justify-content: center;
+}
+
+/* For flex container with no wrap and stretch alignment
+   Possible util classes:
+   .slds-nowrap
+   .slds-nowrap_small
+   .slds-nowrap_medium
+   .slds-nowrap_large */
+.test-cls6 {
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+/* For media object figure with small spacing
+   Possible util class: .slds-media_small .slds-media__figure */
+.test-cls7 {
+  margin-right: $spacingXxSmall;
+  flex-shrink: 0;
+}
+
+/* For vertical margin with medium spacing
+   Possible util class: .slds-m-vertical_medium */
+.test-cls8 {
+  margin-top: $spacingMedium;
+  margin-bottom: $spacingMedium;
+}
+
+/* For flex container with center vertical alignment
+   Possible util class: .slds-grid_vertical-align-center */
+.test-cls9 {
+  align-items: center;
+  align-content: center;
+}
+
+/* For border separators on all sides
+   Possible util classes:
+   Combination of:
+   .slds-col-rule_top
+   .slds-col-rule_right
+   .slds-col-rule_bottom
+   .slds-col-rule_left */
+.test-cls10 {
+  border-top: $colorBorderSeparator;
+  border-right: $colorBorderSeparator;
+  border-bottom: $colorBorderSeparator;
+  border-left: $colorBorderSeparator;
+}
+
+/* For setting width to fixed 20rem
+   Possible util classes: 
+   .slds-size_medium
+   .slds-small-size_medium
+   .slds-max-medium-size_medium */
+.test-cls4 {
+  width: 20rem;
+}
+
+/* For setting element order in flexbox
+   Possible util classes: 
+   .slds-order_1
+   .slds-medium-order_1 */
+.test-cls5 {
+  order: 1;
+}
+
+/* For hiding elements
+   Possible util classes:
+   .slds-hide_small
+   .slds-hide_medium
+   .slds-hide_large
+   .slds-hide_x-large */
+.test-cls6 {
+  display: none;
+}
+
+/* For setting width to 50%
+   Possible util classes:
+   .slds-size_4-of-8
+   .slds-size_6-of-12
+   .slds-small-size_4-of-8
+   .slds-large-size_6-of-12 */
+.test-cls7 {
+  width: 50%;
+} 

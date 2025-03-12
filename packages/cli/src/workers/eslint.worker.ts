@@ -8,7 +8,7 @@ class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
   constructor() {
     super();
     this.eslint = new ESLint({
-      useEslintrc: true,
+      useEslintrc: false,
       fix: this.task.config.fix,
       overrideConfigFile: this.task.config.configPath
     });

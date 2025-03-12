@@ -7,6 +7,7 @@ const presetConfig = createDefaultEsmPreset({
 
 const jestConfig: JestConfigWithTsJest = {
   ...presetConfig,
+  testPathIgnorePatterns:["build"]
 }
 
 export default jestConfig
