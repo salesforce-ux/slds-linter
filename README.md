@@ -52,7 +52,7 @@ Options:
   -h, --help                    display help for command
 
 Commands:
-  lint [options] [directory]    Lint style and markup files
+  lint [options] [directory]    Run both style and component linting
   report [options] [directory]  Generate SARIF report from linting results
   emit [options]                Emits the configuration files used by slds-linter cli
   help [command]                display help for command
