@@ -16,7 +16,7 @@ describe('no-hardcoded-values-slds2', () => {
         }
       `,
       expectedMessage:
-      "Consider replacing the #ff0000 static value with an SLDS 2 styling hook that has a similar value: --slds-g-color-on-error-2"
+      "There’s no replacement SLDS 2 styling hook for the #ff0000 static value. Remove the static value."
     },
     {
       description: 'Does not report 0 as a value',
@@ -83,12 +83,11 @@ describe('no-hardcoded-values-slds2', () => {
         }
       `,
       expectedMessage:`Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: 
-1. --slds-g-color-surface-inverse-1 
-2. --slds-g-color-surface-container-inverse-1 
-3. --slds-g-color-surface-inverse-2 
-4. --slds-g-color-surface-container-inverse-2 
-5. --slds-g-color-accent-container-1 
-`,
+1. --slds-g-color-surface-inverse-2 
+2. --slds-g-color-surface-container-inverse-2 
+3. --slds-g-color-surface-inverse-1 
+4. --slds-g-color-surface-container-inverse-1 
+ (slds/no-hardcoded-values-slds2)`,
     },
     {
       description:
