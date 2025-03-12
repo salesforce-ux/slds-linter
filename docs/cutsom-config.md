@@ -55,7 +55,7 @@ To run SLDS Linter on a specific folder, input as argument. For example, `npx @s
 Recursively linting all style and markup files in the `aura` directory:
 
 ```shell
-npx @salesforce-ux/slds-linter lint aura
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint aura
 ```
 
 ### Example - multiple folders
@@ -63,7 +63,7 @@ npx @salesforce-ux/slds-linter lint aura
 Recursively linting all style and markup files in the `aura` and `lwc` directory:
 
 ```shell
-npx @salesforce-ux/slds-linter lint "**/{aura,lwc}/**"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/{aura,lwc}/**"
 ```
 
 ### Example - lint style files
@@ -71,7 +71,7 @@ npx @salesforce-ux/slds-linter lint "**/{aura,lwc}/**"
 Recursively linting all `.css` files in the `aura` directory:
 
 ```shell
-npx @salesforce-ux/slds-linter lint "aura/**/*.css"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.css"
 ```
 
 ### Example - multiple style file extensions
@@ -79,7 +79,7 @@ npx @salesforce-ux/slds-linter lint "aura/**/*.css"
 Linting all `.css`, `.scss`, and `.sass` files:
 
 ```shell
-npx @salesforce-ux/slds-linter lint "**/*.{css,scss,sass}"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/*.{css,scss,sass}"
 ```
 
 ### Example - lint markeup files
@@ -87,7 +87,7 @@ npx @salesforce-ux/slds-linter lint "**/*.{css,scss,sass}"
 Recursively linting all `.html` files in the `aura` directory:
 
 ```shell
-npx @salesforce-ux/slds-linter lint "aura/**/*.html"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.html"
 ```
 
 ### Example - multiple markup file extensions
@@ -95,5 +95,5 @@ npx @salesforce-ux/slds-linter lint "aura/**/*.html"
 Linting all `.html` and `.cmp` files:
 
 ```shell
-npx @salesforce-ux/slds-linter lint "**/*.{html,cmp}"
+npx @salesforce-ux/slds-linter@0.1.4-alpha.1lint "**/*.{html,cmp}"
 ```
