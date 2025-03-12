@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inline Style Example</title>
+</head>
+<body>
+    
+    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+        <lightning-icon
+            icon-name="utility:close"
+            alternative-text={cancelButtonLabel}
+            variant="bare-inverse"
+            size="large" >
+        </lightning-icon>
+        <span class="slds-assistive-text">{cancelButtonLabel}</span>
+    </button>
+
+    <!-- Scenario 1: Correctly formatted modal close button -->
+    <div>
+        <button class="slds-button slds-button_icon slds-modal__close"></button>
+    </div>
+
+    <!-- Scenario 2: Correct lightning-button-icon with proper attributes -->
+    <div>
+        <lightning-button-icon variant="bare" size="large" class="slds-button slds-button_icon"></lightning-button-icon>
+    </div>
+
+    <!-- Scenario 3: Correct lightning-icon usage -->
+    <div>
+        <lightning-icon size="large"></lightning-icon>
+    </div>
+
+
+    <!-- Scenario 4: lightning-icon with variant outside a modal close button should be valid -->
+    <div>
+        <lightning-icon variant="bare-inverse"></lightning-icon>
+    </div>
+
+    <!-- Scenario 5: lightning-icon inside a button, but button does NOT have slds-modal__close -->
+    <div>
+        <button><lightning-icon variant="bare-inverse"></lightning-icon></button>
+    </div>
+
+    <!-- Scenario 6: This case shouldn't remove the class as button doesn't have a class named slds-modal__close -->
+    <div>
+        <button class="slds-button slds-button_icon slds-button_icon-inverse"></button>
+    </div>
+
+    <!-- Scenario 7: This case shouldn't remove the class as button doesn't have a class named slds-modal__close -->
+    <div>
+        <lightning-button-icon variant="bare-inverse" class="slds-button slds-button_icon"></lightning-button-icon>
+    </div>
+
+</body>
+</html>
