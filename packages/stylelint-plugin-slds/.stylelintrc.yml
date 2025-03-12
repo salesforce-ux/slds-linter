@@ -7,6 +7,9 @@ overrides:
       - '**/*.scss'
     customSyntax: 'postcss'
     rules:
+      length-zero-no-unit:
+        - true
+        - severity: warning
       slds/no-slds-class-overrides:
         - true
         - severity: warning

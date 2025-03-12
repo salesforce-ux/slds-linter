@@ -6,6 +6,7 @@ export interface CliOptions {
   configStyle?: string; // Used for stylelint config when command is lint
   configEslint?: string; // Used for eslint config when command is lint
   editor?: string;
+  persona?: string;
 }
 
 export interface LintResult {
@@ -33,6 +34,7 @@ export type ExitCode = 0 | 1 | 2;
 export interface WorkerConfig {
   configPath?: string;
   fix?: boolean;
+  config?: object;
 }
 
 export interface WorkerResult {

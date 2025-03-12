@@ -10,6 +10,8 @@ import { FileScanner } from '../services/file-scanner';
 import { ComponentFilePatterns } from '../services/file-patterns';
 import { LintRunner } from '../services/lint-runner';
 import { DEFAULT_ESLINT_CONFIG_PATH } from '../services/config.resolver';
+import { loadPersonaConfig } from '../services/config-loader';
+import { loadStoredPersona } from '../services/persona-loader';
 
 export function registerLintComponentsCommand(program: Command): void {
   program
@@ -35,10 +37,15 @@ export function registerLintComponentsCommand(program: Command): void {
         const totalFiles = fileBatches.reduce((sum, batch) => sum + batch.length, 0);
         Logger.info(chalk.blue(`Scanned ${totalFiles} file(s).`));
 
+        const persona = loadStoredPersona();
+        Logger.info(`🔹 Using persona: ${persona}`);
+        const personaConfig = loadPersonaConfig(persona);
+        
         Logger.info(chalk.blue(`Running linting${normalizedOptions.fix?' with autofix':''}...`));
         const results = await LintRunner.runLinting(fileBatches, 'component', {
           fix: normalizedOptions.fix,
           configPath: normalizedOptions.config,
+          config: personaConfig.eslintConfig,
         });
 
         // Print results only for files with issues

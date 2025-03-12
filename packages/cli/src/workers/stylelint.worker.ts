@@ -11,6 +11,13 @@ class StylelintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
       };
 
       // Load custom config if provided
+      // Only add `config` if `personaConfig` is not null or empty
+      if (this.task.config.config) {
+        options.config = this.task.config.config; //Uses the Inline config (Highest Priority)
+      }
+
+      // Load custom config if provided
+      // If config were missing, Stylelint would fallback to using configFile.
       if (this.task.config.configPath) {
         options.configFile = this.task.config.configPath;
       }

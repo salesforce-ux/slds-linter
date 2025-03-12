@@ -1,15 +1,15 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import path from 'path';
 import { CliOptions } from '../types';
-import { getEditorLink, createClickableLineCol } from '../utils/editorLinkUtil';
-import { printLintResults } from '../utils/lintResultsUtil';
-import { normalizeCliOptions } from '../utils/cli-args';
 import { Logger } from '../utils/logger';
+import { normalizeCliOptions } from '../utils/cli-args';
+import { printLintResults } from '../utils/lintResultsUtil';
 import { FileScanner } from '../services/file-scanner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
 import { LintRunner } from '../services/lint-runner';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
+import { loadPersonaConfig } from '../services/config-loader';
+import { loadStoredPersona } from '../services/persona-loader';
 
 export function registerLintCommand(program: Command): void {
   program
@@ -19,15 +19,28 @@ export function registerLintCommand(program: Command): void {
     .option('--fix', 'Automatically fix problems')
     .option('--config-style <path>', 'Path to stylelint config file')
     .option('--config-eslint <path>', 'Path to eslint config file')
+    // .option('--persona <persona>', 'Specify a persona for linting rules')
     .option('--editor <editor>', 'Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode', 'vscode')
     .action(async (options: CliOptions) => {
       const startTime = Date.now();
       try {
-        Logger.info(chalk.blue('Starting lint process...'));
+        Logger.info(chalk.blue('🔹 Starting lint process...'));
+
         const normalizedOptions = normalizeCliOptions(options, {
           configStyle: DEFAULT_STYLELINT_CONFIG_PATH,
           configEslint: DEFAULT_ESLINT_CONFIG_PATH
         });
+
+        // ✅ Load persona-based config
+        // let personaConfig;
+        // if (normalizedOptions.persona) {
+        //   Logger.info(chalk.blue(`🔹 Applying persona-based linting for: ${options.persona}`));
+        //   personaConfig = loadPersonaConfig(options.persona);
+        // }
+
+        const persona = loadStoredPersona();
+        Logger.info(`🔹 Using persona: ${persona}`);
+        const personaConfig = loadPersonaConfig(persona);
 
         // 1) STYLE LINT
         Logger.info(chalk.blue('\nScanning style files...'));
@@ -42,6 +55,7 @@ export function registerLintCommand(program: Command): void {
         const styleResults = await LintRunner.runLinting(styleFileBatches, 'style', {
           fix: normalizedOptions.fix,
           configPath: normalizedOptions.configStyle,
+          config: personaConfig.styleConfig
         });
 
         // Print detailed lint results only for files with issues
@@ -50,7 +64,7 @@ export function registerLintCommand(program: Command): void {
         const styleErrorCount = styleResults.reduce((sum, r) => sum + r.errors.length, 0);
         const styleWarningCount = styleResults.reduce((sum, r) => sum + r.warnings.length, 0);
 
-        // 2) COMPONENT LINT
+        // ✅ Run ESLint
         Logger.info(chalk.blue('\nScanning component files...'));
         const componentFileBatches = await FileScanner.scanFiles(normalizedOptions.directory, {
           patterns: ComponentFilePatterns,
@@ -63,6 +77,7 @@ export function registerLintCommand(program: Command): void {
         const componentResults = await LintRunner.runLinting(componentFileBatches, 'component', {
           fix: normalizedOptions.fix,
           configPath: normalizedOptions.configEslint,
+          config: personaConfig.eslintConfig
         });
 
         // Print component lint issues (only for files with issues)
@@ -82,7 +97,7 @@ export function registerLintCommand(program: Command): void {
         Logger.success(chalk.green(`\nFull linting completed in ${elapsedTime} seconds.`));
         process.exit(totalErrors > 0 ? 1 : 0);
       } catch (error: any) {
-        Logger.error(chalk.red(`Failed to complete linting: ${error.message}`));
+        Logger.error(chalk.red(`❌ Failed to complete linting: ${error.message}`));
         process.exit(1);
       }
     });

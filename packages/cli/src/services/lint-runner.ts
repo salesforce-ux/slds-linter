@@ -9,6 +9,7 @@ export interface LintOptions {
   configPath?: string;
   maxWorkers?: number;
   timeoutMs?: number;
+  config?: object;
 }
 
 export class LintRunner {
@@ -29,6 +30,7 @@ export class LintRunner {
 
       const workerConfig: WorkerConfig = {
         configPath: options.configPath,
+        config: options.config,
         fix: options.fix
       };
 

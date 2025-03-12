@@ -6,6 +6,7 @@ import { registerLintComponentsCommand } from './commands/lint-components';
 import { registerLintCommand } from './commands/lint';
 import { registerReportCommand } from './commands/report';
 import { registerEmitCommand } from './commands/emit';
+import { registerSetPersonaCommand } from './commands/set-persona';
 import { Logger } from './utils/logger';
 import { validateNodeVersion } from './utils/nodeVersionUtil';
 
@@ -39,6 +40,7 @@ registerLintComponentsCommand(program);
 registerLintCommand(program);
 registerReportCommand(program);
 registerEmitCommand(program);
+registerSetPersonaCommand(program);
 registerVersion();
 
 program.parse(process.argv); 

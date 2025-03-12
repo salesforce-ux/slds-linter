@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/metadata-slds",
-  "version": "0.1.3-alpha.0",
+  "version": "0.1.3-alpha.1",
   "files": [
     "./build/**",
     "README.md"

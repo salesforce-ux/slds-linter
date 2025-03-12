@@ -1,0 +1,9 @@
+.my-custom-class {
+    color: red !important;
+}
+.my-class {
+    padding: 20px; /* ❌ Should trigger slds/no-hardcoded-values-slds2 */
+}
+.slds-lookup {
+    position: relative; /* ❌ Should trigger slds/no-slds-class-overrides */
+}

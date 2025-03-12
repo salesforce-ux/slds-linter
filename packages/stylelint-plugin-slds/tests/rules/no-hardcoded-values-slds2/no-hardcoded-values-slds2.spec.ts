@@ -19,6 +19,51 @@ describe('no-hardcoded-values-slds2', () => {
       "Consider replacing the #ff0000 static value with an SLDS 2 styling hook that has a similar value: --slds-g-color-on-error-2"
     },
     {
+      description: 'Does not report 0 as a value',
+      inputCss: `
+        .example {
+          width: 0;
+        }
+      `,
+      expectedMessage: null,
+    },
+    {
+      description: 'Does not report 0px as a value',
+      inputCss: `
+        .example {
+          width: 0px;
+        }
+      `,
+      expectedMessage: null,
+    },
+    {
+      description: 'Does not report 0.0 as a value',
+      inputCss: `
+        .example {
+          width: 0.0;
+        }
+      `,
+      expectedMessage: null,
+    },
+    {
+      description: 'Reports warning for hardcoded font-size value with replacement hook',
+      inputCss: `
+        .example {
+          font-size: 0.875rem;
+        }
+      `,
+      expectedMessage: "Consider replacing the 0.875rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-1 (slds/no-hardcoded-values-slds2)",
+    },
+    {
+      description: 'Reports warning for hardcoded box-shadow value with replacement hook',
+      inputCss: `
+        .example {
+          box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15);
+        }
+      `,
+      expectedMessage: "Consider replacing the 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15) static value with an SLDS 2 styling hook that has a similar value: --slds-s-input-shadow-focus (slds/no-hardcoded-values-slds2)"
+    },
+    {
       description:
         'Reports warning for hardcoded font size with replacement hook',
       inputCss: `

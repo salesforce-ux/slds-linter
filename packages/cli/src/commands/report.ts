@@ -9,6 +9,8 @@ import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patte
 import { LintRunner } from '../services/lint-runner';
 import { ReportGenerator } from '../services/report-generator';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
+import { loadPersonaConfig } from '../services/config-loader';
+import { loadStoredPersona } from '../services/persona-loader';
 
 export function registerReportCommand(program: Command): void {
   program
@@ -25,6 +27,10 @@ export function registerReportCommand(program: Command): void {
           configStyle: DEFAULT_STYLELINT_CONFIG_PATH,
           configEslint: DEFAULT_ESLINT_CONFIG_PATH
         });
+
+        const persona = loadStoredPersona();
+        Logger.info(`🔹 Using persona: ${persona}`);
+        const personaConfig = loadPersonaConfig(persona);
         
         // Run styles linting
         spinner.text = 'Running styles linting...';
@@ -34,7 +40,8 @@ export function registerReportCommand(program: Command): void {
         });
         
         const styleResults = await LintRunner.runLinting(styleFileBatches, 'style', {
-          configPath: normalizedOptions.configStyle
+          configPath: normalizedOptions.configStyle,
+          config: personaConfig.styleConfig
         });
 
         // Run components linting
@@ -45,7 +52,8 @@ export function registerReportCommand(program: Command): void {
         });
         
         const componentResults = await LintRunner.runLinting(componentFileBatches, 'component', {
-          configPath: normalizedOptions.configEslint
+          configPath: normalizedOptions.configEslint,
+          config: personaConfig.eslintConfig
         });
 
         /* 
