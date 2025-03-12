@@ -1,14 +1,23 @@
-import { CliOptions } from '../types';
-import path from 'path';
-import { accessSync } from 'fs';
+import { CliOptions } from "../types";
+import path from "path";
+import { accessSync } from "fs";
+import { glob, globSync } from "glob";
 
-export function validateAndNormalizePath(inputPath?: string): string {
+export function validateAndNormalizeDirPath(inputPath?: string): string {
+    if (!inputPath) {
+      return process.cwd();
+    }
+    //TODO: To check whether it is a valid glob string else error out.
+    return inputPath;
+}
+
+export function validateAndNormalizeOutputPath(inputPath?: string): string {
   if (!inputPath) {
     return process.cwd();
   }
-  
+
   const normalizedPath = path.resolve(inputPath);
-  
+
   try {
     // Check if path exists and is accessible
     accessSync(normalizedPath);
@@ -18,17 +27,20 @@ export function validateAndNormalizePath(inputPath?: string): string {
   }
 }
 
-export function normalizeCliOptions(options: CliOptions, defultOptions:Partial<CliOptions> = {}): Required<CliOptions> {
+export function normalizeCliOptions(
+  options: CliOptions,
+  defultOptions: Partial<CliOptions> = {}
+): Required<CliOptions> {
   return {
     fix: false,
-    editor: 'vscode',
-    config:'',
-    configStyle:'',
-    configEslint:'',
-    persona: options.persona || '',
+    editor: "vscode",
+    config: "",
+    configStyle: "",
+    configEslint: "",
+    persona: options.persona || "",
     ...defultOptions,
     ...options,
-    directory: validateAndNormalizePath(options.directory),
-    output: validateAndNormalizePath(options.output)
+    directory: validateAndNormalizeDirPath(options.directory),
+    output: validateAndNormalizeOutputPath(options.output),
   };
-} 
+}
