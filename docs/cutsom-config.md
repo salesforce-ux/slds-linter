@@ -1,20 +1,20 @@
 # Custom configuration
 To enable / disable rules used by SLDS Linter, you can make use of `emit` command and pass custom configuration to `lint` and `report` command
 
-Follow the steps below to setup and `emit`.
+Follow the steps below to `setup` and `emit`.
 
 ### package.json update
 Execute following command in terminal at root folder of your project to add `@salesforce-ux/slds-linter` entry to `package.json`
 
 ```bash
-npm i @salesforce-ux/slds-linter@0.1.4-alpha.1 --save-dev
+npm i @salesforce-ux/slds-linter@0.1.4-alpha.3 --save-dev
 ```
 
 ### Emit configuration
 Use the `emit` command to export `eslint` and `stylelint` configurations used by `slds-linter` cli
 
 ```bash
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 emit
+npx @salesforce-ux/slds-linter@0.1.4-alpha.3 emit
 ```
 
 This command will create / overwrite `.eslintrc.yml` and `.stylelintrc.yml` files at root of your project directory.
@@ -37,65 +37,37 @@ To disable rule in `.eslintrc.yml` or `.stylelintrc.yml` file, you can simply co
 
 ```
 
-### using custom config file
+### Lint html, cmp using custom config file
 
 You can input custom configuration file to `lint` or `report` by using 
  - `--config-eslint` option to supply `.eslintrc.yml`
  - `--config-stylelint` option to supply `.stylelintrc.yml`
 
+ ```bash
+npx @salesforce-ux/slds-linter@0.1.4-alpha.3 lint "**/{aura,lwc}/**/*.{html,cmp}" --config-eslint .eslintrc.yml
+```
+
+### CSV Report using custom config file
+
+You can use `report` command with `--format` option to generate csv report of all lint issue
+
 ```bash
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
-
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 report --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
+npx @salesforce-ux/slds-linter@0.1.4-alpha.3 report "**/{aura,lwc}/**/*.{html,cmp}" --config-eslint .eslintrc.yml --format csv
 ```
 
-### Examples
-To run SLDS Linter on a specific folder, input as argument. For example, `npx @salesforce-ux/slds-linter lint <directory>`
+### SARIF Report using custom config file
 
-### Example - single folder
 
-Recursively linting all style and markup files in the `aura` directory:
+You can use `report` command with `--format` option to generate csv report of all lint issue
 
-```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint aura --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
+```bash
+npx @salesforce-ux/slds-linter@0.1.4-alpha.3 report "**/{aura,lwc}/**/*.{html,cmp}" --config-eslint .eslintrc.yml --format sarif
 ```
 
-### Example - multiple folders
+### Fix all issues using custom config file
 
-Recursively linting all style and markup files in the `aura` and `lwc` directory:
+You can use `lint` command with `--fix` option to automatically fix all possible linter issues
 
-```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/{aura,lwc}/**" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
-```
-
-### Example - lint style files
-
-Recursively linting all `.css` files in the `aura` directory:
-
-```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.css" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
-```
-
-### Example - multiple style file extensions
-
-Linting all `.css`, `.scss`, and `.sass` files:
-
-```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "**/*.{css,scss,sass}" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
-```
-
-### Example - lint markeup files
-
-Recursively linting all `.html` files in the `aura` directory:
-
-```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1 lint "aura/**/*.html" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
-```
-
-### Example - multiple markup file extensions
-
-Linting all `.html` and `.cmp` files:
-
-```shell
-npx @salesforce-ux/slds-linter@0.1.4-alpha.1lint "**/*.{html,cmp}" --config-eslint .eslintrc.yml --config-stylelint .stylelintrc.yml
+```bash
+npx @salesforce-ux/slds-linter@0.1.4-alpha.3 lint "**/{aura,lwc}/**/*.{html,cmp}" --config-eslint .eslintrc.yml --fix
 ```
