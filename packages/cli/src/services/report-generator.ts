@@ -152,7 +152,7 @@ export class ReportGenerator {
 }
 
 export class CsvReportGenerator {
-  static async generate(results: any[], cwd: string) {
+  static async generate(results: any[]) {
     const csvConfig = mkConfig({
       filename: 'slds-linter-report',
       fieldSeparator: ',',
@@ -162,6 +162,8 @@ export class CsvReportGenerator {
       useBom: true,
       useKeysAsHeaders: true,
     });
+
+    const cwd = process.cwd();
 
     const transformedResults = results.flatMap((result: { errors: any[]; filePath: string; warnings: any[]; }) =>
       [

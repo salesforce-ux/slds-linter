@@ -76,9 +76,7 @@ export function registerReportCommand(program: Command): void {
           Logger.success(`SARIF report generated: ${combinedReportPath}\n`);
         } else if (reportFormat === 'csv') {
           spinner.text = 'Generating CSV report...';
-          const cwd = process.cwd();
-
-          const csvReportPath = await CsvReportGenerator.generate([...styleResults, ...componentResults], cwd);
+          const csvReportPath = await CsvReportGenerator.generate([...styleResults, ...componentResults]);
           Logger.success(`CSV report generated: ${csvReportPath}\n`);
         } else {
           throw new Error(`Invalid format: ${reportFormat}. Supported formats: sarif, csv`);
