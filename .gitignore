@@ -11,6 +11,7 @@ build/
 coverage/
 .sldslinter/
 *.sarif
+slds-linter-report.csv
 *.tgz
 
 # IDE and editor files

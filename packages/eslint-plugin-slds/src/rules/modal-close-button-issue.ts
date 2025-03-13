@@ -73,11 +73,18 @@ export = {
         function validateClassAttr(attribute, attrName) {
           if (attribute && attribute.value) {
             const classList = attribute.value.value.split(/\s+/);
+
+            // Irrespective of whether we are checking for class or icon-class we need to check whether the attribute is present or not.
+            // ✅ Ensure "slds-modal__close" exists before proceeding
+            if(!classAttr?.value?.value?.includes("slds-modal__close"))
+            {
+              return;
+            }
       
             // ✅ Ensure "slds-modal__close" exists before proceeding
-            if (!classList.includes("slds-modal__close")) {
-              return; // Stop execution if the class is missing
-            }
+            // if (!classList.includes("slds-modal__close")) {
+            //   return; // Stop execution if the class is missing
+            // }
       
             // Remove inverse classes
             if (classList.includes("slds-button_icon-inverse") || classList.includes("slds-button--icon-inverse")) {
@@ -102,12 +109,26 @@ export = {
                 node: attribute,
                 messageId: "ensureButtonClasses",
                 fix(fixer) {
-                  const newClassList = [
-                    "slds-button",
-                    "slds-button_icon",
-                    ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
-                  ].join(" ");
-                  return fixer.replaceText(attribute.value, `"${newClassList}"`);
+                  let newClassList;
+                  
+                  if(attrName === 'icon-class'){
+                    newClassList = [
+                      ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
+                    ].join(" ");
+                  }
+                  else{
+                    newClassList = [
+                      "slds-button",
+                      "slds-button_icon",
+                      ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
+                    ].join(" ");
+                  }
+                  // const newClassList = [
+                  //   "slds-button",
+                  //   "slds-button_icon",
+                  //   ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
+                  // ].join(" ");
+                  return fixer.replaceText(attribute.value, `${newClassList}`);
                 },
               });
             }
@@ -162,18 +183,7 @@ export = {
               node: variantAttr,
               messageId: "changeVariant",
               fix(fixer) {
-                return fixer.replaceText(variantAttr.value, `"bare"`);
-              },
-            });
-          }
-
-          // Remove variant attribute completely
-          if (variantAttr) {
-            context.report({
-              node: variantAttr,
-              messageId: "removeVariant",
-              fix(fixer) {
-                return fixer.remove(variantAttr);
+                return fixer.replaceText(variantAttr.value, "bare");
               },
             });
           }
@@ -187,7 +197,7 @@ export = {
                 //return fixer.insertTextAfter(node, ' size="large"');
                 if(variantAttr)
                 {
-                  return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], 'size="large"')
+                  return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], ' size="large"')
                 }
               },
             });
