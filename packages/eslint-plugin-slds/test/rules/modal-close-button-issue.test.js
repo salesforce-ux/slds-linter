@@ -65,22 +65,20 @@ ruleTester.run("slds-modal-button-issue", rule, {
       code: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare-inverse" size="medium"></lightning-icon></button>`,
       errors: [
         //{ messageId: "ensureSizeAttribute", type: "Tag" },
-        { messageId: "changeVariant" },
-        { messageId: "removeVariant" },
+        { messageId: "changeVariant" }
       ],
-      output: `<button class="slds-button slds-modal__close"><lightning-icon  size="medium"></lightning-icon></button>`,
+      output: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare" size="medium"></lightning-icon></button>`,
     },
     {
       code: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare-inverse"></lightning-icon></button>`,
       errors: [
         { messageId: "ensureSizeAttribute", type: "Tag" },
-        { messageId: "changeVariant" },
-        { messageId: "removeVariant" },
+        { messageId: "changeVariant" }
       ],
-      output: `<button class="slds-button slds-modal__close"><lightning-icon ></lightning-icon></button>`,
+      output: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare" size="large"></lightning-icon></button>`,
     },
 
-    /** Real use cases from source graph */
+    // /** Real use cases from source graph */
     // Scenario 1
     {
       code: `<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
@@ -94,14 +92,13 @@ ruleTester.run("slds-modal-button-issue", rule, {
             </button>`,
       errors: [
         { messageId: "removeClass"},
-        { messageId: "changeVariant" },
-        { messageId: "removeVariant" }
+        { messageId: "changeVariant" }
       ],
       output: `<button class="slds-button slds-button_icon slds-modal__close">
                 <lightning-icon
                     icon-name="utility:close"
                     alternative-text={cancelButtonLabel}
-                    
+                    variant="bare"
                     size="large" >
                 </lightning-icon>
                 <span class="slds-assistive-text">{cancelButtonLabel}</span>
@@ -130,18 +127,19 @@ ruleTester.run("slds-modal-button-issue", rule, {
       code: `<lightning-button-icon
                 title={labels.closeButton} icon-name="utility:close"
                 onclick={closeAction}
-                class="slds-button slds-button_icon"
+                class="slds-button slds-button_icon slds-modal__close"
                 icon-class="slds-button slds-button_icon slds-modal__close slds-button--icon-inverse"
                 variant="bare-inverse" size="large">
             </lightning-button-icon>`,
       errors: [
         { messageId: "removeClass"},
-        { messageId: "changeVariant" }
+        { messageId: "changeVariant" },
+        { messageId: "changeVariant" },
       ],
       output: `<lightning-button-icon
                 title={labels.closeButton} icon-name="utility:close"
                 onclick={closeAction}
-                class="slds-button slds-button_icon"
+                class="slds-button slds-button_icon slds-modal__close"
                 icon-class="slds-button slds-button_icon slds-modal__close"
                 variant="bare" size="large">
             </lightning-button-icon>`,
