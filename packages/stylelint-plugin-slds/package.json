@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/stylelint-plugin-slds",
-  "version": "0.1.4-alpha.1",
+  "version": "0.1.4-alpha.2",
   "type": "module",
   "main": "build/index.js",
   "files": [
@@ -21,7 +21,7 @@
     "postcss-value-parser": "^4.2.0",
     "postcss": "^8.4.47",
     "stylelint": "^16.10.0",
-    "@salesforce-ux/metadata-slds": "0.1.4-alpha.1"
+    "@salesforce-ux/metadata-slds": "0.1.4-alpha.2"
   },
   "devDependencies": {
     "@types/mocha": "10.0.6",
