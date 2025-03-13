@@ -40,3 +40,4 @@ logs/
 .sfdx
 .codegenie
 
+slds-linter-report.csv

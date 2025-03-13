@@ -39,6 +39,7 @@ export function normalizeCliOptions(
     editor: "vscode",
     configStylelint: "",
     configEslint: "",
+    format: "sarif",
     ...defultOptions,
     ...options,
     directory: nomalizeDirPath(options.directory),
