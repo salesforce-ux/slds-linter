@@ -8,10 +8,8 @@ import { Logger } from '../utils/logger';
 import { FileScanner } from '../services/file-scanner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
 import { LintRunner } from '../services/lint-runner';
-import { ReportGenerator } from '../services/report-generator';
+import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
-import { mkConfig, generateCsv, asString } from 'export-to-csv';
-import { writeFile } from 'fs/promises';
 
 export function registerReportCommand(program: Command): void {
   program
@@ -22,7 +20,7 @@ export function registerReportCommand(program: Command): void {
     .option('-o, --output <path>', 'Output directory for reports (defaults to current directory)')
     .option('--config-stylelint <path>', 'Path to stylelint config file')
     .option('--config-eslint <path>', 'Path to eslint config file')
-    .option('--format <type>', 'Output format (sarif or csv)', 'sarif')
+    .addOption(new Option('--format <type>', 'Output format').choices(['sarif', 'csv']).default('sarif'))
     .action(async (directory: string, options: CliOptions) => {
       const spinner = ora('Starting report generation...');
       try {        
@@ -78,46 +76,9 @@ export function registerReportCommand(program: Command): void {
           Logger.success(`SARIF report generated: ${combinedReportPath}\n`);
         } else if (reportFormat === 'csv') {
           spinner.text = 'Generating CSV report...';
-          const csvConfig = mkConfig({
-            filename: 'slds-linter-report',
-            fieldSeparator: ',',
-            quoteStrings: true,
-            decimalSeparator: '.',
-            showLabels: true,
-            useTextFile: false,
-            useBom: true,
-            useKeysAsHeaders: true,
-          });
-          
-          const transformedResults = [...styleResults, ...componentResults].flatMap(result =>
-            [
-              ...result.errors.map(error => ({
-                "File Path": result.filePath,
-                "Message": error.message,
-                "Severity": error.severity === 1 ? 'warning' : 'error',
-                "Rule ID": error.ruleId || 'N/A',
-                "Start Line": error.line,
-                "Start Column": error.column,
-                "End Column": error.endColumn || error.column, // Default to start column if missing
-                "Type": 'Error'
-              })),
-              ...result.warnings.map(warning => ({
-                "File Path": result.filePath,
-                "Message": warning.message,
-                "Severity": warning.severity === 1 ? 'warning' : 'error',
-                "Rule ID": warning.ruleId || 'N/A',
-                "Start Line": warning.line,
-                "Start Column": warning.column,
-                "End Column": warning.endColumn || warning.column, // Default to start column if missing
-                "Type": 'Warning'
-              }))
-            ]
-          );
-          
-          const csvData = generateCsv(csvConfig)(transformedResults);
-          const csvString = asString(csvData);
-          const csvReportPath = path.join(normalizedOptions.output, `${csvConfig.filename}.csv`);
-          await writeFile(csvReportPath, csvString);
+          const cwd = process.cwd();
+
+          const csvReportPath = await CsvReportGenerator.generate([...styleResults, ...componentResults], cwd);
           Logger.success(`CSV report generated: ${csvReportPath}\n`);
         } else {
           throw new Error(`Invalid format: ${reportFormat}. Supported formats: sarif, csv`);

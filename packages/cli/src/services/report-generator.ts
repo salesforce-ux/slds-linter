@@ -1,5 +1,6 @@
 import path from 'path';
-import fs from 'fs/promises';
+import fs, { writeFile } from 'fs/promises';
+import { mkConfig, generateCsv, asString } from 'export-to-csv';
 import { Logger } from '../utils/logger';
 import { LintResult } from '../types';
 import { SarifBuilder, SarifRunBuilder, SarifResultBuilder, SarifRuleBuilder } from 'node-sarif-builder';
@@ -7,6 +8,7 @@ import { createWriteStream } from 'fs';
 import { JsonStreamStringify } from 'json-stream-stringify';
 import {getRuleDescription} from "./config.resolver";
 import { replaceNamespaceinRules } from '../utils/lintResultsUtil';
+
 
 export interface ReportOptions {
   outputPath: string;
@@ -147,4 +149,52 @@ export class ReportGenerator {
       runBuilder.addResult(resultBuilder);
     }
   }
-} 
+}
+
+export class CsvReportGenerator {
+  static async generate(results: any[], cwd: string) {
+    const csvConfig = mkConfig({
+      filename: 'slds-linter-report',
+      fieldSeparator: ',',
+      quoteStrings: true,
+      decimalSeparator: '.',
+      showLabels: true,
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    });
+
+    const transformedResults = results.flatMap((result: { errors: any[]; filePath: string; warnings: any[]; }) =>
+      [
+        ...result.errors.map((error: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
+          "File Path": path.relative(cwd, result.filePath),
+          "Message": error.message,
+          "Severity": 'error',
+          "Rule ID": replaceNamespaceinRules(error.ruleId || 'N/A'),
+          "Start Line": error.line,
+          "Start Column": error.column,
+          "End Line": error.endLine || error.line, // Default to start line if missing
+          "End Column": error.endColumn || error.column // Default to start column if missing
+        })),
+        ...result.warnings.map((warning: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
+          "File Path": path.relative(cwd, result.filePath),
+          "Message": warning.message,
+          "Severity": 'warning',
+          "Rule ID": replaceNamespaceinRules(warning.ruleId || 'N/A'),
+          "Start Line": warning.line,
+          "Start Column": warning.column,
+          "End Line": warning.endLine || warning.line, // Default to start line if missing
+          "End Column": warning.endColumn || warning.column // Default to start column if missing
+        }))
+      ]
+    );
+
+    const csvData = generateCsv(csvConfig)(transformedResults);
+    const csvString = asString(csvData);
+    const csvReportPath = path.join(cwd, `${csvConfig.filename}.csv`);
+
+    return writeFile(csvReportPath, csvString).then(() => {
+      return csvReportPath;
+    });
+  }
+}
