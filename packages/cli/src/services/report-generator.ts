@@ -158,7 +158,6 @@ export class CsvReportGenerator {
       fieldSeparator: ',',
       quoteStrings: true,
       decimalSeparator: '.',
-      showLabels: true,
       useTextFile: false,
       useBom: true,
       useKeysAsHeaders: true,
