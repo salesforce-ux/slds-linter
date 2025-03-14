@@ -7,7 +7,11 @@ const presetConfig = createDefaultEsmPreset({
 
 const jestConfig: JestConfigWithTsJest = {
   ...presetConfig,
-  testPathIgnorePatterns:["build"]
+  testPathIgnorePatterns:["build"],
+  coverageReporters: [
+    "lcov",
+    "json-summary"
+  ],
 }
 
 export default jestConfig
