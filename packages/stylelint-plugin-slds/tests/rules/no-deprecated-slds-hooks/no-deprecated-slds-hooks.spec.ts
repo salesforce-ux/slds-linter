@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint } = stylelint;
@@ -22,7 +22,7 @@ describe('slds/no-unsupported-hooks-slds2', () => {
 
       const reportedMessage =
         linterResult.results[0]._postcssResult.messages[index].text;
-      expect(reportedMessage).to.equal(message);
+      expect(reportedMessage).toEqual(message);
     });
   });
 });
