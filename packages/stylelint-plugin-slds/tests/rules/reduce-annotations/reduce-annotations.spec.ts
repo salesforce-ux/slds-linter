@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 import reduceAnnotations from '../../../src/rules/reduce-annotations';
 const { lint }: typeof stylelint = stylelint;
@@ -102,10 +102,10 @@ describe('reduce-annotations', () => {
       // Test for the presence or absence of the message
 
       if (testCase.message) {
-        //expect(messages.length).to.equal(1);
-        expect(messages[0].text).to.contain(testCase.message);
+        //expect(messages.length).toEqual(1);
+        expect(messages[0].text).toContain(testCase.message);
       } else {
-        expect(messages.length).to.equal(0);
+        expect(messages.length).toEqual(0);
       }
     });
   });

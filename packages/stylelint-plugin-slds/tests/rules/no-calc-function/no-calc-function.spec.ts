@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;
@@ -84,14 +84,14 @@ describe('no-calc-function', () => {
         );
 
         if (expectedMessage) {
-          expect(messages[0]).to.include(expectedMessage);
+          expect(messages[0]).toMatch(expectedMessage);
         } else {
-          expect(messages).to.be.empty;
+          expect(messages).toHaveLength(0);
         }
 
         //   if (fix) {
         //     const output = linterResult.results[0].output;
-        //     expect(output).to.equal(expectedOutput);
+        //     expect(output).toEqual(expectedOutput);
         //   }
       });
     }

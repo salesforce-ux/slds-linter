@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;
@@ -46,10 +46,10 @@ describe('no-slds-private-var', () => {
 
       // Test for the presence or absence of the message
       if (testCase.message) {
-        expect(messages.length).to.equal(1);
-        expect(messages[0].text).to.equal(testCase.message);
+        expect(messages.length).toEqual(1);
+        expect(messages[0].text).toEqual(testCase.message);
       } else {
-        expect(messages.length).to.equal(0);
+        expect(messages.length).toEqual(0);
       }
     });
   });

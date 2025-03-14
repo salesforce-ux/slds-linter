@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;
@@ -80,9 +80,9 @@ describe('slds/enforce-sds-to-slds-hooks', () => {
           (message) => message.text
         );
         if (expectedMessage) {
-          expect(reportedMessages[0]).to.include(expectedMessage);
+          expect(reportedMessages[0]).toMatch(expectedMessage);
         } else {
-          expect(reportedMessages).to.be.empty;
+          expect(reportedMessages).toHaveLength(0);
         }
       });
     }

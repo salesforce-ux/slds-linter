@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 const { lint }: typeof stylelint = stylelint;
 
@@ -20,7 +20,7 @@ describe('no-important', () => {
 
       expect(
         linterResult.results.at(0)._postcssResult.messages[index].text
-      ).to.equal(message);
+      ).toEqual(message);
     });
   });
 });
