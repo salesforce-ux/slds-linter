@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 const { lint }: typeof stylelint = stylelint;
 
@@ -72,9 +72,9 @@ const createTest = ({ description, inputCss, expectedMessage }, index) => {
   it(description, async () => {
     const messages = await testStyleLintRule(inputCss);
     if (expectedMessage) {
-      expect(messages[0]).to.include(expectedMessage);
+      expect(messages[0]).toMatch(expectedMessage);
     } else {
-      expect(messages).to.be.empty;
+      expect(messages).toHaveLength(0);
     }
   });
 };
