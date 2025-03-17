@@ -4,5 +4,10 @@
 # Updated README.md file under cli
 ./scripts/update-cli-readme.sh
 
-# Update coverage
-yarn coverage
+
+if git diff --cached --name-only --diff-filter=ACMR | grep -q '^packages/.*\.ts$'; then
+  echo "There are staged TypeScript files changed in the packages directory. Updating coverage"
+  yarn coverage
+else
+  echo "Skipping coverage update as there are no staged TypeScript files changed in the packages directory"
+fi

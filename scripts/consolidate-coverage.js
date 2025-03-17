@@ -66,7 +66,7 @@ function consolidateCoverage() {
   const mergedCoverage = mergeCoverageData(consolidatedCoverage);
 
   // Write consolidated coverage to a file
-  const outputPath = join(coverageDir, 'consolidated-coverage.json');
+  const outputPath = join(coverageDir, 'coverage-summary.json');
   writeFileSync(outputPath, JSON.stringify(mergedCoverage, null, 2));
 
   console.log('===============================');

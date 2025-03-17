@@ -19,15 +19,13 @@
     "test": "yarn workspaces run test",
     "build": "yarn workspaces run build",
     "release": "node scripts/release.js",
-    "coverage": "yarn test --coverage && yarn coverage:consolidate && yarn coverage:badges",
-    "coverage:consolidate":"node scripts/consolidate-coverage.js",
-    "coverage:badges":"coverage-badges -s ./coverage/consolidated-coverage.json --type lines"
+    "coverage": "yarn test --coverage && yarn gen:coverage-summary",
+    "gen:coverage-summary":"node scripts/consolidate-coverage.js"    
   },
   "devDependencies": {
     "@types/eslint": "^8.0.0",
     "@types/node": "^20.11.19",
     "clean-pkg-json": "^1.2.0",
-    "coverage-badges-cli":"^2.1.0",
     "esbuild": "^0.25.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
     "glob": "^11.0.1",
