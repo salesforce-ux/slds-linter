@@ -6,6 +6,10 @@ const config: Config.InitialOptions = {
   transform: {
     '^.+\\.ts?$': 'ts-jest',
   },
+  coverageReporters: [
+    "lcov",
+    "json-summary"
+  ],
   // setupFilesAfterEnv: ['./tests/bootstrap.ts']
 };
 export default config;
