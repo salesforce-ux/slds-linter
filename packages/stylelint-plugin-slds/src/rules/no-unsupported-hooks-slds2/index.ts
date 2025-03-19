@@ -29,14 +29,16 @@ function rule(
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
       const parsedPropertyValue = decl.prop;
-      if (parsedPropertyValue.startsWith('--slds-c-')) {
+      if (parsedPropertyValue.startsWith('--slds-c-')  && parsedPropertyValue in deprecatedHooks) {
+        const index = decl.toString().indexOf(decl.prop);
+        const endIndex = index + decl.prop.length;
         const proposedNewValue = deprecatedHooks[parsedPropertyValue];
         if (proposedNewValue && proposedNewValue !== 'null') {
           const index = decl.toString().indexOf(decl.prop);
           const endIndex = index + decl.prop.length;
 
           utils.report({
-            message: messages.replaced(parsedPropertyValue, proposedNewValue),
+            message: JSON.stringify({message: messages.replaced(parsedPropertyValue, proposedNewValue), suggestions:[proposedNewValue]}),
             node: decl,
             index,
             endIndex,
@@ -50,8 +52,10 @@ function rule(
           }
         } else {
           utils.report({
-            message: messages.deprecated(parsedPropertyValue),
+            message: JSON.stringify({message: messages.deprecated(parsedPropertyValue), suggestions:[]}),
             node: decl,
+            index,
+            endIndex,
             result,
             ruleName,
           });

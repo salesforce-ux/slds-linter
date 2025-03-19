@@ -31,7 +31,7 @@ ruleTester.run("enforce-bem-class", rule, {
       code: `<div class="slds-container--medium"></div>`, // Invalid: underscore instead of double underscore
       errors: [
         {
-          message: "slds-container--medium has been retired. Update it to the new name slds-container_medium.",
+          message: "{\"message\":\"slds-container--medium has been retired. Update it to the new name slds-container_medium.\",\"suggestions\":[\"slds-container_medium\"]}",
           line: 1,
           column: 13,
         },
@@ -42,7 +42,7 @@ ruleTester.run("enforce-bem-class", rule, {
       code: `<div class="block block_element slds-border--left"></div>`, // Invalid: `block_element` not in BEM
       errors: [
         {
-          message: "slds-border--left has been retired. Update it to the new name slds-border_left.",
+          message: "{\"message\":\"slds-border--left has been retired. Update it to the new name slds-border_left.\",\"suggestions\":[\"slds-border_left\"]}",
           line: 1,
           column: 33,
         }
@@ -53,7 +53,7 @@ ruleTester.run("enforce-bem-class", rule, {
       code: `<div class="slds-p-right--xxx-small"></div>`, // Invalid: Missing block name
       errors: [
         {
-          message: "slds-p-right--xxx-small has been retired. Update it to the new name slds-p-right_xxx-small.",
+          message: "{\"message\":\"slds-p-right--xxx-small has been retired. Update it to the new name slds-p-right_xxx-small.\",\"suggestions\":[\"slds-p-right_xxx-small\"]}",
           line: 1,
           column: 13,
         },

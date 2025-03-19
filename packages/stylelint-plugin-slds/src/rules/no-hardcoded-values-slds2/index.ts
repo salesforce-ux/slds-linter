@@ -145,7 +145,7 @@ function rule(
           );
           if (closestHooks.length > 0) {
             utils.report({
-              message: messages.rejected(value, generateTable(closestHooks)),
+              message: JSON.stringify({message: messages.rejected(value, generateTable(closestHooks)), suggestions: closestHooks.map(hook=>hook.name)}),
               node: decl,
               index,
               endIndex,
@@ -155,7 +155,7 @@ function rule(
             });
           } else {
             utils.report({
-              message: messages.suggested(value),
+              message: JSON.stringify({message: messages.suggested(value), suggestions:[]}),
               node: decl,
               index,
               endIndex,
@@ -176,7 +176,7 @@ function rule(
         );
         if (closestHooks.length > 0) {
           utils.report({
-            message: messages.rejected(value, generateTable(closestHooks)),
+            message: JSON.stringify({message: messages.rejected(value, generateTable(closestHooks)), suggestions: closestHooks.map(hook=>hook.name)}),
             node: decl,
             index,
             endIndex,
@@ -186,7 +186,7 @@ function rule(
           });
         } else{
           utils.report({
-            message: messages.suggested(value),
+            message: JSON.stringify({message: messages.suggested(value), suggestions:[]}),
             node: decl,
             index,
             endIndex,

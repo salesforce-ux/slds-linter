@@ -40,8 +40,8 @@ function detectRightSide(decl, basicReportProps, autoFixEnabled){
       return;
     }
 
-    const startIndex = decl.toString().indexOf(decl.value);
-    const endIndex = startIndex + decl.value.length;
+    const startIndex = decl.toString().indexOf(oldValue);
+    const endIndex = startIndex + oldValue.length;
     const suggestedMatch = toSldsToken(oldValue);
     const message = replacePlaceholders(errorMsg, { 
       fullMatch: oldValue, 
@@ -49,7 +49,7 @@ function detectRightSide(decl, basicReportProps, autoFixEnabled){
     });
 
     utils.report({
-      message,
+      message: JSON.stringify({message, suggestions:[suggestedMatch]}),
       index: startIndex,
       endIndex,
       ...basicReportProps,
@@ -78,7 +78,7 @@ function detectLeftSide(decl, basicReportProps, autoFixEnabled) {
     });
 
     utils.report({
-      message,
+      message: JSON.stringify({message, suggestions:[suggestedMatch]}),
       index: startIndex,
       endIndex,
       ...basicReportProps,
@@ -95,7 +95,6 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
     const autoFixEnabled = result.stylelint.config.fix;
 
     root.walkDecls((decl) => {
-
       const basicReportProps = {
         node:decl,
         result,
