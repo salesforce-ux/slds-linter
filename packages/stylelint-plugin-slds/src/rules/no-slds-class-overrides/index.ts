@@ -34,9 +34,9 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
             const index = offsetIndex + classNode.sourceIndex + 1; // find selector in rule plus '.'
             const endIndex = index + classNode.value.length;
             utils.report({
-              message: replacePlaceholders(warningMsg, {
-                selector: `.${classNode.value}`,
-              }),
+              message: JSON.stringify({message:replacePlaceholders(warningMsg, {
+                selector: `.${classNode.value}`
+              }), suggestions:[]}),
               node: rule,
               result,
               ruleName,

@@ -19,7 +19,7 @@ const rule = (primaryOptions, { severity = severityLevel as RuleSeverity } = {})
     root.walkComments((comment) => {
       if (annotationList.some(annotation => comment.text.trim().includes(annotation))) {
         utils.report({
-          message: warningMsg,
+          message:  JSON.stringify({message: warningMsg, suggestions:[]}),
           node: comment,
           result,
           ruleName,

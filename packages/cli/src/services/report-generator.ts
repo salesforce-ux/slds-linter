@@ -1,4 +1,4 @@
-import path from 'path';
+import path, { parse } from 'path';
 import fs, { writeFile } from 'fs/promises';
 import { mkConfig, generateCsv, asString } from 'export-to-csv';
 import { Logger } from '../utils/logger';
@@ -7,7 +7,7 @@ import { SarifBuilder, SarifRunBuilder, SarifResultBuilder, SarifRuleBuilder } f
 import { createWriteStream } from 'fs';
 import { JsonStreamStringify } from 'json-stream-stringify';
 import {getRuleDescription} from "./config.resolver";
-import { replaceNamespaceinRules } from '../utils/lintResultsUtil';
+import { parseText, replaceNamespaceinRules } from '../utils/lintResultsUtil';
 
 
 export interface ReportOptions {
@@ -124,7 +124,7 @@ export class ReportGenerator {
       const resultBuilder = new SarifResultBuilder().initSimple({
         ruleId: replaceNamespaceinRules(error.ruleId),
         level: 'error',
-        messageText: error.message,
+        messageText: parseText(error.message),
         fileUri: path.relative(process.cwd(), lintResult.filePath),
         startLine: error.line,
         startColumn: error.column,
@@ -139,7 +139,7 @@ export class ReportGenerator {
       const resultBuilder = new SarifResultBuilder().initSimple({
         ruleId: replaceNamespaceinRules(warning.ruleId),
         level: 'warning',
-        messageText: warning.message,
+        messageText: parseText(warning.message),
         fileUri: path.relative(process.cwd(), lintResult.filePath),
         startLine: warning.line,
         startColumn: warning.column,
@@ -169,7 +169,7 @@ export class CsvReportGenerator {
       [
         ...result.errors.map((error: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
           "File Path": path.relative(cwd, result.filePath),
-          "Message": error.message,
+          "Message": parseText(error.message),
           "Severity": 'error',
           "Rule ID": replaceNamespaceinRules(error.ruleId || 'N/A'),
           "Start Line": error.line,
@@ -179,7 +179,7 @@ export class CsvReportGenerator {
         })),
         ...result.warnings.map((warning: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
           "File Path": path.relative(cwd, result.filePath),
-          "Message": warning.message,
+          "Message": parseText(warning.message),
           "Severity": 'warning',
           "Rule ID": replaceNamespaceinRules(warning.ruleId || 'N/A'),
           "Start Line": warning.line,

@@ -7,7 +7,7 @@ describe('no-slds-private-var', () => {
   const testCases = [
     {
       message:
-        'This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector --_slds-deprecated-var. For more information, look up private CSS in lightningdesignsystem.com. (slds/no-slds-private-var)',
+        '{\"message\":\"This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector --_slds-deprecated-var. For more information, look up private CSS in lightningdesignsystem.com. (slds/no-slds-private-var)\",\"suggestions\":[\"--slds-deprecated-var\"]}',
       code: `
         .example {
           --_slds-deprecated-var: #fff;
@@ -15,7 +15,7 @@ describe('no-slds-private-var', () => {
       `,
       ruleName: 'slds/no-slds-private-var',
       expectedMessages: [
-        'This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector --_slds-deprecated-var. For more information, look up private CSS in lightningdesignsystem.com. (slds/no-slds-private-var)',
+        '{\"message\":\"This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector --_slds-deprecated-var. For more information, look up private CSS in lightningdesignsystem.com. (slds/no-slds-private-var)\",\"suggestions\":[\"--slds-deprecated-var\"]}',
       ],
     },
     {

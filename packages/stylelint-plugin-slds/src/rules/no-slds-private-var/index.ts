@@ -20,9 +20,13 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
       if (decl.prop.startsWith('--_slds-')) {
+        const index = decl.toString().indexOf(decl.prop);
+        const endIndex = index + decl.prop.length;
         stylelint.utils.report({
-          message: messages.expected(decl.prop),
+          message: JSON.stringify({message:messages.expected(decl.prop), suggestions:[decl.prop.replace("--_slds-", "--slds-")]}),
           node: decl,
+          index,
+          endIndex,
           result,
           ruleName,
           severity

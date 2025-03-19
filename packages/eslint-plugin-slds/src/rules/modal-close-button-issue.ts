@@ -1,4 +1,5 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
+import { messages } from "./utils/rule";
 
 // This rule specific to CVS, find more details here https://issues.salesforce.com/issue/a028c00000zh1iqAAA/modal-close-button-is-not-visible-with-the-new-white-background-after-winter-25-release
 export = {
@@ -10,18 +11,6 @@ export = {
     },
     fixable: "code",
     schema: [],
-    messages: {
-      removeClass:
-        "Remove the slds-button_icon-inverse class from the modal close button in components that use the SLDS modal blueprint.",
-      changeVariant:
-        "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>.",
-      removeVariant:
-        "Remove the variant attribute from the <lightning-icon> component inside the <button> element.",
-      ensureButtonClasses:
-        "Add or move slds-button and slds-button_icon to the class attribute of the <button> element or <lightning-button-icon> component.",
-      ensureSizeAttribute:
-        "To size icons properly, set the size attribute ‌to large in the <lightning-icon> and <lightning-button-icon> components.",
-    },
   },
 
   create(context) {
@@ -48,7 +37,7 @@ export = {
           if (classList.includes("slds-button_icon-inverse") || classList.includes("slds-button--icon-inverse")) {
             context.report({
               node,
-              messageId: "removeClass",
+              message: messages["removeClass"],
               fix(fixer) {
                 const newClassList = classList
                   .filter((cls) => (cls !== "slds-button_icon-inverse" && cls !== "slds-button--icon-inverse"))
@@ -90,7 +79,7 @@ export = {
             if (classList.includes("slds-button_icon-inverse") || classList.includes("slds-button--icon-inverse")) {
               context.report({
                 node,
-                messageId: "removeClass",
+                message: messages["removeClass"],
                 fix(fixer) {
                   const newClassList = classList
                     .filter((cls) => cls !== "slds-button_icon-inverse" && cls !== "slds-button--icon-inverse")
@@ -107,7 +96,7 @@ export = {
             if (!classList.includes("slds-button") || !classList.includes("slds-button_icon")) {
               context.report({
                 node: attribute,
-                messageId: "ensureButtonClasses",
+                message: messages["ensureButtonClasses"],
                 fix(fixer) {
                   let newClassList;
                   
@@ -137,7 +126,7 @@ export = {
             if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
               context.report({
                 node: variantAttr,
-                messageId: "changeVariant",
+                message: messages["changeVariant"],
                 fix(fixer) {
                   return fixer.replaceText(variantAttr.value, `bare`);
                 },
@@ -148,7 +137,7 @@ export = {
             if (!sizeAttr) {
               context.report({
                 node,
-                messageId: "ensureSizeAttribute",
+                message: messages["ensureSizeAttribute"],
                 fix(fixer) {
                   if (variantAttr) {
                     return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], ' size="large"');
@@ -181,7 +170,7 @@ export = {
           if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
             context.report({
               node: variantAttr,
-              messageId: "changeVariant",
+              message: messages["changeVariant"],
               fix(fixer) {
                 return fixer.replaceText(variantAttr.value, "bare");
               },
@@ -203,7 +192,7 @@ export = {
           if (!sizeAttr) {
             context.report({
               node,
-              messageId: "ensureSizeAttribute",
+              message: messages["ensureSizeAttribute"],
               fix(fixer) {
                 //return fixer.insertTextAfter(node, ' size="large"');
                 if(variantAttr)
