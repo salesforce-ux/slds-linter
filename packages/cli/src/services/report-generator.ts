@@ -1,4 +1,4 @@
-import path, { parse } from 'path';
+import path from 'path';
 import fs, { writeFile } from 'fs/promises';
 import { mkConfig, generateCsv, asString } from 'export-to-csv';
 import { Logger } from '../utils/logger';
