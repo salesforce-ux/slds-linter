@@ -1,0 +1,16 @@
+.THIS .demo {
+    /*
+      SLDS linter not handling shorthand props
+      only --lwc-colorBorder should be replaced by --slds-g-color-border-1
+      
+      Expected: 
+        1px solid var(--slds-g-color-border-1, var(--lwc-colorBorder));
+      Actual: 
+      var(--slds-g-color-border-1, 1px solid var(--lwc-colorBorder)); 
+
+      -- (Issue)
+    */
+    border-top: 1px solid var(--lwc-colorBorder, var(--lwc-colorBrandDarker, red));
+
+    --lwc-colorBorderDestructiveActive: 20px solid red;
+}

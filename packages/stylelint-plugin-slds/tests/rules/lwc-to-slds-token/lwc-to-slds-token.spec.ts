@@ -80,7 +80,7 @@ const createTest = ({ description, inputCss, expectedMessage }, index) => {
 };
 
 describe('lwc-token-to-slds-hook', () => {
-  const OnRightSideTestCases = [];
+  const OnRightSideTestCases:any[] = [];
 
   //Right side use text cases
   Object.entries(LWC_TOKEN_MAPPINGS).forEach(([key, val], ind) => {
@@ -122,7 +122,7 @@ describe('lwc-token-to-slds-hook', () => {
     }
   });
 
-  const OnLeftSideTestCases = [];
+  const OnLeftSideTestCases:any[] = [];
 
   //Left side use text cases
   Object.entries(LWC_TOKEN_MAPPINGS).forEach(([key, val], ind) => {
