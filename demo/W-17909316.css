@@ -1,0 +1,71 @@
+/*activateRecordPage.css*/
+.THIS .loadingSpinner {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    justify-content: center;
+    /*This token has multiple sugessions so, this will not be fixed*/
+    background: t(--lwc-colorBackgroundAlt);
+    opacity: 0.9;
+}
+
+/*ui-cdp-components/components/runtime_cdp/dataStreamDefinition/dataStreamDefinition.css*/
+.THIS .slds-accordion__section {
+    /*
+    Issue: linter is not handling individual tokens in shorthand props
+    below line will be replace by `padding: 0` which is invalid.
+    */
+    padding: var(--lwc-spacingXSmall, 8px) var(--lwc-spacingNone, 0px);
+}
+
+.THIS .slds-accordion__summary-heading {
+    background-color: var(--lwc-colorGray3, rgb(243, 242, 242));
+    padding: var(--lwc-spacingXSmall, 8px);
+    border-radius: var(--lwc-borderRadiusMedium,0.25rem)
+}
+
+/* ui-cdp-components/components/runtime_cdp/marketSegmentDetailPanelWrapper/marketSegmentDetailPanelWrapper.css */
+.THIS.runtime_cdpMarketSegmentDetailPanelWrapper {
+    padding: 0;
+}
+.THIS.gdpr-text {
+    background: var(--sds-c-modal-color-background, #f3f2f2);
+    padding: 1.25rem;
+}
+.THIS .inlineTitle {
+    margin-bottom: var(--lwc-varSpacingVerticalMedium, 1rem);
+}
+
+.THIS .forceIcon.slds-button__icon .slds-icon {
+    fill: var(--lwc-colorTextIconDefault, rgb(112, 110, 107));
+}
+.THIS.full-width .forcePageBlockSection .slds-section__content > .slds-form_stacked {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/*horizontalSplitView.css*/
+.THIS .demo {
+    padding: var(--lws-spacingXSmall) var(--lwx-spacingSmall);
+    background-color: var(--lwc-colorBackground);
+    /*
+      SLDS linter not handling shorthand props
+      only --lwc-colorBorder should be replaced by --slds-g-color-border-1
+      
+      Expected: 
+        1px solid var(--slds-g-color-border-1, var(--lwc-colorBorder));
+      Actual: 
+      var(--slds-g-color-border-1, 1px solid var(--lwc-colorBorder)); 
+
+      -- (Issue)
+    */
+    border-top: 1px solid var(--lwc-colorBorder);
+    border-bottom: 1px solid var(--lwc-colorBorder);
+    font-size:var(--lwc-fontSize3);
+    color:var(--lwc-fontSize3);
+}
