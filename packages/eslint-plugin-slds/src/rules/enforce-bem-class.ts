@@ -19,10 +19,6 @@ export = {
         additionalProperties: false,
       },
     ],
-    messages: {      
-      suggestedMsg:
-        "{{actual}} has been retired. Update it to the new name {{newValue}}.",
-    },
   },
 
   create(context) {  
@@ -59,7 +55,7 @@ export = {
                 actual: className,
                 newValue
               },
-              messageId: "suggestedMsg",
+              message: JSON.stringify({message: "{{actual}} has been retired. Update it to the new name {{newValue}}.", suggestions:[newValue]}),
               fix(fixer) {
                 if (newValue) {
                   const newClassValue = classAttr.value.value.replace(

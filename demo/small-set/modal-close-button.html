@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inline Style Example</title>
+</head>
+<body>
+    
+    <!-- Scenario 1 to be fixed -->
+    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+        <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+            <use href="/_slds/icons/utility-sprite/svg/symbols.svg#close"></use>
+        </svg>
+        <span class="slds-assistive-text">Cancel and close</span>
+    </button>
+
+    <!-- <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+        <lightning-icon
+            icon-name="utility:close"
+            alternative-text={cancelButtonLabel}
+            variant="bare-inverse"
+            size="large" >
+        </lightning-icon>
+        <span class="slds-assistive-text">{cancelButtonLabel}</span>
+    </button> -->
+
+    <!-- Scenario 2 to befixed -->
+    <lightning-button-icon icon-name="utility:close"
+        class="slds-button slds-button_icon slds-modal__close"
+        variant="bare-inverse"
+        size="large"
+        icon-class="slds-button__icon slds-button__icon_large slds-button_icon-inverse"
+        onclick={handleClose}
+        alternative-text={labels.closeButtonAssistiveText}>
+    </lightning-button-icon>
+
+    <!-- In this ideally we should remove deprecated BEM slds-button--icon-inverse and also change variant to bare -->
+    <lightning-button-icon 
+        title={labels.closeButton} icon-name="utility:close" 
+        onclick={closeAction} 
+        class="slds-button slds-button_icon slds-modal__close slds-button--icon-inverse" variant="bare-inverse" size="large">
+    </lightning-button-icon>
+
+    <!-- Scenario 2.1.a to be fixed -->
+    <lightning-button-icon 
+        icon-name="utility:close" alternative-text="close" onclick={closeModal}
+        variant="bare-inverse" class="slds-modal__close slds-button__icon_large">
+    </lightning-button-icon>
+
+    <lightning-icon
+        icon-name="utility:close"
+        alternative-text={cancelButtonLabel}
+        variant="bare-inverse"
+        size="large" >
+    </lightning-icon>
+
+    <!-- Scenario3 to be fixed -->
+    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+        <lightning-icon
+        icon-name="utility:close"
+        alternative-text={cancelButtonLabel}
+        variant="bare-inverse"
+        size="large" >
+        </lightning-icon>
+        <span class="slds-assistive-text">{cancelButtonLabel}</span>
+    </button>
+
+    <header class="slds-modal__header">
+        <button class="slds-button slds-button_icon slds-modal__close" title={labels.Close} onclick={close}>
+            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+            </svg>
+            <span class="slds-assistive-text">{labels.Close}</span>
+        </button>
+        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{heading}</h2>
+    </header>
+
+    <lightning-icon
+        icon-name="utility:close"
+        alternative-text={cancelButtonLabel}
+        variant="bare-inverse"
+        size="large" >
+    </lightning-icon>
+
+    <!-- Scenario 1: Correctly formatted modal close button -->
+    <div>
+        <button class="slds-button slds-button_icon slds-modal__close"></button>
+    </div>
+
+    <!-- Scenario 2: Correct lightning-button-icon with proper attributes -->
+    <div>
+        <lightning-button-icon variant="bare" size="large" class="slds-button slds-button_icon"></lightning-button-icon>
+    </div>
+
+    <!-- Scenario 3: Correct lightning-icon usage -->
+    <div>
+        <lightning-icon size="large"></lightning-icon>
+    </div>
+
+
+    <!-- Scenario 4: lightning-icon with variant outside a modal close button should be valid -->
+    <div>
+        <lightning-icon variant="bare-inverse"></lightning-icon>
+    </div>
+
+    <!-- Scenario 5: lightning-icon inside a button, but button does NOT have slds-modal__close -->
+    <div>
+        <button><lightning-icon variant="bare-inverse"></lightning-icon></button>
+    </div>
+
+    <!-- Scenario 6: This case shouldn't remove the class as button doesn't have a class named slds-modal__close -->
+    <div>
+        <button class="slds-button slds-button_icon slds-button_icon-inverse"></button>
+    </div>
+
+    <!-- Scenario 7: This case shouldn't remove the class as button doesn't have a class named slds-modal__close -->
+    <div>
+        <lightning-button-icon variant="bare-inverse" class="slds-button slds-button_icon"></lightning-button-icon>
+    </div>
+
+</body>
+</html>

@@ -48,16 +48,14 @@ Usage: npx @salesforce-ux/slds-linter@latest [options] [command]
 SLDS Linter CLI tool for linting styles and components
 
 Options:
-  -V, --version              output the version number
-  -h, --help                 display help for command
+  -V, --version                 output the version number
+  -h, --help                    display help for command
 
 Commands:
-  lint:styles [options]      Run stylelint on all style files
-  lint:components [options]  Run eslint on all markup files
-  lint [options]             Run both style and component linting
-  report [options]           Generate SARIF report from linting results
-  emit [options]             Emits the configuration files used by slds-linter cli
-  help [command]             display help for command
+  lint [options] [directory]    Run both style and component linting
+  report [options] [directory]  Generate SARIF report from linting results
+  emit [options]                Emits the configuration files used by slds-linter cli
+  help [command]                display help for command
 ```
 
 ## Run SLDS Linter
@@ -70,14 +68,12 @@ In your project root directory, follow these steps.
 2. Run `npx @salesforce-ux/slds-linter lint`. 
     The linting output displayed in the console includes the row and column numbers on the left. Navigate to specific lines in your source code by clicking on the displayed numbers (Command + Click on Mac).
 
-3. (Optional) To see lint errors only on CSS files, run `npx @salesforce-ux/slds-linter lint:styles` .
-4. (Optional) To see lint errors only on component markup files (componentName.html or componentName.cmp files), run `npx @salesforce-ux/slds-linter lint:components` . 
-5. (Optional) To run SLDS Linter on a specific folder, add the `-d` option to specify the directory to be linted: `npx @salesforce-ux/slds-linter -d [directory name]` . This option accepts directories or folders using glob patterns, enabling flexible and efficient matching of multiple paths. For example, run `npx @salesforce-ux/slds-linter lint -d "com/CORE/**"` gives the lint output for all the files under `com/CORE`.
-6. To produce a SARIF report in your project root directory and specify an output directory, run  `npx @salesforce-ux/slds-linter report -o [output directory]`. The output file is named as `slds-linter-report.sarif`.
-7. Open the generated `.sarif` report file.
-8. Make a note of how many components SLDS Linter has identified that you must update.
-9. (Optional) To automatically fix validation errors in bulk, run the `lint` command with the `fix` option, `npx @salesforce-ux/slds-linter lint --fix`.
-7. (Optional) To emit the configuration files used by `slds-linter`, run `npx @salesforce-ux/slds-linter emit` in your component source directory. Note that this command defaults to current working directory. These configuration files are discovered by your VS Code ESLint and Stylelint extensions to display squiggly lines in CSS and HTML files when opened in your code editor. 
+3. (Optional) To run SLDS Linter on a specific folder, specify the directory to be linted: `npx @salesforce-ux/slds-linter [directory name]` . This option accepts directories or folders using [glob](https://github.com/sindresorhus/globby?tab=readme-ov-file#globbing-patterns) patterns, enabling flexible and efficient matching of multiple paths. For example, run `npx @salesforce-ux/slds-linter lint "com/CORE/**"` gives the lint output for all the files under `com/CORE`.
+4. To produce a SARIF report in your project root directory and specify an output directory, run  `npx @salesforce-ux/slds-linter report -o [output directory]`. The output file is named as `slds-linter-report.sarif`.
+5. Open the generated `.sarif` report file.
+6. Make a note of how many components SLDS Linter has identified that you must update.
+7. (Optional) To automatically fix validation errors in bulk, run the `lint` command with the `fix` option, `npx @salesforce-ux/slds-linter lint --fix`.
+8. (Optional) To emit the configuration files used by `slds-linter`, run `npx @salesforce-ux/slds-linter emit` in your component source directory. Note that this command defaults to current working directory. These configuration files are discovered by your VS Code ESLint and Stylelint extensions to display squiggly lines in CSS and HTML files when opened in your code editor.  
 
 
 ### Troubleshoot SARIF Viewer Navigation
@@ -94,8 +90,6 @@ If the SARIF viewer doesn’t automatically go to the line of code when you clic
 Use these commands to run SLDS Linter rules. Review the output violations and fix any issues to uplift your code to SLDS best practices.
 
 - `npx @salesforce-ux/slds-linter lint`. Runs ESlint and Stylelint rules on HTML, CSS, and CMP files.
-- `npx @salesforce-ux/slds-linter lint:styles`. Runs the Stylelint rules on your CSS files.
-- `npx @salesforce-ux/slds-linter lint:components`. Runs the ESlint rules on your HTML/CMP files.
 - `npx @salesforce-ux/slds-linter report`. Generates a SARIF report for static analysis.
 - `npx @salesforce-ux/slds-linter emit`. Emits the configuration files used by `slds-linter`. Defaults to current directory. 
 
@@ -103,13 +97,12 @@ These options are available on SLDS Linter commands.
 
 | **Option**              | **Description**                                                              | **Availability**                           |
 | ------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------ |
-| `-d, --directory <path>` | Target directory to scan (defaults to current directory). Accepts glob patterns.                     | `lint`, `lint:styles`, `lint:components`, `report` |
+| `-d, --directory <path>` | Target directory to scan (defaults to current directory). Supports glob patterns.                     | `lint`, `report` |
 | `-o, --output <path>`    | Output directory for reports (defaults to current directory)                 | `report`                                     |
-| `--fix`                  | Automatically fix problems                                                   | `lint`, `lint:styles`, `lint:components`         |
-| `--config <path>`        | Path to eslint/stylelint config file'         | `lint:styles`, `lint:components`               |
-| `--config-style <path>`  | Path to stylelint config file'             | `lint`                                       |
-| `--config-eslint <path>` | Path to eslint config file'                    | `lint`                                       |
-| `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode | `lint`, `lint:styles`, `lint:components`          |
+| `--fix`                  | Automatically fix problems                                                   | `lint`         |
+| `--config-stylelint <path>`  | Path to stylelint config file             | `lint`, `report`|
+| `--config-eslint <path>` | Path to eslint config file                    | `lint`, `report`|
+| `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode | `lint` |
 
 To view help for these options, add `--help` to each command. For example, run `npx @salesforce-ux/slds-linter lint --help` to see which options you can use with `lint`.
 
@@ -124,6 +117,55 @@ To enhance your linting and error analysis experience, we recommend that you ins
 ## Best Practices
 
 - Run `npx @salesforce-ux/slds-linter lint` to see the lint output on Terminal. 
-- To run SLDS Linter on a specific folder, add option `-d` For example, `npx @salesforce-ux/slds-linter lint -d`
+- To run SLDS Linter on a specific folder, input as argument. For example, `npx @salesforce-ux/slds-linter lint <directory>`
+
+### Example - single folder
+
+Recursively linting all style and markup files in the `aura` directory:
+
+```shell
+npx @salesforce-ux/slds-linter lint aura
+```
+
+### Example - multiple folders
+
+Recursively linting all style and markup files in the `aura` and `lwc` directory:
+
+```shell
+npx @salesforce-ux/slds-linter lint "**/{aura,lwc}/**"
+```
+
+### Example - lint style files
+
+Recursively linting all `.css` files in the `aura` directory:
+
+```shell
+npx @salesforce-ux/slds-linter lint "aura/**/*.css"
+```
+
+### Example - multiple style file extensions
+
+Linting all `.css`, `.scss`, and `.sass` files:
+
+```shell
+npx @salesforce-ux/slds-linter lint "**/*.{css,scss,sass}"
+```
+
+### Example - lint markeup files
+
+Recursively linting all `.html` files in the `aura` directory:
+
+```shell
+npx @salesforce-ux/slds-linter lint "aura/**/*.html"
+```
+
+### Example - multiple markup file extensions
+
+Linting all `.html` and `.cmp` files:
+
+```shell
+npx @salesforce-ux/slds-linter lint "**/*.{html,cmp}"
+```
+
 
 For any questions or issues, open an issue in this repository.

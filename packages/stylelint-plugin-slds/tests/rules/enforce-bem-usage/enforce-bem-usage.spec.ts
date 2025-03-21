@@ -1,5 +1,5 @@
-import { expect } from 'chai';
-import stylelint, { LinterResult, LinterOptions } from 'stylelint';
+
+import stylelint, { LinterResult, LinterOptions, LintResult } from 'stylelint';
 const { lint }: typeof stylelint = stylelint;
 /**
  * Disableing tests for now. TODO: review later
@@ -147,18 +147,17 @@ xdescribe('enforce-bem-usage', () => {
         let lintResult = await processLint(input, false);
 
         // Verify the reported messages
-        const reportedMessages = lintResult._postcssResult.messages.map(
+        const reportedMessages = lintResult._postcssResult?.messages.map(
           (message) => message.text
         );
-        expect(reportedMessages).to.have.members(messages);
-        const reportedPositions = lintResult._postcssResult.messages.map(
+        expect(messages).toContain(reportedMessages)
+        const reportedPositions = lintResult._postcssResult?.messages.map(
           (message) => [message.index, message.endIndex]
         );
-        expect(reportedPositions).to.have.deep.members(messagePositions);
-
+        expect(messagePositions).toEqual(expect.arrayContaining(reportedPositions));
         lintResult = await processLint(input, true);
 
-        expect(lintResult._postcssResult.root.toString()).to.equal(
+        expect(lintResult._postcssResult?.root.toString()).toEqual(
           expectedOutput
         );
       });

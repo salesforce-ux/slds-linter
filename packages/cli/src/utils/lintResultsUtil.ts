@@ -16,6 +16,22 @@ export function replaceNamespaceinRules(id: string) {
     ? id.replace("@salesforce-ux/", "")
     : id;
 }
+/**
+ * 
+ * @param text - The input text that could either be a plain string or a stringified JSON object.
+ * @returns The parsed message or the original string if parsing fails.
+ */
+export function parseText(text: string): string {
+  try {
+    // Try to parse the text as JSON
+    const parsed = JSON.parse(text);
+    // If successful, return the message property or the whole object if no message
+    return parsed.message || JSON.stringify(parsed);
+  } catch (error) {
+    // If JSON parsing fails, return the original string
+    return text;
+  }
+}
 
 /**
  * Prints detailed lint results for each file that has issues.
@@ -32,7 +48,7 @@ export function printLintResults(results: LintResult[], editor: string): void {
     const absolutePath = result.filePath || '';
     const relativeFile = path.relative(process.cwd(), absolutePath) || 'Unknown file';
     // Print file name with a preceding new line for spacing.
-    Logger.info(`\n${chalk.bold(relativeFile)}`);
+    Logger.newLine().info(`${chalk.bold(relativeFile)}`);
 
     if (hasErrors) {
       result.errors.forEach((error: any) => {
@@ -40,9 +56,9 @@ export function printLintResults(results: LintResult[], editor: string): void {
           const lineCol = `${error.line}:${error.column}`;
           const clickable = createClickableLineCol(lineCol, absolutePath, error.line, error.column, editor);
           const ruleId = error.ruleId ? chalk.dim(replaceNamespaceinRules(error.ruleId)) : '';
-          Logger.error(`  ${clickable}  ${error.message}  ${ruleId}`);
+          Logger.error(`  ${clickable}  ${parseText(error.message)}  ${ruleId}`);
         } else {
-          Logger.error(`  ${chalk.red('Error:')} ${error.message}`);
+          Logger.error(`  ${chalk.red('Error:')} ${parseText(error.message)}`);
         }
       });
     }
@@ -53,9 +69,9 @@ export function printLintResults(results: LintResult[], editor: string): void {
           const lineCol = `${warn.line}:${warn.column}`;
           const clickable = createClickableLineCol(lineCol, absolutePath, warn.line, warn.column, editor);
           const ruleId = warn.ruleId ? chalk.dim(replaceNamespaceinRules(warn.ruleId)) : '';
-          Logger.warning(`  ${clickable}  ${warn.message}  ${ruleId}`);
+          Logger.warning(`  ${clickable}  ${parseText(warn.message)}  ${ruleId}`);
         } else {
-          Logger.warning(`  ${chalk.yellow('Warning:')} ${warn.message}`);
+          Logger.warning(`  ${chalk.yellow('Warning:')} ${parseText(warn.message)}`);
         }
       });
     }

@@ -1,17 +1,9 @@
 import { CliOptions } from "../types";
 import path from "path";
 import { accessSync } from "fs";
-import { glob, globSync } from "glob";
+import { isDynamicPattern } from "globby";
 
-export function validateAndNormalizeDirPath(inputPath?: string): string {
-    if (!inputPath) {
-      return process.cwd();
-    }
-    //TODO: To check whether it is a valid glob string else error out.
-    return inputPath;
-}
-
-export function validateAndNormalizeOutputPath(inputPath?: string): string {
+export function nomalizeAndValidatePath(inputPath?: string): string {
   if (!inputPath) {
     return process.cwd();
   }
@@ -27,6 +19,17 @@ export function validateAndNormalizeOutputPath(inputPath?: string): string {
   }
 }
 
+export function nomalizeDirPath(inputPath?: string): string {
+  if (!inputPath) {
+    return process.cwd();
+  }
+  // return the inputPath if the glob pattern is supplied
+  if (isDynamicPattern(inputPath)) {
+    return inputPath;
+  }
+  return nomalizeAndValidatePath(inputPath);
+}
+
 export function normalizeCliOptions(
   options: CliOptions,
   defultOptions: Partial<CliOptions> = {}
@@ -34,12 +37,12 @@ export function normalizeCliOptions(
   return {
     fix: false,
     editor: "vscode",
-    config: "",
-    configStyle: "",
+    configStylelint: "",
     configEslint: "",
+    format: "sarif",
     ...defultOptions,
     ...options,
-    directory: validateAndNormalizeDirPath(options.directory),
-    output: validateAndNormalizeOutputPath(options.output),
+    directory: nomalizeDirPath(options.directory),
+    output: nomalizeAndValidatePath(options.output),
   };
 }

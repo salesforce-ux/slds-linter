@@ -42,8 +42,8 @@ const findClosestColorHook = (
 
       hooks.forEach((hook) => {
         const labSupportedColor = chroma(sldsValue).lab();
-        const distance = chroma.distance(labColor, labSupportedColor, 'lab');
-
+        const distance = (JSON.stringify(labColor) === JSON.stringify(labSupportedColor)) ? 0
+            : chroma.distance(chroma.lab(...labColor), chroma.lab(...labSupportedColor), "lab");
         // Check if the hook has the same property
         if (hook.properties.includes(cssProperty)) {
           // Add to same property hooks if within threshold

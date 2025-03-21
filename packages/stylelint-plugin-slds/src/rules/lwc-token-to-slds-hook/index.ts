@@ -1,7 +1,7 @@
 import { lwcToSlds } from '@salesforce-ux/metadata-slds';
-import { Root } from 'postcss';
+import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
-import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
+import stylelint, { PostcssResult, Rule, RuleContext, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 
@@ -37,27 +37,17 @@ function shouldIgnoreDetection(lwcToken: string) {
   );
 }
 
-function getRecommendation(lwcToken: string, reportProps: any) {
+function getRecommendation(lwcToken: string) {
   const oldValue = lwcToken;
   const recommendation = lwcToSlds[oldValue];
   const hasRecommendation = recommendation && recommendation !== '--';
-  if (!hasRecommendation) {
-    // Found a deprecated token but don't have any alternate recommendation then just report user to follow docs
-    stylelint.utils.report({
-      message: messages.errorWithNoRecommendation(oldValue),
-      ...reportProps,
-    });
-    return;
-  }
-  return recommendation;
+  return {hasRecommendation, recommendation};
 }
 
-function isValueFixed(recommendation, decl, parsedValue) {
+function isValueFixed(recommendation, decl) {
   // Skip if the value has already been fixed only if the recommendation starts with '--slds-'
   const isFixed = (newValue: string) =>
-    newValue.startsWith('--slds-') &&
-    (decl.value.includes(newValue) ||
-      JSON.stringify(parsedValue).includes(newValue));
+    newValue.startsWith('--slds-') && decl.value.includes(newValue);
 
   // If there are multiple --slds- token recommendation for single --lwc we maintain recommendations as array
   let checkFixed = Array.isArray(recommendation)
@@ -66,74 +56,106 @@ function isValueFixed(recommendation, decl, parsedValue) {
   return checkFixed.some(isFixed);
 }
 
-function detectRightSide(decl, basicReportProps, autoFixEnabled) {
+function isVarFunction(node:valueParser.Node): boolean{
+  return (node.type === "function" && node.value === "var" && node.nodes.length>0);
+}
+
+function isAlreadyFixed(recommendation:string,functionNode:valueParser.FunctionNode, allNodes:valueParser.Node[]): boolean{
+  const hasFixInFirstNode = allNodes[0].type == "word" && allNodes[0].value === recommendation;
+  const sourceIndexMatched = functionNode.sourceIndex === allNodes[allNodes.length - 1].sourceIndex
+  return hasFixInFirstNode&& sourceIndexMatched;
+}
+
+function getReportMessage(cssVar:string, recommendation:string|string[]):string{
+  if (!recommendation) {
+    // Found a deprecated token but don't have any alternate recommendation then just report user to follow docs
+    return messages.errorWithNoRecommendation(cssVar);
+  } else if(Array.isArray(recommendation)){
+    return messages.errorWithStyleHooks(cssVar, recommendation.join(' or '));   
+  }
+
+  return messages.errorWithStyleHooks(cssVar, recommendation);
+}
+
+function transformVarFunction(node:valueParser.Node, allNodes:valueParser.Node[]) {
+  if(!isVarFunction(node)){
+    return null;
+  }
+  const functionNode = node as valueParser.FunctionNode;
+  let cssVarNode = functionNode.nodes[0];
+  let hasFallback = functionNode.nodes.length > 2; // Checking if fallback exists
+  let cssVar = cssVarNode.value;
+
+  if (shouldIgnoreDetection(cssVar)) {
+    return null;
+  }
+
+  const index = cssVarNode.sourceIndex;
+  const endIndex = cssVarNode.sourceEndIndex;
+  let replacement:string;
+
+  let {hasRecommendation, recommendation} = getRecommendation(cssVar);
+  if (hasRecommendation) {
+    if(typeof recommendation ==='string' && recommendation.startsWith('--slds-')){
+      
+      if(isAlreadyFixed(recommendation,functionNode,allNodes)){ 
+        // Ignore if already fixed.
+        return null;
+      }
+      replacement = hasFallback
+      ? `var(${recommendation}, var(${cssVar}, ${valueParser.stringify(functionNode.nodes.slice(2))}))`
+      : `var(${recommendation}, var(${cssVar}))`;
+    }
+  } else {
+    recommendation = null;
+  }
+  return {cssVar, replacement, recommendation, original: valueParser.stringify(node), index, endIndex};
+}
+
+/**
+ * 
+ * Example:
+ *  .THIS  .demo {
+ *    border-top: 1px solid var(--lwc-colorBorder, var(--lwc-colorBrandDarker, red));
+ *  }
+ * 
+ */
+function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Problem>) {
   const parsedValue = valueParser(decl.value);
+  const startIndex = decl.toString().indexOf(decl.value);
   // Usage on right side
-  parsedValue.walk((node) => {
-    if (node.type !== 'word' || !node.value.startsWith('--lwc-')) {
-      return;
-    }
-
-    const oldValue = node.value;
-
-    if (shouldIgnoreDetection(oldValue)) {
-      // Ignore if entry not found in the list or the token is marked to use further
-      return;
-    }
-
-    const startIndex = decl.toString().indexOf(decl.value);
-    const endIndex = startIndex + decl.value.length;
-    const reportProps = {
-      index: startIndex,
-      endIndex,
-      ...basicReportProps,
-    };
-
-    const recommendation = getRecommendation(oldValue, reportProps);
-    const hasRecommendation = recommendation && recommendation !== '--';
-
-    if (!hasRecommendation) {
-      return;
-    }
-
-    // Ignores if value already fixed with --slds token
-    if (isValueFixed(recommendation, decl, parsedValue)) {
-      return;
-    }
-
-    // Found recommendation, replace value
-    let proposedFix = '';
-    let canFix = true;
-    let message;
-    if (Array.isArray(recommendation)) {
-      message = messages.errorWithStyleHooks(
-        oldValue,
-        recommendation.join(' or ')
-      );
-      canFix = false;
-    } else if (recommendation.startsWith('--slds-')) {
-      message = messages.errorWithStyleHooks(oldValue, recommendation);
-      // add recommendation with fallback
-      proposedFix = `var(${recommendation}, ${decl.value})`;
-    } else {
-      message = messages.errorWithStyleHooks(oldValue, recommendation);
-      // for any raw values, color-mix, calc
-      proposedFix = recommendation;
-    }
-
-    stylelint.utils.report({
-      message,
-      ...reportProps,
-    });
-
-    // Fix if the context allows
-    if (autoFixEnabled && canFix) {
-      decl.value = proposedFix;
+  parsedValue.walk((node, i, allNodes) => {
+    const result = transformVarFunction(node, allNodes);
+    if(result){
+      const {cssVar, replacement, recommendation, original, index, endIndex} = result;
+      const message = getReportMessage(cssVar, recommendation);
+      let fix = null;
+      
+      if(replacement){
+        fix = () => {
+          decl.value = decl.value.replace(original, replacement);
+        }
+      }
+      
+      stylelint.utils.report(<stylelint.Problem>{
+        message,
+        ...basicReportProps,
+        index: index+startIndex, endIndex: endIndex+startIndex, fix
+      });
     }
   });
 }
 
-function detectLeftSide(decl, basicReportProps, autoFixEnabled) {
+/**
+ * 
+ * Example:
+ * 
+ *.THIS {
+ *     --lwc-colorBorder: #f73650;
+ * }
+ * 
+ */
+function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Problem>) {
   // Usage on left side
   const { prop } = decl;
   if (shouldIgnoreDetection(prop)) {
@@ -147,62 +169,41 @@ function detectLeftSide(decl, basicReportProps, autoFixEnabled) {
     endIndex,
     ...basicReportProps,
   };
-  const recommendation = getRecommendation(prop, reportProps);
-  const hasRecommendation = recommendation && recommendation !== '--';
-
-  if (!hasRecommendation) {
-    return;
+  const {hasRecommendation, recommendation} = getRecommendation(prop);
+  // for any raw values, color-mix, calc just recommend as deprecated, suggest only if recommendation is string or array of strings
+  const canSuggest = (hasRecommendation && (Array.isArray(recommendation) || recommendation.startsWith('--slds-')));
+  reportProps.message = getReportMessage(prop, canSuggest?recommendation:null);
+  if(typeof recommendation ==='string' && recommendation.startsWith('--slds-')){
+    reportProps.fix = () => {
+      decl.prop = recommendation;
+    }
   }
 
-  // Found recommendation, replace value
-  const oldValue = prop;
-  let canFix = false;
-  let message;
-  if (Array.isArray(recommendation)) {
-    message = messages.errorWithStyleHooks(
-      oldValue,
-      recommendation.join(' or ')
-    );
-  } else if (recommendation.startsWith('--slds-')) {
-    message = messages.errorWithStyleHooks(oldValue, recommendation);
-    // add recommendation with fallback
-    recommendation;
-    canFix = true;
-  } else {
-    // for any raw values, color-mix, calc just recommend as deprecated
-    message = messages.errorWithNoRecommendation(oldValue);
-  }
-
-  stylelint.utils.report({
-    message,
-    ...reportProps,
-  });
-
-  // Fix if the context allows
-  if (autoFixEnabled && canFix) {
-    decl.prop = recommendation;
-  }
+  stylelint.utils.report(<stylelint.Problem>reportProps);
 }
 
 // Define the main rule logic
-function rule(
-  primaryOptions: boolean,
-  { severity = severityLevel as RuleSeverity } = {}
-) {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
-    const autoFixEnabled = result.stylelint.config.fix;
     root.walkDecls((node) => {
-      const basicReportProps = {
+      const basicReportProps:Partial<stylelint.Problem> = {
         node,
         result,
         ruleName,
         severity,
       };
-      detectRightSide(node, basicReportProps, autoFixEnabled);
-      detectLeftSide(node, basicReportProps, autoFixEnabled);
+      detectRightSide(node, basicReportProps);
+      detectLeftSide(node, basicReportProps);
     });
   };
 }
+ruleFunction.ruleName = ruleName;
+ruleFunction.messages = messages;
+ruleFunction.meta = {
+  url: '',
+  fixable: true
+};
 
 // Export the plugin
-export default createPlugin(ruleName, rule as unknown as Rule);
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);
+

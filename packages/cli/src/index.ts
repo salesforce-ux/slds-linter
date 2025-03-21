@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { registerLintStylesCommand } from './commands/lint-styles';
-import { registerLintComponentsCommand } from './commands/lint-components';
 import { registerLintCommand } from './commands/lint';
 import { registerReportCommand } from './commands/report';
 import { registerEmitCommand } from './commands/emit';
@@ -34,11 +32,14 @@ function registerVersion(){
   .version(process.env.CLI_VERSION);
 }
 
-registerLintStylesCommand(program);
-registerLintComponentsCommand(program);
 registerLintCommand(program);
 registerReportCommand(program);
 registerEmitCommand(program);
 registerVersion();
+program.configureHelp({  
+  subcommandTerm:(cmd)=>{
+    return cmd.name();
+  },
+})
 
 program.parse(process.argv); 

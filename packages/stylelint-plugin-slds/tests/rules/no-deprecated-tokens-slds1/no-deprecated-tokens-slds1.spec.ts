@@ -1,7 +1,4 @@
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
 import stylelint from 'stylelint';
-import path from 'path';
 
 const ruleName = 'slds/no-deprecated-tokens-slds1';
 const config = {
@@ -29,8 +26,8 @@ describe('no-deprecated-tokens-slds1 Stylelint Rule', () => {
     });
 
     const warnings = result.results[0].warnings;
-    expect(warnings).to.have.lengthOf(1);
-    expect(warnings[0].text).to.include(
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].text).toMatch(
       'Consider removing token(brandPrimary) or replacing it with var(--lwc-brandPrimary, token(brandPrimary)). Set the fallback to token(brandPrimary). For more info, see Styling Hooks on lightningdesignsystem.com.'
     );
   });
@@ -46,7 +43,7 @@ describe('no-deprecated-tokens-slds1 Stylelint Rule', () => {
     });
 
     const fixedCode = result.output;
-    expect(fixedCode).to.include(
+    expect(fixedCode).toMatch(
       'color: var(--lwc-brandPrimary, token(brandPrimary));'
     );
   });
@@ -63,7 +60,7 @@ describe('no-deprecated-tokens-slds1 Stylelint Rule', () => {
     });
 
     const warnings = result.results[0].warnings;
-    expect(warnings).to.have.lengthOf(0);
+    expect(warnings).toHaveLength(0);
   });
 
   it('should handle unknown tokens gracefully', async () => {
@@ -77,8 +74,8 @@ describe('no-deprecated-tokens-slds1 Stylelint Rule', () => {
     });
 
     const warnings = result.results[0].warnings;
-    expect(warnings).to.have.lengthOf(1);
-    expect(warnings[0].text).to.include(
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].text).toMatch(
       'Update outdated design tokens to SLDS 2 styling hooks with similar values. For more information, see Styling Hooks on lightningdesignsystem.com.'
     );
   });

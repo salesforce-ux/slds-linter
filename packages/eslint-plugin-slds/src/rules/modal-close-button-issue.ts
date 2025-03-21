@@ -1,4 +1,5 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
+import { messages } from "./utils/rule";
 
 // This rule specific to CVS, find more details here https://issues.salesforce.com/issue/a028c00000zh1iqAAA/modal-close-button-is-not-visible-with-the-new-white-background-after-winter-25-release
 export = {
@@ -10,18 +11,6 @@ export = {
     },
     fixable: "code",
     schema: [],
-    messages: {
-      removeClass:
-        "Remove the slds-button_icon-inverse class from the modal close button in components that use the SLDS modal blueprint.",
-      changeVariant:
-        "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>.",
-      removeVariant:
-        "Remove the variant attribute from the <lightning-icon> component inside the <button> element.",
-      ensureButtonClasses:
-        "Add or move slds-button and slds-button_icon to the class attribute of the <button> element or <lightning-button-icon> component.",
-      ensureSizeAttribute:
-        "To size icons properly, set the size attribute ‌to large in the <lightning-icon> and <lightning-button-icon> components.",
-    },
   },
 
   create(context) {
@@ -45,20 +34,20 @@ export = {
             return; // Stop execution if the class is missing
           }
 
-          if (classList.includes("slds-button_icon-inverse")) {
-            context.report({
-              node,
-              messageId: "removeClass",
-              fix(fixer) {
-                const newClassList = classList
-                  .filter((cls) => cls !== "slds-button_icon-inverse")
-                  .join(" ");
-                return fixer.replaceText(
-                  classAttr, // Replace the full attribute
-                  `class="${newClassList}"` // Updated class list
-                );
-              },
-            });
+          if (classList.includes("slds-button_icon-inverse") || classList.includes("slds-button--icon-inverse")) {
+            const newClassList = classList
+                                    .filter((cls) => (cls !== "slds-button_icon-inverse" && cls !== "slds-button--icon-inverse"))
+                                    .join(" ");
+                        context.report({
+                            node,
+                            loc: classAttr.loc,
+                            message: JSON.stringify({message: messages["removeClass"], suggestions: [`class="${newClassList}"`]}),
+                            fix(fixer) {                         
+                                return fixer.replaceText(classAttr, // Replace the full attribute
+                                `class="${newClassList}"` // Updated class list
+                                );
+                            },
+                        });
           }
         }
       }
@@ -68,63 +57,94 @@ export = {
         const variantAttr = findAttr(node, "variant");
         const sizeAttr = findAttr(node, "size");
         const classAttr = findAttr(node, "class");
+        const iconClassAttr = findAttr(node, "icon-class"); // 🔍 Check for icon-class attribute
+      
+        function validateClassAttr(attribute, attrName) {
+          if (attribute && attribute.value) {
+            const classList = attribute.value.value.split(/\s+/);
 
-        if (classAttr && classAttr.value) {
-          const classList = classAttr.value.value.split(/\s+/);
-
-          // ✅ Ensure button has "slds-modal__close" before proceeding
-          if (!classList.includes("slds-modal__close")) {
-            return; // Stop execution if the class is missing
-          }
-
-          // Fix variant="bare-inverse" to "bare"
-          if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
-            context.report({
-              node: variantAttr,
-              messageId: "changeVariant",
-              fix(fixer) {
-                return fixer.replaceText(variantAttr.value, `bare`);
-              },
-            });
-          }
-
-          // Ensure size="large" exists
-          if (!sizeAttr) {
-            context.report({
-              node,
-              messageId: "ensureSizeAttribute",
-              fix(fixer) {
-                //return fixer.insertTextAfter(node, ' size="large"');
-                if(variantAttr)
-                {
-                  return fixer.insertTextAfterRange([variantAttr?.range[1], variantAttr?.range[1]], ' size="large"')
-                }
-              },
-            });
-          }
-
-          // Ensure 'slds-button' and 'slds-button_icon' are in the class attribute 
-          if (classAttr && classAttr.value) {
-            const classList = classAttr.value.value.split(/\s+/);
-            if (!classList.includes("slds-button") || !classList.includes("slds-button_icon")) {
-              context.report({
-                node: classAttr,
-                messageId: "ensureButtonClasses",
-                fix(fixer) {
-                  const newClassList = [
-                    "slds-button",
-                    "slds-button_icon",
-                    ...classList.filter(
-                      (cls) => cls !== "slds-button_icon-inverse"
-                    ),
-                  ].join(" ");
-                  return fixer.replaceText(classAttr.value, `"${newClassList}"`);
-                },
-              });
+            // Irrespective of whether we are checking for class or icon-class we need to check whether the attribute is present or not.
+            // ✅ Ensure "slds-modal__close" exists before proceeding
+            if(!classAttr?.value?.value?.includes("slds-modal__close"))
+            {
+              return;
             }
+      
+            // ✅ Ensure "slds-modal__close" exists before proceeding
+            // if (!classList.includes("slds-modal__close")) {
+            //   return; // Stop execution if the class is missing
+            // }
+      
+            // Remove inverse classes
+            if (classList.includes("slds-button_icon-inverse") || classList.includes("slds-button--icon-inverse")) {
+              const newClassList = classList
+                                        .filter((cls) => cls !== "slds-button_icon-inverse" && cls !== "slds-button--icon-inverse")
+                                        .join(" ");
+                            context.report({
+                                node,
+                                loc: attribute.loc,
+                                message: JSON.stringify({message:messages["removeClass"],suggestions:[`${attrName}="${newClassList}"`]}),
+                                fix(fixer) {
+                                    return fixer.replaceText(attribute, // Replace the full attribute
+                                    `${attrName}="${newClassList}"` // Correctly modifies the respective attribute
+                                    );
+                                },
+                            });
+            }
+      
+            // Ensure 'slds-button' and 'slds-button_icon' exist
+            if (!classList.includes("slds-button") || !classList.includes("slds-button_icon")) {
+              let newClassList;
+              if(attrName === 'icon-class'){
+                newClassList = [
+                  ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
+                ].join(" ");
+              }else{
+                newClassList = [
+                  "slds-button",
+                  "slds-button_icon",
+                  ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
+                ].join(" ");
+              }
+              context.report({
+                node: attribute,
+                loc: attribute.value.loc,
+                message: JSON.stringify({message:messages["ensureButtonClasses"],suggestions:[newClassList]}),
+                fix(fixer) {
+                  return fixer.replaceText(attribute.value, `${newClassList}`);
+                },
+              });}
+              
+            // Fix variant="bare-inverse" to "bare"
+            if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
+              context.report({
+                node: variantAttr,
+                message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}),
+                loc: variantAttr.value.loc,
+                fix(fixer) {
+                    return fixer.replaceText(variantAttr.value, `bare`);
+                },
+            });
+            }
+          
+            // Ensure size="large" exists
+            // if (!sizeAttr) {
+            //   context.report({
+            //     node,
+            //     message: messages["ensureSizeAttribute"],
+            //     fix(fixer) {
+            //       if (variantAttr) {
+            //         return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], ' size="large"');
+            //       }
+            //     },
+            //   });
+            // }
           }
         }
-
+      
+        // ✅ Validate `class` and `icon-class` separately, maintaining their own attribute names
+        validateClassAttr(classAttr, "class");
+        validateClassAttr(iconClassAttr, "icon-class");
       }
 
       // ✅ Scenario 3: Fix <lightning-icon> inside <button> & the class name of the parent name as button and it should have `slds-modal__close`
@@ -144,38 +164,39 @@ export = {
           if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
             context.report({
               node: variantAttr,
-              messageId: "changeVariant",
+              message: JSON.stringify({message:messages["changeVariant"], suggestions:["bare"]}),
+              loc: variantAttr.value.loc,
               fix(fixer) {
-                return fixer.replaceText(variantAttr.value, `"bare"`);
+                  return fixer.replaceText(variantAttr.value, `bare`);
               },
-            });
+          });
           }
 
-          // Remove variant attribute completely
-          if (variantAttr) {
-            context.report({
-              node: variantAttr,
-              messageId: "removeVariant",
-              fix(fixer) {
-                return fixer.remove(variantAttr);
-              },
-            });
-          }
+          // // Remove variant attribute completely
+          // if (variantAttr) {
+          //   context.report({
+          //     node: variantAttr,
+          //     messageId: "removeVariant",
+          //     fix(fixer) {
+          //       return fixer.remove(variantAttr);
+          //     },
+          //   });
+          // }
 
           //Ensure size="large" is set
-          if (!sizeAttr) {
-            context.report({
-              node,
-              messageId: "ensureSizeAttribute",
-              fix(fixer) {
-                //return fixer.insertTextAfter(node, ' size="large"');
-                if(variantAttr)
-                {
-                  return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], 'size="large"')
-                }
-              },
-            });
-          }
+          // if (!sizeAttr) {
+          //   context.report({
+          //     node,
+          //     message: messages["ensureSizeAttribute"],
+          //     fix(fixer) {
+          //       //return fixer.insertTextAfter(node, ' size="large"');
+          //       if(variantAttr)
+          //       {
+          //         return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], ' size="large"')
+          //       }
+          //     },
+          //   });
+          // }
         }
       }
     }

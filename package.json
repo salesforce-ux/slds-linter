@@ -19,7 +19,8 @@
     "test": "yarn workspaces run test",
     "build": "yarn workspaces run build",
     "release": "node scripts/release.js",
-    "coverage": "yarn test --coverage && node ./scripts/mergeCoverage.mjs"
+    "coverage": "yarn test --coverage && yarn gen:coverage-summary",
+    "gen:coverage-summary":"node scripts/consolidate-coverage.js"    
   },
   "devDependencies": {
     "@types/eslint": "^8.0.0",
@@ -33,6 +34,10 @@
     "gulp-execa": "^8.0.0",
     "husky": "^8.0.0",
     "lint-staged": "^15.3.0",
+    "listr2":"^8.2.5",
+    "@listr2/prompt-adapter-inquirer": "^2.0.18",
+    "@inquirer/input":"^4.1.7",
+    "@inquirer/select":"^4.0.10",
     "prettier": "^3.4.2",
     "prompts": "^2.4.2",
     "rimraf": "^6.0.1",

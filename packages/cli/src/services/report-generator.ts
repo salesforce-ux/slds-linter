@@ -1,12 +1,14 @@
 import path from 'path';
-import fs from 'fs/promises';
+import fs, { writeFile } from 'fs/promises';
+import { mkConfig, generateCsv, asString } from 'export-to-csv';
 import { Logger } from '../utils/logger';
 import { LintResult } from '../types';
 import { SarifBuilder, SarifRunBuilder, SarifResultBuilder, SarifRuleBuilder } from 'node-sarif-builder';
 import { createWriteStream } from 'fs';
 import { JsonStreamStringify } from 'json-stream-stringify';
 import {getRuleDescription} from "./config.resolver";
-import { replaceNamespaceinRules } from '../utils/lintResultsUtil';
+import { parseText, replaceNamespaceinRules } from '../utils/lintResultsUtil';
+
 
 export interface ReportOptions {
   outputPath: string;
@@ -22,7 +24,6 @@ export class ReportGenerator {
     results: LintResult[],
     options: ReportOptions
   ): Promise<void> {
-    try {
       const builder = new SarifBuilder();
       const runBuilder = new SarifRunBuilder().initSimple({
         toolDriverName: options.toolName,
@@ -65,13 +66,7 @@ export class ReportGenerator {
           .pipe(writeStream)
           .on('finish', resolve)
           .on('error', reject);
-      });
-
-      Logger.success(`SARIF report generated: ${options.outputPath}`);
-    } catch (error: any) {
-      Logger.error(`Failed to generate SARIF report: ${error.message}`);
-      throw error;
-    }
+      });      
   }
 
   /**
@@ -129,8 +124,8 @@ export class ReportGenerator {
       const resultBuilder = new SarifResultBuilder().initSimple({
         ruleId: replaceNamespaceinRules(error.ruleId),
         level: 'error',
-        messageText: error.message,
-        fileUri: lintResult.filePath,
+        messageText: parseText(error.message),
+        fileUri: path.relative(process.cwd(), lintResult.filePath),
         startLine: error.line,
         startColumn: error.column,
         endLine: error.line,
@@ -144,8 +139,8 @@ export class ReportGenerator {
       const resultBuilder = new SarifResultBuilder().initSimple({
         ruleId: replaceNamespaceinRules(warning.ruleId),
         level: 'warning',
-        messageText: warning.message,
-        fileUri: lintResult.filePath,
+        messageText: parseText(warning.message),
+        fileUri: path.relative(process.cwd(), lintResult.filePath),
         startLine: warning.line,
         startColumn: warning.column,
         endLine: warning.line,
@@ -154,4 +149,53 @@ export class ReportGenerator {
       runBuilder.addResult(resultBuilder);
     }
   }
-} 
+}
+
+export class CsvReportGenerator {
+  static async generate(results: any[]) {
+    const csvConfig = mkConfig({
+      filename: 'slds-linter-report',
+      fieldSeparator: ',',
+      quoteStrings: true,
+      decimalSeparator: '.',
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    });
+
+    const cwd = process.cwd();
+
+    const transformedResults = results.flatMap((result: { errors: any[]; filePath: string; warnings: any[]; }) =>
+      [
+        ...result.errors.map((error: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
+          "File Path": path.relative(cwd, result.filePath),
+          "Message": parseText(error.message),
+          "Severity": 'error',
+          "Rule ID": replaceNamespaceinRules(error.ruleId || 'N/A'),
+          "Start Line": error.line,
+          "Start Column": error.column,
+          "End Line": error.endLine || error.line, // Default to start line if missing
+          "End Column": error.endColumn || error.column // Default to start column if missing
+        })),
+        ...result.warnings.map((warning: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
+          "File Path": path.relative(cwd, result.filePath),
+          "Message": parseText(warning.message),
+          "Severity": 'warning',
+          "Rule ID": replaceNamespaceinRules(warning.ruleId || 'N/A'),
+          "Start Line": warning.line,
+          "Start Column": warning.column,
+          "End Line": warning.endLine || warning.line, // Default to start line if missing
+          "End Column": warning.endColumn || warning.column // Default to start column if missing
+        }))
+      ]
+    );
+
+    const csvData = generateCsv(csvConfig)(transformedResults);
+    const csvString = asString(csvData);
+    const csvReportPath = path.join(cwd, `${csvConfig.filename}.csv`);
+
+    return writeFile(csvReportPath, csvString).then(() => {
+      return csvReportPath;
+    });
+  }
+}

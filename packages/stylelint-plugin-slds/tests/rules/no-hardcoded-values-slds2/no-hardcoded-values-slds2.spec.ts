@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;
@@ -16,7 +15,7 @@ describe('no-hardcoded-values-slds2', () => {
         }
       `,
       expectedMessage:
-      "Consider replacing the #ff0000 static value with an SLDS 2 styling hook that has a similar value: --slds-g-color-on-error-2"
+        'There’s no replacement SLDS 2 styling hook for the #ff0000 static value. Remove the static value.',
     },
     {
       description: 'Does not report 0 as a value',
@@ -46,22 +45,26 @@ describe('no-hardcoded-values-slds2', () => {
       expectedMessage: null,
     },
     {
-      description: 'Reports warning for hardcoded font-size value with replacement hook',
+      description:
+        'Reports warning for hardcoded font-size value with replacement hook',
       inputCss: `
         .example {
           font-size: 0.875rem;
         }
       `,
-      expectedMessage: "Consider replacing the 0.875rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-1 (slds/no-hardcoded-values-slds2)",
+      expectedMessage:
+        'Consider replacing the 0.875rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-1 (slds/no-hardcoded-values-slds2)',
     },
     {
-      description: 'Reports warning for hardcoded box-shadow value with replacement hook',
+      description:
+        'Reports warning for hardcoded box-shadow value with replacement hook',
       inputCss: `
         .example {
           box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15);
         }
       `,
-      expectedMessage: "Consider replacing the 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15) static value with an SLDS 2 styling hook that has a similar value: --slds-s-input-shadow-focus (slds/no-hardcoded-values-slds2)"
+      expectedMessage:
+        'Consider replacing the 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15) static value with an SLDS 2 styling hook that has a similar value: --slds-s-input-shadow-focus (slds/no-hardcoded-values-slds2)',
     },
     {
       description:
@@ -72,7 +75,7 @@ describe('no-hardcoded-values-slds2', () => {
         }
       `,
       expectedMessage:
-      "Consider replacing the 16px static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-2"
+        'Consider replacing the 16px static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-2',
     },
     {
       description:
@@ -82,13 +85,8 @@ describe('no-hardcoded-values-slds2', () => {
           background-color: #123456;
         }
       `,
-      expectedMessage:`Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: 
-1. --slds-g-color-surface-inverse-1 
-2. --slds-g-color-surface-container-inverse-1 
-3. --slds-g-color-surface-inverse-2 
-4. --slds-g-color-surface-container-inverse-2 
-5. --slds-g-color-accent-container-1 
-`,
+      expectedMessage:
+        '{"message":"Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: \\n1. --slds-g-color-surface-inverse-2 \\n2. --slds-g-color-surface-container-inverse-2 \\n3. --slds-g-color-surface-inverse-1 \\n4. --slds-g-color-surface-container-inverse-1 \\n (slds/no-hardcoded-values-slds2)","suggestions":["--slds-g-color-surface-inverse-2","--slds-g-color-surface-container-inverse-2","--slds-g-color-surface-inverse-1","--slds-g-color-surface-container-inverse-1"]}',
     },
     {
       description:
@@ -119,9 +117,9 @@ describe('no-hardcoded-values-slds2', () => {
       );
 
       if (expectedMessage) {
-        expect(messages[0]).to.include(expectedMessage);
+        expect(messages[0]).toMatch(expectedMessage);
       } else {
-        expect(messages).to.be.empty;
+        expect(messages).toHaveLength(0);
       }
     });
   });

@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;
@@ -16,8 +16,8 @@ describe('no-hardcoded-values-slds1', () => {
         }
       `,
       expectedMessage:
-        'Replace the #ff0000 static value with an SLDS 1 styling hook: --slds-g-color-error-1.',
-      expectedReplacement: '--slds-g-color-error-1',
+        'Replace the #ff0000 static value with an SLDS 1 styling hook: --slds-g-color-error-base-50',
+      expectedReplacement: '--slds-g-color-error-base-50',
     },
     {
       description: 'Does not report for 0 as a value',
@@ -84,7 +84,7 @@ describe('no-hardcoded-values-slds1', () => {
         }
       `,
       expectedMessage:
-        'Replace the #123456 static value with an SLDS 1 styling hook: \n1. --slds-g-color-accent-container-3 \n2. --slds-g-color-surface-inverse-1 \n3. --slds-g-color-surface-container-inverse-1 \n4. --slds-g-color-surface-inverse-2 \n5. --slds-g-color-surface-container-inverse-2 \n. (slds/no-hardcoded-values-slds1)',
+        'Replace the #123456 static value with an SLDS 1 styling hook: \n1. --slds-g-color-surface-inverse-1 \n2. --slds-g-color-surface-container-inverse-1 \n3. --slds-g-color-surface-inverse-2 \n4. --slds-g-color-surface-container-inverse-2 \n5. --slds-g-color-accent-container-3 \n. (slds/no-hardcoded-values-slds1)',
     },
     {
       description:
@@ -129,12 +129,12 @@ describe('no-hardcoded-values-slds1', () => {
           (warning) => warning.text
         );
         if (expectedMessage) {
-          expect(messages[0]).to.include(expectedMessage);
+          expect(messages[0]).toMatch(expectedMessage);
         } else {
-          expect(messages).to.be.empty;
+          expect(messages).toHaveLength(0);
         }
         if (expectedReplacement) {
-          expect(messages[0]).to.include(expectedReplacement);
+          expect(messages[0]).toMatch(expectedReplacement);
         }
       });
     }
