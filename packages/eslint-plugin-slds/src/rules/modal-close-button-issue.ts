@@ -35,19 +35,19 @@ export = {
           }
 
           if (classList.includes("slds-button_icon-inverse") || classList.includes("slds-button--icon-inverse")) {
-            context.report({
-              node,
-              message: messages["removeClass"],
-              fix(fixer) {
-                const newClassList = classList
-                  .filter((cls) => (cls !== "slds-button_icon-inverse" && cls !== "slds-button--icon-inverse"))
-                  .join(" ");
-                return fixer.replaceText(
-                  classAttr, // Replace the full attribute
-                  `class="${newClassList}"` // Updated class list
-                );
-              },
-            });
+            const newClassList = classList
+                                    .filter((cls) => (cls !== "slds-button_icon-inverse" && cls !== "slds-button--icon-inverse"))
+                                    .join(" ");
+                        context.report({
+                            node,
+                            loc: classAttr.loc,
+                            message: JSON.stringify({message: messages["removeClass"], suggestions: [`class="${newClassList}"`]}),
+                            fix(fixer) {                         
+                                return fixer.replaceText(classAttr, // Replace the full attribute
+                                `class="${newClassList}"` // Updated class list
+                                );
+                            },
+                        });
           }
         }
       }
@@ -77,74 +77,68 @@ export = {
       
             // Remove inverse classes
             if (classList.includes("slds-button_icon-inverse") || classList.includes("slds-button--icon-inverse")) {
-              context.report({
-                node,
-                message: messages["removeClass"],
-                fix(fixer) {
-                  const newClassList = classList
-                    .filter((cls) => cls !== "slds-button_icon-inverse" && cls !== "slds-button--icon-inverse")
-                    .join(" ");
-                  return fixer.replaceText(
-                    attribute, // Replace the full attribute
-                    `${attrName}="${newClassList}"` // Correctly modifies the respective attribute
-                  );
-                },
-              });
+              const newClassList = classList
+                                        .filter((cls) => cls !== "slds-button_icon-inverse" && cls !== "slds-button--icon-inverse")
+                                        .join(" ");
+                            context.report({
+                                node,
+                                loc: attribute.loc,
+                                message: JSON.stringify({message:messages["removeClass"],suggestions:[`${attrName}="${newClassList}"`]}),
+                                fix(fixer) {
+                                    return fixer.replaceText(attribute, // Replace the full attribute
+                                    `${attrName}="${newClassList}"` // Correctly modifies the respective attribute
+                                    );
+                                },
+                            });
             }
       
             // Ensure 'slds-button' and 'slds-button_icon' exist
             if (!classList.includes("slds-button") || !classList.includes("slds-button_icon")) {
+              let newClassList;
+              if(attrName === 'icon-class'){
+                newClassList = [
+                  ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
+                ].join(" ");
+              }else{
+                newClassList = [
+                  "slds-button",
+                  "slds-button_icon",
+                  ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
+                ].join(" ");
+              }
               context.report({
                 node: attribute,
-                message: messages["ensureButtonClasses"],
+                loc: attribute.value.loc,
+                message: JSON.stringify({message:messages["ensureButtonClasses"],suggestions:[newClassList]}),
                 fix(fixer) {
-                  let newClassList;
-                  
-                  if(attrName === 'icon-class'){
-                    newClassList = [
-                      ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
-                    ].join(" ");
-                  }
-                  else{
-                    newClassList = [
-                      "slds-button",
-                      "slds-button_icon",
-                      ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
-                    ].join(" ");
-                  }
-                  // const newClassList = [
-                  //   "slds-button",
-                  //   "slds-button_icon",
-                  //   ...classList.filter((cls) => cls !== "slds-button_icon-inverse"),
-                  // ].join(" ");
                   return fixer.replaceText(attribute.value, `${newClassList}`);
                 },
-              });
-            }
-
+              });}
+              
             // Fix variant="bare-inverse" to "bare"
             if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
               context.report({
                 node: variantAttr,
-                message: messages["changeVariant"],
+                message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}),
+                loc: variantAttr.value.loc,
                 fix(fixer) {
-                  return fixer.replaceText(variantAttr.value, `bare`);
+                    return fixer.replaceText(variantAttr.value, `bare`);
                 },
-              });
+            });
             }
           
             // Ensure size="large" exists
-            if (!sizeAttr) {
-              context.report({
-                node,
-                message: messages["ensureSizeAttribute"],
-                fix(fixer) {
-                  if (variantAttr) {
-                    return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], ' size="large"');
-                  }
-                },
-              });
-            }
+            // if (!sizeAttr) {
+            //   context.report({
+            //     node,
+            //     message: messages["ensureSizeAttribute"],
+            //     fix(fixer) {
+            //       if (variantAttr) {
+            //         return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], ' size="large"');
+            //       }
+            //     },
+            //   });
+            // }
           }
         }
       
@@ -170,11 +164,12 @@ export = {
           if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
             context.report({
               node: variantAttr,
-              message: messages["changeVariant"],
+              message: JSON.stringify({message:messages["changeVariant"], suggestions:["bare"]}),
+              loc: variantAttr.value.loc,
               fix(fixer) {
-                return fixer.replaceText(variantAttr.value, "bare");
+                  return fixer.replaceText(variantAttr.value, `bare`);
               },
-            });
+          });
           }
 
           // // Remove variant attribute completely
@@ -189,19 +184,19 @@ export = {
           // }
 
           //Ensure size="large" is set
-          if (!sizeAttr) {
-            context.report({
-              node,
-              message: messages["ensureSizeAttribute"],
-              fix(fixer) {
-                //return fixer.insertTextAfter(node, ' size="large"');
-                if(variantAttr)
-                {
-                  return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], ' size="large"')
-                }
-              },
-            });
-          }
+          // if (!sizeAttr) {
+          //   context.report({
+          //     node,
+          //     message: messages["ensureSizeAttribute"],
+          //     fix(fixer) {
+          //       //return fixer.insertTextAfter(node, ' size="large"');
+          //       if(variantAttr)
+          //       {
+          //         return fixer.insertTextAfterRange([variantAttr.range[1], variantAttr.range[1]], ' size="large"')
+          //       }
+          //     },
+          //   });
+          // }
         }
       }
     }
