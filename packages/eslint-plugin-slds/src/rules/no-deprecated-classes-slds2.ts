@@ -8,6 +8,8 @@ export = {
     docs: {
       category: "Best Practices",
       recommended: true,
+      description: "Replace classes that aren’t available with SLDS 2 classes. See lightningdesignsystem.com for more info.",
+      url : ""
     },
     schema: [], // No additional options needed
   },

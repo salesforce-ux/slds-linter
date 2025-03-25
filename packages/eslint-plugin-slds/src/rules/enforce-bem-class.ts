@@ -7,6 +7,8 @@ export = {
     docs: {
       category: "Stylistic Issues",
       recommended: true,
+      description: "Replace BEM double-dash syntax in class names with single underscore syntax.",
+      url : ""
     },
     fixable: "code", // This rule can be fixed automatically
     schema: [

@@ -30,13 +30,13 @@ describe('ESLint Plugin Configurations', () => {
   
     test('should define recommended configuration with plugins', () => {
       expect(index.configs.recommended).toHaveProperty('plugins');
-      expect(index.configs.recommended.plugins).toContain('slds');
+      expect(index.configs.recommended.plugins).toContain('@salesforce-ux/slds');
     });
   
     test('should define recommended configuration with rules', () => {
       expect(index.configs.recommended).toHaveProperty('rules');
-      expect(index.configs.recommended.rules).toHaveProperty('slds/enforce-bem-class', 'error');
-      expect(index.configs.recommended.rules).toHaveProperty('slds/no-deprecated-classes-slds2', 'error');
+      expect(index.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/enforce-bem-class', 'error');
+      expect(index.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/no-deprecated-classes-slds2', 'error');
     });
 });
 
