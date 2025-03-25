@@ -23,7 +23,7 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
 });
 
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkRules((rule) => {
       let fixOffset = 0; // aggregate position change if using auto-fix, tracked at the rule level
@@ -62,6 +62,11 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
   };
 }
 
-rule.meta = { ruleName, messages, fixable: true };
+ruleFunction.ruleName = ruleName;
+ruleFunction.messages = messages;
+ruleFunction.meta = {
+  url: '',
+  fixable: true
+};
 
-export default createPlugin(ruleName, rule as unknown as Rule);
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);
