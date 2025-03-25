@@ -1,5 +1,5 @@
 import { globalSharedHooksMetadata } from "@salesforce-ux/metadata-slds";
-import { Root } from 'postcss';
+import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
@@ -13,6 +13,13 @@ const ruleInfo = ruleMetadata(ruleName);
 
 const { severityLevel = 'error', warningMsg = '', errorMsg = '', ruleDesc = 'No description provided' } = ruleMetadata(ruleName) || {};
 
+const messages = utils.ruleMessages(ruleName, {
+  replace: (oldValue:string, suggestedMatch:string)=> replacePlaceholders(errorMsg, { 
+    fullMatch: oldValue, 
+    suggestedMatch
+  })
+})
+
 // data
 const allSldsHooks = [].concat(Object.keys(globalSharedHooksMetadata.global), Object.keys(globalSharedHooksMetadata.shared));
 
@@ -25,7 +32,15 @@ function shouldIgnoreDetection(sdsToken: string) {
   );
 }
 
-function detectRightSide(decl, basicReportProps, autoFixEnabled){
+/**
+ * 
+ * Example:
+ *  .THIS  .demo {
+ *    border: 1px solid var(--sds-g-color-border-1));
+ *  }
+ * 
+ */
+function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Problem>) {
   const parsedValue = valueParser(decl.value);
   // Usage on right side
   parsedValue.walk((node) => {
@@ -43,25 +58,27 @@ function detectRightSide(decl, basicReportProps, autoFixEnabled){
     const startIndex = decl.toString().indexOf(oldValue);
     const endIndex = startIndex + oldValue.length;
     const suggestedMatch = toSldsToken(oldValue);
-    const message = replacePlaceholders(errorMsg, { 
-      fullMatch: oldValue, 
-      suggestedMatch
-    });
+    const message = messages.replace(oldValue, suggestedMatch);
 
-    utils.report({
+    utils.report(<stylelint.Problem>{
       message: JSON.stringify({message, suggestions:[suggestedMatch]}),
       index: startIndex,
       endIndex,
       ...basicReportProps,
+      fix: ()=> decl.value = decl.value.replace(oldValue, suggestedMatch)
     });
-
-    if(autoFixEnabled){
-      decl.value = decl.value.replace(oldValue, suggestedMatch)
-    }
   });
 }
 
-function detectLeftSide(decl, basicReportProps, autoFixEnabled) {
+/**
+ * 
+ * Example:
+ *  .THIS  .demo {
+ *    --sds-c-border-radius: 50%;
+ *  }
+ * 
+ */
+function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Problem>) {
   // Usage on left side
   const { prop } = decl;
   if (shouldIgnoreDetection(prop)) {
@@ -72,27 +89,19 @@ function detectLeftSide(decl, basicReportProps, autoFixEnabled) {
   const endIndex = startIndex + prop.length;
 
   const suggestedMatch = toSldsToken(prop);
-    const message = replacePlaceholders(errorMsg, { 
-      fullMatch: prop, 
-      suggestedMatch
-    });
+  const message = messages.replace(prop, suggestedMatch);
 
-    utils.report({
+    utils.report(<stylelint.Problem>{
       message: JSON.stringify({message, suggestions:[suggestedMatch]}),
       index: startIndex,
       endIndex,
       ...basicReportProps,
+      fix: () => decl.prop = decl.prop.replace(prop, suggestedMatch)
     });
-
-    if(autoFixEnabled){
-      decl.prop = decl.prop.replace(prop, suggestedMatch)
-    }
 }
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) => {
   return (root: Root, result: PostcssResult) => {
-
-    const autoFixEnabled = result.stylelint.config.fix;
 
     root.walkDecls((decl) => {
       const basicReportProps = {
@@ -102,11 +111,16 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
         severity,
       };
 
-      detectRightSide(decl, basicReportProps, autoFixEnabled);
-      detectLeftSide(decl, basicReportProps, autoFixEnabled);      
+      detectRightSide(decl, basicReportProps);
+      detectLeftSide(decl, basicReportProps);      
     });
   };
 }
 
+ruleFunction.ruleName = ruleName;
+ruleFunction.meta = {
+  url: '',
+  fixable: true
+};
 
-export default createPlugin(ruleName, rule as unknown as Rule);
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);

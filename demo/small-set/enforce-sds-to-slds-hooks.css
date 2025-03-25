@@ -1,4 +1,16 @@
 .slds-expandable-section .sldc-section__content {
-        background-color: var(--sds-g-color-brand-base-100, rgb(255, 255, 255));
+        background: 0 3px var(--slds-g-color-brand-base-100, rgb(255, 255, 255));
+}
+
+.replaceProp{
+        --sds-g-color-brand-base-100: rgb(255, 255, 255);
+}
+
+.doNotReplaceProp{
+        --sds-g-non-exitent-100: rgb(255, 255, 255);
+}
+
+.multipleVars{
+        border-color: var(--sds-g-color-border-1) var(--sds-g-color-border-2)
 }
     

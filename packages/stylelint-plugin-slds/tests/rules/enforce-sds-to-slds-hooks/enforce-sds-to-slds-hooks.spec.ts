@@ -1,3 +1,4 @@
+import { messages } from './../../../../eslint-plugin-slds/src/rules/utils/rule';
 
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
@@ -76,11 +77,11 @@ describe('slds/enforce-sds-to-slds-hooks', () => {
         const lintResult = result.results[0];
 
         // Verify the reported messages
-        const reportedMessages = lintResult._postcssResult.messages.map(
-          (message) => message.text
-        );
+        const reportedMessages = lintResult?._postcssResult?.messages.map(
+          (message) => JSON.parse(message.text).message
+        )||[];
         if (expectedMessage) {
-          expect(reportedMessages[0]).toMatch(expectedMessage);
+          expect(expectedMessage).toMatch(reportedMessages[0]||'');
         } else {
           expect(reportedMessages).toHaveLength(0);
         }
