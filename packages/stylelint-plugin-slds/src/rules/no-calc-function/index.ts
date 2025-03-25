@@ -1,5 +1,6 @@
 import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
+import valueParser from 'postcss-value-parser';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 
@@ -15,27 +16,30 @@ const messages = utils.ruleMessages(ruleName, {
     replacePlaceholders(errorMsg,{property}),
 });
 
+function isCalcFunction(node:valueParser.Node): boolean{
+  return (node.type === "function" && node.value === "calc" && node.nodes.length>0);
+}
+
 function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
-      if (decl.value.includes('calc(')) {
-        const index = decl.toString().indexOf('calc(');
-        const endIndex = index + 'calc('.length;
+      const parsedValue = valueParser(decl.value);
+      const startIndex = decl.toString().indexOf(decl.value);
+      parsedValue.walk((node) => {
+        if(!isCalcFunction(node)){
+            return null;
+        }
+        const functionNode = node as valueParser.FunctionNode;
         utils.report({
           message: messages.disallowed(decl.prop),
           node: decl,
-          index,
-          endIndex,
+          index: startIndex + functionNode.sourceIndex,
+          endIndex: startIndex + functionNode.sourceEndIndex,
           result,
           ruleName,
           severity
         });
-
-        // If fixing is enabled
-        // if (context.fix) {
-        //   decl.value = decl.value.replace(/calc\([^)]+\)/g, ''); // Example fix: removes calc()
-        // }
-      }
+      });
     });
   };
 }
