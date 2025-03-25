@@ -8,6 +8,8 @@ export = {
     docs: {
       category: "Best Practices",
       recommended: true,
+      description: "Replace BEM double-dash syntax in class names with single underscore syntax.",
+      url: ""
     },
     fixable: "code",
     schema: [],
