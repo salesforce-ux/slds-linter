@@ -1,5 +1,4 @@
-"use strict";
-module.exports = {
+export = {
     rules: {
         "enforce-bem-class": require('./rules/enforce-bem-class'),
         "no-deprecated-classes-slds2": require('./rules/no-deprecated-classes-slds2'),
