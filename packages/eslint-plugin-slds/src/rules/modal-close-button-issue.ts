@@ -8,7 +8,7 @@ export = {
     docs: {
       category: "Best Practices",
       recommended: true,
-      description: "Replace BEM double-dash syntax in class names with single underscore syntax.",
+      description: "Update component attributes or CSS classes for the modal close button to comply with the modal component blueprint.",
       url: ""
     },
     fixable: "code",
