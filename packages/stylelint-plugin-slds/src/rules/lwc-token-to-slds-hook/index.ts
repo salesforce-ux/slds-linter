@@ -44,18 +44,6 @@ function getRecommendation(lwcToken: string) {
   return {hasRecommendation, recommendation};
 }
 
-function isValueFixed(recommendation, decl) {
-  // Skip if the value has already been fixed only if the recommendation starts with '--slds-'
-  const isFixed = (newValue: string) =>
-    newValue.startsWith('--slds-') && decl.value.includes(newValue);
-
-  // If there are multiple --slds- token recommendation for single --lwc we maintain recommendations as array
-  let checkFixed = Array.isArray(recommendation)
-    ? recommendation
-    : [recommendation];
-  return checkFixed.some(isFixed);
-}
-
 function isVarFunction(node:valueParser.Node): boolean{
   return (node.type === "function" && node.value === "var" && node.nodes.length>0);
 }

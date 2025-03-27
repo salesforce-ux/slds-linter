@@ -15,7 +15,7 @@ describe('no-hardcoded-values-slds2', () => {
         }
       `,
       expectedMessage:
-        'There’s no replacement SLDS 2 styling hook for the #ff0000 static value. Remove the static value.',
+        'There’s no replacement styling hook for the #ff0000 static value. Remove the static value.',
     },
     {
       description: 'Does not report 0 as a value',
@@ -63,8 +63,7 @@ describe('no-hardcoded-values-slds2', () => {
           box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15);
         }
       `,
-      expectedMessage:
-        'Consider replacing the 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15) static value with an SLDS 2 styling hook that has a similar value: --slds-s-input-shadow-focus (slds/no-hardcoded-values-slds2)',
+      expectedMessage: 'There’s no replacement styling hook for the 2px static value. Remove the static value. (slds/no-hardcoded-values-slds2)',
     },
     {
       description:
@@ -85,8 +84,7 @@ describe('no-hardcoded-values-slds2', () => {
           background-color: #123456;
         }
       `,
-      expectedMessage:
-        '{"message":"Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: \\n1. --slds-g-color-surface-inverse-2 \\n2. --slds-g-color-surface-container-inverse-2 \\n3. --slds-g-color-surface-inverse-1 \\n4. --slds-g-color-surface-container-inverse-1 \\n (slds/no-hardcoded-values-slds2)","suggestions":["--slds-g-color-surface-inverse-2","--slds-g-color-surface-container-inverse-2","--slds-g-color-surface-inverse-1","--slds-g-color-surface-container-inverse-1"]}',
+      expectedMessage:`Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-surface-inverse-2\n2. --slds-g-color-surface-container-inverse-2\n3. --slds-g-color-surface-inverse-1\n4. --slds-g-color-surface-container-inverse-1`
     },
     {
       description:
@@ -113,7 +111,7 @@ describe('no-hardcoded-values-slds2', () => {
       } as LinterOptions);
 
       const messages = linterResult.results[0].warnings.map(
-        (warning) => warning.text
+        (warning) => JSON.parse(warning.text).message
       );
 
       if (expectedMessage) {
