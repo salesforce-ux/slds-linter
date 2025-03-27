@@ -29,7 +29,7 @@ const findClosestColorHook = (
   color: string,
   supportedColors,
   cssProperty: string
-): { name: string }[] => {
+): string[] => {
   const returnStylingHooks: string[] = [];
   const closestHooksWithSameProperty: { name: string; distance: number }[] = [];
   const closestHooksWithoutSameProperty: { name: string; distance: number }[] =
@@ -75,12 +75,16 @@ const findClosestColorHook = (
     );
   }
 
-  const uniqueHooks = Array.from(new Set(returnStylingHooks));
-
-  // Transform the unique string array into an array of objects
-  return uniqueHooks.map((hook) => ({
-    name: hook,
-  }));
+  return Array.from(new Set(returnStylingHooks));
 };
 
-export { findClosestColorHook, convertToHex, isHexCode, isHardCodedColor };
+/**
+ * This method is usefull to identify all possible css color values.
+ *  - names colors
+ *  - 6,8 digit hex
+ *  - rgb and rgba
+ *  - hsl and hsla
+ */
+const isValidColor = (val:string):boolean => chroma.valid(val);
+
+export { findClosestColorHook, convertToHex, isHexCode, isHardCodedColor, isValidColor };
