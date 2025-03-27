@@ -24,8 +24,11 @@ export async function normalizeData(sldsVersion) {
     const result = {};
 
     // Normalize the data
-    for (const [scope, hooks] of Object.entries(inputData)) {
-      for (const [hookName, hookDetails] of Object.entries(hooks)) {
+    //for (const [scope, hooks] of Object.entries(inputData)) {
+    // Generate values to hooks mapping using only global hooks
+    // shared hooks are private/ undocumented APIs, so they should not be recommended to customers
+    // Ref this thread: https://salesforce-internal.slack.com/archives/C071J0Q3FNV/p1743010620921339?thread_ts=1743009353.385429&cid=C071J0Q3FNV
+      for (const [hookName, hookDetails] of Object.entries(inputData.global)) {
         let values = hookDetails.values.slds;
         let aliases = hookDetails.aliases.slds;
 
@@ -45,7 +48,7 @@ export async function normalizeData(sldsVersion) {
           });
         });
       }
-    }
+    //}
 
     // Write the normalized data to a new JSON file
     if (sldsVersion === 'slds2') {
