@@ -2479,8 +2479,8 @@
                 "border-radius"
             ],
             "values": {
-                "slds": "&lt;code&gt;100%&lt;/code&gt;",
-                "sldsplus": "&lt;code&gt;100%&lt;/code&gt;"
+                "slds": "100%",
+                "sldsplus": "100%"
             },
             "aliases": {
                 "slds": "",
@@ -2528,7 +2528,7 @@
             ],
             "values": {
                 "slds": "0 2px 8px -2px #18181814, 0 8px 12px -2px #18181828",
-                "sldsplus": "0px 0px 3px 0px #00000016; 0px 2.8px 3px 0px #00000016; 0px -1px 1.2px 0px #00000009"
+                "sldsplus": "0px 0px 3px 0px #00000016, 0px 2.8px 3px 0px #00000016, 0px -1px 1.2px 0px #00000009"
             },
             "aliases": {
                 "slds": "",
@@ -2544,7 +2544,7 @@
             ],
             "values": {
                 "slds": "0 12px 24px -4px #18181814, 0 16px 32px -4px #18181828",
-                "sldsplus": "0px 0px 4.4px 0px #00000014; 0px 4.3px 4.4px 0px #00000017; 0px -1px 1.44px 0px #00000008;"
+                "sldsplus": "0px 0px 4.4px 0px #00000014, 0px 4.3px 4.4px 0px #00000017, 0px -1px 1.44px 0px #00000008"
             },
             "aliases": {
                 "slds": "",
@@ -2560,7 +2560,7 @@
             ],
             "values": {
                 "slds": "0 24px 48px -4px #18181833",
-                "sldsplus": "0px 0px 5.9px 0px #00000012; 0px 5.7px 5.9px 0px #00000012; 0px -1px 1.7px 0px #00000007;"
+                "sldsplus": "0px 0px 5.9px 0px #00000012, 0px 5.7px 5.9px 0px #00000012, 0px -1px 1.7px 0px #00000007"
             },
             "aliases": {
                 "slds": "",

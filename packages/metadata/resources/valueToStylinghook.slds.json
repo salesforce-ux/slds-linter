@@ -173,48 +173,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-background",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-background-focus",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-background-invalid",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-background",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-background-checked",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-background-invalid",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-foreground-invalid",
-        "properties": [
-          "background"
-        ]
       }
     ]
   },
@@ -302,18 +260,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-background",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-background-focus",
-        "properties": [
-          "background"
-        ]
       }
     ]
   },
@@ -391,12 +337,6 @@
         "name": "--slds-g-color-neutral-base-90",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-background-disabled",
-        "properties": [
-          "background"
         ]
       }
     ]
@@ -543,18 +483,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-border",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-border-hover",
-        "properties": [
-          "border-color"
-        ]
       }
     ]
   },
@@ -602,30 +530,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-hover",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-focus",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-invalid",
-        "properties": [
-          "color"
-        ]
       }
     ]
   },
@@ -642,24 +546,6 @@
         "name": "--slds-g-color-neutral-base-20",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-hover",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-focus",
-        "properties": [
-          "color"
         ]
       }
     ]
@@ -760,12 +646,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-placeholder",
-        "properties": [
-          "color"
-        ]
       }
     ]
   },
@@ -830,18 +710,6 @@
         "name": "--slds-g-color-neutral-base-80",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-border-disabled",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-border",
-        "properties": [
-          "border-color"
         ]
       }
     ]
@@ -947,12 +815,6 @@
         "name": "--slds-g-color-brand-base-50",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-border-focus",
-        "properties": [
-          "border-color"
         ]
       }
     ]
@@ -1063,12 +925,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-mark-color-foreground-checked",
-        "properties": [
-          "background"
-        ]
       }
     ]
   },
@@ -1119,12 +975,6 @@
         "name": "--slds-g-color-error-base-40",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-border-invalid",
-        "properties": [
-          "border-color"
         ]
       }
     ]
@@ -1451,48 +1301,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-border",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-border-hover",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-placeholder",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-label-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-helptext-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-border",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-border-hover",
-        "properties": [
-          "border-color"
-        ]
       }
     ]
   },
@@ -1509,12 +1317,6 @@
         "name": "--slds-g-color-neutral-base-60",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-disabled",
-        "properties": [
-          "color"
         ]
       }
     ]
@@ -1605,12 +1407,6 @@
         "name": "--slds-g-color-brand-base-90",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-table-row-color-background-selected",
-        "properties": [
-          "background-color"
         ]
       }
     ]
@@ -2262,12 +2058,6 @@
         "properties": [
           "font-size"
         ]
-      },
-      {
-        "name": "--slds-s-input-font-size",
-        "properties": [
-          "font-size"
-        ]
       }
     ]
   },
@@ -2616,12 +2406,6 @@
           "padding",
           "margin*"
         ]
-      },
-      {
-        "name": "--slds-s-input-radius-border",
-        "properties": [
-          "border-radius"
-        ]
       }
     ]
   },
@@ -2676,12 +2460,6 @@
           "padding",
           "margin*"
         ]
-      },
-      {
-        "name": "--slds-s-input-spacing",
-        "properties": [
-          "padding"
-        ]
       }
     ]
   },
@@ -2709,7 +2487,7 @@
       }
     ]
   },
-  "&lt;code&gt;100%&lt;/code&gt;": {
+  "100%": {
     "hooks": [
       {
         "name": "--slds-g-radius-border-circle",
@@ -2780,12 +2558,6 @@
     "hooks": [
       {
         "name": "--slds-g-sizing-border-1",
-        "properties": [
-          "border-width"
-        ]
-      },
-      {
-        "name": "--slds-s-input-sizing-border",
         "properties": [
           "border-width"
         ]
@@ -3111,144 +2883,6 @@
         "properties": [
           "padding",
           "margin*"
-        ]
-      }
-    ]
-  },
-  "pink-100": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-color-background-invalid",
-        "properties": [
-          "background"
-        ]
-      }
-    ]
-  },
-  "pink-40": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-color-border-invalid",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-invalid",
-        "properties": [
-          "color"
-        ]
-      }
-    ]
-  },
-  "0 0 3px var(--sds-g-color-accent-2)": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-shadow-focus",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "inset 0 0 0 1px var(—sds-g-color-error-1)": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-shadow-invalid",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "normal": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-font-style-placeholder",
-        "properties": [
-          "font-style"
-        ]
-      }
-    ]
-  },
-  "1.875rem": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-sizing-height",
-        "properties": [
-          "height"
-        ]
-      }
-    ]
-  },
-  "kondo-50": {
-    "hooks": [
-      {
-        "name": "--slds-s-button-color-background",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-background-focus",
-        "properties": [
-          "background"
-        ]
-      }
-    ]
-  },
-  "kondo-40": {
-    "hooks": [
-      {
-        "name": "--slds-s-button-color-background-hover",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-background-active",
-        "properties": [
-          "background"
-        ]
-      }
-    ]
-  },
-  "Kondo 40": {
-    "hooks": [
-      {
-        "name": "--slds-s-link-color",
-        "properties": [
-          "color"
-        ]
-      }
-    ]
-  },
-  "Kondo 30": {
-    "hooks": [
-      {
-        "name": "--slds-s-link-color-hover",
-        "properties": [
-          "color"
-        ]
-      }
-    ]
-  },
-  "0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 3px var(—slds-g-color-brand-base-40)": {
-    "hooks": [
-      {
-        "name": "--slds-s-link-shadow-focus",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "kondo-90": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-row-color-background-selected",
-        "properties": [
-          "background-color"
         ]
       }
     ]

@@ -76,18 +76,6 @@
         "properties": [
           "font-weight"
         ]
-      },
-      {
-        "name": "--slds-s-navigation-font-weight",
-        "properties": [
-          "font-weight"
-        ]
-      },
-      {
-        "name": "--slds-s-navigation-font-weight-active",
-        "properties": [
-          "font-weight"
-        ]
       }
     ]
   },
@@ -164,78 +152,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-background",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-background-focus",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-background-disabled",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-background",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-foreground-checked",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-foreground-invalid",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-hover",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-focus",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-active",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-icon-color-foreground",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-icon-color-background",
-        "properties": [
-          "background-color"
-        ]
       }
     ]
   },
@@ -301,18 +217,6 @@
         "name": "--slds-g-color-success-base-100",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-background",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-background-focus",
-        "properties": [
-          "background"
         ]
       }
     ]
@@ -476,18 +380,6 @@
           "color",
           "fill"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-placeholder",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-container-content-color",
-        "properties": [
-          "color"
-        ]
       }
     ]
   },
@@ -511,48 +403,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-border",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-border-hover",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-placeholder",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-label-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-helptext-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-border",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-border-hover",
-        "properties": [
-          "border-color"
-        ]
       }
     ]
   },
@@ -570,24 +420,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-hover",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-focus",
-        "properties": [
-          "color"
-        ]
       }
     ]
   },
@@ -604,24 +436,6 @@
         "name": "--slds-g-color-neutral-base-20",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-hover",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-focus",
-        "properties": [
-          "color"
         ]
       }
     ]
@@ -755,24 +569,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-border-disabled",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-disabled",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-border",
-        "properties": [
-          "border-color"
-        ]
       }
     ]
   },
@@ -844,48 +640,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-border",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-border-hover",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-border-focus",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-label-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-helptext-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-border",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-border-hover",
-        "properties": [
-          "border-color"
-        ]
       }
     ]
   },
@@ -914,24 +668,6 @@
         "name": "--slds-g-color-brand-base-50",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-background-checked",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-background",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-background-focus",
-        "properties": [
-          "background"
         ]
       }
     ]
@@ -962,18 +698,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-button-color-background",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-background-focus",
-        "properties": [
-          "background"
-        ]
       }
     ]
   },
@@ -1002,12 +726,6 @@
         "name": "--slds-g-color-brand-base-40",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-link-color",
-        "properties": [
-          "color"
         ]
       }
     ]
@@ -1038,18 +756,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-button-color-background-hover",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-background-active",
-        "properties": [
-          "background"
-        ]
       }
     ]
   },
@@ -1078,12 +784,6 @@
         "name": "--slds-g-color-brand-base-30",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-link-color-hover",
-        "properties": [
-          "color"
         ]
       }
     ]
@@ -1144,24 +844,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-border-invalid",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-invalid",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-mark-color-background-invalid",
-        "properties": [
-          "background"
-        ]
       }
     ]
   },
@@ -1192,18 +874,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-input-color-border-invalid",
-        "properties": [
-          "border-color"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-invalid",
-        "properties": [
-          "color"
-        ]
       }
     ]
   },
@@ -1219,12 +889,6 @@
         "name": "--slds-g-color-error-base-90",
         "properties": [
           "*"
-        ]
-      },
-      {
-        "name": "--slds-s-input-color-background-invalid",
-        "properties": [
-          "background"
         ]
       }
     ]
@@ -1814,12 +1478,6 @@
         "properties": [
           "*"
         ]
-      },
-      {
-        "name": "--slds-s-table-row-color-background-selected",
-        "properties": [
-          "background-color"
-        ]
       }
     ]
   },
@@ -2402,12 +2060,6 @@
           "padding",
           "margin*"
         ]
-      },
-      {
-        "name": "--slds-s-input-spacing",
-        "properties": [
-          "padding"
-        ]
       }
     ]
   },
@@ -2455,12 +2107,6 @@
     "hooks": [
       {
         "name": "--slds-g-font-size-base",
-        "properties": [
-          "font-size"
-        ]
-      },
-      {
-        "name": "--slds-s-input-font-size",
         "properties": [
           "font-size"
         ]
@@ -2896,18 +2542,6 @@
           "padding",
           "margin*"
         ]
-      },
-      {
-        "name": "--slds-s-input-radius-border",
-        "properties": [
-          "border-radius"
-        ]
-      },
-      {
-        "name": "--slds-s-input-spacing-gap",
-        "properties": [
-          "gap"
-        ]
       }
     ]
   },
@@ -2935,7 +2569,7 @@
       }
     ]
   },
-  "&lt;code&gt;100%&lt;/code&gt;": {
+  "100%": {
     "hooks": [
       {
         "name": "--slds-g-radius-border-circle",
@@ -2972,7 +2606,7 @@
       }
     ]
   },
-  "0px 0px 3px 0px #00000016; 0px 2.8px 3px 0px #00000016; 0px -1px 1.2px 0px #00000009": {
+  "0px 0px 3px 0px #00000016, 0px 2.8px 3px 0px #00000016, 0px -1px 1.2px 0px #00000009": {
     "hooks": [
       {
         "name": "--slds-g-shadow-2",
@@ -2982,7 +2616,7 @@
       }
     ]
   },
-  "0px 0px 4.4px 0px #00000014; 0px 4.3px 4.4px 0px #00000017; 0px -1px 1.44px 0px #00000008;": {
+  "0px 0px 4.4px 0px #00000014, 0px 4.3px 4.4px 0px #00000017, 0px -1px 1.44px 0px #00000008": {
     "hooks": [
       {
         "name": "--slds-g-shadow-3",
@@ -2992,7 +2626,7 @@
       }
     ]
   },
-  "0px 0px 5.9px 0px #00000012; 0px 5.7px 5.9px 0px #00000012; 0px -1px 1.7px 0px #00000007;": {
+  "0px 0px 5.9px 0px #00000012, 0px 5.7px 5.9px 0px #00000012, 0px -1px 1.7px 0px #00000007": {
     "hooks": [
       {
         "name": "--slds-g-shadow-4",
@@ -3006,18 +2640,6 @@
     "hooks": [
       {
         "name": "--slds-g-sizing-border-1",
-        "properties": [
-          "border-width"
-        ]
-      },
-      {
-        "name": "--slds-s-input-sizing-border",
-        "properties": [
-          "border-width"
-        ]
-      },
-      {
-        "name": "--slds-s-button-sizing-border",
         "properties": [
           "border-width"
         ]
@@ -3045,18 +2667,6 @@
     "hooks": [
       {
         "name": "--slds-g-sizing-border-3",
-        "properties": [
-          "border-width"
-        ]
-      },
-      {
-        "name": "--slds-s-navigation-sizing-border-active",
-        "properties": [
-          "border-width"
-        ]
-      },
-      {
-        "name": "--slds-s-navigation-sizing-border-hover",
         "properties": [
           "border-width"
         ]
@@ -3289,524 +2899,6 @@
         "properties": [
           "padding",
           "margin*"
-        ]
-      }
-    ]
-  },
-  "pink-100": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-color-background-invalid",
-        "properties": [
-          "background"
-        ]
-      }
-    ]
-  },
-  "2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15)": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-shadow-focus",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "none": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-shadow-invalid",
-        "properties": [
-          "box-shadow"
-        ]
-      },
-      {
-        "name": "--slds-s-container-shadow",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "normal": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-font-style-placeholder",
-        "properties": [
-          "font-style"
-        ]
-      }
-    ]
-  },
-  "1.875rem": {
-    "hooks": [
-      {
-        "name": "--slds-s-input-sizing-height",
-        "properties": [
-          "height"
-        ]
-      }
-    ]
-  },
-  "0px 1px 0px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.08) inset, 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset": {
-    "hooks": [
-      {
-        "name": "--slds-s-mark-shadow-checked",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15)": {
-    "hooks": [
-      {
-        "name": "--slds-s-mark-shadow-focus",
-        "properties": [
-          "box-shadow"
-        ]
-      },
-      {
-        "name": "--slds-s-link-shadow-focus",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "1rem (13px)": {
-    "hooks": [
-      {
-        "name": "--slds-s-label-font-size",
-        "properties": [
-          "font-size"
-        ]
-      }
-    ]
-  },
-  "400 (Regular SF Pro)": {
-    "hooks": [
-      {
-        "name": "--slds-s-label-font-weight",
-        "properties": [
-          "font-weight"
-        ]
-      }
-    ]
-  },
-  "0.5rem (8px)": {
-    "hooks": [
-      {
-        "name": "--slds-s-label-spacing",
-        "properties": [
-          "padding"
-        ]
-      }
-    ]
-  },
-  "0.25rem (4px)": {
-    "hooks": [
-      {
-        "name": "--slds-s-label-spacing-gap",
-        "properties": [
-          "gap"
-        ]
-      },
-      {
-        "name": "--slds-s-helptext-spacing",
-        "properties": [
-          "padding"
-        ]
-      }
-    ]
-  },
-  "0.937rem (12px)": {
-    "hooks": [
-      {
-        "name": "--slds-s-helptext-font-size",
-        "properties": [
-          "font-size"
-        ]
-      }
-    ]
-  },
-  "#0250D9": {
-    "hooks": [
-      {
-        "name": "--slds-s-button-color-background-hover",
-        "properties": [
-          "background"
-        ]
-      },
-      {
-        "name": "--slds-s-button-color-background-active",
-        "properties": [
-          "background"
-        ]
-      }
-    ]
-  },
-  "600 (Semibold SF Pro)": {
-    "hooks": [
-      {
-        "name": "--slds-s-button-font-weight",
-        "properties": [
-          "color"
-        ]
-      }
-    ]
-  },
-  "100%": {
-    "hooks": [
-      {
-        "name": "--slds-s-button-radius-border",
-        "properties": [
-          "border-radius"
-        ]
-      },
-      {
-        "name": "--slds-s-button-radius-border-startstart",
-        "properties": [
-          "border-start-start-radius"
-        ]
-      },
-      {
-        "name": "--slds-s-button-radius-border-startend",
-        "properties": [
-          "border-start-end-radius"
-        ]
-      }
-    ]
-  },
-  "0px 2px 0px 0px rgba(68, 68, 68, 1) 0px 4px 4px 0px rgba(0, 0, 0, 0.25)0px 3px 3px 0px rgba(0, 0, 0, 0.2)": {
-    "hooks": [
-      {
-        "name": "--slds-s-button-shadow-hover",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "0 0 0 2px var(—slds-g-color-surface-2), 0 0 0 4px var(—slds-g-color-brand-base-15)": {
-    "hooks": [
-      {
-        "name": "--slds-s-button-shadow-focus",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  " inset 0px 1px 0px 0px rgba(0, 0, 0, 0.25)0px 0.5px 2px 0px rgba(0, 0, 0, 0.5)2px 2px 5px 0px rgba(0, 0, 0, 0.1)": {
-    "hooks": [
-      {
-        "name": "--slds-s-button-shadow-active",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "Kondo 40": {
-    "hooks": [
-      {
-        "name": "--slds-s-link-color",
-        "properties": [
-          "color"
-        ]
-      }
-    ]
-  },
-  "Kondo 30": {
-    "hooks": [
-      {
-        "name": "--slds-s-link-color-hover",
-        "properties": [
-          "color"
-        ]
-      }
-    ]
-  },
-  "--slds-g-radius-border-circle": {
-    "hooks": [
-      {
-        "name": "--slds-s-avatar-radius-border",
-        "properties": [
-          "border-radius"
-        ]
-      }
-    ]
-  },
-  "transparent": {
-    "hooks": [
-      {
-        "name": "--slds-s-container-color-border",
-        "properties": [
-          "border-color"
-        ]
-      }
-    ]
-  },
-  "1.25rem (radius-border-4)": {
-    "hooks": [
-      {
-        "name": "",
-        "properties": [
-          "border-radius"
-        ]
-      }
-    ]
-  },
-  "on-surface-3": {
-    "hooks": [
-      {
-        "name": "--slds-s-container-heading-font-color",
-        "properties": [
-          "font-color"
-        ]
-      }
-    ]
-  },
-  "20px (font-scale-3)": {
-    "hooks": [
-      {
-        "name": "--slds-s-container-heading-font-size",
-        "properties": [
-          "font-size"
-        ]
-      }
-    ]
-  },
-  "300 (font-weight-3)": {
-    "hooks": [
-      {
-        "name": "--slds-s-container-heading-font-weight",
-        "properties": [
-          "font-weight"
-        ]
-      }
-    ]
-  },
-  "left": {
-    "hooks": [
-      {
-        "name": "--slds-s-container-heading-font-align",
-        "properties": [
-          "text-align"
-        ]
-      }
-    ]
-  },
-  "right": {
-    "hooks": [
-      {
-        "name": "--slds-s-container-footer-font-align",
-        "properties": [
-          "text-align"
-        ]
-      }
-    ]
-  },
-  "on-surface-2": {
-    "hooks": [
-      {
-        "name": "--slds-s-container-footer-font-color",
-        "properties": [
-          "font-color"
-        ]
-      }
-    ]
-  },
-  "--slds-g-color-surface-container-1": {
-    "hooks": [
-      {
-        "name": "--slds-s-container-footer-color-background",
-        "properties": [
-          "background-color"
-        ]
-      }
-    ]
-  },
-  "--slds-g-sizing-border-1": {
-    "hooks": [
-      {
-        "name": "--slds-s-container-footer-sizing-border",
-        "properties": [
-          "border-width"
-        ]
-      }
-    ]
-  },
-  "rgba(92, 92, 92, 0.80)": {
-    "hooks": [
-      {
-        "name": "--slds-s-backdrop-color-background",
-        "properties": [
-          "background-color"
-        ]
-      }
-    ]
-  },
-  "on-surface-1": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-table-header-color",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-navigation-color",
-        "properties": [
-          "color"
-        ]
-      }
-    ]
-  },
-  "border-1": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-resize-color",
-        "properties": [
-          "color"
-        ]
-      }
-    ]
-  },
-  "accent-3": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-resize-color-active",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-navigation-color-active",
-        "properties": [
-          "color"
-        ]
-      }
-    ]
-  },
-  "surface-container-2": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-header-color-background",
-        "properties": [
-          "background-color"
-        ]
-      }
-    ]
-  },
-  "surface-container-3": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-header-color-background-hover",
-        "properties": [
-          "background-color"
-        ]
-      }
-    ]
-  },
-  "surface-container-1": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-header-color-background-selected",
-        "properties": [
-          "background-color"
-        ]
-      },
-      {
-        "name": "--slds-s-navigation-color-background",
-        "properties": [
-          "background-color"
-        ]
-      },
-      {
-        "name": "--slds-s-navigation-color-background-active",
-        "properties": [
-          "background-color"
-        ]
-      }
-    ]
-  },
-  "brand-base-90": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-row-color-background-selected",
-        "properties": [
-          "background-color"
-        ]
-      },
-      {
-        "name": "--slds-s-navigation-color-background-hover",
-        "properties": [
-          "background-color"
-        ]
-      }
-    ]
-  },
-  "accent-2": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-row-color-border-selected-hover",
-        "properties": [
-          "border-color"
-        ]
-      }
-    ]
-  },
-  "var(--slds-g-color-brand-base-15) 0 0 0 2px inset": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-cell-shadow-selected",
-        "properties": [
-          "box-shadow"
-        ]
-      }
-    ]
-  },
-  "font-weight-6": {
-    "hooks": [
-      {
-        "name": "--slds-s-table-header-font-weight",
-        "properties": [
-          "font-weight"
-        ]
-      }
-    ]
-  },
-  "brand-base-15": {
-    "hooks": [
-      {
-        "name": "--slds-s-navigation-color-hover",
-        "properties": [
-          "color"
-        ]
-      },
-      {
-        "name": "--slds-s-navigation-color-border-hover",
-        "properties": [
-          "border-color"
-        ]
-      }
-    ]
-  },
-  "neutral-base-80": {
-    "hooks": [
-      {
-        "name": "--slds-s-navigation-color-border",
-        "properties": [
-          "border-color"
         ]
       }
     ]
