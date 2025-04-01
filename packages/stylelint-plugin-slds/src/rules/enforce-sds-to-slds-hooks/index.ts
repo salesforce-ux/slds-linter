@@ -20,8 +20,10 @@ const messages = utils.ruleMessages(ruleName, {
   })
 })
 
-// data
-const allSldsHooks = [].concat(Object.keys(globalSharedHooksMetadata.global), Object.keys(globalSharedHooksMetadata.shared));
+// Generate values to hooks mapping using only global hooks
+// shared hooks are private/ undocumented APIs, so they should not be recommended to customers
+// Ref this thread: https://salesforce-internal.slack.com/archives/C071J0Q3FNV/p1743010620921339?thread_ts=1743009353.385429&cid=C071J0Q3FNV
+const allSldsHooks = Object.keys(globalSharedHooksMetadata.global);
 
 const toSldsToken = (sdsToken: string) => sdsToken.replace('--sds-', '--slds-')
 
