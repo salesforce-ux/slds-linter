@@ -3,6 +3,7 @@ import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { getClassNodesFromSelector } from "../../utils/selector-utils";
 const { utils, createPlugin } = stylelint;
 const deprecatedSelectorsList = sldsPlusMetadata.bem.css.deprecated.selectors;
 
@@ -12,39 +13,32 @@ const ruleName:string = 'slds/no-deprecated-slds2-classes';
 
 const { severityLevel = 'error', warningMsg = '', errorMsg = '', ruleDesc = 'No description provided' } = ruleMetadata(ruleName) || {};
 const messages = stylelint.utils.ruleMessages(ruleName, {
-  expected: (selector: string) =>
+  deprecated: (selector: string) =>
     replacePlaceholders(errorMsg,{selector}),
 });
-
-// Check if it's in test environment to load the correct metadata path
-const isTestEnv = process.env.NODE_ENV === 'test';
-
-// Load deprecated selectors from a metadata file
-/* const deprecatedSelectorsPath = metadataFileUrl('./public/metadata/sldsPlus.metadata.json');
-
-// Read and parse the JSON file containing deprecated selectors
-const deprecatedSelectors = JSON.parse(
-  readFileSync(deprecatedSelectorsPath, 'utf8')
-).bem.css.deprecated.selectors; */
 
 function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
   return (root: Root, result: PostcssResult) => {
     root.walkRules((rule) => {
-      // Check if the selector matches any deprecated selectors
-      if (
-        deprecatedSelectorsList.some((deprecatedSelector: string) =>
-          rule.selector.includes(deprecatedSelector)
-        )
-      ) {
-        
+      const classNodes = getClassNodesFromSelector(rule.selector);
+      const offsetIndex = rule.toString().indexOf(rule.selector);
+
+      classNodes.forEach((classNode) => {
+        if (!deprecatedSelectorsList.has(classNode.value)) {
+          return;
+        }
+        const index = offsetIndex + classNode.sourceIndex + 1; // find selector in rule plus '.'
+        const endIndex = index + classNode.value.length;
         utils.report({
-          message: messages.expected(rule.selector),
+          message: messages.deprecated(classNode.value),
           node: rule,
           result,
           ruleName,
-          severity
+          severity,
+          index,
+          endIndex
         });
-      }
+      });
     });
   };
 }

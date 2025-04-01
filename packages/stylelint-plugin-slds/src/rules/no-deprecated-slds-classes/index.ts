@@ -20,18 +20,6 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
     replacePlaceholders(errorMsg, { className }),
 });
 
-/* const isTestEnv = process.env.NODE_ENV === 'test';
-const tokenMappingPath = metadataFileUrl(
-  './public/metadata/deprecatedClasses.json'
-);
-
-const defaultDeprecatedClasses = new Set(
-  JSON.parse(readFileSync(tokenMappingPath, 'utf8'))
-);
- */
-// Regex to match classes
-const classRegex = /\.[\w-]+/g;
-
 
 function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
   return (root: Root, result: PostcssResult) => {
