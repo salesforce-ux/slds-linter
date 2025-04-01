@@ -13,4 +13,8 @@
 .multipleVars{
         border-color: var(--sds-g-color-border-1) var(--sds-g-color-border-2)
 }
+
+.nested{
+        border-color: var(--sds-g-color-border-1, var(--sds-g-color-border-2, #fff))
+}
     

@@ -1,0 +1,97 @@
+.slds-component {
+    /* Possible replacement: var(--lwc-colorBorderError, rgb(194, 57, 52)) */
+    border-color: token(colorBorderError);
+    
+    /* Possible replacement: var(--lwc-colorTextWarning, rgb(255, 183, 93)) */
+    color: t(colorTextWarning);
+    
+    /* Using token() as fallback in var() */
+    background-color: var(--lwc-colorBackground, token(colorBackground));
+    
+    /* Possible replacement: var(--lwc-brandHeaderContrastWeak, rgba(166, 166, 166, 0.1)) */
+    box-shadow: 0 2px 4px t(brandHeaderContrastWeak);
+  }
+  
+  .slds-component__header {
+    /* Possible replacement: var(--lwc-fontSizeLarge, 1.125rem) */
+    font-size: token(fontSizeLarge);
+    
+    /* Possible replacement: var(--lwc-lineHeightHeading, 1.25) */
+    line-height: t(lineHeightHeading);
+    
+    /* Using t() as fallback in var() */
+    font-weight: var(--lwc-fontWeightBold, t(fontWeightBold));
+    
+    /* Possible replacement: var(--lwc-colorTextBrand, rgb(0, 112, 210)) */
+    color: token(colorTextBrand);
+  }
+  
+  .slds-component__body {
+    /* Possible replacement: var(--lwc-varSpacingMedium, 1rem) */
+    padding: token(varSpacingMedium);
+    
+    /* Possible replacement: var(--lwc-colorTextDefault, rgb(8, 7, 7)) */
+    color: t(colorTextDefault);
+    
+    /* Using token() as fallback in var() */
+    background-color: var(--lwc-colorBackgroundAlt, token(colorBackgroundAlt));
+  }
+  
+  .slds-component__footer {
+    /* Possible replacement: var(--lwc-colorBorderSeparator, rgb(249, 249, 250)) */
+    border-top: 1px solid token(colorBorderSeparator);
+    
+    /* Possible replacement: var(--lwc-spacingSmall, 0.75rem) */
+    margin-top: t(spacingSmall);
+    
+    /* Using t() as fallback in var() */
+    background-color: var(--lwc-colorBackgroundInverse, t(colorBackgroundInverse));
+  }
+  
+  .slds-component__button {
+    /* Possible replacement: var(--lwc-colorBrandPrimary, rgb(21, 137, 238)) */
+    background-color: token(colorBrandPrimary);
+    
+    /* Possible replacement: var(--lwc-colorTextInverse, rgb(255, 255, 255)) */
+    color: t(colorTextInverse);
+    
+    /* Using token() as fallback in var() */
+    padding: var(--lwc-spacingXSmall, token(spacingXSmall)) var(--lwc-spacingSmall, token(spacingSmall));
+    
+    /* Possible replacement: var(--lwc-buttonBorderRadius, 0.25rem) */
+    border-radius: t(buttonBorderRadius);
+  }
+  
+  .slds-component__icon {
+    /* Possible replacement: var(--lwc-colorTextIconDefault, rgb(107, 109, 112)) */
+    fill: token(colorTextIconDefault);
+    
+    /* Possible replacement: var(--lwc-squareIconUtilitySmall, 1rem) */
+    width: t(squareIconUtilitySmall);
+    
+    /* Using t() as fallback in var() */
+    height: var(--lwc-squareIconUtilitySmall, t(squareIconUtilitySmall));
+  }
+  
+  .slds-component__input {
+    /* Possible replacement: var(--lwc-heightInput, 1.875rem) */
+    height: token(heightInput);
+    
+    /* Possible replacement: var(--lwc-colorBorderInput, rgb(217, 219, 221)) */
+    border-color: t(colorBorderInput);
+    
+    /* Using token() as fallback in var() */
+    background-color: var(--lwc-colorBackgroundInput, token(colorBackgroundInput));
+  }
+  
+  .slds-component__label {
+    /* Possible replacement: var(--lwc-colorTextLabel, rgb(62, 62, 60)) */
+    color: token(colorTextLabel);
+    
+    /* Possible replacement: var(--lwc-fontSizeSmall, 0.75rem) */
+    font-size: t(fontSizeSmall);
+    
+    /* Using t() as fallback in var() */
+    margin-bottom: var(--lwc-varSpacingXxSmall, t(varSpacingXxSmall));
+  }
+  

@@ -17,79 +17,89 @@ const messages = utils.ruleMessages(ruleName, {
     replacePlaceholders(warningMsg, { oldValue, newValue }),
 });
 
-// Load token mapping file
-/* const tokenMappingPath = metadataFileUrl('./public/metadata/tokenMapping.json');
+function isTokenFunction(node:valueParser.Node): boolean{
+  return (node.type === "function" && (node.value === "token" || node.value === "t") && node.nodes.length>0);
+}
 
-const tokenMapping = JSON.parse(readFileSync(tokenMappingPath, 'utf8')); */
+function shouldIgnoreDetection(token: string):boolean {
+  return (!(token in tokenMapping) || !tokenMapping[token].startsWith('--lwc-'))
+}
+
+function isAlreadyFixed(recommendation:string,functionNode:valueParser.FunctionNode, allNodes:valueParser.Node[]): boolean{
+  const hasFixInFirstNode = allNodes[0].type == "word" && allNodes[0].value === recommendation;
+  const sourceIndexMatched = functionNode.sourceIndex === allNodes[allNodes.length - 1].sourceIndex
+  return hasFixInFirstNode&& sourceIndexMatched;
+}
+
+function transformTokenFunction(node:valueParser.Node, allNodes:valueParser.Node[]) {
+  if(!isTokenFunction(node)){
+    return null;
+  }
+  const functionNode = node as valueParser.FunctionNode;
+  let cssVarNode = functionNode.nodes[0];
+  let cssVar = cssVarNode.value;
+
+  if (shouldIgnoreDetection(cssVar)) {
+    return null;
+  }
+
+  const index = cssVarNode.sourceIndex;
+  const endIndex = cssVarNode.sourceEndIndex;
+  let replacement:string;
+  const recommendation:string = tokenMapping[cssVar];
+
+  if(isAlreadyFixed(recommendation,functionNode,allNodes)){
+    // Ignore if already fixed.
+    return null;
+  }
+  replacement = `var(${recommendation}, ${valueParser.stringify(node)})`;
+
+  return {cssVar, replacement, recommendation, original: valueParser.stringify(node), index, endIndex};
+}
 
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}, context: RuleContext) {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={})  => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
       const parsedValue = valueParser(decl.value);
+      const startIndex = decl.toString().indexOf(decl.value);
+      
+      parsedValue.walk((node, i, allNodes) => {
+        const data = transformTokenFunction(node, allNodes);
 
-      parsedValue.walk((node) => {
-        if (
-          node.type === 'function' &&
-          (node.value === 'token' || node.value === 't')
-        ) {
-          const tokenName = node.nodes[0].value;
-
-          const index = decl.toString().indexOf(decl.value); // Start index of the value
-          const endIndex = index + decl.value.length;
+        if(data){
+          const {cssVar, replacement, recommendation, original, index, endIndex} = data;
+          const message = recommendation?messages.replaced(original, replacement):messages.deprecatedMsg;
+          let fix = null;
           
-          if (tokenName in tokenMapping) {
-            const newValue = tokenMapping[tokenName];
-
-            // Skip if already fixed
-            if (decl.value.includes(newValue)) return;
-
-            if (
-              typeof newValue === 'string' &&
-              newValue.startsWith('--lwc-')
-            ) {
-              const replacementStyle = `var(${newValue}, ${decl.value})`;
-
-              utils.report({
-                message: messages.replaced(decl.value, replacementStyle),
-                node: decl,
-                index,
-                endIndex,
-                result,
-                ruleName,
-                severity,
-              });
-
-              if (context.fix && replacementStyle) {
-                decl.value = replacementStyle;
-              }
-            } else {
-              utils.report({
-                message: messages.deprecatedMsg,
-                node: decl,
-                index,
-                endIndex,
-                result,
-                ruleName,
-                severity,
-              });
+          if(replacement){
+            fix = () => {
+              decl.value = decl.value.replace(original, replacement);
             }
-          } else {
-            utils.report({
-              message: messages.deprecatedMsg,
-              node: decl,
-              index,
-              endIndex,
-              result,
-              ruleName,
-              severity,
-            });
           }
+          
+          stylelint.utils.report(<stylelint.Problem>{
+            message,
+            node: decl,
+            result,
+            ruleName,
+            severity,
+            index: index+startIndex, 
+            endIndex: endIndex+startIndex, 
+            fix
+          });
         }
       });
     });
   };
 }
 
+ruleFunction.ruleName = ruleName;
+ruleFunction.messages = messages;
+ruleFunction.meta = {
+  url: '',
+  fixable: true
+};
+
 // Export the plugin
-export default createPlugin(ruleName, rule as unknown as Rule);
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);
