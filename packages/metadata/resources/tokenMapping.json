@@ -694,14 +694,6 @@
     "colorTextLinkInverseHover": "--lwc-colorTextLinkInverseHover",
     "palettePink80": "--lwc-palettePink80",
     "zIndexModal": "--lwc-zIndexModal",
-    "pageHeaderIconSize": [
-      null,
-      [
-        {
-          "type": "unsupported"
-        }
-      ]
-    ],
     "colorTextDestructiveHover": "--lwc-colorTextDestructiveHover",
     "colorBorderCanvasElementSelection": "--lwc-colorBorderCanvasElementSelection",
     "colorBackgroundSuccess": "--lwc-colorBackgroundSuccess",
@@ -858,14 +850,6 @@
     "fontSizeTextXSmall": "--lwc-fontSizeTextXSmall",
     "colorBackgroundToast": "--lwc-colorBackgroundToast",
     "fontSizeXxLarge": "--lwc-fontSizeXxLarge",
-    "heightSalesPath": [
-      null,
-      [
-        {
-          "type": "unsupported"
-        }
-      ]
-    ],
     "colorTextIconDefaultHintBorderless": "--lwc-colorTextIconDefaultHintBorderless",
     "paletteOrange95": "--lwc-paletteOrange95",
     "colorForegroundPrimary": "--lwc-colorForegroundPrimary",
