@@ -9,7 +9,7 @@ const ruleName: string = 'slds/no-important-tag';
 const { severityLevel = 'error', warningMsg = '', errorMsg = '', ruleDesc = 'No description provided' } = ruleMetadata(ruleName) || {};
 
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
       if (decl.important) {
@@ -24,20 +24,21 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
           result,
           ruleName,
           severity,
+          fix: ()=>{
+            decl.important = false;
+          }
         });
 
-        // Call the fix method if in fixing context
-        if (result.stylelint.config.fix) {
-          fix(decl);
-        }
       }
     });
   };
 }
 
-// Implement the fix method
-function fix(decl: any): void {
-  decl.important = false;
-}
+ruleFunction.ruleName = ruleName;
+ruleFunction.meta = {
+  url: '',
+  fixable: true
+};
 
-export default createPlugin(ruleName, rule as unknown as Rule);
+// Export the plugin
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);

@@ -16,7 +16,7 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
 
 
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
       if (decl.prop.startsWith('--_slds-')) {
@@ -29,22 +29,24 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
           endIndex,
           result,
           ruleName,
-          severity
+          severity,
+          fix:()=>{
+            // Modify the declaration as needed, e.g., remove the deprecated variable or correct it
+            decl.prop = decl.prop.replace('--_slds-', '--slds-');
+          }
         });
-
-        // Optional: Call the fix method if in fixing context
-        if (result.stylelint.config.fix) {
-          fix(decl);
-        }
       }
     });
   };
 }
 
-// Implement the fix method
-function fix(decl: any): void {
-  // Modify the declaration as needed, e.g., remove the deprecated variable or correct it
-  decl.prop = decl.prop.replace('--_slds-', '--slds-');
-}
+ruleFunction.ruleName = ruleName;
+ruleFunction.messages = messages;
+ruleFunction.meta = {
+  url: '',
+  fixable: true
+};
 
-export default createPlugin(ruleName, rule as unknown as Rule);
+// Export the plugin
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);
+

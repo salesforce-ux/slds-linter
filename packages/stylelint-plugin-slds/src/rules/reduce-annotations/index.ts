@@ -14,7 +14,7 @@ const annotationList = [
 ];
 
 // Rule function
-const rule = (primaryOptions, { severity = severityLevel as RuleSeverity } = {}) => {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkComments((comment) => {
       if (annotationList.some(annotation => comment.text.trim().includes(annotation))) {
@@ -24,13 +24,20 @@ const rule = (primaryOptions, { severity = severityLevel as RuleSeverity } = {})
           result,
           ruleName,
           severity,
+          fix:()=>{
+            comment.remove(); // Auto-fix by removing the comment
+          }
         });
-        if (result.stylelint.config.fix) {
-          comment.remove(); // Auto-fix by removing the comment
-        }
       }
     });
   };
 };
 
-export default createPlugin(ruleName, rule as unknown as Rule);
+ruleFunction.ruleName = ruleName;
+ruleFunction.meta = {
+  url: '',
+  fixable: true
+};
+
+// Export the plugin
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);
