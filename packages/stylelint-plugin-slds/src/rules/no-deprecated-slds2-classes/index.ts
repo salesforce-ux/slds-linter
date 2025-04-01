@@ -5,7 +5,7 @@ import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import { getClassNodesFromSelector } from "../../utils/selector-utils";
 const { utils, createPlugin } = stylelint;
-const deprecatedSelectorsList = sldsPlusMetadata.bem.css.deprecated.selectors;
+const deprecatedSelectorsList = new Set(sldsPlusMetadata.bem.css.deprecated.selectors);
 
 
 
