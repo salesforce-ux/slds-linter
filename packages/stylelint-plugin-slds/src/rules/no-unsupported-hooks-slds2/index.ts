@@ -1,11 +1,9 @@
-import stylelint, { Rule, PostcssResult, RuleSeverity } from 'stylelint';
-import { readFileSync } from 'fs';
+import { deprecatedHooks } from '@salesforce-ux/metadata-slds';
 import { Root } from 'postcss';
-import { metadataFileUrl } from '../../utils/metaDataFileUrl';
+import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 const { utils, createPlugin } = stylelint;
-import { deprecatedHooks } from '@salesforce-ux/metadata-slds';
 
 const ruleName: string = 'slds/no-unsupported-hooks-slds2';
 
@@ -22,10 +20,7 @@ const messages = utils.ruleMessages(ruleName, {
     replacePlaceholders(errorMsg, { token, newToken }),
 });
 
-function rule(
-  primaryOptions: boolean,
-  { severity = severityLevel as RuleSeverity } = {}
-) {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
       const parsedPropertyValue = decl.prop;
@@ -45,11 +40,11 @@ function rule(
             result,
             ruleName,
             severity,
+            fix:()=>{
+              decl.prop = proposedNewValue;
+            }
           });
-
-          if (result.stylelint.config.fix) {
-            decl.prop = proposedNewValue;
-          }
+          
         } else {
           utils.report({
             message: JSON.stringify({message: messages.deprecated(parsedPropertyValue), suggestions:[]}),
@@ -65,4 +60,12 @@ function rule(
   };
 }
 
-export default createPlugin(ruleName, rule as unknown as Rule);
+ruleFunction.ruleName = ruleName;
+ruleFunction.messages = messages;
+ruleFunction.meta = {
+  url: '',
+  fixable: true
+};
+
+// Export the plugin
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);
