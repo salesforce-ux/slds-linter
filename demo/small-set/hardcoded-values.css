@@ -154,3 +154,10 @@
 .test-cls7 {
   width: 50%;
 } 
+
+.hardcoded-value{
+	background-color: #fff;
+	border-color: #fff;
+	color: #fff;
+	color: #05628a;
+}

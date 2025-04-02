@@ -63,7 +63,37 @@ describe('no-hardcoded-values-slds2', () => {
           box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15);
         }
       `,
-      expectedMessage: 'Consider replacing the 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15) static value with an SLDS 2 styling hook that has a similar value: --slds-s-input-shadow-focus (slds/no-hardcoded-values-slds2)',
+      expectedMessage: 'There’s no replacement styling hook for the 2px static value. Remove the static value. (slds/no-hardcoded-values-slds2)',
+    },
+    {
+      description:
+        'Reports warning for hardcoded background-color value with replacement hook',
+      inputCss: `
+        .example {
+          background-color: #ffffff;
+        }
+      `,
+      expectedMessage: 'Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-surface-1\n2. --slds-g-color-surface-container-1\n3. --slds-g-color-disabled-container-1 (slds/no-hardcoded-values-slds2)',
+    },
+    {
+      description:
+        'Reports warning for hardcoded color value with replacement hook',
+      inputCss: `
+        .example {
+          color: #ffffff;
+        }
+      `,
+      expectedMessage: 'Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-on-surface-inverse-1\n2. --slds-g-color-on-accent-1 (slds/no-hardcoded-values-slds2)',
+    },
+    {
+      description:
+        'Reports warning for hardcoded border-color value with replacement hook',
+      inputCss: `
+        .example {
+          border-color: #fff;
+        }
+      `,
+      expectedMessage: 'Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-neutral-base-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)',
     },
     {
       description:

@@ -83,7 +83,7 @@ describe('no-hardcoded-values-slds1', () => {
           background-color: #123456;
         }
       `,
-      expectedMessage:'Replace the #123456 static value with an SLDS 1 styling hook: \n1. --slds-g-color-brand-base-15\n2. --slds-g-color-surface-inverse-1\n3. --slds-g-color-surface-container-inverse-1\n4. --slds-g-color-brand-base-20\n5. --slds-g-color-surface-inverse-2. (slds/no-hardcoded-values-slds1)',
+      expectedMessage:'Replace the #123456 static value with an SLDS 1 styling hook: \n1. --slds-g-color-surface-inverse-1\n2. --slds-g-color-surface-container-inverse-1\n3. --slds-g-color-surface-inverse-2\n4. --slds-g-color-surface-container-inverse-2\n5. --slds-g-color-accent-container-3. (slds/no-hardcoded-values-slds1)',
     },
     {
       description:
