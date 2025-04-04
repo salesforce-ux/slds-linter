@@ -67,6 +67,36 @@ describe('no-hardcoded-values-slds2', () => {
     },
     {
       description:
+        'Reports warning for hardcoded background-color value with replacement hook',
+      inputCss: `
+        .example {
+          background-color: #ffffff;
+        }
+      `,
+      expectedMessage: 'Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-surface-1\n2. --slds-g-color-surface-container-1\n3. --slds-g-color-disabled-container-1 (slds/no-hardcoded-values-slds2)',
+    },
+    {
+      description:
+        'Reports warning for hardcoded color value with replacement hook',
+      inputCss: `
+        .example {
+          color: #ffffff;
+        }
+      `,
+      expectedMessage: 'Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-on-surface-inverse-1\n2. --slds-g-color-on-accent-1 (slds/no-hardcoded-values-slds2)',
+    },
+    {
+      description:
+        'Reports warning for hardcoded border-color value with replacement hook',
+      inputCss: `
+        .example {
+          border-color: #fff;
+        }
+      `,
+      expectedMessage: 'Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-neutral-base-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)',
+    },
+    {
+      description:
         'Reports warning for hardcoded font size with replacement hook',
       inputCss: `
         .example {
