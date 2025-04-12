@@ -21,7 +21,8 @@
     "postcss-value-parser": "^4.2.0",
     "postcss": "^8.4.47",
     "stylelint": "^16.10.0",
-    "@salesforce-ux/metadata-slds": "0.1.6"
+    "@salesforce-ux/metadata-slds": "0.1.6",
+    "@salesforce-ux/sds-metadata": "0.0.1-alpha.2"
   },
   "devDependencies": {
     "@types/postcss-plugins": "1.13.2",
