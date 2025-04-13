@@ -1,10 +1,11 @@
-import { bemNaming as bemMappings } from "@salesforce-ux/metadata-slds";
 import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import { getClassNodesFromSelector } from '../../utils/selector-utils';
 import replacePlaceholders from '../../utils/util';
 import ruleMetadata from './../../utils/rulesMetadata';
+import { BEMNaming, MetadataFile, MetadataService } from "../../services/metadata.service";
 const { createPlugin } = stylelint;
+const bemMappings = MetadataService.loadMetadata<BEMNaming>(MetadataFile.BEM_NAMING);
 
 const ruleName: string = 'slds/enforce-bem-usage';
 
