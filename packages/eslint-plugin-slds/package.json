@@ -25,6 +25,7 @@
   "dependencies": {
     "@html-eslint/eslint-plugin": "^0.34.0",
     "@html-eslint/parser": "^0.34.0",
+    "@salesforce-ux/sds-metadata": "0.0.1-alpha.2",
     "eslint": "^8.0.0"
   },
   "devDependencies": {
