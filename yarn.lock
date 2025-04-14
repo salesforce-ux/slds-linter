@@ -874,15 +874,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@salesforce-ux/sds-metadata@0.0.1-alpha.2":
-  version "0.0.1-alpha.2"
-  resolved "https://registry.yarnpkg.com/@salesforce-ux/sds-metadata/-/sds-metadata-0.0.1-alpha.2.tgz#f455b20ee61ed7fc2bb3b7dda739b7ac610e561e"
-  integrity sha512-NzvMkFJ1pLOyzUd/9fm3zh8JpPpjV2GpQWoHUH38M3yJrQgMJuTusqMFsNa1K0EYfnRI3TSRSd+8yCWMfMYUug==
-
 "@salesforce-ux/sds-metadata@~0.0.1-alpha.3":
-  version "0.0.1-alpha.3"
-  resolved "https://registry.yarnpkg.com/@salesforce-ux/sds-metadata/-/sds-metadata-0.0.1-alpha.3.tgz#0be195e9f9df4dea92b94a908676e997a3f41a29"
-  integrity sha512-QbtCuxRCaymLTMr2no66wUqEQsfohoVXovVeDfVjESqyesXoT1n5oO+lpi/N+n/WXJLxBS818fWzuHoFFdpIrw==
+  version "0.0.1-alpha.4"
+  resolved "https://registry.yarnpkg.com/@salesforce-ux/sds-metadata/-/sds-metadata-0.0.1-alpha.4.tgz#0c3289e9be45366bc9959a2d93ef237757be1d54"
+  integrity sha512-Nz1wJtWaNrg4ujFDbkL4tVKE666FzXvKpHpYirJvCVJ1iRQMgRMcwyz+0OheZS0LTGra4uxF4iCPUN2b0DDd8Q==
 
 "@sec-ant/readable-stream@^0.4.1":
   version "0.4.1"
