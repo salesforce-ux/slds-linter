@@ -102,7 +102,16 @@ describe('no-hardcoded-values-slds2', () => {
           font-size: 16px;
         }
       `,
-      expectedMessage:"Replace the 16px static value with an SLDS 1 styling hook: --slds-g-font-scale-2"
+      expectedMessage:"Consider replacing the 16px static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-2 (slds/no-hardcoded-values-slds2)"
+    },{
+      description:
+        'Reports warning for hardcoded font size with replacement hook',
+      inputCss: `
+        .example {
+          font-size: 1rem;
+        }
+      `,
+      expectedMessage:"Consider replacing the 1rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-2 (slds/no-hardcoded-values-slds2)"
     },
     {
       description:

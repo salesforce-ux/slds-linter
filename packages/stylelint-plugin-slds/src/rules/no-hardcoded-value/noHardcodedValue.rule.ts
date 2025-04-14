@@ -275,11 +275,36 @@ export const createNoHardcodedValueRule = (
           });
         } else if (isDensiProp) {
           forEachDensifyValue(parsedValue, (node) => {
+            let alternateValue = null;  
+            const parsedValue = valueParser.unit(node.value);
+            const unitType = parsedValue && parsedValue.unit;
+            const numberVal = parsedValue?Number(parsedValue.number):0;
+            if(unitType === 'px'){
+              let floatValue = parseFloat(`${numberVal / 16}`);
+              if(!isNaN(floatValue)){ // this will void suffix 0's
+                alternateValue = `${parseFloat(floatValue.toFixed(4))}rem`;
+              }
+            } else if(unitType === 'rem'){
+              const intValue = parseInt(`${numberVal * 16}`);
+              if(!isNaN(intValue)){
+                alternateValue = `${intValue}px`;
+              }
+            }
+            
             closestHooks = findExactMatchStylingHook(
               node.value,
               supportedStylinghooks,
               cssProperty
             );
+
+            // Find closest hook for alternate value if no exact match is found
+            if(!closestHooks || !closestHooks.length){
+              closestHooks = findExactMatchStylingHook(
+                alternateValue,
+                supportedStylinghooks,
+                cssProperty
+              );
+            }
 
             const fix = ()=> {
               decl.value = decl.value.replace(valueParser.stringify(node), `var(${closestHooks[0]})`);
