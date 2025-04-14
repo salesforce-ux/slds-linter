@@ -4,7 +4,8 @@ import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 const { utils, createPlugin } = stylelint;
-const deprecatedHooks = MetadataService.loadMetadata<DeprecatedStylingHooks>(MetadataFile.DEPRECATED_STYLING_HOOKS);
+
+const deprecatedHooks = new Set(MetadataService.loadMetadata<DeprecatedStylingHooks>(MetadataFile.DEPRECATED_STYLING_HOOKS));
 
 const ruleName: string = 'slds/no-unsupported-hooks-slds2';
 
@@ -25,10 +26,10 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
       const parsedPropertyValue = decl.prop;
-      if (parsedPropertyValue.startsWith('--slds-c-')  && parsedPropertyValue in deprecatedHooks) {
+      if (parsedPropertyValue.startsWith('--slds-c-')  && deprecatedHooks.has(parsedPropertyValue)) {
         const index = decl.toString().indexOf(decl.prop);
         const endIndex = index + decl.prop.length;
-        const proposedNewValue = deprecatedHooks[parsedPropertyValue];
+        /*const proposedNewValue = deprecatedHooks[parsedPropertyValue];
         if (proposedNewValue && proposedNewValue !== 'null') {
           const index = decl.toString().indexOf(decl.prop);
           const endIndex = index + decl.prop.length;
@@ -46,7 +47,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
             }
           });
           
-        } else {
+        } else {*/
           utils.report({
             message: JSON.stringify({message: messages.deprecated(parsedPropertyValue), suggestions:[]}),
             node: decl,
@@ -55,7 +56,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
             result,
             ruleName,
           });
-        }
+        //}
       }
     });
   };

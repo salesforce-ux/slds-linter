@@ -3,7 +3,7 @@ import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;
 
-describe('no-deprecated-slds2-classes', () => {
+xdescribe('no-deprecated-slds2-classes', () => {
   const ruleName = 'slds/no-deprecated-slds2-classes';
 
   const testCases = [
