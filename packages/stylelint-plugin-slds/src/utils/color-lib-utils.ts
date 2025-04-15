@@ -1,3 +1,4 @@
+import { ValueToStylingHooksMapping, ValueToStylingHookEntry } from '@salesforce-ux/sds-metadata';
 import chroma from 'chroma-js';
 
 const LAB_THRESHOLD = 25; // Adjust this to set how strict the matching should be
@@ -27,7 +28,7 @@ const convertToHex = (color: string): string | null => {
 // Find the closest color hook using LAB distance
 const findClosestColorHook = (
   color: string,
-  supportedColors,
+  supportedColors:ValueToStylingHooksMapping,
   cssProperty: string
 ): string[] => {
   const returnStylingHooks: string[] = [];
@@ -40,7 +41,7 @@ const findClosestColorHook = (
 
   Object.entries(supportedColors).forEach(([sldsValue, data]) => {
     if (sldsValue && isHexCode(sldsValue)) {
-      const hooks = data['hooks']; // Get the hooks for the sldsValue
+      const hooks = data as ValueToStylingHookEntry[]; // Get the hooks for the sldsValue
 
       hooks.forEach((hook) => {
         const labSupportedColor = chroma(sldsValue).lab();

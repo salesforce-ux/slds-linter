@@ -1,5 +1,6 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
-import { bemMapping } from "./bem-mapping";
+import { MetadataService, MetadataFile, BEMNaming } from '../services/metadata.service';
+const bemMapping = MetadataService.loadMetadata<BEMNaming>(MetadataFile.BEM_NAMING);
 
 export = {
   meta: {

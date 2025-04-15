@@ -14,8 +14,7 @@ describe('no-hardcoded-values-slds2', () => {
           color: #ff0000;
         }
       `,
-      expectedMessage:
-        'There’s no replacement styling hook for the #ff0000 static value. Remove the static value.',
+      expectedMessage:"Consider replacing the #ff0000 static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-red-50\n2. --slds-g-color-palette-hot-orange-50\n3. --slds-g-color-palette-hot-orange-60 (slds/no-hardcoded-values-slds2)",
     },
     {
       description: 'Does not report 0 as a value',
@@ -73,7 +72,7 @@ describe('no-hardcoded-values-slds2', () => {
           background-color: #ffffff;
         }
       `,
-      expectedMessage: 'Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-surface-1\n2. --slds-g-color-surface-container-1\n3. --slds-g-color-disabled-container-1 (slds/no-hardcoded-values-slds2)',
+      expectedMessage: "Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)",
     },
     {
       description:
@@ -83,7 +82,7 @@ describe('no-hardcoded-values-slds2', () => {
           color: #ffffff;
         }
       `,
-      expectedMessage: 'Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-on-surface-inverse-1\n2. --slds-g-color-on-accent-1 (slds/no-hardcoded-values-slds2)',
+      expectedMessage: "Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)",
     },
     {
       description:
@@ -93,7 +92,7 @@ describe('no-hardcoded-values-slds2', () => {
           border-color: #fff;
         }
       `,
-      expectedMessage: 'Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-neutral-base-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)',
+      expectedMessage: `Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)`,    
     },
     {
       description:
@@ -103,8 +102,16 @@ describe('no-hardcoded-values-slds2', () => {
           font-size: 16px;
         }
       `,
-      expectedMessage:
-        'Consider replacing the 16px static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-2',
+      expectedMessage:"Consider replacing the 16px static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-2 (slds/no-hardcoded-values-slds2)"
+    },{
+      description:
+        'Reports warning for hardcoded font size with replacement hook',
+      inputCss: `
+        .example {
+          font-size: 1rem;
+        }
+      `,
+      expectedMessage:"Consider replacing the 1rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-2 (slds/no-hardcoded-values-slds2)"
     },
     {
       description:
@@ -114,7 +121,7 @@ describe('no-hardcoded-values-slds2', () => {
           background-color: #123456;
         }
       `,
-      expectedMessage:`Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-surface-inverse-2\n2. --slds-g-color-surface-container-inverse-2\n3. --slds-g-color-surface-inverse-1\n4. --slds-g-color-surface-container-inverse-1`
+      expectedMessage:`Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-cloud-blue-20\n2. --slds-g-color-palette-blue-15\n3. --slds-g-color-palette-cloud-blue-30\n4. --slds-g-color-palette-blue-20\n5. --slds-g-color-palette-cloud-blue-15 (slds/no-hardcoded-values-slds2)`,
     },
     {
       description:

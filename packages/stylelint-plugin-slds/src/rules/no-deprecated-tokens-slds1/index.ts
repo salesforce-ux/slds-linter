@@ -1,13 +1,12 @@
-import { tokenMapping } from "@salesforce-ux/metadata-slds";
 import { Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
-import stylelint, { PostcssResult, Rule, RuleContext, RuleSeverity } from 'stylelint';
+import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
+import { AuraToLwcTokensMapping, MetadataFile, MetadataService } from '../../services/metadata.service';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
-
 const { utils, createPlugin }: typeof stylelint = stylelint;
 const ruleName: string = 'slds/no-deprecated-tokens-slds1';
-
+const tokenMapping = MetadataService.loadMetadata<AuraToLwcTokensMapping>(MetadataFile.AURA_TO_LWC_TOKENS);
 
 const { severityLevel = 'error', warningMsg = '', errorMsg = '', ruleDesc = 'No description provided' } = ruleMetadata(ruleName) || {};
 

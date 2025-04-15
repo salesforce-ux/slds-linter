@@ -5,7 +5,7 @@ const { lint } = stylelint;
 
 describe('slds/no-unsupported-hooks-slds2', () => {
   const expectedMessages = [
-    "{\"message\":\"The --slds-c-breadcrumbs-spacing-inline-start styling hook isn’t present in SLDS 2. Replace it with --slds-c-breadcrumbs-spacing-inlinestart. (slds/no-unsupported-hooks-slds2)\",\"suggestions\":[\"--slds-c-breadcrumbs-spacing-inlinestart\"]}",
+    "{\"message\":\"The --slds-c-breadcrumbs-spacing-inline-start styling hook isn’t present in SLDS 2 and there's no equivalent replacement. Remove it or replace it with a styling hook with a similar effect. (slds/no-unsupported-hooks-slds2)\",\"suggestions\":[]}",
   ];
 
   expectedMessages.forEach((message, index) => {

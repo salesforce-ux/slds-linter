@@ -1,4 +1,4 @@
-import { lwcToSlds } from '@salesforce-ux/metadata-slds';
+import { MetadataService, MetadataFile, LwcToSldsTokensMapping } from '../../services/metadata.service';
 import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleContext, RuleSeverity } from 'stylelint';
@@ -6,7 +6,7 @@ import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 
 const { createPlugin }: typeof stylelint = stylelint;
-
+const lwcToSlds = MetadataService.loadMetadata<LwcToSldsTokensMapping>(MetadataFile.LWC_TO_SLDS);
 const ruleName: string = 'slds/lwc-token-to-slds-hook';
 
 const {
@@ -33,13 +33,13 @@ function shouldIgnoreDetection(lwcToken: string) {
   return (
     !lwcToken.startsWith('--lwc-') ||
     !(lwcToken in lwcToSlds) ||
-    lwcToSlds[lwcToken] === 'Continue to use'
+    lwcToSlds[lwcToken].continueToUse
   );
 }
 
 function getRecommendation(lwcToken: string) {
   const oldValue = lwcToken;
-  const recommendation = lwcToSlds[oldValue];
+  const recommendation = lwcToSlds[oldValue].replacement;
   const hasRecommendation = recommendation && recommendation !== '--';
   return {hasRecommendation, recommendation};
 }

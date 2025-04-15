@@ -874,6 +874,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@salesforce-ux/sds-metadata@~0.0.1-alpha.3":
+  version "0.0.1-alpha.4"
+  resolved "https://registry.yarnpkg.com/@salesforce-ux/sds-metadata/-/sds-metadata-0.0.1-alpha.4.tgz#0c3289e9be45366bc9959a2d93ef237757be1d54"
+  integrity sha512-Nz1wJtWaNrg4ujFDbkL4tVKE666FzXvKpHpYirJvCVJ1iRQMgRMcwyz+0OheZS0LTGra4uxF4iCPUN2b0DDd8Q==
+
 "@sec-ant/readable-stream@^0.4.1":
   version "0.4.1"
   resolved "https://registry.npmjs.org/@sec-ant/readable-stream/-/readable-stream-0.4.1.tgz"
@@ -1537,11 +1542,6 @@ chalk@^5.3.0, chalk@^5.4.1:
   version "5.4.1"
   resolved "https://registry.npmjs.org/chalk/-/chalk-5.4.1.tgz"
   integrity sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==
-
-change-case@^5.4.4:
-  version "5.4.4"
-  resolved "https://registry.npmjs.org/change-case/-/change-case-5.4.4.tgz"
-  integrity sha512-HRQyTk2/YPEkt9TnUPbOpr64Uw3KOicFWPVBb+xiHvd6eBx/qPr9xqfBFDT8P2vWsvvz4jbEkfDe71W3VyNu2w==
 
 char-regex@^1.0.2:
   version "1.0.2"

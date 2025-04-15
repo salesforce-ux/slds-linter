@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/metadata",
     "packages/eslint-plugin-slds",
     "packages/stylelint-plugin-slds",
     "packages/cli"
