@@ -1,9 +1,0 @@
-/* Test file for AURA expressions */
-div[class="{! (v.hasErrors ? 'slds-theme_error' : 'slds-theme_success') + ' slds-modal__header slds-theme_alert-texture'}"] {
-  color: red;
-}
-
-/* Regular CSS class */
-.slds-text-heading_large {
-  border-start-start-radius: 0;
-} 
