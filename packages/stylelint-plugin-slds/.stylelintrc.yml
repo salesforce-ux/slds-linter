@@ -28,9 +28,9 @@ overrides:
       # slds/lwc-token-to-slds-hook: ## Cannot be public as the data is not final. 
       #   - true
       #   - severity: warning
-      # slds/enforce-bem-usage:
-      #   - true
-      #   - severity: warning
+      slds/enforce-bem-usage:
+        - true
+        - severity: warning
       # slds/no-deprecated-slds-classes:
       #   - true
       #   - severity: warning
@@ -56,4 +56,7 @@ overrides:
   - files:
       - '**/*.html'
     customSyntax: 'postcss-html'
-    rules: {}
+    rules: 
+      slds/enforce-bem-usage:
+        - true
+        - severity: warning
