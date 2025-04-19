@@ -48,6 +48,44 @@ function isVarFunction(node:valueParser.Node): boolean{
   return (node.type === "function" && node.value === "var" && node.nodes.length>0);
 }
 
+/**
+ * Adds the original token as a fallback value for transparent color tokens.
+ * 
+ * @param replacement The replacement color-mix CSS function
+ * @param origToken The original token to use as a fallback
+ * @returns Updated replacement with fallback value
+ */
+function addFallbackToTransparentToken(replacement: string, origToken: string): string {
+  // Only process color-mix functions that contain transparent
+  if (!replacement.startsWith('color-mix') || !replacement.includes('transparent')) {
+    return replacement;
+  }
+
+  // Parse the replacement value to identify var() expressions
+  const parsed = valueParser(replacement);
+  
+  // Traverse the parsed value to find var() functions without fallbacks
+  let updatedReplacement = replacement;
+  parsed.walk((node) => {
+    if (node.type === 'function' && node.value === 'var') {
+      // Check if this var() function doesn't already have a fallback
+      if (node.nodes.length === 1) {
+        // Get the var name
+        const varName = valueParser.stringify(node.nodes[0]);
+        // Create new var expression with fallback
+        const newVarValue = `var(${varName}, ${origToken})`;
+        // Replace the old var() with the new one that includes fallback
+        updatedReplacement = updatedReplacement.replace(
+          `var(${varName})`, 
+          newVarValue
+        );
+      }
+    }
+  });
+
+  return updatedReplacement;
+}
+
 function isAlreadyFixed(recommendation:string,functionNode:valueParser.FunctionNode, allNodes:valueParser.Node[]): boolean{
   const hasFixInFirstNode = allNodes[0].type == "word" && allNodes[0].value === recommendation;
   const sourceIndexMatched = functionNode.sourceIndex === allNodes[allNodes.length - 1].sourceIndex
@@ -93,6 +131,12 @@ function transformVarFunction(node:valueParser.Node, allNodes:valueParser.Node[]
       replacement = hasFallback
       ? `var(${recommendation}, var(${cssVar}, ${valueParser.stringify(functionNode.nodes.slice(2))}))`
       : `var(${recommendation}, var(${cssVar}))`;
+    } else if (typeof recommendation === 'string' && recommendation.startsWith('color-mix')) {
+      // Process transparent tokens to add fallback values
+      if (recommendation.includes('transparent')) {
+        recommendation = addFallbackToTransparentToken(recommendation, cssVar);
+      }
+      replacement = recommendation;
     }
   } else {
     recommendation = null;
