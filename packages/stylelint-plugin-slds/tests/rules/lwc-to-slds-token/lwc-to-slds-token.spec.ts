@@ -1,4 +1,3 @@
-
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 const { lint }: typeof stylelint = stylelint;
 
@@ -15,7 +14,7 @@ const LWC_TOKEN_MAPPINGS = {
   '--lwc-brandBackgroundDarkTransparent': 'transparent',
   '--lwc-cardBodyPadding': '0 var(--slds-g-spacing-4)',
   '--lwc-brandPrimaryTransparent10':
-    'color-mix(in oklab, var(--slds-g-color-accent-1), transparent 90%)',
+    'color-mix(in oklab, var(--slds-g-color-accent-1, --lwc-brandPrimaryTransparent10), transparent 90%)',
   '--lwc-nubbinTriangleOffset': '-0.1875rem',
   '--lwc-heightTappable':
     'calc(var(--slds-g-sizing-9) + var(--slds-g-sizing-4))',
@@ -170,5 +169,27 @@ describe('lwc-token-to-slds-hook', () => {
 
   describe('#left-side-use', () => {
     OnLeftSideTestCases.forEach(createTest);
+  });
+});
+
+describe('lwc-to-slds-token Stylelint Rule', () => {
+  it('should handle transparent color tokens with fallbacks correctly', async () => {
+    const result = await lint({
+      code: `
+      .example {
+        color: var(--lwc-brandPrimaryTransparent10);
+      }
+      `,
+      config: {
+        plugins: ['./src/index.ts'],
+        rules: {
+          'slds/lwc-token-to-slds-hook': true,
+        },
+        fix: true,
+      },
+    });
+
+    const fixedOutput = result.output.trim();
+    expect(fixedOutput).toContain('color-mix(in oklab, var(--slds-g-color-accent-1, --lwc-brandPrimaryTransparent10), transparent 90%)');
   });
 });
