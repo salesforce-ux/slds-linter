@@ -69,9 +69,6 @@ const testStyleLintRule = async (inputCss: string) => {
 
 const createTest = ({ description, inputCss, expectedMessage }, index) => {
   it(description, async () => {
-    if(inputCss.includes('--lwc-heightTappable')){
-      debugger
-    }
     const messages = await testStyleLintRule(inputCss);
     if (expectedMessage) {
       expect(messages[0]).toMatch(expectedMessage);
