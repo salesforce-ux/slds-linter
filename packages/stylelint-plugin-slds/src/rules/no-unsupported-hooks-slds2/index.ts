@@ -1,11 +1,11 @@
-import { MetadataService, MetadataFile, DeprecatedStylingHooks } from '../../services/metadata.service';
+import metadata from '@salesforce-ux/sds-metadata';
 import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 const { utils, createPlugin } = stylelint;
 
-const deprecatedHooks = new Set(MetadataService.loadMetadata<DeprecatedStylingHooks>(MetadataFile.DEPRECATED_STYLING_HOOKS));
+const deprecatedHooks = new Set(metadata.deprecatedStylingHooks);
 
 const ruleName: string = 'slds/no-unsupported-hooks-slds2';
 

@@ -9,7 +9,7 @@ import {
 import generateSuggestionsList from '../../utils/generateSuggestionsList';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
-import { ValueToStylingHooksMapping } from '../../services/metadata.service';
+import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 const { utils, createPlugin } = stylelint;
 
 // Define the structure of a hook

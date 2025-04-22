@@ -1,12 +1,12 @@
 import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 
-import { MetadataService, MetadataFile, SldsClasses } from '../../services/metadata.service';
+import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import { getClassNodesFromSelector } from '../../utils/selector-utils';
 import replacePlaceholders from '../../utils/util';
 const { utils, createPlugin }: typeof stylelint = stylelint;
-const sldsClasses = MetadataService.loadMetadata<SldsClasses>(MetadataFile.SLDS_CLASSES);
+const sldsClasses = metadata.sldsClasses;
 
 const ruleName: string = 'slds/no-slds-class-overrides';
 

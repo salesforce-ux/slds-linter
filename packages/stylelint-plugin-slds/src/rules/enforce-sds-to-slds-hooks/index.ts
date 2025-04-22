@@ -3,8 +3,8 @@ import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
-import { MetadataService, MetadataFile, SldsPlusStylingHooks } from "../../services/metadata.service";
-const sldsPlusStylingHooks = MetadataService.loadMetadata<SldsPlusStylingHooks>(MetadataFile.SLDS_PLUS_STYLING_HOOKS);
+import metadata from '@salesforce-ux/sds-metadata';
+const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 

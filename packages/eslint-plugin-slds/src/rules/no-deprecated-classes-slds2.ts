@@ -1,6 +1,6 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
-import { MetadataService, MetadataFile, DeprecatedClasses } from '../services/metadata.service';
-const deprecatedClasses = MetadataService.loadMetadata<DeprecatedClasses>(MetadataFile.DEPRECATED_CLASSES);
+import metadata from '@salesforce-ux/sds-metadata';
+const deprecatedClasses = metadata.deprecatedClasses;
 
 export = {
   meta: {

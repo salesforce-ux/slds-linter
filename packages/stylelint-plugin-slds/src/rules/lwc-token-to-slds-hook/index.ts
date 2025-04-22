@@ -1,12 +1,12 @@
-import { MetadataService, MetadataFile, LwcToSldsTokensMapping } from '../../services/metadata.service';
+import metadata from '@salesforce-ux/sds-metadata';
 import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
-import stylelint, { PostcssResult, Rule, RuleContext, RuleSeverity } from 'stylelint';
+import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 
 const { createPlugin }: typeof stylelint = stylelint;
-const lwcToSlds = MetadataService.loadMetadata<LwcToSldsTokensMapping>(MetadataFile.LWC_TO_SLDS);
+const lwcToSlds = metadata.lwcToSlds;
 const ruleName: string = 'slds/lwc-token-to-slds-hook';
 
 const {

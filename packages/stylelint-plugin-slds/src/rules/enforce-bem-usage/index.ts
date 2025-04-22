@@ -3,9 +3,9 @@ import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import { getClassNodesFromSelector } from '../../utils/selector-utils';
 import replacePlaceholders from '../../utils/util';
 import ruleMetadata from './../../utils/rulesMetadata';
-import { BEMNaming, MetadataFile, MetadataService } from "../../services/metadata.service";
 const { createPlugin } = stylelint;
-const bemMappings = MetadataService.loadMetadata<BEMNaming>(MetadataFile.BEM_NAMING);
+import metadata from '@salesforce-ux/sds-metadata';
+const bemMappings = metadata.bemNaming;
 
 const ruleName: string = 'slds/enforce-bem-usage';
 
