@@ -874,10 +874,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@salesforce-ux/sds-metadata@~0.0.1-alpha.8":
-  version "0.0.1-alpha.8"
-  resolved "https://registry.yarnpkg.com/@salesforce-ux/sds-metadata/-/sds-metadata-0.0.1-alpha.8.tgz#2503230d38a8c197cfabeb6ecefc665399a467d5"
-  integrity sha512-X6lv9xrXg/ksHlPtE1gw006Bt5yYzwxR56VZxcnSJCYYAFH8rmc8iqNxDuinKNGGRKFYjCby7Mvr5/2eokqqqQ==
+"@salesforce-ux/sds-metadata@~0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@salesforce-ux/sds-metadata/-/sds-metadata-0.1.0.tgz#fe86131d277fe5819df756187244dbb009559c36"
+  integrity sha512-UDDshvCpzcb+ENa8xodiJPk6FQKfvyERrv17TQHINcEj0Lk6iHTcj7YcUis18OV/E/g+4gzn6bBs/sd31TCNaA==
 
 "@sec-ant/readable-stream@^0.4.1":
   version "0.4.1"
