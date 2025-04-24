@@ -15,8 +15,7 @@ describe('no-hardcoded-values-slds1', () => {
           color: #ff0000;
         }
       `,
-      expectedMessage:
-        'Replace the #ff0000 static value with an SLDS 1 styling hook: --slds-g-color-error-base-50',
+      expectedMessage:`Replace the #ff0000 static value with an SLDS 1 styling hook: \n1. --slds-g-color-palette-red-50\n2. --slds-g-color-error-base-50\n3. --slds-g-color-palette-hot-orange-50\n4. --slds-g-color-palette-hot-orange-60. (slds/no-hardcoded-values-slds1)`,
       expectedReplacement: '--slds-g-color-error-base-50',
     },
     {
@@ -59,10 +58,10 @@ describe('no-hardcoded-values-slds1', () => {
       description: 'Reports warning for hardcoded box-shadow value with replacement hook',
       inputCss: `
         .example {
-          box-shadow: 0 2px 8px -2px #18181814, 0 8px 12px -2px #18181828;
+          box-shadow: 0px 2px 3px 0px #00000027;
         }
       `,
-      expectedMessage: "Replace the 0 2px 8px -2px #18181814, 0 8px 12px -2px #18181828 static value with an SLDS 1 styling hook: --slds-g-shadow-2. (slds/no-hardcoded-values-slds1)"
+      expectedMessage: "Replace the 0px 2px 3px 0px #00000027 static value with an SLDS 1 styling hook: --slds-g-shadow-2. (slds/no-hardcoded-values-slds1)"
     },
     {
       description:
@@ -83,7 +82,7 @@ describe('no-hardcoded-values-slds1', () => {
           background-color: #123456;
         }
       `,
-      expectedMessage:'Replace the #123456 static value with an SLDS 1 styling hook: \n1. --slds-g-color-surface-inverse-1\n2. --slds-g-color-surface-container-inverse-1\n3. --slds-g-color-surface-inverse-2\n4. --slds-g-color-surface-container-inverse-2\n5. --slds-g-color-accent-container-3. (slds/no-hardcoded-values-slds1)',
+      expectedMessage:`Replace the #123456 static value with an SLDS 1 styling hook: \n1. --slds-g-color-palette-cloud-blue-20\n2. --slds-g-color-palette-blue-15\n3. --slds-g-color-brand-base-15\n4. --slds-g-color-palette-cloud-blue-30\n5. --slds-g-color-palette-blue-20. (slds/no-hardcoded-values-slds1)`,
     },
     {
       description:

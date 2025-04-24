@@ -6,7 +6,6 @@ import noSldsPrivateVar from './no-slds-private-var';
 import lwcTokenToSldsHook from './lwc-token-to-slds-hook';
 import noDeprecatedTokensSlds1 from './no-deprecated-tokens-slds1';
 import enforceBemUsage from './enforce-bem-usage';
-import noDeprecatedSLDS2Classes from './no-deprecated-slds2-classes';
 import noCalcFunction from './no-calc-function';
 import enforceSdsToSldsHooks from './enforce-sds-to-slds-hooks';
 import reduceAnnotations from './reduce-annotations';
@@ -21,7 +20,6 @@ export default [
   noHardcodedValuesSlds,
   noSldsClassOverrides,
   noHardcodedValuesSldsPlus,
-  noDeprecatedSLDS2Classes,
   noDeprecatedTokensSlds1,
   enforceBemUsage,
   noSldsPrivateVar,

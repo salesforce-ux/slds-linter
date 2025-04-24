@@ -1,0 +1,8 @@
+.text-color{
+    /* SLDS Validator and SLDS linter suggestion are different may be becuase of delta calc */
+    color: #ff0000; 
+}
+
+.text-font-size{
+    font-size: 16px;
+}

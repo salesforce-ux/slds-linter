@@ -1,4 +1,4 @@
-import { deprecatedClasses } from "@salesforce-ux/metadata-slds";
+import metadata from '@salesforce-ux/sds-metadata';
 import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
@@ -6,7 +6,7 @@ import { getClassNodesFromSelector } from '../../utils/selector-utils';
 import replacePlaceholders from '../../utils/util';
 
 const { utils, createPlugin } = stylelint;
-
+const deprecatedClasses = metadata.deprecatedClasses;
 const ruleName: string = 'slds/no-deprecated-slds-classes';
 
 const {

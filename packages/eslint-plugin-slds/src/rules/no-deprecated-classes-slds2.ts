@@ -1,6 +1,6 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
-//TODO: load deprecatedClasses from @salesforce-ux/metadata-slds instead of local res file.
-import { deprecatedClasses } from "./deprecatedClasses";
+import metadata from '@salesforce-ux/sds-metadata';
+const deprecatedClasses = metadata.deprecatedClasses;
 
 export = {
   meta: {

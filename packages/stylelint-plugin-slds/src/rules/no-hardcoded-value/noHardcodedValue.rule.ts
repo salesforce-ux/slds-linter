@@ -9,19 +9,13 @@ import {
 import generateSuggestionsList from '../../utils/generateSuggestionsList';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 const { utils, createPlugin } = stylelint;
 
 // Define the structure of a hook
 interface Hook {
   name: string;
   properties: string[];
-}
-
-// Define the structure of the color data
-interface StylinghookData {
-  [value: string]: {
-    hooks: Hook[];
-  };
 }
 
 interface MessagesObj {
@@ -56,12 +50,12 @@ function matchesCssProperty(
 
 export const findExactMatchStylingHook = (
   cssValue: string,
-  supportedStylinghooks: StylinghookData,
+  supportedStylinghooks: ValueToStylingHooksMapping,
   cssProperty: string
 ): { name: string }[] => {
   let matchedHooks = [];
   if (cssValue in supportedStylinghooks) {
-    matchedHooks = supportedStylinghooks[cssValue].hooks || [];
+    matchedHooks = supportedStylinghooks[cssValue] || [];
     return matchedHooks
       .filter((hook) => {
         return matchesCssProperty(hook.properties, cssProperty);
@@ -93,16 +87,28 @@ const densificationProperties = [
   'box-shadow',
 ];
 
+const rgbColorFunctions = [
+  'rgb',
+  'rgba',
+  'hsl',
+  'hsla'
+];
+
 const forEachColorValue = (
   parsedValue: valueParser.ParsedValue,
   cb: valueParser.WalkCallback
 ) => {
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
-      if (node.type !== 'word' || !isValidColor(node.value)) {
-        return;
+      if(node.type === 'function' && rgbColorFunctions.includes(node.value)){
+        // override the type to word
+        node.value = valueParser.stringify(node);
+        //@ts-ignore
+        node.type = 'word';
+        cb(node, index, nodes);
+      } else if (node.type === 'word' && isValidColor(node.value)) {
+        cb(node, index, nodes);
       }
-      cb(node, index, nodes);
     }
   );
 };
@@ -182,7 +188,7 @@ function reportMatchingHooks(
 
 export const createNoHardcodedValueRule = (
   ruleName: string,
-  supportedStylinghooks: StylinghookData
+  supportedStylinghooks: ValueToStylingHooksMapping
 ) => {
   const {
     severityLevel = 'error',
@@ -269,11 +275,36 @@ export const createNoHardcodedValueRule = (
           });
         } else if (isDensiProp) {
           forEachDensifyValue(parsedValue, (node) => {
+            let alternateValue = null;  
+            const parsedValue = valueParser.unit(node.value);
+            const unitType = parsedValue && parsedValue.unit;
+            const numberVal = parsedValue?Number(parsedValue.number):0;
+            if(unitType === 'px'){
+              let floatValue = parseFloat(`${numberVal / 16}`);
+              if(!isNaN(floatValue)){ // this will void suffix 0's
+                alternateValue = `${parseFloat(floatValue.toFixed(4))}rem`;
+              }
+            } else if(unitType === 'rem'){
+              const intValue = parseInt(`${numberVal * 16}`);
+              if(!isNaN(intValue)){
+                alternateValue = `${intValue}px`;
+              }
+            }
+            
             closestHooks = findExactMatchStylingHook(
               node.value,
               supportedStylinghooks,
               cssProperty
             );
+
+            // Find closest hook for alternate value if no exact match is found
+            if(!closestHooks || !closestHooks.length){
+              closestHooks = findExactMatchStylingHook(
+                alternateValue,
+                supportedStylinghooks,
+                cssProperty
+              );
+            }
 
             const fix = ()=> {
               decl.value = decl.value.replace(valueParser.stringify(node), `var(${closestHooks[0]})`);

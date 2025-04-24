@@ -1,9 +1,10 @@
-import { globalSharedHooksMetadata } from "@salesforce-ux/metadata-slds";
 import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import metadata from '@salesforce-ux/sds-metadata';
+const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
@@ -23,7 +24,7 @@ const messages = utils.ruleMessages(ruleName, {
 // Generate values to hooks mapping using only global hooks
 // shared hooks are private/ undocumented APIs, so they should not be recommended to customers
 // Ref this thread: https://salesforce-internal.slack.com/archives/C071J0Q3FNV/p1743010620921339?thread_ts=1743009353.385429&cid=C071J0Q3FNV
-const allSldsHooks = Object.keys(globalSharedHooksMetadata.global);
+const allSldsHooks = [...sldsPlusStylingHooks.global, ...sldsPlusStylingHooks.component];
 
 const toSldsToken = (sdsToken: string) => sdsToken.replace('--sds-', '--slds-')
 

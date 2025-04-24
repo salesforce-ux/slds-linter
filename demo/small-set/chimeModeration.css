@@ -1,0 +1,30 @@
+.field-header {
+  background-color: var(--slds-g-color-neutral-base-95, var(--lwc-paletteNeutral95));
+  box-shadow: 0px var(--slds-g-sizing-border-1, 1px) 0px var(--slds-g-color-neutral-base-80, #C9C9C9);
+}
+
+.warning-popover {
+  position: absolute;
+  z-index: 9;
+}
+
+.warning-cursor {
+  cursor: pointer;
+}
+
+.highlight-cell {
+  border: var(--slds-g-sizing-border-1, 1px) solid;
+  border-color: var(--slds-g-color-accent-container-1, var(--lwc-brandAccessible));
+}
+
+.field-value { 
+  height: 20px;
+}
+
+.footer-hidden {
+  display: none;
+}
+
+.waiting-participants-list {
+  max-height: 17rem;
+}

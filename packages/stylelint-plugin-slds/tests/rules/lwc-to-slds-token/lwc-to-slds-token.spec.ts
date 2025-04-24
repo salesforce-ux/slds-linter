@@ -12,18 +12,17 @@ const errorWithRawValue = (oldValue, newValue) =>
 const LWC_TOKEN_MAPPINGS = {
   '--lwc-brandDark': '--slds-g-color-accent-dark-1',
   '--lwc-brandBackgroundDark': '--',
-  '--lwc-brandBackgroundDarkTransparent': 'transparent',
+  '--lwc-brandPrimaryTransparent': 'transparent',
   '--lwc-cardBodyPadding': '0 var(--slds-g-spacing-4)',
   '--lwc-brandPrimaryTransparent10':
     'color-mix(in oklab, var(--slds-g-color-accent-1), transparent 90%)',
   '--lwc-nubbinTriangleOffset': '-0.1875rem',
-  '--lwc-heightTappable':
-    'calc(var(--slds-g-sizing-9) + var(--slds-g-sizing-4))',
+  //'--lwc-heightTappable':'calc(var(--slds-g-sizing-9) + var(--slds-g-sizing-4))',
   '--lwc-colorBackgroundLight': [
     '--slds-g-color-surface-1',
     '--slds-g-color-surface-container-1',
   ],
-  '--lwc-varFontSize2': 'Continue to use',
+  '--lwc-brandHeader': 'Continue to use',
   '--lwc-customer-created': null,
 };
 

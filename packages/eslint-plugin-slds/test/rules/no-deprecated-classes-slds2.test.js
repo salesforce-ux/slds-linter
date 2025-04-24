@@ -27,10 +27,10 @@ ruleTester.run("no-deprecated-classes", rule, {
   ],
   invalid: [
     {
-      code: `<div class="slds-align-content-center"></div>`, // Single deprecated class
+      code: `<div class="slds-action-overflow--touch"></div>`, // Single deprecated class
       errors: [
         {
-          message: "{\"message\":\"The class slds-align-content-center isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information.\",\"suggestions\":[]}",
+          message: "{\"message\":\"The class slds-action-overflow--touch isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information.\",\"suggestions\":[]}",
           line: 1,
           column: 13,
         },

@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/eslint-plugin-slds",
-  "version": "0.1.6",
+  "version": "0.1.7-alpha.1",
   "main": "build/index.js",
   "files": [
     "build/*",
@@ -25,6 +25,7 @@
   "dependencies": {
     "@html-eslint/eslint-plugin": "^0.34.0",
     "@html-eslint/parser": "^0.34.0",
+    "@salesforce-ux/sds-metadata": "~0.1.0",
     "eslint": "^8.0.0"
   },
   "devDependencies": {

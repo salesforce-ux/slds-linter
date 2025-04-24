@@ -1,5 +1,6 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
-import { bemMapping } from "./bem-mapping";
+import metadata from '@salesforce-ux/sds-metadata';
+const bemMapping = metadata.bemNaming;
 
 export = {
   meta: {
