@@ -91,6 +91,16 @@ const densificationProperties = [
 
 const rgbColorFunctions = ['rgb', 'rgba', 'hsl', 'hsla'];
 
+/**
+ * Walks parsed CSS value nodes, invoking a callback for each relevant node,
+ * while skipping fallback values inside CSS `var()` functions.
+ *
+ * Supports nested `var()` calls like: `var(--x, var(--y, 10px))`,
+ * ensuring only the first non-div argument is processed.
+ *
+ * @param nodes - The root-level valueParser nodes to traverse.
+ * @param cb - The callback to invoke on each valid node.
+ */
 export const walkValueNodesSkippingFallbacks = (
   nodes: valueParser.Node[],
   cb: WalkCallback
@@ -112,14 +122,13 @@ export const walkValueNodesSkippingFallbacks = (
             }
 
             seenNonDiv++;
-            if (seenNonDiv > 1) break; // Stop after first arg
+            if (seenNonDiv > 1) break; // Stop after first argument
           }
           continue;
         }
 
         walk(node.nodes, isInFallback);
 
-        // Let caller decide how to handle function nodes
         cb(node, i, nodes);
       } else {
         if (!isInFallback) {
