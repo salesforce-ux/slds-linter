@@ -17,6 +17,26 @@ describe('no-hardcoded-values-slds2', () => {
       expectedMessage:"Consider replacing the #ff0000 static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-red-50\n2. --slds-g-color-palette-hot-orange-50\n3. --slds-g-color-palette-hot-orange-60 (slds/no-hardcoded-values-slds2)",
     },
     {
+      description:
+        'Does not report warning for hardcoded color value in fallback',
+      inputCss: `
+        .example {
+          background-color: var(--slds-g-color-palette-neutral-100, #fff);
+        }
+      `,
+      expectedMessage: null,
+    },
+    {
+      description:
+        'Does not report warning for hardcoded density value in fallback',
+      inputCss: `
+        .example {
+          border: var(--slds-g-sizing-border-1, 1px) solid;
+        }
+      `,
+      expectedMessage: null,
+    },
+    {
       description: 'Does not report 0 as a value',
       inputCss: `
         .example {

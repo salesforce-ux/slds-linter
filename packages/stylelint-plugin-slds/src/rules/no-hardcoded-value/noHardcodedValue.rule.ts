@@ -1,5 +1,5 @@
 import { Declaration, Root } from 'postcss';
-import valueParser from 'postcss-value-parser';
+import valueParser, { Node } from 'postcss-value-parser';
 import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import {
   convertToHex,
@@ -19,16 +19,39 @@ interface Hook {
 }
 
 interface MessagesObj {
-  rejected: (oldValue: string, newValue: string)=>string,
-  suggested: (oldValue: string) => string
+  rejected: (oldValue: string, newValue: string) => string;
+  suggested: (oldValue: string) => string;
 }
 
-function toRuleMessages(ruleName: string, warningMsg: string):MessagesObj {
+function toRuleMessages(ruleName: string, warningMsg: string): MessagesObj {
   return utils.ruleMessages(ruleName, {
-    rejected: (oldValue: string, newValue: string) => replacePlaceholders(warningMsg, { oldValue, newValue }),
-    suggested: (oldValue: string) => `There’s no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
+    rejected: (oldValue: string, newValue: string) =>
+      replacePlaceholders(warningMsg, { oldValue, newValue }),
+    suggested: (oldValue: string) =>
+      `There’s no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
   });
 }
+
+/**
+ * Checks if the given node is the fallback value in a CSS `var()` function.
+ *
+ * A `var()` function can have a fallback value as its second argument:
+ *   e.g. `var(--my-var, 10px)` → `10px` is the fallback.
+ *
+ * This function assumes `.parent` has already been attached to the node,
+ * typically via a pre-walk or preprocessing step.
+ *
+ * @param node - The valueParser node to check.
+ * @returns `true` if the node is the fallback value inside a `var()` function, otherwise `false`.
+ */
+const isFallbackInVar = (node: valueParser.Node): boolean => {
+  const parent = (node as any).parent;
+  if (parent?.type === 'function' && parent.value === 'var') {
+    const args = parent.nodes.filter((n) => n.type !== 'div');
+    return args[1] === node;
+  }
+  return false;
+};
 
 /**
  * Check if any of the hook properties match the provided cssProperty using wildcard matching.
@@ -87,20 +110,36 @@ const densificationProperties = [
   'box-shadow',
 ];
 
-const rgbColorFunctions = [
-  'rgb',
-  'rgba',
-  'hsl',
-  'hsla'
-];
+const rgbColorFunctions = ['rgb', 'rgba', 'hsl', 'hsla'];
+
+/**
+ *  Attach parent references
+ *  PostCSS itself does not attach `.parent` to the node by default.
+ *  Therefore, we must manually traverse the tree and assign the parent reference
+ *  before checking the parent-child relationships.
+ */
+const attachParents = (
+  nodes: valueParser.Node[],
+  parent: valueParser.Node | null = null
+) => {
+  for (const node of nodes) {
+    (node as any).parent = parent;
+    if (node.type === 'function' && Array.isArray(node.nodes)) {
+      attachParents(node.nodes, node);
+    }
+  }
+};
 
 const forEachColorValue = (
   parsedValue: valueParser.ParsedValue,
   cb: valueParser.WalkCallback
 ) => {
+  // Attach parent references
+  attachParents(parsedValue.nodes);
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
-      if(node.type === 'function' && rgbColorFunctions.includes(node.value)){
+      if (isFallbackInVar(node)) return;
+      if (node.type === 'function' && rgbColorFunctions.includes(node.value)) {
         // override the type to word
         node.value = valueParser.stringify(node);
         //@ts-ignore
@@ -118,16 +157,18 @@ const forEachDensifyValue = (
   cb: valueParser.WalkCallback
 ) => {
   const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
+// Attach parent references
+  attachParents(parsedValue.nodes);
+
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
       const parsedValue = valueParser.unit(node.value);
+
       if (node.type !== 'word' || !parsedValue) {
         // Conider only node of type word and parsable by unit function
         return;
-      } else if (
-        parsedValue.unit &&
-        !ALLOWED_UNITS.includes(parsedValue.unit)
-      ) {
+      } else if (isFallbackInVar(node)) return;
+      else if (parsedValue.unit && !ALLOWED_UNITS.includes(parsedValue.unit)) {
         // If unit exists make sure its in allowed list
         return;
       } else if (isNaN(Number(parsedValue.number))) {
@@ -147,7 +188,7 @@ function reportMatchingHooks(
   suggestions: string[],
   offsetIndex: number,
   props: Partial<stylelint.Problem>,
-  messages:MessagesObj,
+  messages: MessagesObj,
   fix?: stylelint.FixCallback
 ) {
   let index = offsetIndex;
@@ -173,7 +214,7 @@ function reportMatchingHooks(
         suggestions,
       }),
       ...reportProps,
-      fix: suggestions.length ===1?fix:null
+      fix: suggestions.length === 1 ? fix : null,
     });
   } else {
     utils.report(<stylelint.Problem>{
@@ -229,7 +270,7 @@ export const createNoHardcodedValueRule = (
             supportedStylinghooks,
             cssProperty
           );
-          const fix = ()=> {
+          const fix = () => {
             decl.value = `var(${closestHooks[0]})`;
           };
 
@@ -259,8 +300,11 @@ export const createNoHardcodedValueRule = (
               cssProperty
             );
 
-            const fix = ()=> {
-              decl.value = decl.value.replace(valueParser.stringify(node), `var(${closestHooks[0]})`);
+            const fix = () => {
+              decl.value = decl.value.replace(
+                valueParser.stringify(node),
+                `var(${closestHooks[0]})`
+              );
             };
 
             // Report suggessions
@@ -275,22 +319,23 @@ export const createNoHardcodedValueRule = (
           });
         } else if (isDensiProp) {
           forEachDensifyValue(parsedValue, (node) => {
-            let alternateValue = null;  
+            let alternateValue = null;
             const parsedValue = valueParser.unit(node.value);
             const unitType = parsedValue && parsedValue.unit;
-            const numberVal = parsedValue?Number(parsedValue.number):0;
-            if(unitType === 'px'){
+            const numberVal = parsedValue ? Number(parsedValue.number) : 0;
+            if (unitType === 'px') {
               let floatValue = parseFloat(`${numberVal / 16}`);
-              if(!isNaN(floatValue)){ // this will void suffix 0's
+              if (!isNaN(floatValue)) {
+                // this will void suffix 0's
                 alternateValue = `${parseFloat(floatValue.toFixed(4))}rem`;
               }
-            } else if(unitType === 'rem'){
+            } else if (unitType === 'rem') {
               const intValue = parseInt(`${numberVal * 16}`);
-              if(!isNaN(intValue)){
+              if (!isNaN(intValue)) {
                 alternateValue = `${intValue}px`;
               }
             }
-            
+
             closestHooks = findExactMatchStylingHook(
               node.value,
               supportedStylinghooks,
@@ -298,7 +343,7 @@ export const createNoHardcodedValueRule = (
             );
 
             // Find closest hook for alternate value if no exact match is found
-            if(!closestHooks || !closestHooks.length){
+            if (!closestHooks || !closestHooks.length) {
               closestHooks = findExactMatchStylingHook(
                 alternateValue,
                 supportedStylinghooks,
@@ -306,8 +351,11 @@ export const createNoHardcodedValueRule = (
               );
             }
 
-            const fix = ()=> {
-              decl.value = decl.value.replace(valueParser.stringify(node), `var(${closestHooks[0]})`);
+            const fix = () => {
+              decl.value = decl.value.replace(
+                valueParser.stringify(node),
+                `var(${closestHooks[0]})`
+              );
             };
 
             // Report suggessions
