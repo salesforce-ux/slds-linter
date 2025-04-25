@@ -1,6 +1,7 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
 const bemMapping = metadata.bemNaming;
+const deprecatedClasses = metadata.deprecatedClasses;
 
 export = {
   meta: {
@@ -34,7 +35,7 @@ export = {
       if (classAttr && classAttr.value) {
         const classNames = classAttr.value.value.split(/\s+/);
         classNames.forEach((className) => {
-          if (className && className in bemMapping) {
+          if (className && className in bemMapping && !(deprecatedClasses.includes(bemMapping[className]))) {
             // Find the exact location of the problematic class name
             const classNameStart = classAttr.value.value.indexOf(className) + 7; // 7 here is for `class= "`
             const classNameEnd = classNameStart + className.length;
