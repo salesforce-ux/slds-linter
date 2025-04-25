@@ -25,6 +25,12 @@ ruleTester.run("enforce-bem-class", rule, {
     {
       code: `<div class="block__element--"></div>`, // Invalid: Ends with `--`      
     },
+    {
+      code: `<div class="slds-action-overflow--touch"></div>`, // Deprecated BEM value     
+    },
+    {
+      code: `<div class="slds-app-launcher__tile--small"></div>`, // Deprecated BEM value     
+    },
   ],
   invalid: [
     {
@@ -59,6 +65,6 @@ ruleTester.run("enforce-bem-class", rule, {
         },
       ],
       output: `<div class="slds-p-right_xxx-small"></div>`, // Expected fix (if mapping exists)
-    },
+    }
   ],
 });
