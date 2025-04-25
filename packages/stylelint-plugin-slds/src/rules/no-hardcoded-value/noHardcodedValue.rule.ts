@@ -1,5 +1,5 @@
 import { Declaration, Root } from 'postcss';
-import valueParser, { Node } from 'postcss-value-parser';
+import valueParser, { WalkCallback } from 'postcss-value-parser';
 import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import {
   convertToHex,
@@ -31,27 +31,6 @@ function toRuleMessages(ruleName: string, warningMsg: string): MessagesObj {
       `There’s no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
   });
 }
-
-/**
- * Checks if the given node is the fallback value in a CSS `var()` function.
- *
- * A `var()` function can have a fallback value as its second argument:
- *   e.g. `var(--my-var, 10px)` → `10px` is the fallback.
- *
- * This function assumes `.parent` has already been attached to the node,
- * typically via a pre-walk or preprocessing step.
- *
- * @param node - The valueParser node to check.
- * @returns `true` if the node is the fallback value inside a `var()` function, otherwise `false`.
- */
-const isFallbackInVar = (node: valueParser.Node): boolean => {
-  const parent = (node as any).parent;
-  if (parent?.type === 'function' && parent.value === 'var') {
-    const args = parent.nodes.filter((n) => n.type !== 'div');
-    return args[1] === node;
-  }
-  return false;
-};
 
 /**
  * Check if any of the hook properties match the provided cssProperty using wildcard matching.
@@ -112,44 +91,63 @@ const densificationProperties = [
 
 const rgbColorFunctions = ['rgb', 'rgba', 'hsl', 'hsla'];
 
-/**
- *  Attach parent references
- *  PostCSS itself does not attach `.parent` to the node by default.
- *  Therefore, we must manually traverse the tree and assign the parent reference
- *  before checking the parent-child relationships.
- */
-const attachParents = (
+export const walkValueNodesSkippingFallbacks = (
   nodes: valueParser.Node[],
-  parent: valueParser.Node | null = null
-) => {
-  for (const node of nodes) {
-    (node as any).parent = parent;
-    if (node.type === 'function' && Array.isArray(node.nodes)) {
-      attachParents(node.nodes, node);
+  cb: WalkCallback
+): void => {
+  const walk = (nodes: valueParser.Node[], isInFallback = false) => {
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+
+      if (node.type === 'function') {
+        if (node.value === 'var') {
+          // Walk only the first non-div argument
+          let seenNonDiv = 0;
+          for (let j = 0; j < node.nodes.length; j++) {
+            const child = node.nodes[j];
+            if (child.type === 'div') continue;
+
+            if (seenNonDiv === 0) {
+              walk([child], isInFallback);
+            }
+
+            seenNonDiv++;
+            if (seenNonDiv > 1) break; // Stop after first arg
+          }
+          continue;
+        }
+
+        walk(node.nodes, isInFallback);
+
+        // Let caller decide how to handle function nodes
+        cb(node, i, nodes);
+      } else {
+        if (!isInFallback) {
+          cb(node, i, nodes);
+        }
+      }
     }
-  }
+  };
+
+  walk(nodes);
 };
 
 const forEachColorValue = (
   parsedValue: valueParser.ParsedValue,
   cb: valueParser.WalkCallback
 ) => {
-  // Attach parent references
-  attachParents(parsedValue.nodes);
-  parsedValue.walk(
-    (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
-      if (isFallbackInVar(node)) return;
-      if (node.type === 'function' && rgbColorFunctions.includes(node.value)) {
-        // override the type to word
-        node.value = valueParser.stringify(node);
-        //@ts-ignore
-        node.type = 'word';
-        cb(node, index, nodes);
-      } else if (node.type === 'word' && isValidColor(node.value)) {
-        cb(node, index, nodes);
-      }
+  walkValueNodesSkippingFallbacks(parsedValue.nodes, (node, index, nodes) => {
+    if (node.type === 'function' && rgbColorFunctions.includes(node.value)) {
+      const newNode = {
+        ...node,
+        type: 'word' as const,
+        value: valueParser.stringify(node),
+      };
+      cb(newNode, index, nodes);
+    } else if (node.type === 'word' && isValidColor(node.value)) {
+      cb(node, index, nodes);
     }
-  );
+  });
 };
 
 const forEachDensifyValue = (
@@ -157,30 +155,29 @@ const forEachDensifyValue = (
   cb: valueParser.WalkCallback
 ) => {
   const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
-// Attach parent references
-  attachParents(parsedValue.nodes);
 
-  parsedValue.walk(
-    (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
-      const parsedValue = valueParser.unit(node.value);
-
-      if (node.type !== 'word' || !parsedValue) {
-        // Conider only node of type word and parsable by unit function
-        return;
-      } else if (isFallbackInVar(node)) return;
-      else if (parsedValue.unit && !ALLOWED_UNITS.includes(parsedValue.unit)) {
-        // If unit exists make sure its in allowed list
-        return;
-      } else if (isNaN(Number(parsedValue.number))) {
-        // Consider only valid numeric values
-        return;
-      } else if (Number(parsedValue.number) === 0) {
-        // Do not report zero value
-        return;
-      }
-      cb(node, index, nodes);
+  walkValueNodesSkippingFallbacks(parsedValue.nodes, (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
+    const parsedValue = valueParser.unit(node.value);
+    if (node.type !== 'word' || !parsedValue) {
+      // Consider only node of type word and parsable by unit function
+      return;
+    } 
+    if (parsedValue.unit && !ALLOWED_UNITS.includes(parsedValue.unit)) {
+      // If unit exists, make sure it's in the allowed list
+      return;
+    } 
+    if (isNaN(Number(parsedValue.number))) {
+      // Consider only valid numeric values
+      return;
+    } 
+    if (Number(parsedValue.number) === 0) {
+      // Do not report zero value
+      return;
     }
-  );
+    
+    // If all checks pass, call the callback
+    cb(node, index, nodes);
+  });
 };
 
 function reportMatchingHooks(
