@@ -37,6 +37,16 @@ describe('no-hardcoded-values-slds2', () => {
       expectedMessage: null,
     },
     {
+      description:
+        'Does not report warning for hardcoded density value in nested var fallback',
+      inputCss: `
+        .example {
+          border: var(--slds-g-sizing-border-1, var(--lwc-borderWidthThin, 1px)) solid;
+        }
+      `,
+      expectedMessage: null,
+    },
+    {
       description: 'Does not report 0 as a value',
       inputCss: `
         .example {
