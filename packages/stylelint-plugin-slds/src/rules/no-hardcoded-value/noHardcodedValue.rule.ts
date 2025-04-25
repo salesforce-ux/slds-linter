@@ -277,7 +277,7 @@ export const createNoHardcodedValueRule = (
             cssProperty
           );
           const fix = () => {
-            decl.value = `var(${closestHooks[0]})`;
+            decl.value = `var(${closestHooks[0]}, ${cssValue})`;
           };
 
           if (closestHooks.length > 0) {
@@ -309,7 +309,7 @@ export const createNoHardcodedValueRule = (
             const fix = () => {
               decl.value = decl.value.replace(
                 valueParser.stringify(node),
-                `var(${closestHooks[0]})`
+                `var(${closestHooks[0]}, ${cssValue})`
               );
             };
 
