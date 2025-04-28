@@ -110,7 +110,7 @@ export const walkValueNodesSkippingFallbacks = (
   valueParser.walk(nodes, (node) => {
     if (node.type === 'function') {
       if (node.value === 'var') {
-        // For var() functions, only process the first non-div argument
+        // For var() functions, only process the first non-div argument.
         let seenNonDiv = 0;
         for (const child of node.nodes) {
           if (child.type === 'div') continue;
