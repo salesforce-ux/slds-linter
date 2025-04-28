@@ -3,6 +3,19 @@ import metadata from '@salesforce-ux/sds-metadata';
 const bemMapping = metadata.bemNaming;
 const deprecatedClasses = metadata.deprecatedClasses;
 
+/**
+ * Checks if a given className or its BEM mapped equivalent is deprecated.
+ * 
+ * This function checks whether the provided className is included in the
+ * `deprecatedClasses` list or if the BEM mapped class is deprecated.
+ * 
+ * @param className - The class name to check for deprecation.
+ * @returns A boolean indicating whether the className or its mapped version is deprecated.
+ */
+const isDeprecatedClass = (className : string) => {
+  return (deprecatedClasses.includes(className) || deprecatedClasses.includes(bemMapping[className]))
+}
+
 export = {
   meta: {
     type: "problem", // The rule type
@@ -35,7 +48,7 @@ export = {
       if (classAttr && classAttr.value) {
         const classNames = classAttr.value.value.split(/\s+/);
         classNames.forEach((className) => {
-          if (className && className in bemMapping && !(deprecatedClasses.includes(bemMapping[className]))) {
+          if (className && className in bemMapping && !isDeprecatedClass(className)) {
             // Find the exact location of the problematic class name
             const classNameStart = classAttr.value.value.indexOf(className) + 7; // 7 here is for `class= "`
             const classNameEnd = classNameStart + className.length;
