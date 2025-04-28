@@ -31,6 +31,9 @@ ruleTester.run("enforce-bem-class", rule, {
     {
       code: `<div class="slds-app-launcher__tile--small"></div>`, // Deprecated BEM value     
     },
+    {
+      code: `<div class="slds-action-overflow_touch"></div>`, // Deprecated BEM equivalent     
+    },
   ],
   invalid: [
     {
