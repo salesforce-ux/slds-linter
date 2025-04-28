@@ -363,7 +363,7 @@ export const createNoHardcodedValueRule = (
             const fix = () => {
               decl.value = decl.value.replace(
                 valueParser.stringify(node),
-                `var(${closestHooks[0]})`
+                `var(${closestHooks[0]}, ${node.value})`
               );
             };
 
