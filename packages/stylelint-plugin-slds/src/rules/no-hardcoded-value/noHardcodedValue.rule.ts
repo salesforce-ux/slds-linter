@@ -92,53 +92,53 @@ const densificationProperties = [
 const rgbColorFunctions = ['rgb', 'rgba', 'hsl', 'hsla'];
 
 /**
- * Walks parsed CSS value nodes, invoking a callback for each relevant node,
- * while skipping fallback values inside CSS `var()` functions.
+ * Walks parsed CSS value nodes using valueParser.walk, invoking a callback for each relevant node.
+ * Special handling for CSS `var()` functions to only process the first non-div argument.
  *
- * Supports nested `var()` calls like: `var(--x, var(--y, 10px))`,
- * ensuring only the first non-div argument is processed.
+ * Example:
+ * ```css
+ * var(--a, 10px)            // Only processes --a
+ * ```
  *
- * @param nodes - The root-level valueParser nodes to traverse.
- * @param cb - The callback to invoke on each valid node.
+ * @param nodes - The root-level valueParser nodes to traverse
+ * @param cb - The callback to invoke on each valid node
  */
 export const walkValueNodesSkippingFallbacks = (
   nodes: valueParser.Node[],
   cb: WalkCallback
 ): void => {
-  const walk = (nodes: valueParser.Node[], isInFallback = false) => {
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-
-      if (node.type === 'function') {
-        if (node.value === 'var') {
-          // Walk only the first non-div argument
-          let seenNonDiv = 0;
-          for (let j = 0; j < node.nodes.length; j++) {
-            const child = node.nodes[j];
-            if (child.type === 'div') continue;
-
-            if (seenNonDiv === 0) {
-              walk([child], isInFallback);
-            }
-
-            seenNonDiv++;
-            if (seenNonDiv > 1) break; // Stop after first argument
+  valueParser.walk(nodes, (node) => {
+    if (node.type === 'function') {
+      if (node.value === 'var') {
+        // For var() functions, only process the first non-div argument
+        let seenNonDiv = 0;
+        for (const child of node.nodes) {
+          if (child.type === 'div') continue;
+          
+          if (seenNonDiv === 0) {
+            // Process the first non-div argument
+            valueParser.walk([child], (nestedNode) => {
+              cb(nestedNode, 0, [nestedNode]);
+              return true;
+            }, true); // Use bubble=true to prevent double processing
           }
-          continue;
+          
+          seenNonDiv++;
+          if (seenNonDiv > 1) break;
         }
-
-        walk(node.nodes, isInFallback);
-
-        cb(node, i, nodes);
       } else {
-        if (!isInFallback) {
-          cb(node, i, nodes);
-        }
+        // For other functions, process all nodes
+        valueParser.walk(node.nodes, (childNode) => {
+          cb(childNode, 0, node.nodes);
+          return true;
+        }, true); // Use bubble=true to prevent double processing
       }
+      return false; // Skip walking function nodes as we process them separately
+    } else {
+      cb(node, 0, nodes);
     }
-  };
-
-  walk(nodes);
+    return true;
+  }); // Removed explicit bubble=false as it's the default
 };
 
 const forEachColorValue = (
@@ -165,28 +165,31 @@ const forEachDensifyValue = (
 ) => {
   const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
 
-  walkValueNodesSkippingFallbacks(parsedValue.nodes, (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
-    const parsedValue = valueParser.unit(node.value);
-    if (node.type !== 'word' || !parsedValue) {
-      // Consider only node of type word and parsable by unit function
-      return;
-    } 
-    if (parsedValue.unit && !ALLOWED_UNITS.includes(parsedValue.unit)) {
-      // If unit exists, make sure it's in the allowed list
-      return;
-    } 
-    if (isNaN(Number(parsedValue.number))) {
-      // Consider only valid numeric values
-      return;
-    } 
-    if (Number(parsedValue.number) === 0) {
-      // Do not report zero value
-      return;
+  walkValueNodesSkippingFallbacks(
+    parsedValue.nodes,
+    (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
+      const parsedValue = valueParser.unit(node.value);
+      if (node.type !== 'word' || !parsedValue) {
+        // Consider only node of type word and parsable by unit function
+        return;
+      }
+      if (parsedValue.unit && !ALLOWED_UNITS.includes(parsedValue.unit)) {
+        // If unit exists, make sure it's in the allowed list
+        return;
+      }
+      if (isNaN(Number(parsedValue.number))) {
+        // Consider only valid numeric values
+        return;
+      }
+      if (Number(parsedValue.number) === 0) {
+        // Do not report zero value
+        return;
+      }
+
+      // If all checks pass, call the callback
+      cb(node, index, nodes);
     }
-    
-    // If all checks pass, call the callback
-    cb(node, index, nodes);
-  });
+  );
 };
 
 function reportMatchingHooks(
