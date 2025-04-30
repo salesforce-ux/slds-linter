@@ -28,6 +28,16 @@ describe('no-hardcoded-values-slds2', () => {
     },
     {
       description:
+        'Reports warning for hardcoded color value in var function without fallback',
+      inputCss: `
+        .example {
+          background-color: var(#fff);
+        }
+      `,
+      expectedMessage: 'Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)',
+    },
+    {
+      description:
         'Does not report warning for hardcoded density value in fallback',
       inputCss: `
         .example {

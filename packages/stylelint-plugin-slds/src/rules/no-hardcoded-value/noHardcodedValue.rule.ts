@@ -1,5 +1,5 @@
 import { Declaration, Root } from 'postcss';
-import valueParser, { WalkCallback } from 'postcss-value-parser';
+import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import {
   convertToHex,
@@ -59,7 +59,7 @@ export const findExactMatchStylingHook = (
   if (cssValue in supportedStylinghooks) {
     matchedHooks = supportedStylinghooks[cssValue] || [];
     return matchedHooks
-      .filter((hook) => {
+      .filter((hook: Hook) => {
         return matchesCssProperty(hook.properties, cssProperty);
       })
       .map((hook) => hook.name);
@@ -92,71 +92,59 @@ const densificationProperties = [
 const rgbColorFunctions = ['rgb', 'rgba', 'hsl', 'hsla'];
 
 /**
- * Walks parsed CSS value nodes using valueParser.walk, invoking a callback for each relevant node.
- * Special handling for CSS `var()` functions to only process the first non-div argument.
+ * Handles CSS var() function calls in the value parser.
  *
- * Example:
- * ```css
- * var(--a, 10px)            // Only processes --a
- * ```
+ * @param node - The function node from the CSS value parser
+ * @param cb - Callback function to process valid variables
+ * @returns boolean - false to stop processing this node, true to continue
  *
- * @param nodes - The root-level valueParser nodes to traverse
- * @param cb - The callback to invoke on each valid node
+ * Examples:
+ * color: var( #ffffff) -> processes '#ffffff'
+ * color: var(--slds-g-color-palette-neutral-100, #ffffff) -> skips processing (starts with --)
  */
-export const walkValueNodesSkippingFallbacks = (
-  nodes: valueParser.Node[],
-  cb: WalkCallback
-): void => {
-  valueParser.walk(nodes, (node) => {
-    if (node.type === 'function') {
-      if (node.value === 'var') {
-        // For var() functions, only process the first non-div argument.
-        let seenNonDiv = 0;
-        for (const child of node.nodes) {
-          if (child.type === 'div') continue;
-          
-          if (seenNonDiv === 0) {
-            // Process the first non-div argument
-            valueParser.walk([child], (nestedNode) => {
-              cb(nestedNode, 0, [nestedNode]);
-              return true;
-            }, true); // Use bubble=true to prevent double processing
-          }
-          
-          seenNonDiv++;
-          if (seenNonDiv > 1) break;
-        }
-      } else {
-        // For other functions, process all nodes
-        valueParser.walk(node.nodes, (childNode) => {
-          cb(childNode, 0, node.nodes);
-          return true;
-        }, true); // Use bubble=true to prevent double processing
-      }
-      return false; // Skip walking function nodes as we process them separately
-    } else {
-      cb(node, 0, nodes);
+const handleVarFunction = (
+  node: valueParser.FunctionNode,
+  cb: valueParser.WalkCallback
+): boolean => {
+  // Check if this is a var() function
+  if (node.value === 'var') {
+    // Get the first argument of the var() function
+    const firstArg = node.nodes[0];
+    if (
+      firstArg &&
+      firstArg.type === 'word' &&
+      !firstArg.value.startsWith('--')
+    ) {
+      cb(firstArg, 0, node.nodes);
     }
-    return true;
-  }); // Removed explicit bubble=false as it's the default
+    return false;
+  }
+  return true;
 };
 
 const forEachColorValue = (
   parsedValue: valueParser.ParsedValue,
   cb: valueParser.WalkCallback
 ) => {
-  walkValueNodesSkippingFallbacks(parsedValue.nodes, (node, index, nodes) => {
-    if (node.type === 'function' && rgbColorFunctions.includes(node.value)) {
-      const newNode = {
-        ...node,
-        type: 'word' as const,
-        value: valueParser.stringify(node),
-      };
-      cb(newNode, index, nodes);
-    } else if (node.type === 'word' && isValidColor(node.value)) {
-      cb(node, index, nodes);
-    }
-  });
+  parsedValue.walk(
+    (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
+      if (node.type === 'function') {
+        if (!handleVarFunction(node, cb)) {
+          return false;
+        } else if (rgbColorFunctions.includes(node.value)) {
+          node.value = valueParser.stringify(node);
+          //@ts-ignore
+          node.type = 'word';
+          cb(node, index, nodes);
+        }
+        return false;
+      } else if (node.type === 'word' && isValidColor(node.value)) {
+        cb(node, index, nodes);
+      }
+      return true;
+    },
+    false
+  );
 };
 
 const forEachDensifyValue = (
@@ -164,31 +152,33 @@ const forEachDensifyValue = (
   cb: valueParser.WalkCallback
 ) => {
   const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
-
-  walkValueNodesSkippingFallbacks(
-    parsedValue.nodes,
+  parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
+      if (node.type === 'function') {
+        if (!handleVarFunction(node, cb)) {
+          return false;
+        }
+      }
       const parsedValue = valueParser.unit(node.value);
       if (node.type !== 'word' || !parsedValue) {
-        // Consider only node of type word and parsable by unit function
+        // Conider only node of type word and parsable by unit function
         return;
-      }
-      if (parsedValue.unit && !ALLOWED_UNITS.includes(parsedValue.unit)) {
-        // If unit exists, make sure it's in the allowed list
+      } else if (
+        parsedValue.unit &&
+        !ALLOWED_UNITS.includes(parsedValue.unit)
+      ) {
+        // If unit exists make sure its in allowed list
         return;
-      }
-      if (isNaN(Number(parsedValue.number))) {
+      } else if (isNaN(Number(parsedValue.number))) {
         // Consider only valid numeric values
         return;
-      }
-      if (Number(parsedValue.number) === 0) {
+      } else if (Number(parsedValue.number) === 0) {
         // Do not report zero value
         return;
       }
-
-      // If all checks pass, call the callback
       cb(node, index, nodes);
-    }
+    },
+    false
   );
 };
 
@@ -312,7 +302,7 @@ export const createNoHardcodedValueRule = (
             const fix = () => {
               decl.value = decl.value.replace(
                 valueParser.stringify(node),
-                `var(${closestHooks[0]}, ${cssValue})`
+                `var(${closestHooks[0]}, ${hexValue})`
               );
             };
 
@@ -344,7 +334,7 @@ export const createNoHardcodedValueRule = (
                 alternateValue = `${intValue}px`;
               }
             }
-
+            let suggestedValue = node.value;
             closestHooks = findExactMatchStylingHook(
               node.value,
               supportedStylinghooks,
@@ -353,6 +343,7 @@ export const createNoHardcodedValueRule = (
 
             // Find closest hook for alternate value if no exact match is found
             if (!closestHooks || !closestHooks.length) {
+              suggestedValue = alternateValue;
               closestHooks = findExactMatchStylingHook(
                 alternateValue,
                 supportedStylinghooks,
@@ -363,7 +354,7 @@ export const createNoHardcodedValueRule = (
             const fix = () => {
               decl.value = decl.value.replace(
                 valueParser.stringify(node),
-                `var(${closestHooks[0]}, ${node.value})`
+                `var(${closestHooks[0]}, ${suggestedValue})`
               );
             };
 
