@@ -92,35 +92,10 @@ const densificationProperties = [
 const rgbColorFunctions = ['rgb', 'rgba', 'hsl', 'hsla'];
 
 /**
- * Handles CSS var() function calls in the value parser.
- *
- * @param node - The function node from the CSS value parser
- * @param cb - Callback function to process valid variables
- * @returns boolean - false to stop processing this node, true to continue
- *
- * Examples:
- * color: var( #ffffff) -> processes '#ffffff'
- * color: var(--slds-g-color-palette-neutral-100, #ffffff) -> skips processing (starts with --)
+ * Regex pattern for matching CSS functions.
  */
-const handleVarFunction = (
-  node: valueParser.FunctionNode,
-  cb: valueParser.WalkCallback
-): boolean => {
-  // Check if this is a var() function
-  if (node.value === 'var') {
-    // Get the first argument of the var() function
-    const firstArg = node.nodes[0];
-    if (
-      firstArg &&
-      firstArg.type === 'word' &&
-      !firstArg.value.startsWith('--')
-    ) {
-      cb(firstArg, 0, node.nodes);
-    }
-    return false;
-  }
-  return true;
-};
+const CSS_FUNCTIONS_REGEX =
+  /^(?:attr|calc|color-mix|conic-gradient|counter|cubic-bezier|linear-gradient|max|min|radial-gradient|repeating-conic-gradient|repeating-linear-gradient|repeating-radial-gradient|var)$/;
 
 const forEachColorValue = (
   parsedValue: valueParser.ParsedValue,
@@ -129,13 +104,13 @@ const forEachColorValue = (
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
       if (node.type === 'function') {
-        if (!handleVarFunction(node, cb)) {
-          return false;
-        } else if (rgbColorFunctions.includes(node.value)) {
+        if (rgbColorFunctions.includes(node.value)) {
           node.value = valueParser.stringify(node);
           //@ts-ignore
           node.type = 'word';
           cb(node, index, nodes);
+        } else if (CSS_FUNCTIONS_REGEX.test(node.value)) {
+          return false;
         }
         return false;
       } else if (node.type === 'word' && isValidColor(node.value)) {
@@ -154,10 +129,8 @@ const forEachDensifyValue = (
   const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
-      if (node.type === 'function') {
-        if (!handleVarFunction(node, cb)) {
-          return false;
-        }
+      if (node.type === 'function' && CSS_FUNCTIONS_REGEX.test(node.value)) {
+        return false;
       }
       const parsedValue = valueParser.unit(node.value);
       if (node.type !== 'word' || !parsedValue) {
