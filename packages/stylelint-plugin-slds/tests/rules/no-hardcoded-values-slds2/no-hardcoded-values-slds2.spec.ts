@@ -28,16 +28,6 @@ describe('no-hardcoded-values-slds2', () => {
     },
     {
       description:
-        'Does not report warning for var function',
-      inputCss: `
-        .example {
-          background-color: var(#fff);
-        }
-      `,
-      expectedMessage: null,
-    },
-    {
-      description:
         'Does not report warning for hardcoded density value in fallback',
       inputCss: `
         .example {

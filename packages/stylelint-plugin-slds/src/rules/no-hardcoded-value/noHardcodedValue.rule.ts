@@ -94,7 +94,7 @@ const rgbColorFunctions = ['rgb', 'rgba', 'hsl', 'hsla'];
 /**
  * Regex pattern for matching CSS functions.
  */
-const CSS_FUNCTIONS_REGEX =
+const cssFunctionsRegex =
   /^(?:attr|calc|color-mix|conic-gradient|counter|cubic-bezier|linear-gradient|max|min|radial-gradient|repeating-conic-gradient|repeating-linear-gradient|repeating-radial-gradient|var)$/;
 
 const forEachColorValue = (
@@ -109,7 +109,7 @@ const forEachColorValue = (
           //@ts-ignore
           node.type = 'word';
           cb(node, index, nodes);
-        } else if (CSS_FUNCTIONS_REGEX.test(node.value)) {
+        } else if (cssFunctionsRegex.test(node.value)) {
           return false;
         }
         return false;
@@ -129,7 +129,7 @@ const forEachDensifyValue = (
   const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
-      if (node.type === 'function' && CSS_FUNCTIONS_REGEX.test(node.value)) {
+      if (node.type === 'function' && cssFunctionsRegex.test(node.value)) {
         return false;
       }
       const parsedValue = valueParser.unit(node.value);
