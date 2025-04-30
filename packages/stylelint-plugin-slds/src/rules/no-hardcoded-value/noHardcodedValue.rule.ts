@@ -101,6 +101,11 @@ const forEachColorValue = (
   parsedValue: valueParser.ParsedValue,
   cb: valueParser.WalkCallback
 ) => {
+  /**
+   * Using valueParser.walk() without the bubble parameter (defaults to false),
+   * which means returning false in the callback prevents traversal of descendant nodes.
+   * See: https://www.npmjs.com/package/postcss-value-parser#valueparserwalknodes-callback-bubble
+   */
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
       if (node.type === 'function') {
@@ -110,15 +115,15 @@ const forEachColorValue = (
           node.type = 'word';
           cb(node, index, nodes);
         } else if (cssFunctionsRegex.test(node.value)) {
+          // Skip CSS functions as they often contain necessary hardcoded values
+          // that are part of their syntax (e.g., linear-gradient(45deg, #fff, #000))
           return false;
         }
-        return false;
       } else if (node.type === 'word' && isValidColor(node.value)) {
         cb(node, index, nodes);
       }
       return true;
-    },
-    false
+    }
   );
 };
 
@@ -127,9 +132,16 @@ const forEachDensifyValue = (
   cb: valueParser.WalkCallback
 ) => {
   const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
+  /**
+   * Using valueParser.walk() without the bubble parameter (defaults to false),
+   * which means returning false in the callback prevents traversal of descendant nodes.
+   * See: https://www.npmjs.com/package/postcss-value-parser#valueparserwalknodes-callback-bubble
+   */
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
       if (node.type === 'function' && cssFunctionsRegex.test(node.value)) {
+        // Skip CSS functions as they often contain necessary hardcoded values
+        // that are part of their syntax (e.g., calc(100% - 20px))
         return false;
       }
       const parsedValue = valueParser.unit(node.value);
@@ -150,8 +162,7 @@ const forEachDensifyValue = (
         return;
       }
       cb(node, index, nodes);
-    },
-    false
+    }
   );
 };
 
