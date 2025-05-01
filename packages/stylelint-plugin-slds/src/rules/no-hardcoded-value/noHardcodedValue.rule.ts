@@ -19,14 +19,16 @@ interface Hook {
 }
 
 interface MessagesObj {
-  rejected: (oldValue: string, newValue: string)=>string,
-  suggested: (oldValue: string) => string
+  rejected: (oldValue: string, newValue: string) => string;
+  suggested: (oldValue: string) => string;
 }
 
-function toRuleMessages(ruleName: string, warningMsg: string):MessagesObj {
+function toRuleMessages(ruleName: string, warningMsg: string): MessagesObj {
   return utils.ruleMessages(ruleName, {
-    rejected: (oldValue: string, newValue: string) => replacePlaceholders(warningMsg, { oldValue, newValue }),
-    suggested: (oldValue: string) => `There’s no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
+    rejected: (oldValue: string, newValue: string) =>
+      replacePlaceholders(warningMsg, { oldValue, newValue }),
+    suggested: (oldValue: string) =>
+      `There’s no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
   });
 }
 
@@ -57,7 +59,7 @@ export const findExactMatchStylingHook = (
   if (cssValue in supportedStylinghooks) {
     matchedHooks = supportedStylinghooks[cssValue] || [];
     return matchedHooks
-      .filter((hook) => {
+      .filter((hook: Hook) => {
         return matchesCssProperty(hook.properties, cssProperty);
       })
       .map((hook) => hook.name);
@@ -87,28 +89,40 @@ const densificationProperties = [
   'box-shadow',
 ];
 
-const rgbColorFunctions = [
-  'rgb',
-  'rgba',
-  'hsl',
-  'hsla'
-];
+const rgbColorFunctions = ['rgb', 'rgba', 'hsl', 'hsla'];
+
+/**
+ * Regex pattern for matching CSS functions.
+ */
+const cssFunctionsRegex =
+  /^(?:attr|calc|color-mix|conic-gradient|counter|cubic-bezier|linear-gradient|max|min|radial-gradient|repeating-conic-gradient|repeating-linear-gradient|repeating-radial-gradient|var)$/;
 
 const forEachColorValue = (
   parsedValue: valueParser.ParsedValue,
   cb: valueParser.WalkCallback
 ) => {
+  /**
+   * Using valueParser.walk() without the bubble parameter (defaults to false),
+   * which means returning false in the callback prevents traversal of descendant nodes.
+   * See: https://www.npmjs.com/package/postcss-value-parser#valueparserwalknodes-callback-bubble
+   */
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
-      if(node.type === 'function' && rgbColorFunctions.includes(node.value)){
-        // override the type to word
-        node.value = valueParser.stringify(node);
-        //@ts-ignore
-        node.type = 'word';
-        cb(node, index, nodes);
+      if (node.type === 'function') {
+        if (rgbColorFunctions.includes(node.value)) {
+          node.value = valueParser.stringify(node);
+          //@ts-ignore
+          node.type = 'word';
+          cb(node, index, nodes);
+        } else if (cssFunctionsRegex.test(node.value)) {
+          // Skip CSS functions as they often contain necessary hardcoded values
+          // that are part of their syntax (e.g., linear-gradient(45deg, #fff, #000))
+          return false;
+        }
       } else if (node.type === 'word' && isValidColor(node.value)) {
         cb(node, index, nodes);
       }
+      return true;
     }
   );
 };
@@ -118,8 +132,18 @@ const forEachDensifyValue = (
   cb: valueParser.WalkCallback
 ) => {
   const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
+  /**
+   * Using valueParser.walk() without the bubble parameter (defaults to false),
+   * which means returning false in the callback prevents traversal of descendant nodes.
+   * See: https://www.npmjs.com/package/postcss-value-parser#valueparserwalknodes-callback-bubble
+   */
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
+      if (node.type === 'function' && cssFunctionsRegex.test(node.value)) {
+        // Skip CSS functions as they often contain necessary hardcoded values
+        // that are part of their syntax (e.g., calc(100% - 20px))
+        return false;
+      }
       const parsedValue = valueParser.unit(node.value);
       if (node.type !== 'word' || !parsedValue) {
         // Conider only node of type word and parsable by unit function
@@ -147,7 +171,7 @@ function reportMatchingHooks(
   suggestions: string[],
   offsetIndex: number,
   props: Partial<stylelint.Problem>,
-  messages:MessagesObj,
+  messages: MessagesObj,
   fix?: stylelint.FixCallback
 ) {
   let index = offsetIndex;
@@ -173,7 +197,7 @@ function reportMatchingHooks(
         suggestions,
       }),
       ...reportProps,
-      fix: suggestions.length ===1?fix:null
+      fix: suggestions.length === 1 ? fix : null,
     });
   } else {
     utils.report(<stylelint.Problem>{
@@ -229,8 +253,8 @@ export const createNoHardcodedValueRule = (
             supportedStylinghooks,
             cssProperty
           );
-          const fix = ()=> {
-            decl.value = `var(${closestHooks[0]})`;
+          const fix = () => {
+            decl.value = `var(${closestHooks[0]}, ${cssValue})`;
           };
 
           if (closestHooks.length > 0) {
@@ -259,8 +283,11 @@ export const createNoHardcodedValueRule = (
               cssProperty
             );
 
-            const fix = ()=> {
-              decl.value = decl.value.replace(valueParser.stringify(node), `var(${closestHooks[0]})`);
+            const fix = () => {
+              decl.value = decl.value.replace(
+                valueParser.stringify(node),
+                `var(${closestHooks[0]}, ${hexValue})`
+              );
             };
 
             // Report suggessions
@@ -275,22 +302,23 @@ export const createNoHardcodedValueRule = (
           });
         } else if (isDensiProp) {
           forEachDensifyValue(parsedValue, (node) => {
-            let alternateValue = null;  
+            let alternateValue = null;
             const parsedValue = valueParser.unit(node.value);
             const unitType = parsedValue && parsedValue.unit;
-            const numberVal = parsedValue?Number(parsedValue.number):0;
-            if(unitType === 'px'){
+            const numberVal = parsedValue ? Number(parsedValue.number) : 0;
+            if (unitType === 'px') {
               let floatValue = parseFloat(`${numberVal / 16}`);
-              if(!isNaN(floatValue)){ // this will void suffix 0's
+              if (!isNaN(floatValue)) {
+                // this will void suffix 0's
                 alternateValue = `${parseFloat(floatValue.toFixed(4))}rem`;
               }
-            } else if(unitType === 'rem'){
+            } else if (unitType === 'rem') {
               const intValue = parseInt(`${numberVal * 16}`);
-              if(!isNaN(intValue)){
+              if (!isNaN(intValue)) {
                 alternateValue = `${intValue}px`;
               }
             }
-            
+            let suggestedValue = node.value;
             closestHooks = findExactMatchStylingHook(
               node.value,
               supportedStylinghooks,
@@ -298,7 +326,8 @@ export const createNoHardcodedValueRule = (
             );
 
             // Find closest hook for alternate value if no exact match is found
-            if(!closestHooks || !closestHooks.length){
+            if (!closestHooks || !closestHooks.length) {
+              suggestedValue = alternateValue;
               closestHooks = findExactMatchStylingHook(
                 alternateValue,
                 supportedStylinghooks,
@@ -306,8 +335,11 @@ export const createNoHardcodedValueRule = (
               );
             }
 
-            const fix = ()=> {
-              decl.value = decl.value.replace(valueParser.stringify(node), `var(${closestHooks[0]})`);
+            const fix = () => {
+              decl.value = decl.value.replace(
+                valueParser.stringify(node),
+                `var(${closestHooks[0]}, ${suggestedValue})`
+              );
             };
 
             // Report suggessions
