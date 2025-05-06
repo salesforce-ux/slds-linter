@@ -61,15 +61,6 @@ function getFallbackValue(varName: string): string | null {
     return sldsVariables[bestMatch];
   }
   
-  // Default fallbacks by detected type if no similar variable found
-  if (varName.includes('color') || varName.includes('border')) {
-    return '#cccccc'; // Neutral gray for colors
-  } else if (varName.includes('spacing') || varName.includes('sizing')) {
-    return '0'; // Zero for spacing
-  } else if (varName.includes('font')) {
-    return '1rem'; // 1rem for font sizes
-  }
-  
   // Return null if we can't determine a good fallback
   return null;
 }
