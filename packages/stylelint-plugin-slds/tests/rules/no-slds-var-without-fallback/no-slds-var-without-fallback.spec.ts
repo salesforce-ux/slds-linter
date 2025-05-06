@@ -174,4 +174,104 @@ describe('no-slds-var-without-fallback', () => {
     expect(fixedCss).toContain('var(--slds-g-spacing-4, 1rem)');
     expect(fixedCss).toContain('var(--slds-g-font-scale-2, 1rem)');
   });
+
+  test('Finds similar variable fallbacks when exact match is not found', async () => {
+    const css = `
+      .example {
+        /* These variables don't exist but should match with similar ones */
+        color: var(--slds-g-color-border-custom);
+        margin: var(--slds-g-spacing-custom);
+        font-size: var(--slds-g-font-custom);
+      }
+    `;
+
+    const result = await stylelint.lint({
+      code: css,
+      config: {
+        plugins: ['./src/index.ts'],
+        rules: {
+          [ruleName]: true,
+        },
+      },
+    });
+
+    const warningTexts = result.results[0]?.warnings.map(w => w.text);
+    console.log('Fuzzy matching warnings:', warningTexts);
+
+    // Check that warnings were generated using our fuzzy matching logic
+    expect(warningTexts?.length).toBe(3);
+    
+    // The exact values may vary depending on which similar variables are chosen,
+    // but we should verify that we found some reasonable fallbacks
+    expect(warningTexts?.some(text => 
+      text.includes('--slds-g-color-border-custom') && 
+      text.includes('#')
+    )).toBeTruthy();
+
+    expect(warningTexts?.some(text => 
+      text.includes('--slds-g-spacing-custom')
+    )).toBeTruthy();
+
+    expect(warningTexts?.some(text => 
+      text.includes('--slds-g-font-custom')
+    )).toBeTruthy();
+  });
+
+  test('Shows lightningdesignsystem.com reference for completely unknown variables', async () => {
+    // Create a variable name that's unlikely to have any close matches
+    const css = `
+      .example {
+        /* This variable is completely made up with no likely matches */
+        transform: var(--slds-completely-unknown-variable);
+      }
+    `;
+
+    const result = await stylelint.lint({
+      code: css,
+      config: {
+        plugins: ['./src/index.ts'],
+        rules: {
+          [ruleName]: true,
+        },
+      },
+    });
+
+    const warningTexts = result.results[0]?.warnings.map(w => w.text);
+    console.log('Unknown variable warning:', warningTexts);
+
+    // Check that we get the message referring to lightningdesignsystem.com
+    expect(warningTexts?.length).toBe(1);
+    expect(warningTexts?.[0]).toContain('lightningdesignsystem.com');
+    
+    // And check that it doesn't suggest a specific fallback value
+    expect(warningTexts?.[0]).not.toContain('Suggested:');
+  });
+
+  it('Does not add fallback for completely unknown variables when fixing', async () => {
+    const inputCss = `
+      .example {
+        transform: var(--slds-completely-unknown-variable);
+      }
+    `;
+    
+    const linterResult: LinterResult = await lint({
+      code: inputCss,
+      config: {
+        plugins: ['./src/index.ts'],
+        rules: {
+          [ruleName]: true,
+        },
+      },
+      fix: true,
+    } as LinterOptions);
+
+    const fixedCss = linterResult.output;
+    
+    // Verify that the fix was not applied (output should be the same as input)
+    expect(fixedCss).toBeDefined();
+    
+    // The variable should remain without a fallback
+    expect(fixedCss.includes('var(--slds-completely-unknown-variable)')).toBeTruthy();
+    expect(fixedCss.includes('var(--slds-completely-unknown-variable, ')).toBeFalsy();
+  });
 }); 
