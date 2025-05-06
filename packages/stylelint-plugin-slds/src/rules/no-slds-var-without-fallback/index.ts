@@ -20,48 +20,17 @@ const messages = utils.ruleMessages(ruleName, {
   withRecommendation: (cssVar: string, recommendation: string) =>
     `var(${cssVar}) must include a fallback value. Suggested: var(${cssVar}, ${recommendation}) (slds/no-slds-var-without-fallback)`,
   withoutRecommendation: (cssVar: string) =>
-    `var(${cssVar}) must include a fallback value. For more info, refer lightningdesignsystem.com. (slds/no-slds-var-without-fallback)`,
+    `var(${cssVar}) must include a fallback value. For more info, see Global Styling Hooks on lightningdesignsystem.com. (slds/no-slds-var-without-fallback)`,
 });
 
 // Find a fallback value based on the CSS variable name
 function getFallbackValue(varName: string): string | null {
-  // First check if we have an exact match in the slds1ExcludedVars
+  // Check if we have an exact match in the slds1ExcludedVars
   if (sldsVariables[varName]) {
     return sldsVariables[varName];
   }
-
-  // If no exact match, look for similar variables in the metadata
-  const varNameParts = varName.split('-').filter(Boolean);
   
-  // Find variables that share similar naming patterns
-  const similarVariables = Object.keys(sldsVariables).filter(key => {
-    const keyParts = key.split('-').filter(Boolean);
-    // Check if at least one significant part matches (excluding common parts like 'slds', 'g')
-    return varNameParts.some(part => 
-      keyParts.includes(part) && 
-      part.length > 1 && 
-      !['slds', 'g'].includes(part)
-    );
-  });
-
-  if (similarVariables.length > 0) {
-    // Prioritize variables with more matching parts
-    const bestMatch = similarVariables.sort((a, b) => {
-      const aMatchCount = varNameParts.filter(part => 
-        a.includes(part) && part.length > 1 && !['slds', 'g'].includes(part)
-      ).length;
-      
-      const bMatchCount = varNameParts.filter(part => 
-        b.includes(part) && part.length > 1 && !['slds', 'g'].includes(part)
-      ).length;
-      
-      return bMatchCount - aMatchCount;
-    })[0];
-    
-    return sldsVariables[bestMatch];
-  }
-  
-  // Return null if we can't determine a good fallback
+  // Return null if no exact match is found
   return null;
 }
 
@@ -115,16 +84,16 @@ function ruleFunction(primary: boolean, { severity = severityLevel as RuleSeveri
           const fallbackValue = getFallbackValue(varName);
 
           const fix = primary ? () => {
-            // Add the fallback value
+            // Add the fallback value, but only if we have a match in the metadata
             if (fallbackValue) {
               node.nodes.push(
                 { type: 'div', value: ',', sourceIndex: 0, sourceEndIndex: 1, before: '', after: ' ' } as valueParser.DivNode,
                 { type: 'word', value: fallbackValue, sourceIndex: 0, sourceEndIndex: fallbackValue.length } as valueParser.WordNode
               );
+              
+              // Update the declaration value
+              decl.value = parsedValue.toString();
             }
-            
-            // Update the declaration value
-            decl.value = parsedValue.toString();
           } : undefined;
 
           // Report the issue with appropriate message

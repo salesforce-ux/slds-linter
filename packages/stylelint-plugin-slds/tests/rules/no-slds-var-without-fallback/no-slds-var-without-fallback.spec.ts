@@ -112,11 +112,11 @@ describe('no-slds-var-without-fallback', () => {
     }
   );
 
-  // Test for fixing functionality
-  it('Fixes var(--slds-*) without fallback by adding a fallback value', async () => {
+  // Test for fixing functionality - using a known variable from metadata
+  it('Fixes var(--slds-*) without fallback by adding a fallback value for known variables', async () => {
     const inputCss = `
       .example {
-        color: var(--slds-color-brand);
+        color: var(--slds-g-color-border-base-1);
       }
     `;
     
@@ -131,13 +131,12 @@ describe('no-slds-var-without-fallback', () => {
       fix: true,
     } as LinterOptions);
 
-    // Just check that the fixed CSS contains a fallback value
+    // Check that the fixed CSS contains a fallback value
     const fixedCss = linterResult.output;
     
     // Verify that the fix was applied correctly
     expect(fixedCss).toBeDefined();
-    expect(fixedCss).toContain('var(--slds-color-brand,');
-    expect(fixedCss).toContain(')');
+    expect(fixedCss).toContain('var(--slds-g-color-border-base-1, #c9c9c9)');
   });
   
   // Test fixing specific SLDS variables with correct fallback values
@@ -175,10 +174,10 @@ describe('no-slds-var-without-fallback', () => {
     expect(fixedCss).toContain('var(--slds-g-font-scale-2, 1rem)');
   });
 
-  test('Finds similar variable fallbacks when exact match is not found', async () => {
+  test('Shows documentation reference for non-exact matches', async () => {
     const css = `
       .example {
-        /* These variables don't exist but should match with similar ones */
+        /* These variables don't exist in the metadata */
         color: var(--slds-g-color-border-custom);
         margin: var(--slds-g-spacing-custom);
         font-size: var(--slds-g-font-custom);
@@ -198,23 +197,14 @@ describe('no-slds-var-without-fallback', () => {
     const warningTexts = result.results[0]?.warnings.map(w => w.text);
     console.log('Fuzzy matching warnings:', warningTexts);
 
-    // Check that warnings were generated using our fuzzy matching logic
+    // Check that warnings were generated
     expect(warningTexts?.length).toBe(3);
     
-    // The exact values may vary depending on which similar variables are chosen,
-    // but we should verify that we found some reasonable fallbacks
-    expect(warningTexts?.some(text => 
-      text.includes('--slds-g-color-border-custom') && 
-      text.includes('#')
-    )).toBeTruthy();
-
-    expect(warningTexts?.some(text => 
-      text.includes('--slds-g-spacing-custom')
-    )).toBeTruthy();
-
-    expect(warningTexts?.some(text => 
-      text.includes('--slds-g-font-custom')
-    )).toBeTruthy();
+    // All warnings should reference the documentation
+    expect(warningTexts?.every(text => text.includes('Global Styling Hooks on lightningdesignsystem.com'))).toBeTruthy();
+    
+    // None of the warnings should contain "Suggested:"
+    expect(warningTexts?.every(text => !text.includes('Suggested:'))).toBeTruthy();
   });
 
   test('Shows lightningdesignsystem.com reference for completely unknown variables', async () => {
@@ -247,7 +237,7 @@ describe('no-slds-var-without-fallback', () => {
     expect(warningTexts?.[0]).not.toContain('Suggested:');
   });
 
-  it('Does not add fallback for completely unknown variables when fixing', async () => {
+  it('Does not add fallback for non-metadata variables when fixing', async () => {
     const inputCss = `
       .example {
         transform: var(--slds-completely-unknown-variable);
