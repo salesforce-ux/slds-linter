@@ -1,8 +1,7 @@
 import { Root, Declaration } from 'postcss';
-import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
+import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import valueParser from 'postcss-value-parser';
-import * as fs from 'fs';
-import * as path from 'path';
+import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 
@@ -10,131 +9,131 @@ const { utils, createPlugin }: typeof stylelint = stylelint;
 
 const ruleName: string = 'slds/no-slds-var-without-fallback';
 
-// Fetch metadata
-const { severityLevel = 'error', warningMsg = 'var({{cssVar}}) must include a fallback value. Suggested: {{recommendation}}', errorMsg = '', ruleDesc = 'Checks for var(--slds-*) functions without fallbacks' } = ruleMetadata(ruleName) || {};
+// Cast the metadata to access the slds1ExcludedVars property
+const sldsVariables = (metadata as any).slds1ExcludedVars || {};
+
+const { severityLevel = 'error', warningMsg = 'var({{cssVar}}) must include a fallback value. Suggested: var({{cssVar}}, {{recommendation}})' } = ruleMetadata(ruleName) || {};
 
 const messages = utils.ruleMessages(ruleName, {
   expected: (cssVar: string, recommendation: string) =>
     replacePlaceholders(warningMsg, { cssVar, recommendation }),
 });
 
-// Default fallback values by variable type
-const defaultFallbacks: {[key: string]: string} = {
+// Define default fallbacks for specific types of variables based on naming patterns
+const defaultFallbacks = {
+  // Colors
   color: '#000000',
-  'background-color': '#ffffff',
+  border: '#000000',
+  // Spacing
   spacing: '0',
-  'font-size': '1rem',
-  'line-height': '1.5',
-  border: '0',
-  radius: '0',
-  'z-index': '0',
-  duration: '0ms',
-  opacity: '1',
-  shadow: 'none',
-  default: 'initial'
+  sizing: '0',
+  // Font size
+  font: '1rem',
+  // Default fallback for unidentified variable types
+  default: '0',
 };
 
-// Function to get a fallback value for a variable
-function getFallbackValue(cssVarName: string, property?: string): string {
-  // Determine fallback based on variable name patterns
-  if (cssVarName.includes('-color-')) {
-    return defaultFallbacks.color;
-  } else if (cssVarName.includes('-background-')) {
-    return defaultFallbacks['background-color'];
-  } else if (cssVarName.includes('-spacing-') || cssVarName.includes('-size-')) {
-    return defaultFallbacks.spacing;
-  } else if (cssVarName.includes('-font-size-')) {
-    return defaultFallbacks['font-size'];
-  } else if (cssVarName.includes('-radius-')) {
-    return defaultFallbacks.radius;
-  } else if (cssVarName.includes('-z-index-')) {
-    return defaultFallbacks['z-index'];
-  } else if (cssVarName.includes('-duration-')) {
-    return defaultFallbacks.duration;
-  } else if (cssVarName.includes('-shadow-')) {
-    return defaultFallbacks.shadow;
-  } else if (cssVarName.includes('-opacity-')) {
-    return defaultFallbacks.opacity;
-  } else if (property) {
-    // Use property as a hint for the type of fallback needed
-    const propertyLower = property.toLowerCase();
-    for (const [key, value] of Object.entries(defaultFallbacks)) {
-      if (propertyLower.includes(key)) {
-        return value;
-      }
-    }
+// Find a fallback value based on the CSS variable name
+function getFallbackValue(varName: string): string {
+  // First check if we have an exact match in the slds1ExcludedVars
+  if (sldsVariables[varName]) {
+    return sldsVariables[varName];
   }
-  
-  // Default fallback
+
+  // If we don't have a direct match, use pattern matching as a fallback
+  if (varName.includes('color') || varName.includes('border')) {
+    return defaultFallbacks.color;
+  } else if (varName.includes('spacing') || varName.includes('sizing')) {
+    return defaultFallbacks.spacing;
+  } else if (varName.includes('font')) {
+    return defaultFallbacks.font;
+  }
   return defaultFallbacks.default;
 }
 
-// Rule function
-const ruleFunction: Partial<stylelint.Rule> = (primaryOption: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
+function ruleFunction(primary: boolean, { severity = severityLevel as RuleSeverity } = {}) {
   return (root: Root, result: PostcssResult) => {
-    const validOptions = stylelint.utils.validateOptions(result, ruleName, {
-      actual: primaryOption,
-    });
-
-    if (!validOptions) {
+    // Early exit if the rule is not enabled
+    if (!primary) {
       return;
     }
 
+    // Process the CSS root and find CSS variables
     root.walkDecls((decl: Declaration) => {
+      // Skip if the value doesn't contain `var(`
+      if (!decl.value || !decl.value.includes('var(')) {
+        return;
+      }
+
+      // Parse the value
       const parsedValue = valueParser(decl.value);
 
+      // Walk through function nodes
       parsedValue.walk((node) => {
-        // Check if it's a var() function
-        if (node.type === 'function' && node.value === 'var') {
-          // Extract the variable name (first argument)
-          const cssVarNode = node.nodes[0];
-          if (!cssVarNode) return;
+        if (node.type !== 'function' || node.value !== 'var') {
+          return;
+        }
 
-          const cssVar = cssVarNode.value;
-          
-          // Only process SLDS variables (--slds-*)
-          if (!cssVar.startsWith('--slds-')) {
-            return;
-          }
-          
-          // Check if it has a fallback (a comma followed by additional content)
-          const hasFallback = node.nodes.length > 2 && 
-                             node.nodes[1].type === 'div' && 
-                             node.nodes[1].value === ',';
-                              
-          if (!hasFallback) {
-            // Get a recommended fallback
-            const fallbackValue = getFallbackValue(cssVar, decl.prop);
+        // Extract the variable name from the function arguments
+        const args = node.nodes;
+        if (args.length === 0) {
+          return;
+        }
+
+        // Get the variable name (first argument)
+        const varNameNode = args[0];
+        if (varNameNode.type !== 'word') {
+          return;
+        }
+
+        const varName = varNameNode.value;
+
+        // Only process SLDS variables (starting with --slds-)
+        if (!varName.startsWith('--slds-')) {
+          return;
+        }
+
+        // Check if the variable already has a fallback
+        const hasFallback = args.some((arg) => arg.type === 'div' && arg.value === ',');
+
+        if (!hasFallback) {
+          // Get an appropriate fallback value
+          const fallbackValue = getFallbackValue(varName);
+
+          const fix = primary ? () => {
+            // Add the fallback value
+            node.nodes.push(
+              { type: 'div', value: ',', sourceIndex: 0, sourceEndIndex: 1, before: '', after: ' ' } as valueParser.DivNode,
+              { type: 'word', value: fallbackValue, sourceIndex: 0, sourceEndIndex: fallbackValue.length } as valueParser.WordNode
+            );
             
-            utils.report({
-              message: messages.expected(cssVar, `var(${cssVar}, ${fallbackValue})`),
-              node: decl,
-              result,
-              ruleName,
-              severity,
-              fix: primaryOption ? () => {
-                // Apply the fix - add a fallback value to the var() function
-                node.nodes.push(
-                  { type: 'div', value: ',', sourceIndex: 0, sourceEndIndex: 1, before: '', after: ' ' },
-                  { type: 'word', value: fallbackValue, sourceIndex: 0, sourceEndIndex: fallbackValue.length }
-                );
-                
-                // Update the declaration value
-                decl.value = parsedValue.toString();
-              } : undefined
-            });
-          }
+            // Update the declaration value
+            decl.value = parsedValue.toString();
+          } : undefined;
+
+          // Report the issue
+          utils.report({
+            message: messages.expected(varName, fallbackValue),
+            node: decl,
+            result,
+            ruleName,
+            severity,
+            fix
+          });
         }
       });
     });
   };
-};
+}
 
 ruleFunction.ruleName = ruleName;
+ruleFunction.messages = messages;
 ruleFunction.meta = {
   url: '',
-  fixable: true
+  fixable: true,
+  description: 'Enforces that any SLDS hooks (variables) include a fallback value',
+  detail: 'This ensures CSS will still function in contexts where SLDS hooks are not available',
+  documentation: 'https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.create_components_css_custom_properties'
 };
 
-// Export the plugin
-export default createPlugin(ruleName, <stylelint.Rule>ruleFunction); 
+export default createPlugin(ruleName, ruleFunction as unknown as Rule); 
