@@ -29,9 +29,9 @@ To disable rule in `.eslintrc.yml` or `.stylelintrc.yml` file, you can simply co
        - "@html-eslint"
        - "@salesforce-ux/slds"
      rules:
--      "@salesforce-ux/slds/enforce-bem-class": "error"
+-      "@salesforce-ux/slds/enforce-bem-usage": "error"
 -      "@salesforce-ux/slds/no-deprecated-classes-slds2": "error"
-+    #  "@salesforce-ux/slds/enforce-bem-class": "error"
++    #  "@salesforce-ux/slds/enforce-bem-usage": "error"
 +    #  "@salesforce-ux/slds/no-deprecated-classes-slds2": "error"
        "@salesforce-ux/slds/modal-close-button-issue": "error"
 

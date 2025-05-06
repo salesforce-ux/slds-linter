@@ -1,7 +1,7 @@
 const rulesMetadata = {
   //eslint
-  "slds/enforce-bem-class": {
-    name: "slds/enforce-bem-class", // BEM - Double Dash to BEM Notation
+  "slds/enforce-bem-usage": {
+    name: "slds/enforce-bem-usage", // BEM - Double Dash to BEM Notation
     severityLevel: "error",
     ruleDesc:
       "Replace BEM double-dash syntax in class names with single underscore syntax.",
@@ -28,16 +28,16 @@ const rulesMetadata = {
     ruleDesc: "Disallow units for zero lengths.",
   },
 
-  "slds/enforce-bem-usage": {
-    name: "slds/enforce-bem-usage", // BEM - Double Dash to BEM Notation
-    severityLevel: "warning",
-    warningMsg:
-      "The ${oldValue} class doesn’t follow the correct BEM naming convention. Update it to ${newValue}",
-    errorMsg:
-      "${oldValue} has been retired. Update it to the new name ${newValue}",
-    ruleDesc:
-      "Replace BEM double-dash syntax in class names with single underscore syntax.",
-  },
+  // "slds/enforce-bem-usage": {
+  //   name: "slds/enforce-bem-usage", // BEM - Double Dash to BEM Notation
+  //   severityLevel: "warning",
+  //   warningMsg:
+  //     "The ${oldValue} class doesn’t follow the correct BEM naming convention. Update it to ${newValue}",
+  //   errorMsg:
+  //     "${oldValue} has been retired. Update it to the new name ${newValue}",
+  //   ruleDesc:
+  //     "Replace BEM double-dash syntax in class names with single underscore syntax.",
+  // },
 
   // Checked
   "slds/no-hardcoded-values-slds1": {

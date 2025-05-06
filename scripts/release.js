@@ -8,6 +8,7 @@ import path from "path";
 import semver from "semver";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
+import { generateReleaseNotes } from "./generate-release-notes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
@@ -138,10 +139,13 @@ async function publishPackages(workspaceInfo, version, releaseType) {
 }
 
 async function createGitHubRelease(version, tarballPath, releaseType) {
-  const releaseNotes = `Release ${version}`;
+  const previousVersion = execSync("git describe --tags --abbrev=0")
+    .toString()
+    .trim();
+  const releaseNotes = await generateReleaseNotes(version, previousVersion);
   const releaseSuffix = releaseType !== "final" ? " --prerelease" : "";
   execSync(
-    `gh release create ${version} ${tarballPath} --title "Release ${version}" --notes "${releaseNotes}"${releaseSuffix}`
+    `gh release create ${version} ${tarballPath} --title "${version}" --notes "${releaseNotes}"${releaseSuffix}`
   );
   console.log(chalk.green(`Created GitHub release: ${version}`));
 }
@@ -286,6 +290,13 @@ async function main() {
               ctx.sldsLinterTarball,
               ctx.releaseType
             );
+          },
+        },
+        {
+          title: "Comment on included PRs",
+          skip: () => isDryRun,
+          task: async () => {
+            return exec("node scripts/comment-release-prs.js");
           },
         },
         {
