@@ -63,14 +63,23 @@ async function getPRsFromCommits(commits) {
 }
 
 async function commentOnPRs(prs, releaseVersion) {
-  const comment = `🎉 This PR has been included in [v${releaseVersion}](https://github.com/salesforce-ux/slds-linter/releases/tag/${releaseVersion}). Thank you for your contribution!`;
-  
-  for (const prNumber of prs) {
+  for (const pr of prs) {
     try {
-      execSync(`gh pr comment ${prNumber} --body "${comment}"`);
-      console.log(chalk.green(`Commented on PR #${prNumber}`));
+      // Add comment to PR
+      const comment = `🎉 This PR has been included in [v${releaseVersion}](https://github.com/salesforce-ux/slds-linter/releases/tag/${releaseVersion}). Thank you for your contribution!`;
+      execSync(
+        `gh pr comment ${pr} --body "${comment}"`
+      );
+      console.log(chalk.green(`Commented on PR #${pr}`));
+
+      // Add labels to PR
+      const labels = ["released", `v${releaseVersion}`];
+      execSync(
+        `gh pr edit ${pr} --add-label "${labels.join(",")}"`
+      );
+      console.log(chalk.green(`Added labels to PR #${pr}: ${labels.join(", ")}`));
     } catch (error) {
-      console.warn(chalk.yellow(`Warning: Could not comment on PR #${prNumber}: ${error.message}`));
+      console.error(chalk.red(`Error commenting on PR #${pr}:`), error.message);
     }
   }
 }
