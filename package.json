@@ -25,6 +25,7 @@
     "@types/eslint": "^8.0.0",
     "@types/node": "^20.11.19",
     "clean-pkg-json": "^1.2.0",
+    "conventional-commits-parser": "^3.0.0",
     "esbuild": "^0.25.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
     "glob": "^11.0.1",

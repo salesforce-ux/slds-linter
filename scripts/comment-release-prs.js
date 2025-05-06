@@ -1,0 +1,100 @@
+import { execSync } from "child_process";
+import chalk from "chalk";
+
+async function getLatestReleases() {
+  try {
+    const releases = execSync("gh release list --limit 2")
+      .toString()
+      .trim()
+      .split("\n");
+    
+    if (releases.length < 2) {
+      throw new Error("Need at least 2 releases to compare");
+    }
+
+    const [currentRelease, previousRelease] = releases.map(line => {
+      const [tag] = line.split("\t");
+      return tag;
+    });
+
+    return { currentRelease, previousRelease };
+  } catch (error) {
+    throw new Error(`Failed to get releases: ${error.message}`);
+  }
+}
+
+async function getCommitsBetweenReleases(currentRelease, previousRelease) {
+  try {
+    const commits = execSync(`git log ${previousRelease}..${currentRelease} --pretty=format:"%H"`)
+      .toString()
+      .trim()
+      .split("\n");
+    return commits;
+  } catch (error) {
+    throw new Error(`Failed to get commits: ${error.message}`);
+  }
+}
+
+async function getPRsFromCommits(commits) {
+  const prSet = new Set();
+  
+  for (const commit of commits) {
+    try {
+      console.log(chalk.blue(`Checking commit: ${commit}`));
+      
+      // Use GitHub API to find PRs associated with this commit
+      const prInfo = execSync(`gh api /repos/salesforce-ux/slds-linter/commits/${commit}/pulls`)
+        .toString()
+        .trim();
+      
+      if (prInfo) {
+        const prList = JSON.parse(prInfo);
+        prList.forEach(pr => {
+          console.log(chalk.blue(`Found PR #${pr.number} for commit ${commit}`));
+          prSet.add(pr.number);
+        });
+      }
+    } catch (error) {
+      console.warn(chalk.yellow(`Warning: Could not find PR for commit ${commit}: ${error.message}`));
+    }
+  }
+  
+  return Array.from(prSet);
+}
+
+async function commentOnPRs(prs, releaseVersion) {
+  const comment = `🎉 This PR has been included in [v${releaseVersion}](https://github.com/salesforce-ux/slds-linter/releases/tag/${releaseVersion}). Thank you for your contribution!`;
+  
+  for (const prNumber of prs) {
+    try {
+      execSync(`gh pr comment ${prNumber} --body "${comment}"`);
+      console.log(chalk.green(`Commented on PR #${prNumber}`));
+    } catch (error) {
+      console.warn(chalk.yellow(`Warning: Could not comment on PR #${prNumber}: ${error.message}`));
+    }
+  }
+}
+
+async function main() {
+  try {
+    console.log(chalk.blue("Starting PR comment process..."));
+    
+    const { currentRelease, previousRelease } = await getLatestReleases();
+    console.log(chalk.blue(`Comparing releases: ${previousRelease} -> ${currentRelease}`));
+    
+    const commits = await getCommitsBetweenReleases(currentRelease, previousRelease);
+    console.log(chalk.blue(`Found ${commits.length} commits between releases`));
+    
+    const prs = await getPRsFromCommits(commits);
+    console.log(chalk.blue(`Found ${prs.length} PRs to comment on`));
+    
+    await commentOnPRs(prs, currentRelease);
+    
+    console.log(chalk.green("Successfully commented on all PRs!"));
+  } catch (error) {
+    console.error(chalk.red("Error:"), chalk.red(error.message));
+    process.exit(1);
+  }
+}
+
+main(); 
