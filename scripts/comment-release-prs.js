@@ -62,15 +62,41 @@ async function getPRsFromCommits(commits) {
   return Array.from(prSet);
 }
 
-async function commentOnPRs(prs, releaseVersion) {
-  const comment = `🎉 This PR has been included in [v${releaseVersion}](https://github.com/salesforce-ux/slds-linter/releases/tag/${releaseVersion}). Thank you for your contribution!`;
-  
-  for (const prNumber of prs) {
+async function ensureLabelsExist(labels) {
+  for (const label of labels) {
     try {
-      execSync(`gh pr comment ${prNumber} --body "${comment}"`);
-      console.log(chalk.green(`Commented on PR #${prNumber}`));
+      // Check if label exists
+      execSync(`gh label view "${label}"`, { stdio: 'ignore' });
     } catch (error) {
-      console.warn(chalk.yellow(`Warning: Could not comment on PR #${prNumber}: ${error.message}`));
+      // Label doesn't exist, create it
+      const color = label === "released" ? "0E8A16" : "0366D6"; // Green for released, blue for version
+      execSync(`gh label create "${label}" --color "${color}" --description "PR included in ${label}"`);
+      console.log(chalk.green(`Created label: ${label}`));
+    }
+  }
+}
+
+async function commentOnPRs(prs, releaseVersion) {
+  // Ensure labels exist before adding them to PRs
+  const labels = ["released", `v${releaseVersion}`];
+  await ensureLabelsExist(labels);
+
+  for (const pr of prs) {
+    try {
+      // Add comment to PR
+      const comment = `🎉 This PR has been included in [v${releaseVersion}](https://github.com/salesforce-ux/slds-linter/releases/tag/${releaseVersion}). Thank you for your contribution!`;
+      execSync(
+        `gh pr comment ${pr} --body "${comment}"`
+      );
+      console.log(chalk.green(`Commented on PR #${pr}`));
+
+      // Add labels to PR
+      execSync(
+        `gh pr edit ${pr} --add-label "${labels.join(",")}"`
+      );
+      console.log(chalk.green(`Added labels to PR #${pr}: ${labels.join(", ")}`));
+    } catch (error) {
+      console.error(chalk.red(`Error commenting on PR #${pr}:`), error.message);
     }
   }
 }
