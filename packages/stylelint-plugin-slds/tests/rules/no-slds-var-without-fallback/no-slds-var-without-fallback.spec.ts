@@ -83,9 +83,9 @@ describe('no-slds-var-without-fallback', () => {
 
         if (expectedWarning) {
           expect(messages.length).toBeGreaterThan(0);
-          // Check that one of the warnings contains "must include a fallback value"
+          // Check that one of the warnings contains text about styling hooks being unavailable
           const warningTexts = messages.map(w => w.text);
-          expect(warningTexts.some(text => text.includes('must include a fallback value'))).toBeTruthy();
+          expect(warningTexts.some(text => text.includes('styling hook without a fallback value'))).toBeTruthy();
           
           // If we have specific expected fallbacks, verify them
           if (expectedFallbacks) {
@@ -97,9 +97,9 @@ describe('no-slds-var-without-fallback', () => {
 
             // For each expected fallback, check if any warning includes it
             Object.entries(expectedFallbacks).forEach(([varName, expectedValue]) => {
-              // The warning text will include the actual variable name in the format var(varName)
+              // The warning text will include the actual variable name in the format "varName"
               const hasMatchingWarning = warningTexts.some(text => 
-                text.includes(`var(${varName}`) && text.includes(expectedValue)
+                text.includes(`"${varName}"`) && text.includes(expectedValue) && text.includes('SLDS1 tokens page')
               );
               console.log(`Checking for "${varName}" with value "${expectedValue}": ${hasMatchingWarning}`);
               expect(hasMatchingWarning).toBeTruthy();
@@ -174,7 +174,7 @@ describe('no-slds-var-without-fallback', () => {
     expect(fixedCss).toContain('var(--slds-g-font-scale-2, 1rem)');
   });
 
-  test('Shows documentation reference for non-exact matches', async () => {
+  test('Shows new error message format for non-exact matches', async () => {
     const css = `
       .example {
         /* These variables don't exist in the metadata */
@@ -195,19 +195,25 @@ describe('no-slds-var-without-fallback', () => {
     });
 
     const warningTexts = result.results[0]?.warnings.map(w => w.text);
-    console.log('Fuzzy matching warnings:', warningTexts);
+    console.log('Unknown variable warnings:', warningTexts);
 
     // Check that warnings were generated
     expect(warningTexts?.length).toBe(3);
     
-    // All warnings should reference the documentation
-    expect(warningTexts?.every(text => text.includes('Global Styling Hooks on lightningdesignsystem.com'))).toBeTruthy();
+    // All warnings should mention SLDS1 tokens page
+    expect(warningTexts?.every(text => text.includes('SLDS1 tokens page'))).toBeTruthy();
     
-    // None of the warnings should contain "Suggested:"
-    expect(warningTexts?.every(text => !text.includes('Suggested:'))).toBeTruthy();
+    // All warnings should mention "add a fallback value"
+    expect(warningTexts?.every(text => text.includes('add a fallback value'))).toBeTruthy();
+    
+    // All warnings should mention styling hooks being unavailable 
+    expect(warningTexts?.every(text => text.includes('Styling hooks are unavailable in some Salesforce environments'))).toBeTruthy();
+    
+    // None of the warnings should contain specific fallback values
+    expect(warningTexts?.every(text => !text.includes('add this fallback value:'))).toBeTruthy();
   });
 
-  test('Shows lightningdesignsystem.com reference for completely unknown variables', async () => {
+  test('Shows updated error message for completely unknown variables', async () => {
     // Create a variable name that's unlikely to have any close matches
     const css = `
       .example {
@@ -229,12 +235,14 @@ describe('no-slds-var-without-fallback', () => {
     const warningTexts = result.results[0]?.warnings.map(w => w.text);
     console.log('Unknown variable warning:', warningTexts);
 
-    // Check that we get the message referring to lightningdesignsystem.com
+    // Check that we get the updated message format
     expect(warningTexts?.length).toBe(1);
-    expect(warningTexts?.[0]).toContain('lightningdesignsystem.com');
+    expect(warningTexts?.[0]).toContain('SLDS1 tokens page');
+    expect(warningTexts?.[0]).toContain('To make sure your component renders correctly in all environments, add a fallback value');
+    expect(warningTexts?.[0]).toContain('Your code uses the "--slds-completely-unknown-variable" styling hook without a fallback value');
     
     // And check that it doesn't suggest a specific fallback value
-    expect(warningTexts?.[0]).not.toContain('Suggested:');
+    expect(warningTexts?.[0]).not.toContain('add this fallback value:');
   });
 
   it('Does not add fallback for non-metadata variables when fixing', async () => {
