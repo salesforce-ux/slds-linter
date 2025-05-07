@@ -83,11 +83,11 @@ function forEachVarFn(
   return parsedValue;
 }
 
-function ruleFunction(primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) {
+const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     // Process the CSS root and find CSS variables
     root.walkDecls((decl: Declaration) => {
-      const parsedValue = forEachVarFn(decl, result, severity, (varName, node, hasFallback) => {
+      forEachVarFn(decl, result, severity, (varName, node, hasFallback) => {
         if (!hasFallback) {
           // Get an appropriate fallback value
           const fallbackValue = getFallbackValue(varName);
@@ -122,11 +122,9 @@ function ruleFunction(primaryOptions: boolean, { severity = severityLevel as Rul
           });
         }
       });
-
-      // No need to update the declaration value here, as we directly modify it in the fix function
     });
   };
-}
+};
 
 ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
@@ -135,4 +133,5 @@ ruleFunction.meta = {
   fixable: true
 };
 
-export default createPlugin(ruleName, ruleFunction as unknown as Rule); 
+// Export the plugin
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction); 
