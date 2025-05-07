@@ -23,7 +23,57 @@ function getFallbackValue(varName: string): string | null {
   return sldsVariables[varName] || null;
 }
 
-// Helper function to process var() functions
+/**
+ * Check if a CSS variable name starts with --slds-
+ */
+function isSldsCssVariable(cssVar: string): boolean {
+  return cssVar.startsWith('--slds-');
+}
+
+/**
+ * Checks if a var() function has a fallback value
+ */
+function hasFallbackValue(nodes: valueParser.Node[]): boolean {
+  return nodes.some((arg) => arg.type === 'div' && arg.value === ',');
+}
+
+/**
+ * Extract the variable name from a var() function
+ */
+function extractVarName(node: valueParser.FunctionNode): string | null {
+  if (node.nodes.length === 0) return null;
+  
+  const varNameNode = node.nodes[0];
+  if (varNameNode.type !== 'word') return null;
+  
+  return varNameNode.value;
+}
+
+/**
+ * Process a CSS var() function node
+ */
+function processVarFunction(
+  node: valueParser.FunctionNode,
+  callback: (varName: string, node: valueParser.FunctionNode, fallbackValue: string) => void
+): void {
+  const varName = extractVarName(node);
+  
+  // Skip if not a valid variable name or not an SLDS variable
+  if (!varName || !isSldsCssVariable(varName)) return;
+  
+  // Skip if already has fallback
+  if (hasFallbackValue(node.nodes)) return;
+  
+  // Get fallback value from metadata
+  const fallbackValue = getFallbackValue(varName);
+  
+  // Only report if we have a fallback value from metadata
+  if (!fallbackValue) return;
+  
+  callback(varName, node, fallbackValue);
+}
+
+// Helper function to process CSS declarations
 function forEachVarFn(
   decl: Declaration,
   result: PostcssResult,
@@ -35,44 +85,31 @@ function forEachVarFn(
   const parsedValue = valueParser(decl.value);
   
   parsedValue.walk((node) => {
-    if (node.type !== 'function' || node.value !== 'var') return;
-    
-    const args = node.nodes;
-    if (args.length === 0) return;
-
-    const varNameNode = args[0];
-    if (varNameNode.type !== 'word') return;
-
-    const varName = varNameNode.value;
-    if (!varName.startsWith('--slds-')) return;
-
-    // Check if already has fallback
-    const hasFallback = args.some((arg) => arg.type === 'div' && arg.value === ',');
-    if (hasFallback) return;
-    
-    // Get fallback value
-    const fallbackValue = getFallbackValue(varName);
-    
-    // Only report if we have a fallback value from metadata
-    if (!fallbackValue) return;
-    
-    callback(varName, node, fallbackValue);
+    if (node.type === 'function' && node.value === 'var') {
+      processVarFunction(node as valueParser.FunctionNode, callback);
+      return false; // Skip children of this node
+    }
+    return true;
   });
 
   return parsedValue;
+}
+
+/**
+ * Create a fix function that adds a fallback value to a var() function
+ */
+function createFix(decl: Declaration, node: valueParser.FunctionNode, varName: string, fallbackValue: string) {
+  return () => {
+    const varFunctionStr = valueParser.stringify(node);
+    const varNameWithFallback = `var(${varName}, ${fallbackValue})`;
+    decl.value = decl.value.replace(varFunctionStr, varNameWithFallback);
+  };
 }
 
 const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl: Declaration) => {
       forEachVarFn(decl, result, severity, (varName, node, fallbackValue) => {
-        // Apply fix
-        const fix = () => {
-          const varFunctionStr = valueParser.stringify(node);
-          const varNameWithFallback = `var(${varName}, ${fallbackValue})`;
-          decl.value = decl.value.replace(varFunctionStr, varNameWithFallback);
-        };
-
         // Report the issue
         utils.report({
           message: replacePlaceholders(errorMsg, {
@@ -83,7 +120,7 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
           result,
           ruleName,
           severity,
-          fix
+          fix: createFix(decl, node, varName, fallbackValue)
         });
       });
     });
