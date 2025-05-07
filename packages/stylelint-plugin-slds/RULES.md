@@ -1,4 +1,3 @@
-
 ## Enforce `--sds` to `--slds`
 
    .myCustomClass{
@@ -157,6 +156,25 @@ lightning-tabset {
       font-size: 120%;
    }
 
+## No `slds` var without fallback
+   .example {
+      color: var(--slds-color-brand);
+   }
+
+   // Should be: 
+   .example {
+      color: var(--slds-color-brand, #000000);
+   }
+
+   // For known SLDS variables, the rule suggests suitable fallbacks:
+   .example {
+      color: var(--slds-g-link-color-focus);
+   }
+
+   // Will be fixed to:
+   .example {
+      color: var(--slds-g-link-color-focus, #014486);
+   }
 
 
 ## TODO

@@ -10,6 +10,7 @@ import noCalcFunction from './no-calc-function';
 import enforceSdsToSldsHooks from './enforce-sds-to-slds-hooks';
 import reduceAnnotations from './reduce-annotations';
 import { noHardcodedValuesSlds, noHardcodedValuesSldsPlus } from './no-hardcoded-value';
+import noSldsVarWithoutFallback from './no-slds-var-without-fallback';
 
 export default [
   enforceSdsToSldsHooks,
@@ -24,5 +25,6 @@ export default [
   enforceBemUsage,
   noSldsPrivateVar,
   noImportantTag,
-  reduceAnnotations
+  reduceAnnotations,
+  noSldsVarWithoutFallback
 ];

@@ -49,6 +49,9 @@ overrides:
       slds/no-unsupported-hooks-slds2:
         - true
         - severity: warning
+      slds/no-slds-var-without-fallback:
+        - true
+        - severity: warning
 
     sourceMap:
       - false
