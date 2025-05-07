@@ -19,7 +19,8 @@
     "build": "yarn workspaces run build",
     "release": "node scripts/release.js",
     "coverage": "yarn test --coverage && yarn gen:coverage-summary",
-    "gen:coverage-summary":"node scripts/consolidate-coverage.js"    
+    "gen:coverage-summary":"node scripts/consolidate-coverage.js",
+    "validate-sarif": "node scripts/validate-sarif.js"
   },
   "devDependencies": {
     "@types/eslint": "^8.0.0",
