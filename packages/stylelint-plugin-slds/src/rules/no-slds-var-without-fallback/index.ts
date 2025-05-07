@@ -12,14 +12,11 @@ const ruleName: string = 'slds/no-slds-var-without-fallback';
 // Access the slds1ExcludedVars property from metadata
 const sldsVariables = metadata.slds1ExcludedVars || {};
 
-const { severityLevel = 'error', warningMsg = 'var({{cssVar}}) must include a fallback value. Suggested: var({{cssVar}}, {{recommendation}})' } = ruleMetadata(ruleName) || {};
-
-const messages = utils.ruleMessages(ruleName, {
-  expected: (cssVar: string, recommendation: string) =>
-    replacePlaceholders(warningMsg, { cssVar, recommendation }),
-  withRecommendation: (cssVar: string, recommendation: string) =>
-    `Your code uses the "${cssVar}" styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To make sure your component renders correctly in all environments, add this fallback value: "${recommendation}". If you need this fallback value to be brand-aware, please check out the SLDS1 tokens page.`,
-});
+// Get rule metadata
+const { 
+  severityLevel = 'error', 
+  errorMsg = '' 
+} = ruleMetadata(ruleName) || {};
 
 // Find a fallback value based on the CSS variable name
 function getFallbackValue(varName: string): string | null {
@@ -78,7 +75,10 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
 
         // Report the issue
         utils.report({
-          message: messages.withRecommendation(varName, fallbackValue),
+          message: replacePlaceholders(errorMsg, {
+            cssVar: varName,
+            recommendation: fallbackValue
+          }),
           node: decl,
           result,
           ruleName,
@@ -91,7 +91,6 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
 };
 
 ruleFunction.ruleName = ruleName;
-ruleFunction.messages = messages;
 ruleFunction.meta = {
   url: '',
   fixable: true

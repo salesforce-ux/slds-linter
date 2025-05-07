@@ -191,6 +191,15 @@ const rulesMetadata = {
     errorMsg: "Don’t use the calc() function in the property ${property}.",
     ruleDesc: "Avoid using calc() functions.",
   },
+  
+  // Rule to ensure SLDS variables have fallback values
+  "slds/no-slds-var-without-fallback": {
+    name: "slds/no-slds-var-without-fallback",
+    severityLevel: "error",
+    warningMsg: "var(${cssVar}) must include a fallback value. Suggested: var(${cssVar}, ${recommendation})",
+    errorMsg: "Your code uses the \"${cssVar}\" styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To make sure your component renders correctly in all environments, add this fallback value: \"${recommendation}\". If you need this fallback value to be brand-aware, please check out the SLDS1 tokens page.",
+    ruleDesc: "Ensure SLDS CSS variables include fallback values for environments where styling hooks are unavailable.",
+  },
 } as const; // Ensures it's a readonly object
 
 export default rulesMetadata;
