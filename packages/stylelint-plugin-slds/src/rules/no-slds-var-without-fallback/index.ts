@@ -18,115 +18,74 @@ const messages = utils.ruleMessages(ruleName, {
   expected: (cssVar: string, recommendation: string) =>
     replacePlaceholders(warningMsg, { cssVar, recommendation }),
   withRecommendation: (cssVar: string, recommendation: string) =>
-    `Your code uses the "${cssVar}" styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To make sure your component renders correctly in all environments, add this fallback value: "${recommendation}". If you need this fallback value to be brand-aware, please check out the SLDS1 tokens page. (slds/no-slds-var-without-fallback)`,
-  withoutRecommendation: (cssVar: string) =>
-    `Your code uses the "${cssVar}" styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To make sure your component renders correctly in all environments, add a fallback value. If you need this fallback value to be brand-aware, please check out the SLDS1 tokens page. (slds/no-slds-var-without-fallback)`,
+    `Your code uses the "${cssVar}" styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To make sure your component renders correctly in all environments, add this fallback value: "${recommendation}". If you need this fallback value to be brand-aware, please check out the SLDS1 tokens page.`,
 });
 
 // Find a fallback value based on the CSS variable name
 function getFallbackValue(varName: string): string | null {
-  // Check if we have an exact match in the slds1ExcludedVars
-  if (sldsVariables[varName]) {
-    return sldsVariables[varName];
-  }
-  
-  // Return null if no exact match is found
-  return null;
+  return sldsVariables[varName] || null;
 }
 
-// Check if node is a var() function
-function isVarFunction(node: valueParser.Node): boolean {
-  return (
-    node.type === "function" && 
-    node.value === "var" && 
-    node.nodes.length > 0
-  );
-}
-
-// Check if node has a fallback (second argument to var())
-function hasFallbackValue(node: valueParser.FunctionNode): boolean {
-  return node.nodes.some((arg) => arg.type === 'div' && arg.value === ',');
-}
-
-// Process SLDS variables in CSS declarations
-function processSldsCssVars(
+// Helper function to process var() functions
+function forEachVarFn(
   decl: Declaration,
   result: PostcssResult,
-  ruleName: string,
-  severity: RuleSeverity
+  severity: RuleSeverity,
+  callback: (varName: string, node: valueParser.FunctionNode, fallbackValue: string) => void
 ) {
-  // Skip if value doesn't contain var() function
-  if (!decl.value || !decl.value.includes('var(')) {
-    return;
-  }
+  if (!decl.value?.includes('var(')) return;
 
   const parsedValue = valueParser(decl.value);
   
   parsedValue.walk((node) => {
-    // Check if this is a var() function
-    if (!isVarFunction(node)) {
-      return;
-    }
-
-    const functionNode = node as valueParser.FunctionNode;
-    const varNameNode = functionNode.nodes[0];
+    if (node.type !== 'function' || node.value !== 'var') return;
     
-    // Skip if not a text node
-    if (varNameNode.type !== 'word') {
-      return;
-    }
+    const args = node.nodes;
+    if (args.length === 0) return;
+
+    const varNameNode = args[0];
+    if (varNameNode.type !== 'word') return;
 
     const varName = varNameNode.value;
+    if (!varName.startsWith('--slds-')) return;
+
+    // Check if already has fallback
+    const hasFallback = args.some((arg) => arg.type === 'div' && arg.value === ',');
+    if (hasFallback) return;
     
-    // Only process SLDS variables
-    if (!varName.startsWith('--slds-')) {
-      return;
-    }
-
-    // Check if variable already has a fallback
-    if (hasFallbackValue(functionNode)) {
-      return;
-    }
-
-    // Get an appropriate fallback value
+    // Get fallback value
     const fallbackValue = getFallbackValue(varName);
     
-    // Only add fix if we have a fallback value
-    let fix = undefined;
-    if (fallbackValue) {
-      fix = () => {
-        // Simple string replacement approach
-        const varFunctionStr = valueParser.stringify(node);
-        const varNameWithFallback = `var(${varName}, ${fallbackValue})`;
-        decl.value = decl.value.replace(varFunctionStr, varNameWithFallback);
-      };
-    }
-
-    // Report the issue with appropriate message
-    let message;
-    if (fallbackValue) {
-      message = messages.withRecommendation(varName, fallbackValue);
-    } else {
-      message = messages.withoutRecommendation(varName);
-    }
-
-    // Report the issue
-    utils.report({
-      message,
-      node: decl,
-      result,
-      ruleName,
-      severity,
-      fix
-    });
+    // Only report if we have a fallback value from metadata
+    if (!fallbackValue) return;
+    
+    callback(varName, node, fallbackValue);
   });
+
+  return parsedValue;
 }
 
 const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
-    // Process the CSS root and find CSS variables
     root.walkDecls((decl: Declaration) => {
-      processSldsCssVars(decl, result, ruleName, severity);
+      forEachVarFn(decl, result, severity, (varName, node, fallbackValue) => {
+        // Apply fix
+        const fix = () => {
+          const varFunctionStr = valueParser.stringify(node);
+          const varNameWithFallback = `var(${varName}, ${fallbackValue})`;
+          decl.value = decl.value.replace(varFunctionStr, varNameWithFallback);
+        };
+
+        // Report the issue
+        utils.report({
+          message: messages.withRecommendation(varName, fallbackValue),
+          node: decl,
+          result,
+          ruleName,
+          severity,
+          fix
+        });
+      });
     });
   };
 };
