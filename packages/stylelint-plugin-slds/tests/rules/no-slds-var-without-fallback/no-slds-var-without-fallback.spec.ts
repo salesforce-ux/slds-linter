@@ -223,4 +223,57 @@ describe('no-slds-var-without-fallback', () => {
     expect(fixedCss.includes('var(--slds-completely-unknown-variable)')).toBeTruthy();
     expect(fixedCss.includes('var(--slds-completely-unknown-variable, ')).toBeFalsy();
   });
+
+  test('Flags nested var() functions without fallback', async () => {
+    // Nested variables
+    const css = `
+      .example {
+        color: var(--lwc-color-background, var(--slds-g-color-border-base-1));
+      }
+    `;
+
+    const result = await stylelint.lint({
+      code: css,
+      config: {
+        plugins: ['./src/index.ts'],
+        rules: {
+          [ruleName]: true,
+        },
+      },
+    });
+
+    const messages = result.results[0]?.warnings ?? [];
+    
+    // We expect a warning for the nested SLDS variable
+    expect(messages.length).toBeGreaterThan(0);
+    const warningTexts = messages.map(w => w.text);
+    console.log('Nested var warning texts:', warningTexts);
+    expect(warningTexts.some(text => text.includes('--slds-g-color-border-base-1'))).toBeTruthy();
+    expect(warningTexts.some(text => text.includes('#c9c9c9'))).toBeTruthy();
+  });
+
+  test('Applies fallback value to nested var() functions when fixing', async () => {
+    const inputCss = `
+      .example {
+        color: var(--lwc-color-background, var(--slds-g-color-border-base-1));
+      }
+    `;
+    
+    const linterResult: LinterResult = await lint({
+      code: inputCss,
+      config: {
+        plugins: ['./src/index.ts'],
+        rules: {
+          [ruleName]: true,
+        },
+      },
+      fix: true,
+    } as LinterOptions);
+
+    const fixedCss = linterResult.output;
+    
+    // Verify that the fix was applied to the nested variable
+    expect(fixedCss).toBeDefined();
+    expect(fixedCss.includes('var(--slds-g-color-border-base-1, #c9c9c9)')).toBeTruthy();
+  });
 }); 

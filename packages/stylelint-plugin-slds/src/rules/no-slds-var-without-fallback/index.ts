@@ -93,7 +93,8 @@ function forEachVarFn(
   parsedValue.walk((node) => {
     if (node.type === 'function' && node.value === 'var') {
       processVarFunction(node as valueParser.FunctionNode, callback);
-      return false; // Skip children of this node
+      // Continue walking to check for nested var() functions
+      return true;
     }
     return true;
   });
