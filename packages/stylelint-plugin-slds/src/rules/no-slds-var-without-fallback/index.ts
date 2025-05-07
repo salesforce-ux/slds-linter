@@ -34,94 +34,99 @@ function getFallbackValue(varName: string): string | null {
   return null;
 }
 
-// Helper function to process var() functions
-function forEachVarFn(
+// Check if node is a var() function
+function isVarFunction(node: valueParser.Node): boolean {
+  return (
+    node.type === "function" && 
+    node.value === "var" && 
+    node.nodes.length > 0
+  );
+}
+
+// Check if node has a fallback (second argument to var())
+function hasFallbackValue(node: valueParser.FunctionNode): boolean {
+  return node.nodes.some((arg) => arg.type === 'div' && arg.value === ',');
+}
+
+// Process SLDS variables in CSS declarations
+function processSldsCssVars(
   decl: Declaration,
   result: PostcssResult,
-  severity: RuleSeverity,
-  callback: (varName: string, node: valueParser.FunctionNode, hasFallback: boolean) => void
+  ruleName: string,
+  severity: RuleSeverity
 ) {
-  // Skip if the value doesn't contain `var(`
+  // Skip if value doesn't contain var() function
   if (!decl.value || !decl.value.includes('var(')) {
     return;
   }
 
-  // Parse the value
   const parsedValue = valueParser(decl.value);
-
-  // Walk through function nodes
+  
   parsedValue.walk((node) => {
-    if (node.type !== 'function' || node.value !== 'var') {
+    // Check if this is a var() function
+    if (!isVarFunction(node)) {
       return;
     }
 
-    // Extract the variable name from the function arguments
-    const args = node.nodes;
-    if (args.length === 0) {
-      return;
-    }
-
-    // Get the variable name (first argument)
-    const varNameNode = args[0];
+    const functionNode = node as valueParser.FunctionNode;
+    const varNameNode = functionNode.nodes[0];
+    
+    // Skip if not a text node
     if (varNameNode.type !== 'word') {
       return;
     }
 
     const varName = varNameNode.value;
-
-    // Only process SLDS variables (starting with --slds-)
+    
+    // Only process SLDS variables
     if (!varName.startsWith('--slds-')) {
       return;
     }
 
-    // Check if the variable already has a fallback
-    const hasFallback = args.some((arg) => arg.type === 'div' && arg.value === ',');
+    // Check if variable already has a fallback
+    if (hasFallbackValue(functionNode)) {
+      return;
+    }
 
-    callback(varName, node, hasFallback);
+    // Get an appropriate fallback value
+    const fallbackValue = getFallbackValue(varName);
+    
+    // Only add fix if we have a fallback value
+    let fix = undefined;
+    if (fallbackValue) {
+      fix = () => {
+        // Simple string replacement approach
+        const varFunctionStr = valueParser.stringify(node);
+        const varNameWithFallback = `var(${varName}, ${fallbackValue})`;
+        decl.value = decl.value.replace(varFunctionStr, varNameWithFallback);
+      };
+    }
+
+    // Report the issue with appropriate message
+    let message;
+    if (fallbackValue) {
+      message = messages.withRecommendation(varName, fallbackValue);
+    } else {
+      message = messages.withoutRecommendation(varName);
+    }
+
+    // Report the issue
+    utils.report({
+      message,
+      node: decl,
+      result,
+      ruleName,
+      severity,
+      fix
+    });
   });
-
-  return parsedValue;
 }
 
 const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     // Process the CSS root and find CSS variables
     root.walkDecls((decl: Declaration) => {
-      forEachVarFn(decl, result, severity, (varName, node, hasFallback) => {
-        if (!hasFallback) {
-          // Get an appropriate fallback value
-          const fallbackValue = getFallbackValue(varName);
-          
-          // Only add fix if we have a fallback value
-          let fix = undefined;
-          if (fallbackValue) {
-            fix = () => {
-              // Simple string replacement approach
-              const varFunctionStr = valueParser.stringify(node);
-              const varNameWithFallback = `var(${varName}, ${fallbackValue})`;
-              decl.value = decl.value.replace(varFunctionStr, varNameWithFallback);
-            };
-          }
-
-          // Report the issue with appropriate message
-          let message;
-          if (fallbackValue) {
-            message = messages.withRecommendation(varName, fallbackValue);
-          } else {
-            message = messages.withoutRecommendation(varName);
-          }
-
-          // Report the issue
-          utils.report({
-            message,
-            node: decl,
-            result,
-            ruleName,
-            severity,
-            fix
-          });
-        }
-      });
+      processSldsCssVars(decl, result, ruleName, severity);
     });
   };
 };
