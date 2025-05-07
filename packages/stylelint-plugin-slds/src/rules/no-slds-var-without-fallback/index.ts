@@ -96,10 +96,10 @@ function ruleFunction(primaryOptions: boolean, { severity = severityLevel as Rul
           let fix = undefined;
           if (fallbackValue) {
             fix = () => {
-              node.nodes.push(
-                { type: 'div', value: ',', sourceIndex: 0, sourceEndIndex: 1, before: '', after: ' ' } as valueParser.DivNode,
-                { type: 'word', value: fallbackValue, sourceIndex: 0, sourceEndIndex: fallbackValue.length } as valueParser.WordNode
-              );
+              // Simple string replacement approach
+              const varFunctionStr = valueParser.stringify(node);
+              const varNameWithFallback = `var(${varName}, ${fallbackValue})`;
+              decl.value = decl.value.replace(varFunctionStr, varNameWithFallback);
             };
           }
 
@@ -123,10 +123,7 @@ function ruleFunction(primaryOptions: boolean, { severity = severityLevel as Rul
         }
       });
 
-      // Update the declaration value if changes were made
-      if (parsedValue) {
-        decl.value = parsedValue.toString();
-      }
+      // No need to update the declaration value here, as we directly modify it in the fix function
     });
   };
 }
