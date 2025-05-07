@@ -10,8 +10,7 @@ const { utils, createPlugin }: typeof stylelint = stylelint;
 const ruleName: string = 'slds/no-slds-var-without-fallback';
 
 // Access the slds1ExcludedVars property from metadata
-// Type assertion needed until the metadata interface is updated to include this property
-const sldsVariables = (metadata as any).slds1ExcludedVars || {};
+const sldsVariables = metadata.slds1ExcludedVars || {};
 
 const { severityLevel = 'error', warningMsg = 'var({{cssVar}}) must include a fallback value. Suggested: var({{cssVar}}, {{recommendation}})' } = ruleMetadata(ruleName) || {};
 
