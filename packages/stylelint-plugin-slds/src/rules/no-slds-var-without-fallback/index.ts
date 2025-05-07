@@ -39,7 +39,6 @@ function forEachVarFn(
   decl: Declaration,
   result: PostcssResult,
   severity: RuleSeverity,
-  fix: boolean,
   callback: (varName: string, node: valueParser.FunctionNode, hasFallback: boolean) => void
 ) {
   // Skip if the value doesn't contain `var(`
@@ -84,34 +83,25 @@ function forEachVarFn(
   return parsedValue;
 }
 
-function ruleFunction(primary: boolean, { severity = severityLevel as RuleSeverity } = {}) {
+function ruleFunction(primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) {
   return (root: Root, result: PostcssResult) => {
-    // Early exit if the rule is not enabled
-    if (!primary) {
-      return;
-    }
-
     // Process the CSS root and find CSS variables
     root.walkDecls((decl: Declaration) => {
-      const parsedValue = forEachVarFn(decl, result, severity, !!primary, (varName, node, hasFallback) => {
+      const parsedValue = forEachVarFn(decl, result, severity, (varName, node, hasFallback) => {
         if (!hasFallback) {
           // Get an appropriate fallback value
           const fallbackValue = getFallbackValue(varName);
           
-          // Return early if no match is found in the metadata
-          if (!fallbackValue && !primary) {
-            return;
-          }
-
-          const fix = primary ? () => {
-            // Add the fallback value, but only if we have a match in the metadata
-            if (fallbackValue) {
+          // Only add fix if we have a fallback value
+          let fix = undefined;
+          if (fallbackValue) {
+            fix = () => {
               node.nodes.push(
                 { type: 'div', value: ',', sourceIndex: 0, sourceEndIndex: 1, before: '', after: ' ' } as valueParser.DivNode,
                 { type: 'word', value: fallbackValue, sourceIndex: 0, sourceEndIndex: fallbackValue.length } as valueParser.WordNode
               );
-            }
-          } : undefined;
+            };
+          }
 
           // Report the issue with appropriate message
           let message;
