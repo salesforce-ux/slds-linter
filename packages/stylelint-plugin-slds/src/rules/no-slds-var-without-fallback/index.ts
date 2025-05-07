@@ -145,8 +145,7 @@ ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
 ruleFunction.meta = {
   url: '',
-  fixable: true,
-  documentation: 'https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.create_components_css_custom_properties'
+  fixable: true
 };
 
 export default createPlugin(ruleName, ruleFunction as unknown as Rule); 
