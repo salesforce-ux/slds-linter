@@ -18,6 +18,12 @@ const {
   errorMsg = '' 
 } = ruleMetadata(ruleName) || {};
 
+// Create formatted message object
+const messages = utils.ruleMessages(ruleName, {
+  expected: (cssVar: string, recommendation: string) =>
+    replacePlaceholders(errorMsg, { cssVar, recommendation }),
+});
+
 // Find a fallback value based on the CSS variable name
 function getFallbackValue(varName: string): string | null {
   return sldsVariables[varName] || null;
@@ -112,10 +118,7 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
       forEachVarFn(decl, result, severity, (varName, node, fallbackValue) => {
         // Report the issue
         utils.report({
-          message: replacePlaceholders(errorMsg, {
-            cssVar: varName,
-            recommendation: fallbackValue
-          }),
+          message: messages.expected(varName, fallbackValue),
           node: decl,
           result,
           ruleName,
@@ -128,6 +131,7 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
 };
 
 ruleFunction.ruleName = ruleName;
+ruleFunction.messages = messages;
 ruleFunction.meta = {
   url: '',
   fixable: true
