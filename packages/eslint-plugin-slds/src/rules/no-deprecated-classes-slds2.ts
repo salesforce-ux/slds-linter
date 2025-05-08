@@ -1,5 +1,6 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
+import { formatMessageWithSuggestions } from '../../../shared-utils/src/message-formatter';
 const deprecatedClasses = metadata.deprecatedClasses;
 
 export = {
@@ -47,7 +48,10 @@ export = {
               data: {
                 className,
               },
-              message: JSON.stringify({message:"The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information.", suggestions:[]}),
+              message: formatMessageWithSuggestions(
+                "The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information.",
+                []
+              ),
             });
           }
         });

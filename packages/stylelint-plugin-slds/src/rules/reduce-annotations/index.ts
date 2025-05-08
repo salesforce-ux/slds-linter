@@ -1,6 +1,7 @@
 import { Root, Comment } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
+import { formatMessageWithSuggestions } from '../../../../shared-utils/src';
 
 const { utils, createPlugin } = stylelint;
 const ruleName = 'slds/reduce-annotations';
@@ -19,7 +20,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
     root.walkComments((comment) => {
       if (annotationList.some(annotation => comment.text.trim().includes(annotation))) {
         utils.report({
-          message:  JSON.stringify({message: warningMsg, suggestions:[]}),
+          message: formatMessageWithSuggestions(warningMsg, []),
           node: comment,
           result,
           ruleName,

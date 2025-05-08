@@ -103,7 +103,7 @@ describe('no-hardcoded-values-slds1', () => {
       `,
       //expectedMessage: null, // No warning expected
       expectedMessage:
-        'There’s no replacement styling hook for the 20px static value. Remove the static value.',
+        'There’s no replacement styling hook for the 20px static value. Remove the static value. (slds/no-hardcoded-values-slds1)',
     },
   ];
 
@@ -124,7 +124,7 @@ describe('no-hardcoded-values-slds1', () => {
         } as LinterOptions);
 
         const messages = linterResult.results[0].warnings.map(
-          (warning) => JSON.parse(warning.text).message
+          (warning) => warning.text
         );
         if (expectedMessage) {
           expect(messages[0]).toMatch(expectedMessage);

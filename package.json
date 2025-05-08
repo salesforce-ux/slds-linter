@@ -6,7 +6,8 @@
   "workspaces": [
     "packages/eslint-plugin-slds",
     "packages/stylelint-plugin-slds",
-    "packages/cli"
+    "packages/cli",
+    "packages/shared-utils"
   ],
   "packageManager": "yarn@1.22.22",
   "engines": {
