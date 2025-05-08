@@ -1,5 +1,6 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
+import { formatMessageWithSuggestions } from '../../../shared-utils/src';
 const bemMapping = metadata.bemNaming;
 const deprecatedClasses = metadata.deprecatedClasses;
 
@@ -72,7 +73,10 @@ export = {
                 actual: className,
                 newValue
               },
-              message: JSON.stringify({message: "{{actual}} has been retired. Update it to the new name {{newValue}}.", suggestions:[newValue]}),
+              message: formatMessageWithSuggestions(
+                "{{actual}} has been retired. Update it to the new name {{newValue}}.",
+                [newValue]
+              ),
               fix(fixer) {
                 if (newValue) {
                   const newClassValue = classAttr.value.value.replace(

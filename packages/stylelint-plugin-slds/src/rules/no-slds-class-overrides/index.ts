@@ -5,6 +5,7 @@ import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import { getClassNodesFromSelector } from '../../utils/selector-utils';
 import replacePlaceholders from '../../utils/util';
+import { formatMessageWithSuggestions } from '../../../../shared-utils/src';
 const { utils, createPlugin }: typeof stylelint = stylelint;
 const sldsClasses = metadata.sldsClasses;
 
@@ -35,9 +36,12 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
             const index = offsetIndex + classNode.sourceIndex + 1; // find selector in rule plus '.'
             const endIndex = index + classNode.value.length;
             utils.report({
-              message: JSON.stringify({message:replacePlaceholders(warningMsg, {
-                selector: `.${classNode.value}`
-              }), suggestions:[]}),
+              message: formatMessageWithSuggestions(
+                replacePlaceholders(warningMsg, {
+                  selector: `.${classNode.value}`
+                }),
+                []
+              ),
               node: rule,
               result,
               ruleName,

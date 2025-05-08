@@ -78,7 +78,7 @@ describe('slds/enforce-sds-to-slds-hooks', () => {
 
         // Verify the reported messages
         const reportedMessages = lintResult?._postcssResult?.messages.map(
-          (message) => JSON.parse(message.text).message
+          (message) => message.text
         )||[];
         if (expectedMessage) {
           expect(expectedMessage).toMatch(reportedMessages[0]||'');

@@ -2,6 +2,7 @@ import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { formatMessageWithSuggestions } from '../../../../shared-utils/src';
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
@@ -23,7 +24,10 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
         const index = decl.toString().indexOf(decl.prop);
         const endIndex = index + decl.prop.length;
         stylelint.utils.report({
-          message: JSON.stringify({message:messages.expected(decl.prop), suggestions:[decl.prop.replace("--_slds-", "--slds-")]}),
+          message: formatMessageWithSuggestions(
+            messages.expected(decl.prop),
+            [decl.prop.replace("--_slds-", "--slds-")]
+          ),
           node: decl,
           index,
           endIndex,

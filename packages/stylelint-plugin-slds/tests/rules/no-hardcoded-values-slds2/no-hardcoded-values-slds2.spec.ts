@@ -188,7 +188,7 @@ describe('no-hardcoded-values-slds2', () => {
       } as LinterOptions);
 
       const messages = linterResult.results[0].warnings.map(
-        (warning) => JSON.parse(warning.text).message
+        (warning) => warning.text
       );
 
       if (expectedMessage) {

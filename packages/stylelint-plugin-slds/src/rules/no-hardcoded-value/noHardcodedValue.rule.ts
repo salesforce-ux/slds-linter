@@ -9,6 +9,7 @@ import {
 import generateSuggestionsList from '../../utils/generateSuggestionsList';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { formatMessageWithSuggestions } from '../../../../shared-utils/src';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 const { utils, createPlugin } = stylelint;
 
@@ -192,19 +193,19 @@ function reportMatchingHooks(
 
   if (suggestions.length > 0) {
     utils.report(<stylelint.Problem>{
-      message: JSON.stringify({
-        message: messages.rejected(value, generateSuggestionsList(suggestions)),
-        suggestions,
-      }),
+      message: formatMessageWithSuggestions(
+        messages.rejected(value, generateSuggestionsList(suggestions)),
+        suggestions
+      ),
       ...reportProps,
       fix: suggestions.length === 1 ? fix : null,
     });
   } else {
     utils.report(<stylelint.Problem>{
-      message: JSON.stringify({
-        message: messages.suggested(value),
-        suggestions: [],
-      }),
+      message: formatMessageWithSuggestions(
+        messages.suggested(value),
+        []
+      ),
       ...reportProps,
     });
   }
