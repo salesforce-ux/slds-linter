@@ -65,13 +65,20 @@ async function getPRsFromCommits(commits) {
 async function ensureLabelsExist(labels) {
   for (const label of labels) {
     try {
-      // Check if label exists
-      execSync(`gh label view "${label}"`, { stdio: 'ignore' });
+      // Check if label exists by listing all labels and filtering
+      const existingLabels = execSync('gh label list --json name')
+        .toString()
+        .trim();
+      const labelExists = JSON.parse(existingLabels).some(l => l.name === label);
+      
+      if (!labelExists) {
+        // Label doesn't exist, create it
+        const color = label === "released" ? "0E8A16" : "0366D6"; // Green for released, blue for version
+        execSync(`gh label create "${label}" --color "${color}" --description "PR included in ${label}"`);
+        console.log(chalk.green(`Created label: ${label}`));
+      }
     } catch (error) {
-      // Label doesn't exist, create it
-      const color = label === "released" ? "0E8A16" : "0366D6"; // Green for released, blue for version
-      execSync(`gh label create "${label}" --color "${color}" --description "PR included in ${label}"`);
-      console.log(chalk.green(`Created label: ${label}`));
+      console.error(chalk.red(`Error checking/creating label "${label}":`), error.message);
     }
   }
 }
