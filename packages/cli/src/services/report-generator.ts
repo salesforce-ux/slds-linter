@@ -1,14 +1,13 @@
 import path from 'path';
 import fs, { writeFile } from 'fs/promises';
 import { mkConfig, generateCsv, asString } from 'export-to-csv';
-import { Logger } from '../utils/logger';
-import { LintResult } from '../types';
+import { LintResult, LintResultEntry, SarifResultEntry } from '../types';
 import { SarifBuilder, SarifRunBuilder, SarifResultBuilder, SarifRuleBuilder } from 'node-sarif-builder';
 import { createWriteStream } from 'fs';
 import { JsonStreamStringify } from 'json-stream-stringify';
 import {getRuleDescription} from "./config.resolver";
-import { parseText, replaceNamespaceinRules } from '../utils/lintResultsUtil';
-
+import { parseText, replaceNamespaceinRules, transformedResults } from '../utils/lintResultsUtil';
+import { processArtifacts } from './artifact-processor';
 
 export interface ReportOptions {
   outputPath: string;
@@ -25,11 +24,24 @@ export class ReportGenerator {
     options: ReportOptions
   ): Promise<void> {
       const builder = new SarifBuilder();
-      const runBuilder = new SarifRunBuilder().initSimple({
+      const runBuilder = new SarifRunBuilder({
+        defaultSourceLanguage: 'html'
+      }).initSimple({
         toolDriverName: options.toolName,
         toolDriverVersion: options.toolVersion,
         url: 'https://github.com/salesforce-ux/slds-linter'
       });
+
+      runBuilder.run.properties = {
+        id: Number(Math.random().toString(10).substring(2, 10)),
+        version: options.toolVersion,
+        submissionDate: new Date().toISOString().split('T')[0],
+        language: 'html',
+        status: 'accepted',
+        type: 'source code'
+      };
+
+      runBuilder.run.tool.driver.organization = "Salesforce";
 
       // Add rules
       const rules = this.extractRules(results);
@@ -51,6 +63,11 @@ export class ReportGenerator {
 
       // Generate the report
       const sarifReport = builder.buildSarifOutput();
+
+      // Process artifacts and add file content properties
+      for (const run of sarifReport.runs) {
+        await processArtifacts(run.artifacts);
+      }
       
       // Ensure output directory exists
       const outputDir = path.dirname(options.outputPath);
@@ -118,36 +135,15 @@ export class ReportGenerator {
     runBuilder: SarifRunBuilder,
     lintResult: LintResult
   ): void {
-    // Add errors
-    for (const error of lintResult.errors) {
-
-      const resultBuilder = new SarifResultBuilder().initSimple({
-        ruleId: replaceNamespaceinRules(error.ruleId),
-        level: 'error',
-        messageText: parseText(error.message),
-        fileUri: path.relative(process.cwd(), lintResult.filePath),
-        startLine: error.line,
-        startColumn: error.column,
-        endLine: error.line,
-        endColumn: error.endColumn
-      });
+    lintResult.errors.forEach(error => {
+      const resultBuilder = new SarifResultBuilder().initSimple(transformedResults(lintResult, error, 'error'));
       runBuilder.addResult(resultBuilder);
-    }
+    });
 
-    // Add warnings
-    for (const warning of lintResult.warnings) {
-      const resultBuilder = new SarifResultBuilder().initSimple({
-        ruleId: replaceNamespaceinRules(warning.ruleId),
-        level: 'warning',
-        messageText: parseText(warning.message),
-        fileUri: path.relative(process.cwd(), lintResult.filePath),
-        startLine: warning.line,
-        startColumn: warning.column,
-        endLine: warning.line,
-        endColumn: warning.endColumn
-      });
+    lintResult.warnings.forEach(warning => {
+      const resultBuilder = new SarifResultBuilder().initSimple(transformedResults(lintResult, warning, 'warning'));
       runBuilder.addResult(resultBuilder);
-    }
+    });
   }
 }
 
