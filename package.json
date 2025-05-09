@@ -20,7 +20,8 @@
     "release": "node scripts/release.js",
     "coverage": "yarn test --coverage && yarn gen:coverage-summary",
     "gen:coverage-summary":"node scripts/consolidate-coverage.js",
-    "validate-sarif": "node scripts/validate-sarif.js"
+    "gen:sarif": "node ./packages/cli/build/index.js report \"demo/**\"",
+    "validate:sarif": "yarn gen:sarif && node scripts/validate-sarif.js"
   },
   "devDependencies": {
     "@types/eslint": "^8.0.0",

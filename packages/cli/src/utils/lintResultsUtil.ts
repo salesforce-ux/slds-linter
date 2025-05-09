@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import path from 'path';
 import { createClickableLineCol } from './editorLinkUtil';
 import { Logger } from '../utils/logger';
-import { LintResult } from '../types';
+import { LintResult, LintResultEntry, SarifResultEntry } from '../types';
 
 /**
  * 
@@ -22,15 +22,17 @@ export function replaceNamespaceinRules(id: string) {
  * @returns The parsed message or the original string if parsing fails.
  */
 export function parseText(text: string): string {
+  let safeText = text;
   try {
     // Try to parse the text as JSON
     const parsed = JSON.parse(text);
     // If successful, return the message property or the whole object if no message
-    return parsed.message || JSON.stringify(parsed);
+    safeText = parsed.message || JSON.stringify(parsed);
   } catch (error) {
     // If JSON parsing fails, return the original string
-    return text;
+    safeText = text;
   }
+  return safeText.endsWith('.') ? safeText : `${safeText}.`;
 }
 
 /**
@@ -76,4 +78,17 @@ export function printLintResults(results: LintResult[], editor: string): void {
       });
     }
   });
+}
+
+export function transformedResults(lintResult: LintResult, entry: LintResultEntry, level: 'error' | 'warning'): SarifResultEntry {
+  return {
+    ruleId: replaceNamespaceinRules(entry.ruleId),
+    level,
+    messageText: parseText(entry.message),
+    fileUri: path.relative(process.cwd(), lintResult.filePath),
+    startLine: entry.line,
+    startColumn: entry.column,
+    endLine: entry.line,
+    endColumn: entry.endColumn
+  }
 }
