@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/slds-linter",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "SLDS Linter CLI tool for linting styles and components",
   "keywords": [
     "lightning design system linter",
@@ -12,9 +12,14 @@
   "author": "UXF Tooling Team",
   "type": "module",
   "main": "build/index.js",
+  "exports": {
+    ".": "./build/index.js",
+    "./executor": "./build/executor/index.js"
+  },
   "files": [
     "build/**",
-    "README.md"
+    "README.md",
+    "examples/**"
   ],
   "bin": {
     "slds-linter": "./build/index.js"
