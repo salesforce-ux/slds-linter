@@ -25,7 +25,7 @@ We created several tests to verify the API functionality:
 ### Basic Linting
 
 ```javascript
-import { sldsExecutor } from '../packages/cli/build/executor/index.js';
+import { sldsExecutor } from '../../build/executor/index.js';
 
 // Lint specific files
 const results = await sldsExecutor.lint({
@@ -39,7 +39,7 @@ console.log(`Found ${results.length} files with issues`);
 ### Generating Reports
 
 ```javascript
-import { sldsExecutor } from '../packages/cli/build/executor/index.js';
+import { sldsExecutor } from '../../build/executor/index.js';
 
 // Lint files
 const results = await sldsExecutor.lint({

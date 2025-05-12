@@ -1,7 +1,8 @@
 // Comprehensive test for SLDS Linter Node API
 console.log('Starting comprehensive API test...');
 
-import('../packages/cli/build/executor/index.js')
+// Updated import path for the new location
+import('../../build/executor/index.js')
   .then(async module => {
     try {
       console.log('Module imported successfully');

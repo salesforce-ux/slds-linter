@@ -1,7 +1,8 @@
 // Simplest test for SLDS Linter Node API
 console.log('Starting test script');
 
-import('../packages/cli/build/executor/index.js')
+// Updated import path for the new location
+import('../../build/executor/index.js')
   .then(module => {
     console.log('Module imported successfully');
     console.log('sldsExecutor available:', !!module.sldsExecutor);

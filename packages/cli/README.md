@@ -4,7 +4,7 @@
 
 SLDS Linter provides custom linting rules built for Salesforce Lightning Design System 2 (SLDS 2 beta). Lint your components against SLDS 2 best practices to ensure they adhere to the latest styling standards. 
 
-SLDS Linter checks your Aura and Lightning web components’ CSS and markup files to identify styling issues that you can fix for SLDS 2 compatibility. SLDS Linter helps you maintain consistent styling and identify common issues with custom Lightning components.
+SLDS Linter checks your Aura and Lightning web components' CSS and markup files to identify styling issues that you can fix for SLDS 2 compatibility. SLDS Linter helps you maintain consistent styling and identify common issues with custom Lightning components.
 
 ## Features
 
@@ -78,7 +78,7 @@ In your project root directory, follow these steps.
 
 ### Troubleshoot SARIF Viewer Navigation
 
-If the SARIF viewer doesn’t automatically go to the line of code when you click on an error or warning, follow these steps.
+If the SARIF viewer doesn't automatically go to the line of code when you click on an error or warning, follow these steps.
 
 1. In the SARIF viewer pop-up window, click Locate.
 2. In the file explorer or code editor, locate the file.
@@ -169,17 +169,9 @@ npx @salesforce-ux/slds-linter lint "**/*.{html,cmp}"
 
 For any questions or issues, open an issue in this repository.
 
-## Using SLDS Linter as a Node.js API
+## Node.js API
 
-Starting from version 0.2.0, SLDS Linter can be used as a Node.js API in your projects.
-
-### Requirements
-
-- Node.js 18.x or higher (Node.js 20.x is recommended)
-- ESM module compatibility
-  - Your package.json should have `"type": "module"`, or
-  - Use `.mjs` file extensions, or
-  - Use proper import/export syntax
+Starting with version 0.2.0, the SLDS Linter can be used programmatically in Node.js applications. This allows you to integrate the linter directly into your build process or other tools.
 
 ### Installation
 
@@ -187,115 +179,62 @@ Starting from version 0.2.0, SLDS Linter can be used as a Node.js API in your pr
 npm install @salesforce-ux/slds-linter
 ```
 
-### API Usage
-
-The SLDS Linter API provides two main methods: `lint` and `report`.
-
-#### Lint Method
-
-The `lint` method performs linting on files or directories and returns the results as a JSON object.
+### Usage
 
 ```javascript
-import { sldsExecutor } from "@salesforce-ux/slds-linter/executor";
+import { sldsExecutor } from '@salesforce-ux/slds-linter/executor';
 
-try {
-  const results = await sldsExecutor.lint({
-    // Directory to scan (defaults to current directory if not specified)
-    directory: "./src",
-    
-    // Specific files to lint (optional, takes precedence over directory)
-    files: [
-      "src/components/button/button.js",
-      "src/components/button/button.scss",
-      "src/components/button/button.html"
-    ],
-    
-    // Automatically fix problems (optional, defaults to false)
-    fix: true,
-    
-    // Custom stylelint configuration path (optional)
-    configStylelint: "./custom-stylelint.config.js",
-    
-    // Custom eslint configuration path (optional)
-    configEslint: "./custom-eslint.config.js"
-  });
-  
-  console.log(`Found ${results.length} files with issues`);
-  
-  // Process results
-  for (const result of results) {
-    console.log(`File: ${result.filePath}`);
-    console.log(`Errors: ${result.errors.length}`);
-    console.log(`Warnings: ${result.warnings.length}`);
-  }
-} catch (error) {
-  console.error('Linting failed:', error);
-}
+// Lint files in a directory
+const results = await sldsExecutor.lint({
+  directory: './src',
+  fix: false // Set to true to auto-fix issues where possible
+});
+
+console.log(`Found ${results.length} files with issues`);
+
+// Generate a report
+const reportStream = await sldsExecutor.report({
+  issues: results,  // Pass the lint results
+  format: 'json'    // 'json' or 'sarif'
+});
+
+// Process the report stream
+let reportData = '';
+reportStream.on('data', chunk => {
+  reportData += chunk;
+});
+
+reportStream.on('end', () => {
+  console.log('Report:', reportData);
+});
 ```
 
-#### Report Method
+### API Reference
 
-The `report` method generates a report from linting results and returns it as a stream.
+The Node.js API provides the following methods:
 
-```javascript
-import { sldsExecutor } from "@salesforce-ux/slds-linter/executor";
-import fs from 'fs';
+#### `sldsExecutor.lint(options)`
 
-try {
-  // The report method returns a readable stream
-  const reportStream = await sldsExecutor.report({
-    directory: "./src",
-    
-    // Optional: specific files to lint
-    files: [
-      "src/components/button/button.js",
-      "src/components/button/button.scss",
-      "src/components/button/button.html"
-    ],
-    
-    // Format: 'json' (default), 'sarif', or 'csv'
-    format: "sarif",
-    
-    // Custom configuration paths (optional)
-    configStylelint: "./custom-stylelint.config.js",
-    configEslint: "./custom-eslint.config.js"
-  });
-  
-  // Example: Save the report to a file
-  const writeStream = fs.createWriteStream('slds-lint-report.sarif');
-  
-  reportStream.pipe(writeStream);
-  
-  reportStream.on('end', () => {
-    console.log('Report generation completed');
-  });
-  
-  reportStream.on('error', (error) => {
-    console.error('Report generation failed:', error);
-  });
-} catch (error) {
-  console.error('Report generation failed:', error);
-}
-```
+Lints files for SLDS compliance.
 
-### API Interface
+**Options:**
+- `directory`: Path to directory to scan for files to lint
+- `files`: Array of specific file paths to lint
+- `fix`: Boolean indicating whether to automatically fix issues when possible
 
-#### Lint Config Options
+**Returns:** Promise resolving to an array of result objects containing linting issues
 
-| Option | Type | Description |
-|--------|------|-------------|
-| directory | string | Target directory to scan (defaults to current directory) |
-| files | string[] | Specific files to lint (takes precedence over directory) |
-| fix | boolean | Automatically fix problems (defaults to false) |
-| configStylelint | string | Path to custom stylelint config file |
-| configEslint | string | Path to custom eslint config file |
+#### `sldsExecutor.report(options)`
 
-#### Report Config Options
+Generates a report of linting issues.
 
-| Option | Type | Description |
-|--------|------|-------------|
-| directory | string | Target directory to scan (defaults to current directory) |
-| files | string[] | Specific files to include in the report |
-| configStylelint | string | Path to custom stylelint config file |
-| configEslint | string | Path to custom eslint config file |
-| format | 'json' \| 'sarif' \| 'csv' | Output format (defaults to 'json') |
+**Options:**
+- `issues`: Array of lint results (from `lint()`)
+- `format`: Report format ('json' or 'sarif')
+
+**Returns:** A readable stream containing the report data
+
+### Examples
+
+For complete examples, see the [examples directory](./examples/).
+
