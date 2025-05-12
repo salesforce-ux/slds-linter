@@ -1,0 +1,12 @@
+.test-class {
+  /* Using incorrect SLDS colors */
+  color: red;
+  background-color: blue;
+  
+  /* Incorrect spacing */
+  padding:10px;
+  margin:  20px;
+  
+  /* Non-compliant property */
+  border-radius: 5px;
+} 
