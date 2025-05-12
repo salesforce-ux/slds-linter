@@ -17,7 +17,14 @@ import('../../build/executor/index.js')
       if (results.length > 0) {
         console.log('Issues found in test.css:');
         results[0].warnings.forEach(warning => {
-          console.log(` - Line ${warning.line}: ${warning.text}`);
+          // Parse the JSON message string
+          try {
+            const parsedMessage = JSON.parse(warning.message);
+            console.log(` - Line ${warning.line}: ${parsedMessage.message}`);
+          } catch (e) {
+            // Fallback if not JSON or parsing fails
+            console.log(` - Line ${warning.line}: ${warning.message || warning.text}`);
+          }
         });
       }
       
@@ -26,8 +33,20 @@ import('../../build/executor/index.js')
         issues: results,
         format: 'json'
       }).then(report => {
-        console.log(`Generated report with ${report.length} characters`);
-        console.log('Test completed successfully');
+        // Collect report data from the stream
+        let reportData = '';
+        
+        report.on('data', chunk => {
+          reportData += chunk.toString();
+        });
+        
+        return new Promise(resolve => {
+          report.on('end', () => {
+            console.log(`Generated report with ${reportData.length} characters`);
+            console.log('Test completed successfully');
+            resolve(reportData);
+          });
+        });
       });
     });
   })
