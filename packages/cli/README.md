@@ -238,9 +238,13 @@ Generates a report of linting issues.
 
 **Returns:** A readable stream containing the report data
 
-#### `sldsExecutor.normalizeConfig(options)`
+### Utility Functions
 
-Normalizes configuration options with default values.
+The package also provides utility functions to help with configuration:
+
+#### `normalizeConfig(options)`
+
+Normalizes configuration options with default values. Import from `@salesforce-ux/slds-linter/utils/config-utils`.
 
 **Options:** Same as the options for `lint()` or `report()`
 

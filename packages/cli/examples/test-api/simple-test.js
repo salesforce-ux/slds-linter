@@ -23,7 +23,7 @@ import('../../build/executor/index.js')
             console.log(` - Line ${warning.line}: ${parsedMessage.message}`);
           } catch (e) {
             // Fallback if not JSON or parsing fails
-            console.log(` - Line ${warning.line}: ${warning.message || warning.text}`);
+            console.log(` - Line ${warning.line}: ${warning.message}`);
           }
         });
       }

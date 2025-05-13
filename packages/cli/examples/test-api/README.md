@@ -8,7 +8,10 @@ The SLDS Linter Node API provides the following methods:
 
 - `lint(options)` - Lints files for SLDS compliance
 - `report(options)` - Generates reports in different formats
-- `normalizeConfig(options)` - Normalizes configuration options
+
+The API also leverages utility functions such as:
+
+- `normalizeConfig(options)` - Normalizes configuration options (imported from `'@salesforce-ux/slds-linter/utils/config-utils'`)
 
 ## Test Results
 
@@ -45,17 +48,35 @@ const results = await sldsExecutor.lint({
   files: ['./path/to/file.css']
 });
 
-// Generate JSON report
-const jsonReport = await sldsExecutor.report({
-  issues: results,
-  format: 'json'
-});
-
 // Generate SARIF report
 const sarifReport = await sldsExecutor.report({
   issues: results,
-  format: 'sarif'
+  format: 'sarif' // Supported formats: 'sarif', 'csv'
 });
+
+// Process the stream
+let reportData = '';
+sarifReport.on('data', chunk => {
+  reportData += chunk.toString();
+});
+
+sarifReport.on('end', () => {
+  console.log(`Generated report with ${reportData.length} characters`);
+});
+```
+
+### Using Configuration Utilities
+
+```javascript
+import { normalizeConfig } from '../../build/utils/config-utils.js';
+
+// Normalize a configuration object with defaults
+const config = normalizeConfig({
+  directory: './src',
+  fix: false
+});
+
+console.log('Normalized config:', config);
 ```
 
 ## Notes

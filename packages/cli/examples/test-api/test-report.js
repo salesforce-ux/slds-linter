@@ -19,25 +19,7 @@ async function runReportTest() {
     
     console.log(`Found ${lintResults.length} files with issues`);
     
-    // 3. Generate and test JSON report
-    console.log('\nGenerating JSON report...');
-    const jsonReportStream = await sldsExecutor.report({
-      issues: lintResults,
-      format: 'json'
-    });
-    
-    const jsonReport = await streamToString(jsonReportStream);
-    console.log(`JSON report size: ${jsonReport.length} characters`);
-    
-    // Validate JSON report
-    validateJsonReport(jsonReport);
-    
-    // Save JSON report to file
-    const jsonFilePath = path.join(process.cwd(), 'lint-report.json');
-    fs.writeFileSync(jsonFilePath, jsonReport);
-    console.log(`JSON report saved to: ${jsonFilePath}`);
-    
-    // 4. Generate and test SARIF report
+    // 3. Generate and test SARIF report
     console.log('\nGenerating SARIF report...');
     const sarifReportStream = await sldsExecutor.report({
       issues: lintResults,
@@ -79,39 +61,6 @@ function streamToString(stream) {
       reject(error);
     });
   });
-}
-
-// Validate JSON report structure
-function validateJsonReport(jsonStr) {
-  try {
-    const report = JSON.parse(jsonStr);
-    console.log('JSON report is valid');
-    
-    if (!Array.isArray(report)) {
-      throw new Error('JSON report is not an array');
-    }
-    
-    console.log(`Report contains data for ${report.length} files`);
-    
-    // If we have results, check the first file
-    if (report.length > 0) {
-      const firstFile = report[0];
-      if (!firstFile.source && !firstFile.filePath) {
-        console.warn('Warning: File source/path is missing in report');
-      }
-      
-      if (!Array.isArray(firstFile.warnings)) {
-        throw new Error('Warnings is not an array');
-      }
-      
-      console.log(`First file has ${firstFile.warnings.length} warnings`);
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('❌ JSON report validation failed:', error.message);
-    throw error;
-  }
 }
 
 // Validate SARIF report structure

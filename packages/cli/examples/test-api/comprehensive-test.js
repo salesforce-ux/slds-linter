@@ -7,9 +7,12 @@ import('../../build/executor/index.js')
     try {
       console.log('Module imported successfully');
       
-      // 1. Test normalizeConfig method
-      console.log('\n1. Testing normalizeConfig method:');
-      const config = module.sldsExecutor.normalizeConfig({
+      // Import the config utils directly for normalization
+      const { normalizeConfig } = await import('../../build/utils/config-utils.js');
+      
+      // 1. Test normalizeConfig utility function
+      console.log('\n1. Testing normalizeConfig utility:');
+      const config = normalizeConfig({
         directory: './',
         fix: false
       });
@@ -43,7 +46,7 @@ import('../../build/executor/index.js')
             const parsedMessage = JSON.parse(warning.message);
             console.log(`  ${i+1}. Line ${warning.line}, col ${warning.column}: ${parsedMessage.message}`);
           } catch (e) {
-            console.log(`  ${i+1}. Line ${warning.line}, col ${warning.column}: ${warning.message || warning.text}`);
+            console.log(`  ${i+1}. Line ${warning.line}, col ${warning.column}: ${warning.message}`);
           }
         });
         
@@ -95,7 +98,7 @@ import('../../build/executor/index.js')
         });
       });
       
-      // 5. Test direct report generation from directory
+      // 5. Testing direct report generation from directory
       console.log('\n5. Testing direct report generation from directory:');
       const directReportStream = await module.sldsExecutor.report({
         directory: './',
