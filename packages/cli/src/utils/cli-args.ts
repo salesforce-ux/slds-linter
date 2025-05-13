@@ -1,48 +1,29 @@
+// DEPRECATED: This file is kept for backward compatibility
+// New code should import from '../utils/config-utils' instead
+
+import { normalizeDirectoryPath, normalizeAndValidatePath, normalizeCliOptions as importedNormalizeCliOptions } from './config-utils';
 import { CliOptions } from "../types";
-import path from "path";
-import { accessSync } from "fs";
-import { isDynamicPattern } from "globby";
 
+/**
+ * @deprecated Use normalizeAndValidatePath from config-utils instead
+ */
 export function nomalizeAndValidatePath(inputPath?: string): string {
-  if (!inputPath) {
-    return process.cwd();
-  }
-
-  const normalizedPath = path.resolve(inputPath);
-
-  try {
-    // Check if path exists and is accessible
-    accessSync(normalizedPath);
-    return normalizedPath;
-  } catch (error) {
-    throw new Error(`Invalid path: ${inputPath}`);
-  }
+  return normalizeAndValidatePath(inputPath);
 }
 
+/**
+ * @deprecated Use normalizeDirectoryPath from config-utils instead
+ */
 export function nomalizeDirPath(inputPath?: string): string {
-  if (!inputPath) {
-    return process.cwd();
-  }
-  // return the inputPath if the glob pattern is supplied
-  if (isDynamicPattern(inputPath)) {
-    return inputPath;
-  }
-  return nomalizeAndValidatePath(inputPath);
+  return normalizeDirectoryPath(inputPath);
 }
 
+/**
+ * @deprecated Use normalizeCliOptions from config-utils instead
+ */
 export function normalizeCliOptions(
   options: CliOptions,
   defultOptions: Partial<CliOptions> = {}
 ): Required<CliOptions> {
-  return {
-    fix: false,
-    editor: "vscode",
-    configStylelint: "",
-    configEslint: "",
-    format: "sarif",
-    ...defultOptions,
-    ...options,
-    directory: nomalizeDirPath(options.directory),
-    output: nomalizeAndValidatePath(options.output),
-  };
+  return importedNormalizeCliOptions(options, defultOptions);
 }

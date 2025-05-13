@@ -3,7 +3,7 @@ import path from 'path';
 import ora from 'ora';
 import chalk from 'chalk';
 import { CliOptions } from '../types';
-import { nomalizeDirPath, normalizeCliOptions } from '../utils/cli-args';
+import { normalizeCliOptions, normalizeDirectoryPath, normalizeAndValidatePath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
 import { FileScanner } from '../services/file-scanner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
@@ -30,7 +30,7 @@ export function registerReportCommand(program: Command): void {
         });
 
         if(directory){ // If argument is passed, ignore -d, --directory option
-          normalizedOptions.directory = nomalizeDirPath(directory);
+          normalizedOptions.directory = normalizeDirectoryPath(directory);
         } else if(options.directory){
           // If  -d, --directory option is passed, prompt deprecation warning
           Logger.newLine().warning(chalk.yellow(

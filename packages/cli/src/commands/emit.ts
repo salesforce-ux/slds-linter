@@ -2,7 +2,7 @@ import { Command } from "commander";
 import chalk from "chalk";
 import { CliOptions } from "../types";
 import { Logger } from "../utils/logger";
-import { normalizeCliOptions } from "../utils/cli-args";
+import { normalizeCliOptions, normalizeAndValidatePath } from '../utils/config-utils';
 import {
   DEFAULT_ESLINT_CONFIG_PATH,
   DEFAULT_STYLELINT_CONFIG_PATH,
