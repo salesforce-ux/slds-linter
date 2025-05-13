@@ -1,86 +1,60 @@
 # SLDS Linter Node API Tests
 
-This directory contains tests for the SLDS Linter Node API.
+This directory contains simplified tests for the SLDS Linter Node API.
+
+## Files
+
+- **api-test.js**: Consolidated test file that verifies core API functionality
+- **test.css**: Sample CSS file with SLDS linting issues for testing
+
+## Running the Test
+
+```bash
+# Navigate to CLI package root
+cd ../../
+
+# Build the package
+npm run build
+
+# Run the test
+cd examples/test-api
+node api-test.js
+```
 
 ## API Overview
 
 The SLDS Linter Node API provides the following methods:
 
-- `lint(options)` - Lints files for SLDS compliance
-- `report(options)` - Generates reports in different formats
+| Method | Description |
+| ------ | ----------- |
+| `lint(options)` | Lints files for SLDS compliance |
+| `report(options)` | Generates reports in different formats |
 
-The API also leverages utility functions such as:
+The API also provides utility functions:
 
-- `normalizeConfig(options)` - Normalizes configuration options (imported from `'@salesforce-ux/slds-linter/utils/config-utils'`)
+| Function | Description |
+| -------- | ----------- |
+| `normalizeConfig(options)` | Normalizes configuration options |
 
-## Test Results
-
-We created several tests to verify the API functionality:
-
-1. **Simple Test** (`simple-test.js`): Verifies basic API functionality by linting a sample CSS file.
-2. **API Methods Test** (`api-methods-test.js`): Inspects the available methods in the API.
-3. **File List Test** (`file-list-test.js`): Tests file batching functionality.
-4. **Comprehensive Test** (`comprehensive-test.js`): Tests all API methods together.
-
-## Usage Examples
-
-### Basic Linting
+## Usage Example
 
 ```javascript
-import { sldsExecutor } from '../../build/executor/index.js';
+import { sldsExecutor } from '@salesforce-ux/slds-linter/executor';
 
-// Lint specific files
+// Lint files using glob patterns
 const results = await sldsExecutor.lint({
-  files: ['./path/to/file.css'],
-  fix: false // set to true to automatically fix issues
-});
-
-console.log(`Found ${results.length} files with issues`);
-```
-
-### Generating Reports
-
-```javascript
-import { sldsExecutor } from '../../build/executor/index.js';
-
-// Lint files
-const results = await sldsExecutor.lint({
-  files: ['./path/to/file.css']
-});
-
-// Generate SARIF report
-const sarifReport = await sldsExecutor.report({
-  issues: results,
-  format: 'sarif' // Supported formats: 'sarif', 'csv'
-});
-
-// Process the stream
-let reportData = '';
-sarifReport.on('data', chunk => {
-  reportData += chunk.toString();
-});
-
-sarifReport.on('end', () => {
-  console.log(`Generated report with ${reportData.length} characters`);
-});
-```
-
-### Using Configuration Utilities
-
-```javascript
-import { normalizeConfig } from '../../build/utils/config-utils.js';
-
-// Normalize a configuration object with defaults
-const config = normalizeConfig({
-  directory: './src',
+  directory: "components/**/*.css",
   fix: false
 });
 
-console.log('Normalized config:', config);
+// Generate a report
+const reportStream = await sldsExecutor.report({
+  issues: results,
+  format: 'sarif'
+});
+
+// Process the stream
+reportStream.pipe(fs.createWriteStream('lint-report.sarif'));
 ```
 
-## Notes
-
-- The API is implemented using ESM modules
-- When importing in CommonJS, use dynamic import: `const { sldsExecutor } = await import('...')`
-- Some fields in the results may be undefined in the current implementation 
+For more detailed examples, see the main documentation and the `api-test.js` file. 
