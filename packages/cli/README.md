@@ -171,7 +171,7 @@ For any questions or issues, open an issue in this repository.
 
 ## Node.js API
 
-Starting with version 0.2.0, the SLDS Linter can be used programmatically in Node.js applications. This allows you to integrate the linter directly into your build process or other tools.
+The SLDS Linter provides a programmatic API for Node.js applications. This allows you to integrate the linter directly into your build process or other tools without relying on the command-line interface.
 
 ### Installation
 
