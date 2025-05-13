@@ -25,12 +25,12 @@ export class ReportGenerator {
     results: LintResult[],
     options: ReportOptions
   ): Promise<void> {
-      const sarifData = await this.buildSarifReport(results, options);
-      
       // If no outputPath, we're just building the report in memory
       if (!options.outputPath) {
         return;
       }
+      
+      const sarifData = await this.buildSarifReport(results, options);
       
       // Ensure output directory exists
       const outputDir = path.dirname(options.outputPath);
@@ -206,11 +206,10 @@ export class ReportGenerator {
 
 export class CsvReportGenerator {
   /**
-   * Generate CSV report and write to file
+   * Get default CSV configuration
    */
-  static async generate(results: any[]): Promise<string> {
-    const csvConfig = mkConfig({
-      filename: 'slds-linter-report',
+  private static getDefaultCsvConfig() {
+    return mkConfig({
       fieldSeparator: ',',
       quoteStrings: true,
       decimalSeparator: '.',
@@ -218,37 +217,37 @@ export class CsvReportGenerator {
       useBom: true,
       useKeysAsHeaders: true,
     });
+  }
 
-    const csvData = this.generateCsvData(results, csvConfig);
-    const csvString = asString(csvData);
-    const csvReportPath = path.join(process.cwd(), `${csvConfig.filename}.csv`);
+  /**
+   * Generate CSV report and write to file
+   */
+  static async generate(results: any[]): Promise<string> {
+    // Generate CSV string using the shared method
+    const csvString = this.generateCsvString(results);
+    
+    // Define the output path
+    const csvReportPath = path.join(process.cwd(), 'slds-linter-report.csv');
 
+    // Write to file
     await writeFile(csvReportPath, csvString);
     return csvReportPath;
   }
   
   /**
-   * Generate CSV data in memory without writing to file
+   * Generate CSV string from lint results
    */
   static generateCsvString(results: any[]): string {
-    const csvConfig = mkConfig({
-      fieldSeparator: ',',
-      quoteStrings: true,
-      decimalSeparator: '.',
-      useTextFile: false,
-      useBom: true,
-      useKeysAsHeaders: true,
-    });
-    
-    const csvData = this.generateCsvData(results, csvConfig);
+    const csvData = this.convertResultsToCsvData(results);
     return asString(csvData);
   }
   
   /**
-   * Generate CSV data from lint results
+   * Convert lint results to CSV-compatible data format
    */
-  private static generateCsvData(results: any[], csvConfig: any): any {
+  private static convertResultsToCsvData(results: any[]): any {
     const cwd = process.cwd();
+    const csvConfig = this.getDefaultCsvConfig();
 
     const transformedResults = results.flatMap((result: { errors: any[]; filePath: string; warnings: any[]; }) =>
       [

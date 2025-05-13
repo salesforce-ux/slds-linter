@@ -9,26 +9,28 @@ export interface CliOptions {
 }
 
 /**
- * Configuration for linting operation in the Node API
- * Extends the CLI options with additional API-specific properties
+ * Common configuration options shared between linting and reporting operations
  */
-export interface LintConfig {
+export interface BaseConfig {
   directory?: string;
   files?: string[];
-  fix?: boolean;
   configStylelint?: string;
   configEslint?: string;
 }
 
 /**
- * Configuration for report generation in the Node API
- * Extends the CLI options with additional API-specific properties
+ * Configuration for linting operation in the Node API
+ * Extends the common base configuration
  */
-export interface ReportConfig {
-  directory?: string;
-  files?: string[];
-  configStylelint?: string;
-  configEslint?: string;
+export interface LintConfig extends BaseConfig {
+  fix?: boolean;
+}
+
+/**
+ * Configuration for report generation in the Node API
+ * Extends the common base configuration
+ */
+export interface ReportConfig extends BaseConfig {
   format?: 'sarif' | 'csv';
   issues?: LintResult[];
 }
