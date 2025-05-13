@@ -9,7 +9,6 @@ The SLDS Linter Node API provides the following methods:
 - `lint(options)` - Lints files for SLDS compliance
 - `report(options)` - Generates reports in different formats
 - `normalizeConfig(options)` - Normalizes configuration options
-- `batchFiles(config)` - Creates batches of files for processing
 
 ## Test Results
 
