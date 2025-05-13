@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/slds-linter",
-  "version": "0.2.0",
+  "version": "0.1.9",
   "description": "SLDS Linter CLI tool for linting styles and components",
   "keywords": [
     "lightning design system linter",
