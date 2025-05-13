@@ -3,8 +3,7 @@
  * 
  * To run this example:
  * 1. Install @salesforce-ux/slds-linter
- * 2. Save this file as node-api-example.mjs
- * 3. Run with: node node-api-example.mjs
+ * 2. Run with: node node-api-example.mjs
  */
 
 import { sldsExecutor } from '@salesforce-ux/slds-linter/executor';
@@ -24,53 +23,35 @@ async function lintDirectory() {
     console.log(`Found ${results.length} files with issues`);
     
     // Display summary of issues
-    let totalErrors = 0;
-    let totalWarnings = 0;
-    
-    for (const result of results) {
-      console.log(`\nFile: ${result.filePath}`);
-      console.log(`- Errors: ${result.errors.length}`);
-      console.log(`- Warnings: ${result.warnings.length}`);
-      
-      totalErrors += result.errors.length;
-      totalWarnings += result.warnings.length;
-    }
-    
-    console.log(`\nTotal: ${totalErrors} errors, ${totalWarnings} warnings`);
+    results.forEach(result => {
+      console.log(`File: ${path.basename(result.filePath)}`);
+      console.log(`- Errors: ${result.errors.length}, Warnings: ${result.warnings.length}`);
+    });
   } catch (error) {
     console.error('Linting failed:', error);
   }
 }
 
-// Example 2: Generate a SARIF report from linting results
+// Example 2: Generate a SARIF report
 async function generateSarifReport() {
   console.log('\n--- Example 2: Generating a SARIF report ---');
   
   try {
-    // First run linting to get results
+    // Run linting and generate report
     const lintResults = await sldsExecutor.lint({
       directory: './src'
     });
     
-    // Generate report with the lint results
     const reportStream = await sldsExecutor.report({
       issues: lintResults,
       format: 'sarif'
     });
     
-    // Save the report to a file
+    // Save report to file
     const outputPath = path.join(process.cwd(), 'slds-lint-report.sarif');
-    const writeStream = fs.createWriteStream(outputPath);
-    
-    reportStream.pipe(writeStream);
-    
-    await new Promise((resolve, reject) => {
-      writeStream.on('finish', resolve);
-      writeStream.on('error', reject);
-      reportStream.on('error', reject);
-    });
-    
-    console.log(`SARIF report saved to: ${outputPath}`);
+    reportStream.pipe(fs.createWriteStream(outputPath))
+      .on('finish', () => console.log(`SARIF report saved to: ${path.basename(outputPath)}`))
+      .on('error', err => console.error('Error saving report:', err));
   } catch (error) {
     console.error('Report generation failed:', error);
   }
@@ -81,24 +62,17 @@ async function generateCsvReport() {
   console.log('\n--- Example 3: Generating a CSV report ---');
   
   try {
+    // Generate report directly from directory
     const reportStream = await sldsExecutor.report({
       directory: './src',
       format: 'csv'
     });
     
-    // Save the report to a file
+    // Save report to file
     const outputPath = path.join(process.cwd(), 'slds-lint-report.csv');
-    const writeStream = fs.createWriteStream(outputPath);
-    
-    reportStream.pipe(writeStream);
-    
-    await new Promise((resolve, reject) => {
-      writeStream.on('finish', resolve);
-      writeStream.on('error', reject);
-      reportStream.on('error', reject);
-    });
-    
-    console.log(`CSV report saved to: ${outputPath}`);
+    reportStream.pipe(fs.createWriteStream(outputPath))
+      .on('finish', () => console.log(`CSV report saved to: ${path.basename(outputPath)}`))
+      .on('error', err => console.error('Error saving report:', err));
   } catch (error) {
     console.error('Report generation failed:', error);
   }
@@ -111,4 +85,4 @@ async function runExamples() {
   await generateCsvReport();
 }
 
-runExamples(); runExamples();
+runExamples();
