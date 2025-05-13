@@ -1,10 +1,8 @@
 /**
- * Placeholder test file for executor module
- * 
- * Proper tests will be implemented in a future update
+ * Tests for executor module functionality
  */
 
-import { SldsExecutor } from '../index';
+import { lint, report } from '../index';
 import { LintConfig, ReportConfig, LintResult } from '../../types';
 import { LintRunner } from '../../services/lint-runner';
 import { FileScanner } from '../../services/file-scanner';
@@ -42,11 +40,8 @@ jest.mock('../../services/file-scanner', () => {
 jest.mock('fs/promises');
 
 // Skip tests temporarily until TypeScript issues are resolved
-xdescribe('SldsExecutor', () => {
-  let executor: SldsExecutor;
-  
+xdescribe('Executor functions', () => {
   beforeEach(() => {
-    executor = new SldsExecutor();
     jest.clearAllMocks();
   });
   
@@ -57,7 +52,7 @@ xdescribe('SldsExecutor', () => {
         fix: true
       };
       
-      const results = await executor.lint(config);
+      const results = await lint(config);
       
       // Check FileScanner was called with correct params
       expect(FileScanner.scanFiles).toHaveBeenCalledTimes(2);
@@ -74,7 +69,7 @@ xdescribe('SldsExecutor', () => {
         files: ['file1.css', 'component1.html']
       };
       
-      await executor.lint(config);
+      await lint(config);
       
       // FileScanner should not be called when files are provided
       expect(FileScanner.scanFiles).not.toHaveBeenCalled();
@@ -91,35 +86,35 @@ xdescribe('SldsExecutor', () => {
         format: 'sarif'
       };
       
-      const stream = await executor.report(config);
+      const stream = await report(config);
       
       expect(stream).toBeInstanceOf(Readable);
     });
     
     it('should use lint results to generate a report', async () => {
-      // Create a spy on the lint method
-      const lintSpy = jest.spyOn(executor, 'lint').mockResolvedValue([mockLintResult]);
+      // Create mock module for lint function to spy on
+      const lintMock = jest.spyOn(require('../index'), 'lint').mockResolvedValue([mockLintResult]);
       
       const config: ReportConfig = {
         directory: './src',
         format: 'sarif'
       };
       
-      await executor.report(config);
+      await report(config);
       
-      expect(lintSpy).toHaveBeenCalledWith({
+      expect(lintMock).toHaveBeenCalledWith({
         directory: './src',
         configStylelint: expect.any(String),
         configEslint: expect.any(String)
       });
       
       // Restore the original implementation
-      lintSpy.mockRestore();
+      lintMock.mockRestore();
     });
   });
 });
 
-describe('SldsExecutor placeholder tests', () => {
+describe('Executor placeholder tests', () => {
   it('should be implemented in the future', () => {
     expect(true).toBe(true);
   });

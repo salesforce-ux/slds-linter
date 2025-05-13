@@ -89,6 +89,7 @@ export function normalizeCliOptions(
     configStylelint: "",
     configEslint: "",
     format: "sarif",
+    files: [],
     // Default overrides
     ...defaultOptions,
     // User-provided options (highest priority)
@@ -99,7 +100,7 @@ export function normalizeCliOptions(
   };
   
   Logger.debug(`Normalized CLI options: ${JSON.stringify(normalizedOptions, null, 2)}`);
-  return normalizedOptions;
+  return normalizedOptions as Required<CliOptions>;
 }
 
 /**

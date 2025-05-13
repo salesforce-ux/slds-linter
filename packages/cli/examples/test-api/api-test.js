@@ -15,7 +15,7 @@ console.log('Starting SLDS Linter API tests...');
 async function runTests() {
   try {
     // Import modules
-    const { sldsExecutor } = await import('../../build/executor/index.js');
+    const { lint, report } = await import('../../build/executor/index.js');
     const { normalizeConfig } = await import('../../build/utils/config-utils.js');
     console.log('✓ Modules imported successfully');
     
@@ -27,7 +27,7 @@ async function runTests() {
     console.log('✓ Config normalization works');
     
     // Test linting
-    const lintResults = await sldsExecutor.lint({
+    const lintResults = await lint({
       directory: './'
     });
     
@@ -54,8 +54,8 @@ async function runTests() {
     }
     
     // Test SARIF report generation
-    const sarifStream = await sldsExecutor.report({
-      issues: lintResults,
+    const sarifStream = await report({
+      results: lintResults,
       format: 'sarif'
     });
     
@@ -69,8 +69,8 @@ async function runTests() {
     console.log(`  Report saved to: ${path.basename(sarifFilePath)}`);
     
     // Test CSV report generation
-    const csvStream = await sldsExecutor.report({
-      issues: lintResults,
+    const csvStream = await report({
+      results: lintResults,
       format: 'csv'
     });
     

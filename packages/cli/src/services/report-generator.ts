@@ -58,7 +58,7 @@ export class ReportGenerator {
   ): Readable {
     // Create a readable stream to return the results
     const outputStream = new Readable({
-      read() {} // No-op implementation
+      read() {} // No-op implementation required for Readable stream
     });
     
     // Generate SARIF report asynchronously and push to stream
@@ -67,6 +67,7 @@ export class ReportGenerator {
         // Use JsonStreamStringify for consistent streaming approach
         const jsonStream = new JsonStreamStringify(sarifData, null, 2);
         
+        // Forward data from jsonStream to our output stream
         jsonStream.on('data', chunk => {
           outputStream.push(chunk);
         });

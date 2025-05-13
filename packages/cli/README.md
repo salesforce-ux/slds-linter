@@ -182,10 +182,10 @@ npm install @salesforce-ux/slds-linter
 ### Usage
 
 ```javascript
-import { sldsExecutor } from '@salesforce-ux/slds-linter/executor';
+import { lint, report } from '@salesforce-ux/slds-linter/executor';
 
 // Lint files in a directory
-const results = await sldsExecutor.lint({
+const results = await lint({
   directory: './src',
   fix: false // Set to true to auto-fix issues where possible
 });
@@ -193,8 +193,8 @@ const results = await sldsExecutor.lint({
 console.log(`Found ${results.length} files with issues`);
 
 // Generate a report
-const reportStream = await sldsExecutor.report({
-  issues: results,  // Pass the lint results
+const reportStream = await report({
+  results: results,  // Pass the lint results
   format: 'sarif'   // 'sarif' or 'csv'
 });
 
@@ -213,7 +213,7 @@ reportStream.on('end', () => {
 
 The Node.js API provides the following methods:
 
-#### `sldsExecutor.lint(options)`
+#### `lint(options)`
 
 Lints files for SLDS compliance.
 
@@ -225,13 +225,13 @@ Lints files for SLDS compliance.
 
 **Returns:** Promise resolving to an array of result objects containing linting issues
 
-#### `sldsExecutor.report(options)`
+#### `report(options)`
 
 Generates a report of linting issues.
 
 **Options:**
-- `issues`: Array of lint results (from `lint()`)
-- `directory`: Path to directory to scan (if `issues` is not provided)
+- `results`: Array of lint results (from `lint()`)
+- `directory`: Path to directory to scan (if `results` is not provided)
 - `format`: Report format ('sarif' or 'csv')
 - `configStylelint`: Path to custom stylelint configuration file (if `directory` is used)
 - `configEslint`: Path to custom eslint configuration file (if `directory` is used)

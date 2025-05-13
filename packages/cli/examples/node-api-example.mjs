@@ -6,7 +6,7 @@
  * 2. Run with: node node-api-example.mjs
  */
 
-import { sldsExecutor } from '@salesforce-ux/slds-linter/executor';
+import { lint, report } from '@salesforce-ux/slds-linter/executor';
 import fs from 'fs';
 import path from 'path';
 
@@ -15,7 +15,7 @@ async function lintDirectory() {
   console.log('--- Example 1: Linting files in a directory ---');
   
   try {
-    const results = await sldsExecutor.lint({
+    const results = await lint({
       directory: './src', // Directory to scan
       fix: false // Don't auto-fix issues
     });
@@ -38,12 +38,12 @@ async function generateSarifReport() {
   
   try {
     // Run linting and generate report
-    const lintResults = await sldsExecutor.lint({
+    const lintResults = await lint({
       directory: './src'
     });
     
-    const reportStream = await sldsExecutor.report({
-      issues: lintResults,
+    const reportStream = await report({
+      results: lintResults,
       format: 'sarif'
     });
     
@@ -63,7 +63,7 @@ async function generateCsvReport() {
   
   try {
     // Generate report directly from directory
-    const reportStream = await sldsExecutor.report({
+    const reportStream = await report({
       directory: './src',
       format: 'csv'
     });

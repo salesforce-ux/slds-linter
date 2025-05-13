@@ -1,21 +1,18 @@
-export interface CliOptions {
-  directory?: string;
-  output?: string;
-  fix?: boolean;  
-  configStylelint?: string; // Used for stylelint config when command is lint
-  configEslint?: string; // Used for eslint config when command is lint
-  editor?: string;
-  format?: string;
-}
-
-/**
- * Common configuration options shared between linting and reporting operations
- */
 export interface BaseConfig {
   directory?: string;
   files?: string[];
   configStylelint?: string;
   configEslint?: string;
+}
+
+/**
+ * CLI options interface extends BaseConfig for shared properties
+ */
+export interface CliOptions extends BaseConfig {
+  output?: string;
+  fix?: boolean;  
+  editor?: string;
+  format?: string;
 }
 
 /**
@@ -32,7 +29,7 @@ export interface LintConfig extends BaseConfig {
  */
 export interface ReportConfig extends BaseConfig {
   format?: 'sarif' | 'csv';
-  issues?: LintResult[];
+  results?: LintResult[];
 }
 
 export interface LintResult {
