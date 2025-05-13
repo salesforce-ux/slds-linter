@@ -11,26 +11,12 @@ import('../../build/executor/index.js')
       console.log('\n1. Testing normalizeConfig method:');
       const config = module.sldsExecutor.normalizeConfig({
         directory: './',
-        files: ['./test.css'],
         fix: false
       });
       console.log('Normalized config:', config);
       
-      // 2. Test file handling capabilities
-      console.log('\n2. Testing file handling capabilities:');
-      
-      // Note: batchFiles is a private method and not part of the public API
-      // Instead, let's demonstrate the file handling capabilities by running lint with different inputs
-      
-      // a. Test with a specific file
-      console.log('a. Testing with a specific file:');
-      const fileResults = await module.sldsExecutor.lint({
-        files: ['./test.css']
-      });
-      console.log(`Found ${fileResults.length} files with specific file input`);
-      
-      // b. Test with a directory
-      console.log('b. Testing with a directory:');
+      // 2. Test directory scanning
+      console.log('\n2. Testing directory scanning:');
       const dirResults = await module.sldsExecutor.lint({
         directory: './'
       });
@@ -38,10 +24,10 @@ import('../../build/executor/index.js')
       console.log(`Files found in directory scan:`);
       dirResults.forEach(result => console.log(` - ${result.filePath || result.source}`));
       
-      // 3. Test lint method with a specific file
-      console.log('\n3. Testing lint method with specific file:');
+      // 3. Test lint method
+      console.log('\n3. Testing lint method:');
       const lintResults = await module.sldsExecutor.lint({
-        files: ['./test.css'],
+        directory: './',
         fix: false
       });
       
@@ -68,26 +54,9 @@ import('../../build/executor/index.js')
       
       // 4. Test report method
       console.log('\n4. Testing report method:');
-      // JSON report
-      const jsonReportStream = await module.sldsExecutor.report({
-        issues: lintResults,
-        format: 'json'
-      });
-      
-      // Properly collect the stream data
-      let jsonReport = '';
-      await new Promise(resolve => {
-        jsonReportStream.on('data', chunk => {
-          jsonReport += chunk.toString();
-        });
-        
-        jsonReportStream.on('end', () => {
-          console.log(`Generated JSON report: ${jsonReport.length} characters`);
-          resolve();
-        });
-      });
       
       // SARIF report
+      console.log('a. Testing SARIF report generation:');
       const sarifReportStream = await module.sldsExecutor.report({
         issues: lintResults,
         format: 'sarif'
@@ -102,6 +71,46 @@ import('../../build/executor/index.js')
         
         sarifReportStream.on('end', () => {
           console.log(`Generated SARIF report: ${sarifReport.length} characters`);
+          resolve();
+        });
+      });
+      
+      // CSV report
+      console.log('\nb. Testing CSV report generation:');
+      const csvReportStream = await module.sldsExecutor.report({
+        issues: lintResults,
+        format: 'csv'
+      });
+      
+      // Properly collect the stream data
+      let csvReport = '';
+      await new Promise(resolve => {
+        csvReportStream.on('data', chunk => {
+          csvReport += chunk.toString();
+        });
+        
+        csvReportStream.on('end', () => {
+          console.log(`Generated CSV report: ${csvReport.length} characters`);
+          resolve();
+        });
+      });
+      
+      // 5. Test direct report generation from directory
+      console.log('\n5. Testing direct report generation from directory:');
+      const directReportStream = await module.sldsExecutor.report({
+        directory: './',
+        format: 'sarif'
+      });
+      
+      // Properly collect the stream data
+      let directReport = '';
+      await new Promise(resolve => {
+        directReportStream.on('data', chunk => {
+          directReport += chunk.toString();
+        });
+        
+        directReportStream.on('end', () => {
+          console.log(`Generated direct report: ${directReport.length} characters`);
           resolve();
         });
       });

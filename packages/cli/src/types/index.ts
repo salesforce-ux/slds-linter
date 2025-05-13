@@ -8,6 +8,31 @@ export interface CliOptions {
   format?: string;
 }
 
+/**
+ * Configuration for linting operation in the Node API
+ * Extends the CLI options with additional API-specific properties
+ */
+export interface LintConfig {
+  directory?: string;
+  files?: string[];
+  fix?: boolean;
+  configStylelint?: string;
+  configEslint?: string;
+}
+
+/**
+ * Configuration for report generation in the Node API
+ * Extends the CLI options with additional API-specific properties
+ */
+export interface ReportConfig {
+  directory?: string;
+  files?: string[];
+  configStylelint?: string;
+  configEslint?: string;
+  format?: 'sarif' | 'csv';
+  issues?: LintResult[];
+}
+
 export interface LintResult {
   filePath: string;
   errors: Array<{

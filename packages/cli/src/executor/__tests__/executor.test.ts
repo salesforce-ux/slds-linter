@@ -4,12 +4,12 @@
  * Proper tests will be implemented in a future update
  */
 
-import { SldsExecutor, LintConfig, ReportConfig } from '../index';
+import { SldsExecutor } from '../index';
+import { LintConfig, ReportConfig, LintResult } from '../../types';
 import { LintRunner } from '../../services/lint-runner';
 import { FileScanner } from '../../services/file-scanner';
 import { Readable } from 'stream';
 import { jest } from '@jest/globals';
-import { LintResult } from '../../types';
 
 // Create mock type-safe functions
 const mockLintResult: LintResult = {
@@ -88,7 +88,7 @@ xdescribe('SldsExecutor', () => {
     it('should return a readable stream', async () => {
       const config: ReportConfig = {
         directory: './src',
-        format: 'json'
+        format: 'sarif'
       };
       
       const stream = await executor.report(config);
@@ -102,7 +102,7 @@ xdescribe('SldsExecutor', () => {
       
       const config: ReportConfig = {
         directory: './src',
-        format: 'json'
+        format: 'sarif'
       };
       
       await executor.report(config);

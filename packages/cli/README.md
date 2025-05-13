@@ -195,7 +195,7 @@ console.log(`Found ${results.length} files with issues`);
 // Generate a report
 const reportStream = await sldsExecutor.report({
   issues: results,  // Pass the lint results
-  format: 'json'    // 'json' or 'sarif'
+  format: 'sarif'   // 'sarif' or 'csv'
 });
 
 // Process the report stream
@@ -219,8 +219,9 @@ Lints files for SLDS compliance.
 
 **Options:**
 - `directory`: Path to directory to scan for files to lint
-- `files`: Array of specific file paths to lint
 - `fix`: Boolean indicating whether to automatically fix issues when possible
+- `configStylelint`: Path to custom stylelint configuration file
+- `configEslint`: Path to custom eslint configuration file
 
 **Returns:** Promise resolving to an array of result objects containing linting issues
 
@@ -230,9 +231,20 @@ Generates a report of linting issues.
 
 **Options:**
 - `issues`: Array of lint results (from `lint()`)
-- `format`: Report format ('json' or 'sarif')
+- `directory`: Path to directory to scan (if `issues` is not provided)
+- `format`: Report format ('sarif' or 'csv')
+- `configStylelint`: Path to custom stylelint configuration file (if `directory` is used)
+- `configEslint`: Path to custom eslint configuration file (if `directory` is used)
 
 **Returns:** A readable stream containing the report data
+
+#### `sldsExecutor.normalizeConfig(options)`
+
+Normalizes configuration options with default values.
+
+**Options:** Same as the options for `lint()` or `report()`
+
+**Returns:** A normalized configuration object with default values applied
 
 ### Examples
 

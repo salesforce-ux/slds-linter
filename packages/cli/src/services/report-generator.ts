@@ -8,49 +8,29 @@ import { createWriteStream } from 'fs';
 import { JsonStreamStringify } from 'json-stream-stringify';
 import {getRuleDescription} from "./config.resolver";
 import { parseText, replaceNamespaceinRules } from '../utils/lintResultsUtil';
+import { Readable } from 'stream';
 
 
 export interface ReportOptions {
-  outputPath: string;
+  outputPath?: string;
   toolName: string;
   toolVersion: string;
 }
 
 export class ReportGenerator {
   /**
-   * Generate SARIF report from lint results
+   * Generate SARIF report from lint results with file output
    */
   static async generateSarifReport(
     results: LintResult[],
     options: ReportOptions
   ): Promise<void> {
-      const builder = new SarifBuilder();
-      const runBuilder = new SarifRunBuilder().initSimple({
-        toolDriverName: options.toolName,
-        toolDriverVersion: options.toolVersion,
-        url: 'https://github.com/salesforce-ux/slds-linter'
-      });
-
-      // Add rules
-      const rules = this.extractRules(results);
-      for (const rule of rules) {
-        const ruleBuilder = new SarifRuleBuilder().initSimple({
-          ruleId: replaceNamespaceinRules(rule.id),
-          shortDescriptionText: rule.shortDescription?.text,
-        });
-        runBuilder.addRule(ruleBuilder);
+      const sarifData = await this.buildSarifReport(results, options);
+      
+      // If no outputPath, we're just building the report in memory
+      if (!options.outputPath) {
+        return;
       }
-
-      // Add results
-      for (const result of results) {
-        this.addResultsToSarif(runBuilder, result);
-      }
-
-      // Add run to builder
-      builder.addRun(runBuilder);
-
-      // Generate the report
-      const sarifReport = builder.buildSarifOutput();
       
       // Ensure output directory exists
       const outputDir = path.dirname(options.outputPath);
@@ -58,7 +38,7 @@ export class ReportGenerator {
 
       // Use JsonStreamStringify to write large JSON efficiently
       const writeStream = createWriteStream(options.outputPath);
-      const jsonStream = new JsonStreamStringify(sarifReport, null, 2); // pretty print with 2 spaces
+      const jsonStream = new JsonStreamStringify(sarifData, null, 2); // pretty print with 2 spaces
       
       // Write the report
       await new Promise<void>((resolve, reject) => {
@@ -67,6 +47,70 @@ export class ReportGenerator {
           .on('finish', resolve)
           .on('error', reject);
       });      
+  }
+  
+  /**
+   * Generate SARIF report as a stream without creating a file
+   */
+  static generateSarifReportStream(
+    results: LintResult[],
+    options: ReportOptions
+  ): Readable {
+    // Create a readable stream to return the results
+    const outputStream = new Readable({
+      objectMode: true,
+      read() {} // No-op implementation
+    });
+    
+    // Generate SARIF report asynchronously and push to stream
+    this.buildSarifReport(results, options)
+      .then(sarifData => {
+        // Convert to JSON string
+        const jsonString = JSON.stringify(sarifData, null, 2);
+        outputStream.push(jsonString);
+        outputStream.push(null); // End of stream
+      })
+      .catch(error => {
+        outputStream.emit('error', error);
+      });
+    
+    return outputStream;
+  }
+
+  /**
+   * Build SARIF report data in memory
+   */
+  static async buildSarifReport(
+    results: LintResult[],
+    options: ReportOptions
+  ): Promise<any> {
+    const builder = new SarifBuilder();
+    const runBuilder = new SarifRunBuilder().initSimple({
+      toolDriverName: options.toolName,
+      toolDriverVersion: options.toolVersion,
+      url: 'https://github.com/salesforce-ux/slds-linter'
+    });
+
+    // Add rules
+    const rules = this.extractRules(results);
+    for (const rule of rules) {
+      const ruleBuilder = new SarifRuleBuilder().initSimple({
+        ruleId: replaceNamespaceinRules(rule.id),
+        shortDescriptionText: rule.shortDescription?.text,
+      });
+      runBuilder.addRule(ruleBuilder);
+    }
+
+    // Add results
+    for (const result of results) {
+      this.addResultsToSarif(runBuilder, result);
+    }
+
+    // Add run to builder
+    builder.addRun(runBuilder);
+
+    // Return the report data
+    return builder.buildSarifOutput();
   }
 
   /**
@@ -152,7 +196,10 @@ export class ReportGenerator {
 }
 
 export class CsvReportGenerator {
-  static async generate(results: any[]) {
+  /**
+   * Generate CSV report and write to file
+   */
+  static async generate(results: any[]): Promise<string> {
     const csvConfig = mkConfig({
       filename: 'slds-linter-report',
       fieldSeparator: ',',
@@ -163,6 +210,35 @@ export class CsvReportGenerator {
       useKeysAsHeaders: true,
     });
 
+    const csvData = this.generateCsvData(results, csvConfig);
+    const csvString = asString(csvData);
+    const csvReportPath = path.join(process.cwd(), `${csvConfig.filename}.csv`);
+
+    await writeFile(csvReportPath, csvString);
+    return csvReportPath;
+  }
+  
+  /**
+   * Generate CSV data in memory without writing to file
+   */
+  static generateCsvString(results: any[]): string {
+    const csvConfig = mkConfig({
+      fieldSeparator: ',',
+      quoteStrings: true,
+      decimalSeparator: '.',
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    });
+    
+    const csvData = this.generateCsvData(results, csvConfig);
+    return asString(csvData);
+  }
+  
+  /**
+   * Generate CSV data from lint results
+   */
+  private static generateCsvData(results: any[], csvConfig: any): any {
     const cwd = process.cwd();
 
     const transformedResults = results.flatMap((result: { errors: any[]; filePath: string; warnings: any[]; }) =>
@@ -190,12 +266,6 @@ export class CsvReportGenerator {
       ]
     );
 
-    const csvData = generateCsv(csvConfig)(transformedResults);
-    const csvString = asString(csvData);
-    const csvReportPath = path.join(cwd, `${csvConfig.filename}.csv`);
-
-    return writeFile(csvReportPath, csvString).then(() => {
-      return csvReportPath;
-    });
+    return generateCsv(csvConfig)(transformedResults);
   }
 }
