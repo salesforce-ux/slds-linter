@@ -3,7 +3,7 @@ import path from 'path';
 import ora from 'ora';
 import chalk from 'chalk';
 import { CliOptions } from '../types';
-import { normalizeCliOptions, normalizeDirectoryPath, normalizeAndValidatePath } from '../utils/config-utils';
+import { normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
 import { FileScanner } from '../services/file-scanner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';

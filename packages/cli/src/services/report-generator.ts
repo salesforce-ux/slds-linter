@@ -183,20 +183,6 @@ export class ReportGenerator {
 
 export class CsvReportGenerator {
   /**
-   * Get default CSV configuration
-   */
-  private static getDefaultCsvConfig() {
-    return mkConfig({
-      fieldSeparator: ',',
-      quoteStrings: true,
-      decimalSeparator: '.',
-      useTextFile: false,
-      useBom: true,
-      useKeysAsHeaders: true,
-    });
-  }
-
-  /**
    * Generate CSV report and write to file
    */
   static async generate(results: any[]): Promise<string> {
@@ -224,7 +210,16 @@ export class CsvReportGenerator {
    */
   private static convertResultsToCsvData(results: any[]): any {
     const cwd = process.cwd();
-    const csvConfig = this.getDefaultCsvConfig();
+    
+    // Create CSV config inline instead of using a separate method
+    const csvConfig = mkConfig({
+      fieldSeparator: ',',
+      quoteStrings: true,
+      decimalSeparator: '.',
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    });
 
     const transformedResults = results.flatMap((result: { errors: any[]; filePath: string; warnings: any[]; }) =>
       [

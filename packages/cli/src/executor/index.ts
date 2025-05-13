@@ -1,4 +1,3 @@
-import path from 'path';
 import { Readable } from 'stream';
 import { FileScanner } from '../services/file-scanner';
 import { LintRunner, LintOptions } from '../services/lint-runner';
