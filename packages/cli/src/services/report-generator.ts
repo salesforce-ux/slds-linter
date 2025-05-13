@@ -52,39 +52,15 @@ export class ReportGenerator {
   /**
    * Generate SARIF report as a stream without creating a file
    */
-  static generateSarifReportStream(
+  static async generateSarifReportStream(
     results: LintResult[],
     options: ReportOptions
-  ): Readable {
-    // Create a readable stream to return the results
-    const outputStream = new Readable({
-      read() {} // No-op implementation required for Readable stream
-    });
+  ): Promise<Readable> {
+    // Create SARIF report
+    const sarifData = await this.buildSarifReport(results, options);
     
-    // Generate SARIF report asynchronously and push to stream
-    this.buildSarifReport(results, options)
-      .then(sarifData => {
-        // Use JsonStreamStringify for consistent streaming approach
-        const jsonStream = new JsonStreamStringify(sarifData, null, 2);
-        
-        // Forward data from jsonStream to our output stream
-        jsonStream.on('data', chunk => {
-          outputStream.push(chunk);
-        });
-        
-        jsonStream.on('end', () => {
-          outputStream.push(null); // End of stream
-        });
-        
-        jsonStream.on('error', error => {
-          outputStream.emit('error', error);
-        });
-      })
-      .catch(error => {
-        outputStream.emit('error', error);
-      });
-    
-    return outputStream;
+    // Return JsonStreamStringify as a readable stream
+    return new JsonStreamStringify(sarifData, null, 2);
   }
 
   /**
