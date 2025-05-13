@@ -58,17 +58,26 @@ export class ReportGenerator {
   ): Readable {
     // Create a readable stream to return the results
     const outputStream = new Readable({
-      objectMode: true,
       read() {} // No-op implementation
     });
     
     // Generate SARIF report asynchronously and push to stream
     this.buildSarifReport(results, options)
       .then(sarifData => {
-        // Convert to JSON string
-        const jsonString = JSON.stringify(sarifData, null, 2);
-        outputStream.push(jsonString);
-        outputStream.push(null); // End of stream
+        // Use JsonStreamStringify for consistent streaming approach
+        const jsonStream = new JsonStreamStringify(sarifData, null, 2);
+        
+        jsonStream.on('data', chunk => {
+          outputStream.push(chunk);
+        });
+        
+        jsonStream.on('end', () => {
+          outputStream.push(null); // End of stream
+        });
+        
+        jsonStream.on('error', error => {
+          outputStream.emit('error', error);
+        });
       })
       .catch(error => {
         outputStream.emit('error', error);
