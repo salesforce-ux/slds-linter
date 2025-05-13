@@ -18,8 +18,7 @@
   },
   "files": [
     "build/**",
-    "README.md",
-    "examples/**"
+    "README.md"
   ],
   "bin": {
     "slds-linter": "./build/index.js"
