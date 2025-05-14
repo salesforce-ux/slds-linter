@@ -20,14 +20,12 @@
     "build/**",
     "README.md"
   ],
-  "bin": {
-    "slds-linter": "./build/index.js"
-  },
+  "bin": "./build/index.js",
   "scripts": {
     "prepublishOnly": "clean-pkg-json",
     "build": "gulp build",
     "dev": "gulp dev",
-    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest",
+    "test": "NODE_OPTIONS=\"--experimental-vm-modules\" npx jest",
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
