@@ -4,10 +4,8 @@ import { CliOptions } from '../types';
 import { printLintResults } from '../utils/lintResultsUtil';
 import { normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
-import { FileScanner } from '../services/file-scanner';
-import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
-import { LintRunner } from '../services/lint-runner';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
+import { lint } from '../executor';
 
 export function registerLintCommand(program: Command): void {
   program
@@ -41,61 +39,33 @@ export function registerLintCommand(program: Command): void {
           Logger.newLine().warning(chalk.yellow(
             `WARNING: --directory, -d option is deprecated. Supply as argument instead.
             Example: npx @salesforce-ux/slds-linter lint ${options.directory}`
-          ))
+          ));
         }
 
-        // 1) STYLE LINT
-        Logger.newLine().info(chalk.blue('Scanning style files...'));
-        const styleFileBatches = await FileScanner.scanFiles(normalizedOptions.directory, {
-          patterns: StyleFilePatterns,
-          batchSize: 100,
-        });
-        const totalStyleFiles = styleFileBatches.reduce((sum, batch) => sum + batch.length, 0);
-        Logger.info(chalk.blue(`Found ${totalStyleFiles} style file(s). Running stylelint...`));
-
-        Logger.newLine().info(chalk.blue(`Running stylelint${normalizedOptions.fix?' with autofix':''}...`));
-        const styleResults = await LintRunner.runLinting(styleFileBatches, 'style', {
+        // Use Node API to perform the linting
+        const lintResults = await lint({
+          directory: normalizedOptions.directory,
           fix: normalizedOptions.fix,
-          configPath: normalizedOptions.configStylelint,
+          configStylelint: normalizedOptions.configStylelint,
+          configEslint: normalizedOptions.configEslint
         });
 
         // Print detailed lint results only for files with issues
-        printLintResults(styleResults, normalizedOptions.editor);
+        printLintResults(lintResults, normalizedOptions.editor);
 
-        const styleErrorCount = styleResults.reduce((sum, r) => sum + r.errors.length, 0);
-        const styleWarningCount = styleResults.reduce((sum, r) => sum + r.warnings.length, 0);
-
-        // 2) COMPONENT LINT
-        Logger.newLine().info(chalk.blue('Scanning component files...'));
-        const componentFileBatches = await FileScanner.scanFiles(normalizedOptions.directory, {
-          patterns: ComponentFilePatterns,
-          batchSize: 100,
-        });
-        const totalComponentFiles = componentFileBatches.reduce((sum, batch) => sum + batch.length, 0);
-        Logger.info(chalk.blue(`Found ${totalComponentFiles} component file(s). Running eslint...\n`));
-
-        Logger.info(chalk.blue(`Running linting${normalizedOptions.fix?' with autofix':''}...`));
-        const componentResults = await LintRunner.runLinting(componentFileBatches, 'component', {
-          fix: normalizedOptions.fix,
-          configPath: normalizedOptions.configEslint,
-        });
-
-        // Print component lint issues (only for files with issues)
-        printLintResults(componentResults, normalizedOptions.editor);
-
-        const componentErrorCount = componentResults.reduce((sum, r) => sum + r.errors.length, 0);
-        const componentWarningCount = componentResults.reduce((sum, r) => sum + r.warnings.length, 0);
+        // Calculate statistics
+        const errorCount = lintResults.reduce((sum, r) => sum + r.errors.length, 0);
+        const warningCount = lintResults.reduce((sum, r) => sum + r.warnings.length, 0);
 
         // Final summary
-        const totalErrors = styleErrorCount + componentErrorCount;
-        const totalWarnings = styleWarningCount + componentWarningCount;
         Logger.info(
-          `\n${chalk.red(`${totalErrors} error${totalErrors !== 1 ? 's' : ''}`)}` +
-          `  ${chalk.yellow(`${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''}`)}`
+          `\n${chalk.red(`${errorCount} error${errorCount !== 1 ? 's' : ''}`)}` +
+          `  ${chalk.yellow(`${warningCount} warning${warningCount !== 1 ? 's' : ''}`)}`
         );
+        
         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
         Logger.success(chalk.green(`\nLinting completed in ${elapsedTime} seconds.`));
-        process.exit(totalErrors > 0 ? 1 : 0);
+        process.exit(errorCount > 0 ? 1 : 0);
       } catch (error: any) {
         Logger.error(chalk.red(`Failed to complete linting: ${error.message}`));
         process.exit(1);

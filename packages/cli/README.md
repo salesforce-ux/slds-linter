@@ -103,6 +103,7 @@ These options are available on SLDS Linter commands.
 | `--config-stylelint <path>`  | Path to stylelint config file             | `lint`, `report`|
 | `--config-eslint <path>` | Path to eslint config file                    | `lint`, `report`|
 | `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode | `lint` |
+| `--format <type>`        | Output format (sarif, csv). Defaults to sarif | `report` |
 
 To view help for these options, add `--help` to each command. For example, run `npx @salesforce-ux/slds-linter lint --help` to see which options you can use with `lint`.
 
