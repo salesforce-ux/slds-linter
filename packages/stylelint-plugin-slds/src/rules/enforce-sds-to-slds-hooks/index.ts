@@ -4,6 +4,7 @@ import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import metadata from '@salesforce-ux/sds-metadata';
+import { formatMessageWithSuggestions } from '../../../../shared-utils/src';
 const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
@@ -64,7 +65,7 @@ function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Pr
     const message = messages.replace(oldValue, suggestedMatch);
 
     utils.report(<stylelint.Problem>{
-      message: JSON.stringify({message, suggestions:[suggestedMatch]}),
+      message: formatMessageWithSuggestions(message, [suggestedMatch]),
       index: startIndex,
       endIndex,
       ...basicReportProps,
@@ -95,7 +96,7 @@ function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Pro
   const message = messages.replace(prop, suggestedMatch);
 
     utils.report(<stylelint.Problem>{
-      message: JSON.stringify({message, suggestions:[suggestedMatch]}),
+      message: formatMessageWithSuggestions(message, [suggestedMatch]),
       index: startIndex,
       endIndex,
       ...basicReportProps,

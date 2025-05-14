@@ -3,6 +3,7 @@ import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { formatMessageWithSuggestions } from '../../../../shared-utils/src';
 const { utils, createPlugin } = stylelint;
 
 const deprecatedHooks = new Set(metadata.deprecatedStylingHooks);
@@ -49,7 +50,10 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
           
         } else {*/
           utils.report({
-            message: JSON.stringify({message: messages.deprecated(parsedPropertyValue), suggestions:[]}),
+            message: formatMessageWithSuggestions(
+              messages.deprecated(parsedPropertyValue),
+              []
+            ),
             node: decl,
             index,
             endIndex,
