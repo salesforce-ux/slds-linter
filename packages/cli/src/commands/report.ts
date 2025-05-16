@@ -2,14 +2,12 @@ import { Command, Option } from 'commander';
 import path from 'path';
 import ora from 'ora';
 import chalk from 'chalk';
+import fs from 'fs';
 import { CliOptions } from '../types';
-import { nomalizeDirPath, normalizeCliOptions } from '../utils/cli-args';
+import { normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
-import { FileScanner } from '../services/file-scanner';
-import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
-import { LintRunner } from '../services/lint-runner';
-import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
-import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
+import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
+import { report, lint } from '../executor';
 
 export function registerReportCommand(program: Command): void {
   program
@@ -30,9 +28,9 @@ export function registerReportCommand(program: Command): void {
         });
 
         if(directory){ // If argument is passed, ignore -d, --directory option
-          normalizedOptions.directory = nomalizeDirPath(directory);
+          normalizedOptions.directory = normalizeDirectoryPath(directory);
         } else if(options.directory){
-          // If  -d, --directory option is passed, prompt deprecation warning
+          // If -d, --directory option is passed, prompt deprecation warning
           Logger.newLine().warning(chalk.yellow(
             `WARNING: --directory, -d option is deprecated. Supply as argument instead.
             Example: npx @salesforce-ux/slds-linter report ${options.directory}`
@@ -40,48 +38,43 @@ export function registerReportCommand(program: Command): void {
         }
         spinner.start();
         
-        // Run styles linting
-        spinner.text = 'Running styles linting...';
-        const styleFileBatches = await FileScanner.scanFiles(normalizedOptions.directory, {
-          patterns: StyleFilePatterns,
-          batchSize: 100
+        // Generate report based on format using Node API
+        const reportFormat = normalizedOptions.format?.toLowerCase() || 'sarif';
+        
+        // First run linting to get results
+        const lintResults = await lint({
+          directory: normalizedOptions.directory,
+          configStylelint: normalizedOptions.configStylelint,
+          configEslint: normalizedOptions.configEslint
         });
         
-        const styleResults = await LintRunner.runLinting(styleFileBatches, 'style', {
-          configPath: normalizedOptions.configStylelint
-        });
-
-        // Run components linting
-        spinner.text = 'Running components linting...';
-        const componentFileBatches = await FileScanner.scanFiles(normalizedOptions.directory, {
-          patterns: ComponentFilePatterns,
-          batchSize: 100
-        });
+        // Generate report using the lint results
+        const reportStream = await report({
+          format: reportFormat as 'sarif' | 'csv'
+        }, lintResults);
         
-        const componentResults = await LintRunner.runLinting(componentFileBatches, 'component', {
-          configPath: normalizedOptions.configEslint
-        });
-
-        // Generate report based on format
-        const reportFormat = options.format.toLowerCase();
-        
+        // Save the report to a file
+        let outputFilePath: string;
         if (reportFormat === 'sarif') {
-          spinner.text = 'Generating SARIF report...';
-          const combinedReportPath = path.join(normalizedOptions.output, 'slds-linter-report.sarif');
-          await ReportGenerator.generateSarifReport([...styleResults, ...componentResults], {
-            outputPath: combinedReportPath,
-            toolName: 'slds-linter',
-            toolVersion: LINTER_CLI_VERSION
-          });
-          Logger.success(`SARIF report generated: ${combinedReportPath}\n`);
+          spinner.text = 'Saving SARIF report...';
+          outputFilePath = path.join(normalizedOptions.output, 'slds-linter-report.sarif');
         } else if (reportFormat === 'csv') {
-          spinner.text = 'Generating CSV report...';
-          const csvReportPath = await CsvReportGenerator.generate([...styleResults, ...componentResults]);
-          Logger.success(`CSV report generated: ${csvReportPath}\n`);
+          spinner.text = 'Saving CSV report...';
+          outputFilePath = path.join(normalizedOptions.output, 'slds-linter-report.csv');
         } else {
           throw new Error(`Invalid format: ${reportFormat}. Supported formats: sarif, csv`);
         }
         
+        // Save stream to file
+        const writeStream = fs.createWriteStream(outputFilePath);
+        reportStream.pipe(writeStream);
+        
+        await new Promise<void>((resolve, reject) => {
+          writeStream.on('finish', resolve);
+          writeStream.on('error', reject);
+        });
+        
+        Logger.success(`${reportFormat.toUpperCase()} report generated: ${outputFilePath}\n`);
         spinner.succeed('Report generation completed');
         process.exit(0);
       } catch (error: any) {

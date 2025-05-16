@@ -1,11 +1,34 @@
-export interface CliOptions {
+export interface BaseConfig {
   directory?: string;
+  files?: string[];
+  configStylelint?: string;
+  configEslint?: string;
+}
+
+/**
+ * CLI options interface extends BaseConfig for shared properties
+ */
+export interface CliOptions extends BaseConfig {
   output?: string;
   fix?: boolean;  
-  configStylelint?: string; // Used for stylelint config when command is lint
-  configEslint?: string; // Used for eslint config when command is lint
   editor?: string;
   format?: string;
+}
+
+/**
+ * Configuration for linting operation in the Node API
+ * Extends the common base configuration
+ */
+export interface LintConfig extends BaseConfig {
+  fix?: boolean;
+}
+
+/**
+ * Configuration for report generation in the Node API
+ * Extends the common base configuration
+ */
+export interface ReportConfig extends BaseConfig {
+  format?: 'sarif' | 'csv';
 }
 
 export interface LintResultEntry {

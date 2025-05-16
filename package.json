@@ -8,22 +8,25 @@
     "packages/stylelint-plugin-slds",
     "packages/cli"
   ],
-  "packageManager": "yarn@1.22.22",
+  "packageManager": "yarn@4.2.2",
   "engines": {
     "node": ">=20.18.3"
   },
   "scripts": {
     "prepare": "husky install",
     "preinstall": "./scripts/validate-setup.sh",
-    "test": "yarn workspaces run test",
-    "build": "yarn workspaces run build",
+    "test": "yarn workspaces foreach -At run test",
+    "build": "yarn workspaces foreach -At run build",
     "release": "node scripts/release.js",
     "coverage": "yarn test --coverage && yarn gen:coverage-summary",
-    "gen:coverage-summary":"node scripts/consolidate-coverage.js",
+    "gen:coverage-summary": "node scripts/consolidate-coverage.js",
     "gen:sarif": "node ./packages/cli/build/index.js report \"demo/**\"",
     "validate:sarif": "yarn gen:sarif && node scripts/validate-sarif.js"
   },
   "devDependencies": {
+    "@inquirer/input": "^4.1.7",
+    "@inquirer/select": "^4.0.10",
+    "@listr2/prompt-adapter-inquirer": "^2.0.18",
     "@types/eslint": "^8.0.0",
     "@types/node": "^20.11.19",
     "clean-pkg-json": "^1.2.0",
@@ -36,10 +39,7 @@
     "gulp-execa": "^8.0.0",
     "husky": "^8.0.0",
     "lint-staged": "^15.3.0",
-    "listr2":"^8.2.5",
-    "@listr2/prompt-adapter-inquirer": "^2.0.18",
-    "@inquirer/input":"^4.1.7",
-    "@inquirer/select":"^4.0.10",
+    "listr2": "^8.2.5",
     "prettier": "^3.4.2",
     "prompts": "^2.4.2",
     "rimraf": "^6.0.1",
