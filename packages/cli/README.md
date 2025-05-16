@@ -195,9 +195,9 @@ console.log(`Found ${results.length} files with issues`);
 
 // Generate a report
 const reportStream = await report({
-  results: results,  // Pass the lint results
-  format: 'sarif'   // 'sarif' or 'csv'
-});
+  directory: './src',
+  format: 'sarif'
+}, results);  // Pass the lint results as second parameter
 
 // Process the report stream
 let reportData = '';
@@ -231,11 +231,14 @@ Lints files for SLDS compliance.
 Generates a report of linting issues.
 
 **Options:**
-- `results`: Array of lint results (from `lint()`)
 - `directory`: Path to directory to scan (if `results` is not provided)
 - `format`: Report format ('sarif' or 'csv')
 - `configStylelint`: Path to custom stylelint configuration file (if `directory` is used)
 - `configEslint`: Path to custom eslint configuration file (if `directory` is used)
+
+**Parameters:**
+- `options`: Configuration options as detailed above
+- `results`: Optional array of lint results (from `lint()`). If not provided, will run lint on the specified directory
 
 **Returns:** A readable stream containing the report data
 

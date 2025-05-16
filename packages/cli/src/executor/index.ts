@@ -5,7 +5,7 @@ import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patte
 import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
 import { LintResult, LintConfig, ReportConfig } from '../types';
-import { normalizeConfig } from '../utils/config-utils';
+import { normalizeCliOptions } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
 
 /**
@@ -20,7 +20,7 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     Logger.debug('Starting linting with Node API');
     
     // Normalize configuration to ensure all required fields have values
-    const normalizedConfig = normalizeConfig(config);
+    const normalizedConfig = normalizeCliOptions(config, {}, true);
     
     // Scan directory for style files (CSS, SCSS, etc.)
     const styleFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
@@ -68,31 +68,26 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
  * Generate a report from linting results
  * 
  * @param config Report configuration options
+ * @param results Optional lint results (if not provided, will run lint)
  * @returns A readable stream containing the report data
  * @throws Error if report generation fails
  */
-export async function report(config: ReportConfig): Promise<Readable> {
+export async function report(config: ReportConfig, results?: LintResult[]): Promise<Readable> {
   try {
     Logger.debug('Starting report generation with Node API');
     
     // Normalize configuration to ensure all required fields have values
-    const normalizedConfig = normalizeConfig(config);
+    const normalizedConfig = normalizeCliOptions(config, {}, true);
     
     // Determine report format with default
     const format = normalizedConfig.format || 'sarif';
     
-    // Get lint results either from provided results or by running lint
-    let lintResults: LintResult[];
-    
-    if (normalizedConfig.results) {
-      lintResults = normalizedConfig.results;
-    } else {
-      lintResults = await lint({
-        directory: normalizedConfig.directory,
-        configStylelint: normalizedConfig.configStylelint,
-        configEslint: normalizedConfig.configEslint,
-      });
-    }
+    // Get lint results either from provided results parameter or by running lint
+    const lintResults = results || await lint({
+      directory: normalizedConfig.directory,
+      configStylelint: normalizedConfig.configStylelint,
+      configEslint: normalizedConfig.configEslint,
+    });
     
     // Process based on requested format
     switch (format) {

@@ -27,9 +27,10 @@ export function registerLintCommand(program: Command): void {
       const startTime = Date.now();
       try {
         Logger.info(chalk.blue('Starting lint process...'));
+        // Parse CLI options with appropriate defaults
         const normalizedOptions = normalizeCliOptions(options, {
           configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
-          configEslint: DEFAULT_ESLINT_CONFIG_PATH
+          configEslint: DEFAULT_ESLINT_CONFIG_PATH,
         });
 
         if(directory){ // If argument is passed, ignore -d, --directory option

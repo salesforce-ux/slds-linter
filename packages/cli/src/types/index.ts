@@ -29,7 +29,6 @@ export interface LintConfig extends BaseConfig {
  */
 export interface ReportConfig extends BaseConfig {
   format?: 'sarif' | 'csv';
-  results?: LintResult[];
 }
 
 export interface LintResult {

@@ -7,7 +7,7 @@ import { CliOptions } from '../types';
 import { normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
-import { report } from '../executor';
+import { report, lint } from '../executor';
 
 export function registerReportCommand(program: Command): void {
   program
@@ -40,12 +40,18 @@ export function registerReportCommand(program: Command): void {
         
         // Generate report based on format using Node API
         const reportFormat = normalizedOptions.format?.toLowerCase() || 'sarif';
-        const reportStream = await report({
+        
+        // First run linting to get results
+        const lintResults = await lint({
           directory: normalizedOptions.directory,
           configStylelint: normalizedOptions.configStylelint,
-          configEslint: normalizedOptions.configEslint,
-          format: reportFormat as 'sarif' | 'csv'
+          configEslint: normalizedOptions.configEslint
         });
+        
+        // Generate report using the lint results
+        const reportStream = await report({
+          format: reportFormat as 'sarif' | 'csv'
+        }, lintResults);
         
         // Save the report to a file
         let outputFilePath: string;

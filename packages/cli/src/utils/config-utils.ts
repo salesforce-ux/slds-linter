@@ -1,3 +1,9 @@
+/**
+ * Config utilities for SLDS Linter
+ * 
+ * Note: This file replaces the earlier cli-args.ts and consolidates configuration 
+ * handling for both CLI and Node API into a single place
+ */
 import path from 'path';
 import { LintConfig, ReportConfig, CliOptions } from '../types';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
@@ -64,65 +70,59 @@ export function normalizeDirectoryPath(directory?: string): string {
 }
 
 /**
- * Normalize CLI options with appropriate defaults
- * This function ensures all required CLI options have valid values
- * It applies provided defaults and then options, then normalizes paths
+ * Normalize configuration with appropriate defaults
+ * This function ensures all required options have valid values
+ * It applies provided defaults, then user-provided options, then normalizes paths
+ * Used by both CLI commands and Node API functions
  * 
- * @param options CLI options to normalize
+ * @param options Options to normalize
  * @param defaultOptions Default options to apply
- * @returns Normalized CLI options with all fields populated
+ * @param isNodeApi Whether this is being called from the Node API
+ * @returns Normalized options with appropriate defaults
  */
-export function normalizeCliOptions(
-  options: CliOptions,
-  defaultOptions: Partial<CliOptions> = {}
-): Required<CliOptions> {
-  Logger.debug('Normalizing CLI options');
-  
-  // Create normalized options object with appropriate precedence:
-  // 1. Base defaults
-  // 2. Provided default overrides
-  // 3. User-provided options
-  const normalizedOptions = {
-    // Base defaults
-    fix: false,
-    editor: "vscode",
-    configStylelint: "",
-    configEslint: "",
-    format: "sarif",
+export function normalizeCliOptions<T extends CliOptions | LintConfig | ReportConfig>(
+  options: T,
+  defaultOptions: Partial<T> = {},
+  isNodeApi = false
+): T {
+  // Set up defaults based on context
+  const baseDefaults: Partial<CliOptions> = {
     files: [],
-    // Default overrides
-    ...defaultOptions,
-    // User-provided options (highest priority)
-    ...options,
-    // Special handling for paths
-    directory: normalizeDirectoryPath(options.directory),
-    output: normalizeAndValidatePath(options.output),
+    configStylelint: isNodeApi ? DEFAULT_STYLELINT_CONFIG_PATH : "",
+    configEslint: isNodeApi ? DEFAULT_ESLINT_CONFIG_PATH : "",
   };
   
-  Logger.debug(`Normalized CLI options: ${JSON.stringify(normalizedOptions, null, 2)}`);
-  return normalizedOptions as Required<CliOptions>;
+  // Add CLI-specific defaults
+  if (!isNodeApi) {
+    Object.assign(baseDefaults, {
+      fix: false,
+      editor: "vscode",
+      format: "sarif",
+    });
+  }
+  
+  // Create normalized options with proper precedence
+  const normalizedOptions = {
+    ...baseDefaults,
+    ...defaultOptions,
+    ...options,
+    directory: normalizeDirectoryPath(options.directory),
+  };
+  
+  // Handle output path for CLI options
+  if (!isNodeApi) {
+    (normalizedOptions as any).output = (options as any).output 
+      ? normalizeAndValidatePath((options as any).output)
+      : process.cwd();
+  }
+  
+  // Handle ReportConfig specific fields
+  if ('format' in options && !options.format && isNodeApi) {
+    (normalizedOptions as any).format = 'sarif';
+  }
+  
+  return normalizedOptions as T;
 }
 
-/**
- * Normalize configuration for the Node API
- * This function applies default values to the configuration object
- * It handles configuration for both linting and reporting operations
- * 
- * @param config Configuration object to normalize
- * @returns Normalized configuration with defaults applied
- */
-export function normalizeConfig<T extends LintConfig | ReportConfig>(config: T): T {
-  Logger.debug('Normalizing Node API configuration');
-  
-  // Apply defaults while preserving the original object structure
-  const normalizedConfig = {
-    ...config,
-    // Apply defaults for common properties
-    directory: config.directory || '.',
-    configStylelint: config.configStylelint || DEFAULT_STYLELINT_CONFIG_PATH,
-    configEslint: config.configEslint || DEFAULT_ESLINT_CONFIG_PATH,
-  };
-  
-  Logger.debug(`Normalized config: ${JSON.stringify(normalizedConfig, null, 2)}`);
-  return normalizedConfig;
-} 
+// For backward compatibility with imports, but deprecate in future versions
+export const normalizeConfig = normalizeCliOptions; 

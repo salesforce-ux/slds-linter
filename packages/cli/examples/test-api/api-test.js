@@ -16,14 +16,14 @@ async function runTests() {
   try {
     // Import modules
     const { lint, report } = await import('../../build/executor/index.js');
-    const { normalizeConfig } = await import('../../build/utils/config-utils.js');
+    const { normalizeCliOptions } = await import('../../build/utils/config-utils.js');
     console.log('✓ Modules imported successfully');
     
     // Test config normalization
-    const config = normalizeConfig({
+    const config = normalizeCliOptions({
       directory: './',
       fix: false
-    });
+    }, {}, true);
     console.log('✓ Config normalization works');
     
     // Test linting
@@ -55,9 +55,8 @@ async function runTests() {
     
     // Test SARIF report generation
     const sarifStream = await report({
-      results: lintResults,
       format: 'sarif'
-    });
+    }, lintResults);
     
     const sarifReport = await streamToString(sarifStream);
     validateReport(sarifReport, 'sarif');
@@ -70,9 +69,8 @@ async function runTests() {
     
     // Test CSV report generation
     const csvStream = await report({
-      results: lintResults,
       format: 'csv'
-    });
+    }, lintResults);
     
     const csvReport = await streamToString(csvStream);
     console.log(`✓ CSV report generation works (${csvReport.length} bytes)`);
