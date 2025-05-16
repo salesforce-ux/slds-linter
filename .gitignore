@@ -41,4 +41,6 @@ logs/
 .sfdx
 .codegenie
 
+# SARIF files
 slds-linter-report.csv
+sarif-validation-report.html
