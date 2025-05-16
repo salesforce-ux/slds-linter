@@ -1,25 +1,56 @@
-# SLDS Linter Node API Tests
+# API Test Example
 
-This directory contains simplified tests for the SLDS Linter Node API.
+This directory contains a simple test script to verify the Node.js API functionality of SLDS Linter.
+
+## How it works
+
+The `api-test.js` script tests the core API functions:
+
+1. **Module loading**: Verifies that the API modules can be imported correctly
+2. **Config normalization**: Tests that configuration parameters are properly normalized
+3. **Linting**: Tests the linting functionality using files from the `demo` directory
+4. **Report generation**: Tests both SARIF and CSV report formats
+
+## How to run
+
+```bash
+# Navigate to this directory
+cd packages/cli/examples/test-api
+
+# Run the test script
+node api-test.js
+```
+
+## Expected output
+
+The script will display the test progress and results:
+
+```
+Starting SLDS Linter API tests...
+✓ Modules imported successfully
+✓ Config normalization works
+✓ Lint works - found X files with issues
+  File: hardcoded-values.css
+  Issues: Y
+  First issue: Line Z - [Issue message]
+✓ SARIF report generation works (XXXX bytes)
+  Report saved to: api-test-report.sarif
+✓ CSV report generation works (XXX bytes)
+
+All tests completed successfully ✅
+```
+
+## Cleanup
+
+After running the tests, you may want to remove the generated report files:
+
+```bash
+rm api-test-report.sarif
+```
 
 ## Files
 
-- **api-test.js**: Consolidated test file that verifies core API functionality
-- **test.css**: Sample CSS file with SLDS linting issues for testing
-
-## Running the Test
-
-```bash
-# Navigate to CLI package root
-cd ../../
-
-# Build the package
-npm run build
-
-# Run the test
-cd examples/test-api
-node api-test.js
-```
+- **api-test.js**: Test script that verifies core API functionality
 
 ## API Overview
 

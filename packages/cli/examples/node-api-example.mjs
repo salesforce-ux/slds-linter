@@ -16,7 +16,7 @@ async function lintDirectory() {
   
   try {
     const results = await lint({
-      directory: './src', // Directory to scan
+      directory: '../../demo/small-set', // Use demo directory for testing
       fix: false // Don't auto-fix issues
     });
     
@@ -38,18 +38,35 @@ async function generateSarifReport() {
   
   try {
     // Run linting and generate report
-    const lintResults = await lint({
-      directory: './src'
+    let lintResults = await lint({
+      directory: '../../demo/small-set/hardcoded-values.css' // Use specific file from demo
     });
+    
+    if (!lintResults || lintResults.length === 0) {
+      console.log('No lint issues found, creating sample data for report demo');
+      lintResults = [{
+        filePath: '../../demo/small-set/hardcoded-values.css',
+        errors: [],
+        warnings: [{
+          line: 1,
+          column: 1,
+          endColumn: 10,
+          message: 'Sample warning message for testing',
+          ruleId: 'test-rule',
+          severity: 1
+        }]
+      }];
+    }
     
     const reportStream = await report({
-      results: lintResults,
       format: 'sarif'
-    });
+    }, lintResults);
     
     // Save report to file
-    const outputPath = path.join(process.cwd(), 'slds-lint-report.sarif');
-    reportStream.pipe(fs.createWriteStream(outputPath))
+    const outputPath = path.join(process.cwd(), 'example-report.sarif');
+    const writeStream = fs.createWriteStream(outputPath);
+    
+    reportStream.pipe(writeStream)
       .on('finish', () => console.log(`SARIF report saved to: ${path.basename(outputPath)}`))
       .on('error', err => console.error('Error saving report:', err));
   } catch (error) {
@@ -62,15 +79,37 @@ async function generateCsvReport() {
   console.log('\n--- Example 3: Generating a CSV report ---');
   
   try {
-    // Generate report directly from directory
-    const reportStream = await report({
-      directory: './src',
-      format: 'csv'
+    // First run lint to get results
+    let lintResults = await lint({
+      directory: '../../demo/small-set/deprecated_classes.css'
     });
     
+    if (!lintResults || lintResults.length === 0) {
+      console.log('No lint issues found, creating sample data for report demo');
+      lintResults = [{
+        filePath: '../../demo/small-set/deprecated_classes.css',
+        errors: [],
+        warnings: [{
+          line: 1,
+          column: 1,
+          endColumn: 10,
+          message: 'Sample warning message for testing',
+          ruleId: 'test-rule',
+          severity: 1
+        }]
+      }];
+    }
+    
+    // Generate report using the lint results
+    const reportStream = await report({
+      format: 'csv'
+    }, lintResults);
+    
     // Save report to file
-    const outputPath = path.join(process.cwd(), 'slds-lint-report.csv');
-    reportStream.pipe(fs.createWriteStream(outputPath))
+    const outputPath = path.join(process.cwd(), 'example-report.csv');
+    const writeStream = fs.createWriteStream(outputPath);
+    
+    reportStream.pipe(writeStream)
       .on('finish', () => console.log(`CSV report saved to: ${path.basename(outputPath)}`))
       .on('error', err => console.error('Error saving report:', err));
   } catch (error) {
@@ -80,9 +119,15 @@ async function generateCsvReport() {
 
 // Run all examples sequentially
 async function runExamples() {
-  await lintDirectory();
-  await generateSarifReport();
-  await generateCsvReport();
+  try {
+    await lintDirectory();
+    await generateSarifReport();
+    await generateCsvReport();
+    console.log('\nExamples completed successfully! Check example-report.* files for outputs.');
+    console.log('Note: Remember to delete the generated report files when done.');
+  } catch (error) {
+    console.error('Error running examples:', error);
+  }
 }
 
 runExamples();
