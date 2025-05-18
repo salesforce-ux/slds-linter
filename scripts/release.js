@@ -17,15 +17,20 @@ const skipCheck = process.argv.includes("--skip-check") || false; // Skips check
 
 async function getWorkspaceInfo() {
   try {
-    const output = execSync("yarn workspaces info --json").toString();
-    const matches = output
-      .trim()
-      .replace(/\n/g, "")
-      .match(/\{(.*)\}/);
-    if (!matches || !matches.length) {
-      throw new Error(output);
+    const output = execSync("yarn workspaces list --json").toString();
+    const workspaces = output.trim().split('\n').map(line => JSON.parse(line));
+    
+    // Convert array of workspaces to object format expected by the rest of the script
+    const workspaceInfo = {};
+    for (const workspace of workspaces) {
+      workspaceInfo[workspace.name] = {
+        location: workspace.location === '.' ? '' : workspace.location,
+        workspaceDependencies: [],
+        mismatchedWorkspaceDependencies: []
+      };
     }
-    return JSON.parse(matches[0]);
+    
+    return workspaceInfo;
   } catch (error) {
     throw new Error(`Failed to parse workspace info: ${error.message}`);
   }
