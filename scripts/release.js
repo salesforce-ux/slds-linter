@@ -18,19 +18,20 @@ const skipCheck = process.argv.includes("--skip-check") || false; // Skips check
 async function getWorkspaceInfo() {
   try {
     const output = execSync("yarn workspaces list --json").toString();
-    const workspaces = output.trim().split('\n').map(line => JSON.parse(line));
+    // Convert array-style output from workspaces list to object-style output like workspaces info
+    const workspacesArray = output.trim().split('\n').map(line => JSON.parse(line));
     
-    // Convert array of workspaces to object format expected by the rest of the script
-    const workspaceInfo = {};
-    for (const workspace of workspaces) {
-      workspaceInfo[workspace.name] = {
-        location: workspace.location === '.' ? '' : workspace.location,
+    // Format as an object that matches the original format expected by the rest of the script
+    const formattedOutput = {};
+    workspacesArray.forEach(workspace => {
+      formattedOutput[workspace.name] = {
+        location: workspace.location,
         workspaceDependencies: [],
         mismatchedWorkspaceDependencies: []
       };
-    }
+    });
     
-    return workspaceInfo;
+    return formattedOutput;
   } catch (error) {
     throw new Error(`Failed to parse workspace info: ${error.message}`);
   }
@@ -123,54 +124,34 @@ async function gitOperations(version) {
 async function publishPackages(workspaceInfo, version, releaseType) {
   const tag = releaseType === "final" ? "latest" : releaseType;
   let sldsLinterTarball = "";
-  const publishedPackages = [];
 
   for (const [pkgName, info] of Object.entries(workspaceInfo)) {
     const pkgPath = path.join(ROOT_DIR, info.location);
-    const pkgJsonPath = path.join(pkgPath, "package.json");
-    const pkgJsonOriginal = await fs.readFile(pkgJsonPath, "utf8");
-    const pkgJson = JSON.parse(pkgJsonOriginal);
     
-    // Create a temporary non-private version of package.json if needed
-    let restorationNeeded = false;
-    if (pkgJson.private === true && pkgName.includes("slds-linter")) {
-      console.log(chalk.yellow(`Temporarily removing private flag from ${pkgName} for publishing`));
-      pkgJson.private = false;
-      await fs.writeFile(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + "\n");
-      restorationNeeded = true;
-    } else if (pkgJson.private === true) {
+    // Check if package is private before trying to publish
+    const pkgJsonPath = path.join(pkgPath, "package.json");
+    const pkgJson = JSON.parse(await fs.readFile(pkgJsonPath, "utf8"));
+    
+    if (pkgJson.private === true) {
       console.log(chalk.yellow(`Skipping private package: ${pkgName}`));
       continue;
     }
     
-    try {
-      if (pkgName.match(/slds-linter/)) {
-        // Generate tarball for slds-linter
-        sldsLinterTarball = execSync(`cd ${pkgPath} && npm pack`)
-          .toString()
-          .trim();
-        console.log(chalk.blue(`Generated tarball: ${sldsLinterTarball}`));
-        sldsLinterTarball = path.join(pkgPath, sldsLinterTarball);
-      }
-      
-      execSync(
-        `cd ${pkgPath} && NPM_TOKEN=${process.env.NPM_TOKEN} npm publish --tag ${tag} --access public ${isDryRun ? "--dry-run" : ""}`
-      );
-      console.log(chalk.green(`Published ${pkgName}@${version}`));
-      publishedPackages.push(pkgName);
-    } catch (error) {
-      console.error(chalk.red(`Failed to publish ${pkgName}: ${error.message}`));
-    } finally {
-      // Restore the original package.json if needed
-      if (restorationNeeded) {
-        await fs.writeFile(pkgJsonPath, pkgJsonOriginal);
-        console.log(chalk.yellow(`Restored private flag for ${pkgName}`));
-      }
+    if (pkgName.match(/slds-linter/)) {
+      // Generate tarball for slds-linter
+      sldsLinterTarball = execSync(`cd ${pkgPath} && npm pack`)
+        .toString()
+        .trim();
+      console.log(chalk.blue(`Generated tarball: ${sldsLinterTarball}`));
+      sldsLinterTarball = path.join(pkgPath, sldsLinterTarball);
     }
+    execSync(
+      `cd ${pkgPath} && NPM_TOKEN=${process.env.NPM_TOKEN} npm publish --tag ${tag} --access public ${isDryRun ? "--dry-run" : ""}`
+    );
+    console.log(chalk.green(`Published ${pkgName}@${version}`));
   }
-  
-  // Set a flag to indicate if any packages were published
-  return { sldsLinterTarball, publishedCount: publishedPackages.length };
+
+  return sldsLinterTarball;
 }
 
 async function createGitHubRelease(version, tarballPath, releaseType) {
@@ -309,13 +290,13 @@ async function main() {
         {
           title: "Publish packages",
           task: async (ctx) => {
-            ctx.publishResult = await publishPackages(
+            ctx.sldsLinterTarball = await publishPackages(
               ctx.workspaceInfo,
               ctx.finalVersion,
               ctx.releaseType
             );
-            // Check if any package was published
-            ctx.packagesPublished = ctx.publishResult.publishedCount > 0;
+            // Check if tarball was created
+            ctx.packagesPublished = ctx.sldsLinterTarball && ctx.sldsLinterTarball.length > 0;
           },
         },
         {
@@ -324,7 +305,7 @@ async function main() {
           task: async (ctx) => {
             await createGitHubRelease(
               ctx.finalVersion,
-              ctx.publishResult.sldsLinterTarball,
+              ctx.sldsLinterTarball,
               ctx.releaseType
             );
           },
