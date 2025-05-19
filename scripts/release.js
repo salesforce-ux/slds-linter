@@ -17,15 +17,19 @@ const skipCheck = process.argv.includes("--skip-check") || false; // Skips check
 
 async function getWorkspaceInfo() {
   try {
-    const output = execSync("yarn workspaces info --json").toString();
-    const matches = output
-      .trim()
-      .replace(/\n/g, "")
-      .match(/\{(.*)\}/);
-    if (!matches || !matches.length) {
-      throw new Error(output);
-    }
-    return JSON.parse(matches[0]);
+    const output = execSync("yarn workspaces list --json").toString();
+    // Convert array-style output from workspaces list to object-style output like workspaces info
+    const workspacesArray = output.trim().split('\n').slice(1).map(line => JSON.parse(line));
+    
+    // Format as an object that matches the original format expected by the rest of the script
+    return workspacesArray.reduce((acc, workspace) => {
+      acc[workspace.name] = {
+        location: workspace.location,
+        workspaceDependencies: [],
+        mismatchedWorkspaceDependencies: []
+      };
+      return acc;
+    }, {});
   } catch (error) {
     throw new Error(`Failed to parse workspace info: ${error.message}`);
   }
@@ -121,7 +125,8 @@ async function publishPackages(workspaceInfo, version, releaseType) {
 
   for (const [pkgName, info] of Object.entries(workspaceInfo)) {
     const pkgPath = path.join(ROOT_DIR, info.location);
-    if (pkgName.match(/slds-linter/)) {
+    
+    if (pkgName === "@salesforce-ux/slds-linter") {
       // Generate tarball for slds-linter
       sldsLinterTarball = execSync(`cd ${pkgPath} && npm pack`)
         .toString()
@@ -278,7 +283,7 @@ async function main() {
               ctx.workspaceInfo,
               ctx.finalVersion,
               ctx.releaseType
-            );
+            );            
           },
         },
         {
