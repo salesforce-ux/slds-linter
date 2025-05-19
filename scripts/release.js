@@ -19,19 +19,17 @@ async function getWorkspaceInfo() {
   try {
     const output = execSync("yarn workspaces list --json").toString();
     // Convert array-style output from workspaces list to object-style output like workspaces info
-    const workspacesArray = output.trim().split('\n').map(line => JSON.parse(line));
+    const workspacesArray = output.trim().split('\n').slice(1).map(line => JSON.parse(line));
     
     // Format as an object that matches the original format expected by the rest of the script
-    const formattedOutput = {};
-    workspacesArray.forEach(workspace => {
-      formattedOutput[workspace.name] = {
+    return workspacesArray.reduce((acc, workspace) => {
+      acc[workspace.name] = {
         location: workspace.location,
         workspaceDependencies: [],
         mismatchedWorkspaceDependencies: []
       };
-    });
-    
-    return formattedOutput;
+      return acc;
+    }, {});
   } catch (error) {
     throw new Error(`Failed to parse workspace info: ${error.message}`);
   }
@@ -128,16 +126,7 @@ async function publishPackages(workspaceInfo, version, releaseType) {
   for (const [pkgName, info] of Object.entries(workspaceInfo)) {
     const pkgPath = path.join(ROOT_DIR, info.location);
     
-    // Check if package is private before trying to publish
-    const pkgJsonPath = path.join(pkgPath, "package.json");
-    const pkgJson = JSON.parse(await fs.readFile(pkgJsonPath, "utf8"));
-    
-    if (pkgJson.private === true) {
-      console.log(chalk.yellow(`Skipping private package: ${pkgName}`));
-      continue;
-    }
-    
-    if (pkgName.match(/slds-linter/)) {
+    if (pkgName === "@salesforce-ux/slds-linter") {
       // Generate tarball for slds-linter
       sldsLinterTarball = execSync(`cd ${pkgPath} && npm pack`)
         .toString()
@@ -294,14 +283,12 @@ async function main() {
               ctx.workspaceInfo,
               ctx.finalVersion,
               ctx.releaseType
-            );
-            // Check if tarball was created
-            ctx.packagesPublished = ctx.sldsLinterTarball && ctx.sldsLinterTarball.length > 0;
+            );            
           },
         },
         {
           title: "Create GitHub release",
-          skip: () => isDryRun || !ctx.packagesPublished,
+          skip: () => isDryRun || !ctx.sldsLinterTarball,
           task: async (ctx) => {
             await createGitHubRelease(
               ctx.finalVersion,

@@ -1,6 +1,6 @@
 {
-  "name": "slds-linter",
-  "version": "0.2.0-alpha.2",
+  "name": "slds-linter-workspace",
+  "version": "0.0.0-DEVELOPMENT.0",
   "private": true,
   "type": "module",
   "workspaces": [
