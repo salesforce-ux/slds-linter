@@ -13,8 +13,16 @@
   "type": "module",
   "main": "build/index.js",
   "exports": {
-    ".": "./build/index.js",
-    "./executor": "./build/executor/index.js"
+    ".": {
+      "import": "./build/index.js",
+      "require": "./build/index.js",
+      "default": "./build/index.js"
+    },
+    "./executor": {
+      "import": "./build/executor/index.js",
+      "require": "./build/executor/index.js",
+      "default": "./build/executor/index.js"
+    }
   },
   "files": [
     "build/**",
