@@ -7,6 +7,9 @@ import { registerEmitCommand } from './commands/emit';
 import { Logger } from './utils/logger';
 import { validateNodeVersion } from './utils/nodeVersionUtil';
 
+// Re-export the executor functions for Node API usage
+export * from './executor/index.js';
+
 // Validate Node.js version before proceeding
 validateNodeVersion();
 
