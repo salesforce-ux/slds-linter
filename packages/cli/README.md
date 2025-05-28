@@ -210,6 +210,30 @@ reportStream.on('end', () => {
 });
 ```
 
+### TypeScript Support
+
+The Node.js API includes comprehensive TypeScript type definitions. You can import both the API functions and their associated types:
+
+```typescript
+// Import from the root package
+import { 
+  lint, 
+  report, 
+  LintConfig, 
+  ReportConfig, 
+  LintResult 
+} from '@salesforce-ux/slds-linter';
+
+// Define configuration with typed interface
+const config: LintConfig = {
+  directory: './src',
+  fix: false
+};
+
+// Results will be properly typed
+const results: LintResult[] = await lint(config);
+```
+
 ### API Reference
 
 The Node.js API provides the following methods:

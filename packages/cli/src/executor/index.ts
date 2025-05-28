@@ -4,7 +4,7 @@ import { LintRunner, LintOptions } from '../services/lint-runner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
 import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
-import { LintResult, LintConfig, ReportConfig } from '../types';
+import { LintResult, LintConfig, ReportConfig, LintResultEntry, ExitCode, WorkerResult, SarifResultEntry } from '../types';
 import { normalizeCliOptions } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
 
@@ -119,3 +119,14 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
     throw new Error(errorMessage);
   }
 } 
+
+// Re-export types for Node API users
+export type { 
+  LintResult, 
+  LintResultEntry, 
+  LintConfig, 
+  ReportConfig, 
+  ExitCode, 
+  WorkerResult, 
+  SarifResultEntry 
+}; 

@@ -12,9 +12,16 @@
   "author": "UXF Tooling Team",
   "type": "module",
   "main": "build/index.js",
+  "types": "./build/index.d.ts",
   "exports": {
-    ".": "./build/index.js",
-    "./executor": "./build/executor/index.js"
+    ".": {
+      "types": "./build/index.d.ts",
+      "default": "./build/index.js"
+    },
+    "./executor": {
+      "types": "./build/executor/index.d.ts",
+      "default": "./build/executor/index.js"
+    }
   },
   "files": [
     "build/**",

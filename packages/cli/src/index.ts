@@ -43,3 +43,8 @@ program.configureHelp({
 })
 
 program.parse(process.argv); 
+
+// Re-export types for package consumers
+export * from './types';
+// Re-export Node API from executor
+export * from './executor'; 
