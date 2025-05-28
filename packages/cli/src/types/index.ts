@@ -36,6 +36,7 @@ export interface LintResultEntry {
   column: number;
   endColumn: number;
   message: string;
+  suggestions?: string[];
   ruleId: string;
   severity: number;
 }

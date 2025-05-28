@@ -1,6 +1,7 @@
 import { ESLint } from 'eslint';
 import { BaseWorker } from './base.worker';
 import { WorkerConfig, WorkerResult } from '../types';
+import { normalizeLintMessage } from '../utils/lintMessageUtils';
 
 class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
   private eslint: ESLint;
@@ -31,7 +32,7 @@ class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
             line: warning.line,
             column: warning.column,
             endColumn: warning.endColumn,
-            message: warning.message,
+            ...normalizeLintMessage(warning.message),
             ruleId: warning.ruleId || 'unknown'
           })),
         errors: fileResult.messages
@@ -40,7 +41,7 @@ class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
             line: error.line,
             column: error.column,
             endColumn: error.endColumn,
-            message: error.message,
+            ...normalizeLintMessage(error.message),
             ruleId: error.ruleId || 'unknown'
           }))
       };

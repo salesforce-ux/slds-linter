@@ -1,6 +1,7 @@
 import stylelint from 'stylelint';
 import { BaseWorker } from './base.worker';
 import { WorkerConfig, WorkerResult } from '../types';
+import { normalizeLintMessage } from '../utils/lintMessageUtils';
 
 class StylelintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
   protected async processFile(filePath: string): Promise<WorkerResult> {
@@ -25,7 +26,7 @@ class StylelintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
           line: warning.line,
           column: warning.column,
           endColumn: warning.endColumn,
-          message: warning.text,
+          ...normalizeLintMessage(warning.text),
           ruleId: warning.rule
         })),
         errors: [] // Stylelint doesn't differentiate between warnings and errors
