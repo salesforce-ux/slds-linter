@@ -16,24 +16,6 @@ export function replaceNamespaceinRules(id: string) {
     ? id.replace("@salesforce-ux/", "")
     : id;
 }
-/**
- * 
- * @param text - The input text that could either be a plain string or a stringified JSON object.
- * @returns The parsed message or the original string if parsing fails.
- */
-export function parseText(text: string): string {
-  let safeText = text;
-  try {
-    // Try to parse the text as JSON
-    const parsed = JSON.parse(text);
-    // If successful, return the message property or the whole object if no message
-    safeText = parsed.message || JSON.stringify(parsed);
-  } catch (error) {
-    // If JSON parsing fails, return the original string
-    safeText = text;
-  }
-  return safeText.endsWith('.') ? safeText : `${safeText}.`;
-}
 
 /**
  * Prints detailed lint results for each file that has issues.
@@ -58,9 +40,9 @@ export function printLintResults(results: LintResult[], editor: string): void {
           const lineCol = `${error.line}:${error.column}`;
           const clickable = createClickableLineCol(lineCol, absolutePath, error.line, error.column, editor);
           const ruleId = error.ruleId ? chalk.dim(replaceNamespaceinRules(error.ruleId)) : '';
-          Logger.error(`  ${clickable}  ${parseText(error.message)}  ${ruleId}`);
+          Logger.error(`  ${clickable}  ${error.message}  ${ruleId}`);
         } else {
-          Logger.error(`  ${chalk.red('Error:')} ${parseText(error.message)}`);
+          Logger.error(`  ${chalk.red('Error:')} ${error.message}`);
         }
       });
     }
@@ -71,9 +53,9 @@ export function printLintResults(results: LintResult[], editor: string): void {
           const lineCol = `${warn.line}:${warn.column}`;
           const clickable = createClickableLineCol(lineCol, absolutePath, warn.line, warn.column, editor);
           const ruleId = warn.ruleId ? chalk.dim(replaceNamespaceinRules(warn.ruleId)) : '';
-          Logger.warning(`  ${clickable}  ${parseText(warn.message)}  ${ruleId}`);
+          Logger.warning(`  ${clickable}  ${warn.message}  ${ruleId}`);
         } else {
-          Logger.warning(`  ${chalk.yellow('Warning:')} ${parseText(warn.message)}`);
+          Logger.warning(`  ${chalk.yellow('Warning:')} ${warn.message}`);
         }
       });
     }
@@ -84,7 +66,7 @@ export function transformedResults(lintResult: LintResult, entry: LintResultEntr
   return {
     ruleId: replaceNamespaceinRules(entry.ruleId),
     level,
-    messageText: parseText(entry.message),
+    messageText: entry.message,
     fileUri: path.relative(process.cwd(), lintResult.filePath),
     startLine: entry.line,
     startColumn: entry.column,

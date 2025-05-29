@@ -6,7 +6,7 @@ import { SarifBuilder, SarifRunBuilder, SarifResultBuilder, SarifRuleBuilder } f
 import { createWriteStream } from 'fs';
 import { JsonStreamStringify } from 'json-stream-stringify';
 import {getRuleDescription} from "./config.resolver";
-import { parseText, replaceNamespaceinRules, transformedResults } from '../utils/lintResultsUtil';
+import { replaceNamespaceinRules, transformedResults } from '../utils/lintResultsUtil';
 import { Readable } from 'stream';
 import { processArtifacts } from './artifact-processor';
 
@@ -224,7 +224,7 @@ export class CsvReportGenerator {
       [
         ...result.errors.map((error: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
           "File Path": path.relative(cwd, result.filePath),
-          "Message": parseText(error.message),
+          "Message": error.message,
           "Severity": 'error',
           "Rule ID": replaceNamespaceinRules(error.ruleId || 'N/A'),
           "Start Line": error.line,
@@ -234,7 +234,7 @@ export class CsvReportGenerator {
         })),
         ...result.warnings.map((warning: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
           "File Path": path.relative(cwd, result.filePath),
-          "Message": parseText(warning.message),
+          "Message": warning.message,
           "Severity": 'warning',
           "Rule ID": replaceNamespaceinRules(warning.ruleId || 'N/A'),
           "Start Line": warning.line,
