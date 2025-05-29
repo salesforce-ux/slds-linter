@@ -118,4 +118,6 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
     Logger.error(errorMessage);
     throw new Error(errorMessage);
   }
-} 
+}
+
+export type { LintResult, LintResultEntry, LintConfig, ReportConfig, ExitCode, WorkerResult, SarifResultEntry } from '../types'; 
