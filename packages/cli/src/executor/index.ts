@@ -129,21 +129,21 @@ function standardizeLintMessages(results: LintResult[]): LintResult[] {
         msgObj = JSON.parse(entry.message);
         // If already has message, keep as is
         if (typeof msgObj === 'object' && 'message' in msgObj) {
-          return { ...entry, message: JSON.stringify(msgObj) };
+          return { ...entry, message: msgObj.message };
         }
       } catch {}
       // Otherwise, wrap as { message }
-      return { ...entry, message: JSON.stringify({ message: entry.message }) };
+      return { ...entry, message: entry.message };
     }),
     warnings: result.warnings.map(entry => {
       let msgObj;
       try {
         msgObj = JSON.parse(entry.message);
         if (typeof msgObj === 'object' && 'message' in msgObj) {
-          return { ...entry, message: JSON.stringify(msgObj) };
+          return { ...entry, message: msgObj.message };
         }
       } catch {}
-      return { ...entry, message: JSON.stringify({ message: entry.message }) };
+      return { ...entry, message: entry.message };
     })
   }));
 }
