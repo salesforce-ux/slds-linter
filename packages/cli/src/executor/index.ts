@@ -54,8 +54,7 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     
     // Combine results from both linters
     const combinedResults = [...styleResults, ...componentResults];
-    
-    return combinedResults;
+    return standardizeLintMessages(combinedResults);
   } catch (error: any) {
     // Enhance error with context for better debugging
     const errorMessage = `Linting failed: ${error.message}`;
@@ -118,6 +117,35 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
     Logger.error(errorMessage);
     throw new Error(errorMessage);
   }
+}
+
+// Helper to standardize message field for all warnings and errors
+function standardizeLintMessages(results: LintResult[]): LintResult[] {
+  return results.map(result => ({
+    ...result,
+    errors: result.errors.map(entry => {
+      let msgObj;
+      try {
+        msgObj = JSON.parse(entry.message);
+        // If already has message, keep as is
+        if (typeof msgObj === 'object' && 'message' in msgObj) {
+          return { ...entry, message: JSON.stringify(msgObj) };
+        }
+      } catch {}
+      // Otherwise, wrap as { message }
+      return { ...entry, message: JSON.stringify({ message: entry.message }) };
+    }),
+    warnings: result.warnings.map(entry => {
+      let msgObj;
+      try {
+        msgObj = JSON.parse(entry.message);
+        if (typeof msgObj === 'object' && 'message' in msgObj && 'suggestions' in msgObj) {
+          return { ...entry, message: JSON.stringify(msgObj) };
+        }
+      } catch {}
+      return { ...entry, message: JSON.stringify({ message: entry.message, suggestions: [] }) };
+    })
+  }));
 }
 
 export type { LintResult, LintResultEntry, LintConfig, ReportConfig, ExitCode, WorkerResult, SarifResultEntry } from '../types'; 
