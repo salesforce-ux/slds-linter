@@ -5,38 +5,101 @@
     <title>Deprecated Hooks Demo</title>
     <link rel="stylesheet" href="deprecatedHooks.css">
     <style>
-        /* Inline style block with deprecated properties */
+        /* Global hooks */
         :root {
-            /* Deprecated properties with their replacements */
+            --slds-g-color-border-base-2: #dddbda;
+            --slds-g-color-border-base-3: #c9c7c5;
+            --slds-g-link-color: #0070d2;
+            --slds-g-link-color-hover: #005fb2;
+        }
+
+        /* Kynatic hooks */
+        :root {
+            --slds-kx-button-underline-scale-x: 1;
+            --slds-kx-button-underline-base-y: 0;
+            --slds-kx-button-underline-offset-y: 0;
+            --slds-kx-button-gradient-size: 100%;
+        }
+
+        /* Shared hooks */
+        :root {
+            --sds-s-navigation-radius-border: 0.25rem;
+            --sds-s-label-sizing-gap: 0.5rem;
+            --sds-s-input-color-border-hover: #1589ee;
+        }
+
+        /* Component hooks */
+        :root {
             --slds-c-accordion-heading-text-color: #333;
             --slds-c-accordion-section-spacing-block-end: 1rem;
             --slds-c-alert-spacing-inline-start: 1rem;
+            --slds-c-alert-spacing-block-end: 2rem;
             --slds-c-button-spacing-inline-end: 0.5rem;
+            --slds-c-button-spacing-block-start: 1rem;
+            --slds-c-toast-sizing-min-width: 320px;
+            --slds-c-toast-spacing-block-start: 1rem;
+            --slds-c-modal-header-spacing-block-start: 1rem;
+            --slds-c-modal-header-spacing-inline-end: 1rem;
+            --slds-c-pill-container-spacing-block-end: 1rem;
+            --slds-c-pill-container-spacing-inline-start: 0.5rem;
+            --slds-c-form-compound-spacing-block-start: 1rem;
+            --slds-c-form-compound-spacing-inline: 1rem;
+            --slds-c-card-spacing-block-start: 1rem;
+            --slds-c-card-spacing-inline-end: 1rem;
         }
     </style>
 </head>
 <body>
-    <!-- Using deprecated properties in inline styles -->
-    <div class="accordion" style="--slds-c-accordion-heading-text-color: blue;">
-        <h2>Accordion Title</h2>
-        <div class="accordion-content">Content here</div>
+    <!-- Global hooks example -->
+    <div class="global-example">
+        <a href="#" class="global-link">Global Link Example</a>
     </div>
 
-    <div class="alert-container" style="--slds-c-alert-spacing-block-end: 2rem;">
+    <!-- Kynatic hooks example -->
+    <div>
+        <button class="kynatic-button">Kynatic Button</button>
+    </div>
+
+    <!-- Shared hooks example -->
+    <div>
+        <nav class="shared-nav">Shared Navigation</nav>
+        <input type="text" class="shared-input" placeholder="Shared Input">
+    </div>
+
+    <!-- Component hooks examples -->
+    <div class="accordion">
+        <h2>Accordion Title</h2>
+        <div>Content here</div>
+    </div>
+
+    <div class="alert-container">
         <p>Alert message</p>
     </div>
 
     <div class="button-group">
-        <button style="--slds-c-button-spacing-inline-end: 1rem;">Button 1</button>
+        <button>Button 1</button>
         <button>Button 2</button>
     </div>
 
-    <textarea class="textarea-wrapper" style="--slds-c-textarea-sizing-min-height: 100px;">
-        Sample textarea
-    </textarea>
-
-    <div class="toast-notification" style="--slds-c-toast-sizing-min-width: 320px;">
+    <div class="toast-notification">
         Toast message
+    </div>
+
+    <!-- Additional component examples -->
+    <div class="modal-container">
+        <div>Modal Header</div>
+    </div>
+
+    <div class="pill-container">
+        <span>Pill Content</span>
+    </div>
+
+    <div class="form-compound">
+        <div>Form Content</div>
+    </div>
+
+    <div class="card-container">
+        <div>Card Content</div>
     </div>
 </body>
 </html> 

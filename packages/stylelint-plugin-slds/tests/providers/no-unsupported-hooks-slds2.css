@@ -1,12 +1,93 @@
 .div-modal-cls {
-	--slds-c-breadcrumbs-spacing-inline-start: 1rem;	
+	--slds-c-breadcrumbs-spacing-inline-start: 1rem;
 }
 
 .testClass2{
 	--slds-c-pill-container-spacing-block-end: 5rem;
 }
 
-/*TODO: In the below we don't have a replacement but we know the user shouldn't use this hook. Currently we don't have a message so leaving it for now.*/
-.testClass{
-	--slds-c-pill-action-shadow: none;
+/* Global hooks */
+.global-example {
+    --slds-g-color-border-base-2: #dddbda;
+    --slds-g-color-border-base-3: #c9c7c5;
+    border: 1px solid var(--slds-g-color-border-base-2);
 }
+
+.global-link {
+    --slds-g-link-color: #0070d2;
+    --slds-g-link-color-hover: #005fb2;
+    color: var(--slds-g-link-color);
+}
+
+/* Kynatic hooks */
+.kynatic-button {
+    --slds-kx-button-underline-scale-x: 1;
+    --slds-kx-button-underline-base-y: 0;
+    --slds-kx-button-underline-offset-y: 0;
+    transform: scaleX(var(--slds-kx-button-underline-scale-x));
+}
+
+/* Shared hooks */
+.shared-nav {
+    --sds-s-navigation-radius-border: 0.25rem;
+    --sds-s-label-sizing-gap: 0.5rem;
+    border-radius: var(--sds-s-navigation-radius-border);
+}
+
+.shared-input {
+    --sds-s-input-color-border-hover: #1589ee;
+    border-color: var(--sds-s-input-color-border-hover);
+}
+
+/* Component hooks */
+.accordion {
+    --slds-c-accordion-heading-text-color: #333;
+    --slds-c-accordion-section-spacing-block-end: 1rem;
+    color: var(--slds-c-accordion-heading-text-color);
+}
+
+.alert-container {
+    --slds-c-alert-spacing-inline-start: 1rem;
+    --slds-c-alert-spacing-block-end: 2rem;
+    padding-left: var(--slds-c-alert-spacing-inline-start);
+}
+
+.button-group {
+    --slds-c-button-spacing-inline-end: 0.5rem;
+    --slds-c-button-spacing-block-start: 1rem;
+    margin-right: var(--slds-c-button-spacing-inline-end);
+}
+
+.toast-notification {
+    --slds-c-toast-sizing-min-width: 320px;
+    --slds-c-toast-spacing-block-start: 1rem;
+    min-width: var(--slds-c-toast-sizing-min-width);
+}
+
+/* Modal component hooks */
+.modal-container {
+    --slds-c-modal-header-spacing-block-start: 1rem;
+    --slds-c-modal-header-spacing-inline-end: 1rem;
+    padding-top: var(--slds-c-modal-header-spacing-block-start);
+}
+
+/* Pill component hooks */
+.pill-container {
+    --slds-c-pill-container-spacing-block-end: 1rem;
+    --slds-c-pill-container-spacing-inline-start: 0.5rem;
+    margin-bottom: var(--slds-c-pill-container-spacing-block-end);
+}
+
+/* Form component hooks */
+.form-compound {
+    --slds-c-form-compound-spacing-block-start: 1rem;
+    --slds-c-form-compound-spacing-inline: 1rem;
+    margin-top: var(--slds-c-form-compound-spacing-block-start);
+}
+
+/* Card component hooks */
+.card-container {
+    --slds-c-card-spacing-block-start: 1rem;
+    --slds-c-card-spacing-inline-end: 1rem;
+    padding-top: var(--slds-c-card-spacing-block-start);
+} 
