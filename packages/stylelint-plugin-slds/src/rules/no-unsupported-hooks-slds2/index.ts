@@ -1,5 +1,6 @@
 import metadata from '@salesforce-ux/sds-metadata';
-import { Root } from 'postcss';
+import { Declaration, Root } from 'postcss';
+import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
@@ -22,42 +23,86 @@ const messages = utils.ruleMessages(ruleName, {
     replacePlaceholders(errorMsg, { token, newToken }),
 });
 
+function shouldIgnoreDetection(sldsHook: string) {
+  return !deprecatedHooks.has(sldsHook);
+}
+
+function isVarFunction(node:valueParser.Node): boolean{
+  return (node.type === "function" && node.value === "var" && node.nodes.length>0);
+}
+
+/**
+ * 
+ * Example:
+ *  .THIS  .demo {
+ *    border-top: 1px solid var(--slds-g-color-border-brand-1);
+ *  }
+ * 
+ */
+function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Problem>) {
+  const parsedValue = valueParser(decl.value);
+  const startIndex = decl.toString().indexOf(decl.value);
+  // Usage on right side
+  parsedValue.walk((node) => {
+    if(!isVarFunction(node)){
+      return;
+    }
+    const functionNode = node as valueParser.FunctionNode;
+    let cssVarNode = functionNode.nodes[0];
+    let cssVar = cssVarNode.value;
+    if (shouldIgnoreDetection(cssVar)) {
+      return;
+    }
+  
+    const index = cssVarNode.sourceIndex;
+    const endIndex = cssVarNode.sourceEndIndex;
+
+    stylelint.utils.report(<stylelint.Problem>{
+      message: messages.deprecated(cssVar),
+      ...basicReportProps,
+      index: index+startIndex, endIndex: endIndex+startIndex
+    });
+
+  });
+}
+
+/**
+ * 
+ * Example:
+ * 
+ *.THIS {
+ *     --slds-g-link-color: #f73650;
+ * }
+ * 
+ */
+ function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Problem>) {
+  // Usage on left side
+  const { prop } = decl;
+  if (shouldIgnoreDetection(prop)) {
+    return;
+  }
+  const startIndex = decl.toString().indexOf(prop);
+  const endIndex = startIndex + prop.length;
+  const reportProps = {
+    index: startIndex,
+    endIndex,
+    ...basicReportProps,
+  };  
+  reportProps.message = messages.deprecated(prop);
+  stylelint.utils.report(<stylelint.Problem>reportProps);
+}
+
 const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
-    root.walkDecls((decl) => {
-      const parsedPropertyValue = decl.prop;
-      if (parsedPropertyValue.startsWith('--slds-c-')  && deprecatedHooks.has(parsedPropertyValue)) {
-        const index = decl.toString().indexOf(decl.prop);
-        const endIndex = index + decl.prop.length;
-        /*const proposedNewValue = deprecatedHooks[parsedPropertyValue];
-        if (proposedNewValue && proposedNewValue !== 'null') {
-          const index = decl.toString().indexOf(decl.prop);
-          const endIndex = index + decl.prop.length;
-
-          utils.report({
-            message: JSON.stringify({message: messages.replaced(parsedPropertyValue, proposedNewValue), suggestions:[proposedNewValue]}),
-            node: decl,
-            index,
-            endIndex,
-            result,
-            ruleName,
-            severity,
-            fix:()=>{
-              decl.prop = proposedNewValue;
-            }
-          });
-          
-        } else {*/
-          utils.report({
-            message: JSON.stringify({message: messages.deprecated(parsedPropertyValue), suggestions:[]}),
-            node: decl,
-            index,
-            endIndex,
-            result,
-            ruleName,
-          });
-        //}
-      }
+    root.walkDecls((node) => {
+      const basicReportProps:Partial<stylelint.Problem> = {
+        node,
+        result,
+        ruleName,
+        severity,
+      };
+      detectRightSide(node, basicReportProps);
+      detectLeftSide(node, basicReportProps);
     });
   };
 }
@@ -66,7 +111,7 @@ ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
 ruleFunction.meta = {
   url: '',
-  fixable: true
+  fixable: false
 };
 
 // Export the plugin
