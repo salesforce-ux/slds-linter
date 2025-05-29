@@ -139,11 +139,11 @@ function standardizeLintMessages(results: LintResult[]): LintResult[] {
       let msgObj;
       try {
         msgObj = JSON.parse(entry.message);
-        if (typeof msgObj === 'object' && 'message' in msgObj && 'suggestions' in msgObj) {
+        if (typeof msgObj === 'object' && 'message' in msgObj) {
           return { ...entry, message: JSON.stringify(msgObj) };
         }
       } catch {}
-      return { ...entry, message: JSON.stringify({ message: entry.message, suggestions: [] }) };
+      return { ...entry, message: JSON.stringify({ message: entry.message }) };
     })
   }));
 }
