@@ -196,9 +196,9 @@ const rulesMetadata = {
   "slds/no-slds-var-without-fallback": {
     name: "slds/no-slds-var-without-fallback",
     severityLevel: "error",
-    warningMsg: "var(${cssVar}) must include a fallback value. Suggested: var(${cssVar}, ${recommendation})",
-    errorMsg: "Your code uses the \"${cssVar}\" styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To make sure your component renders correctly in all environments, add this fallback value: \"${recommendation}\". If you need this fallback value to be brand-aware, please check out the SLDS1 tokens page.",
-    ruleDesc: "Ensure SLDS CSS variables include fallback values for environments where styling hooks are unavailable.",
+    warningMsg: "Your code uses the ${cssVar} styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To render your component correctly in all environments, add this fallback value: var(${cssVar}, ${recommendation}) . To make this fallback value brand-aware, use a branded design token instead of a static value. See Design Tokens on v1.lightningdesignsystem.com.",
+    errorMsg: "Your code uses the ${cssVar} styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To render your component correctly in all environments, add this fallback value: var(${cssVar}, ${recommendation}) . To make this fallback value brand-aware, use a branded design token instead of a static value. See Design Tokens on v1.lightningdesignsystem.com.",
+    ruleDesc: "Add fallback values to SLDS styling hooks. The fallback values are used in Salesforce environments where styling hooks are unavailable.",
   },
 } as const; // Ensures it's a readonly object
 
