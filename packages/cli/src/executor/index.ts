@@ -127,9 +127,9 @@ function standardizeLintMessages(results: LintResult[]): LintResult[] {
       let msgObj;
       try {
         msgObj = JSON.parse(entry.message);
-        // If already has message, keep as is
+        // If already an object, spread all properties into the entry
         if (typeof msgObj === 'object' && 'message' in msgObj) {
-          return { ...entry, message: msgObj.message };
+          return { ...entry, ...msgObj };
         }
       } catch {}
       // Otherwise, wrap as { message }
@@ -140,7 +140,7 @@ function standardizeLintMessages(results: LintResult[]): LintResult[] {
       try {
         msgObj = JSON.parse(entry.message);
         if (typeof msgObj === 'object' && 'message' in msgObj) {
-          return { ...entry, message: msgObj.message };
+          return { ...entry, ...msgObj };
         }
       } catch {}
       return { ...entry, message: entry.message };
