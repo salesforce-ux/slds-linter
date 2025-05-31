@@ -4,6 +4,7 @@ import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { isTargetProperty } from '../../utils/prop-utills';
 
 const { createPlugin }: typeof stylelint = stylelint;
 const lwcToSlds = metadata.lwcToSlds;
@@ -171,9 +172,13 @@ function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Pro
 }
 
 // Define the main rule logic
-const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity, propertyTargets = [] } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((node) => {
+      if (!isTargetProperty(node.prop, propertyTargets)) {
+        return;
+      }
+
       const basicReportProps:Partial<stylelint.Problem> = {
         node,
         result,

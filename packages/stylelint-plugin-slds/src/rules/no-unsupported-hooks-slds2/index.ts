@@ -4,6 +4,7 @@ import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { isTargetProperty } from '../../utils/prop-utills';
 const { utils, createPlugin } = stylelint;
 
 const deprecatedHooks = new Set(metadata.deprecatedStylingHooks);
@@ -92,9 +93,13 @@ function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Pr
   stylelint.utils.report(<stylelint.Problem>reportProps);
 }
 
-const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity, propertyTargets = [] } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((node) => {
+      if (!isTargetProperty(node.prop, propertyTargets)) {
+        return;
+      }
+
       const basicReportProps:Partial<stylelint.Problem> = {
         node,
         result,

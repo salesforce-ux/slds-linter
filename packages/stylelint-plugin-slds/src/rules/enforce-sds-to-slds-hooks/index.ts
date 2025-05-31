@@ -3,6 +3,7 @@ import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { isTargetProperty } from '../../utils/prop-utills';
 import metadata from '@salesforce-ux/sds-metadata';
 const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
 
@@ -103,10 +104,15 @@ function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Pro
     });
 }
 
-const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) => {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity, propertyTargets = []}={}) => {
+
   return (root: Root, result: PostcssResult) => {
 
     root.walkDecls((decl) => {
+      if (!isTargetProperty(decl.prop, propertyTargets)) {
+        return;
+      }
+
       const basicReportProps = {
         node:decl,
         result,
