@@ -4,6 +4,7 @@ import valueParser from 'postcss-value-parser';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { isTargetProperty } from '../../utils/prop-utills';
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
@@ -113,9 +114,13 @@ function createFix(decl: Declaration, node: valueParser.FunctionNode, varName: s
   };
 }
 
-const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
+const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity, propertyTargets = [] } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl: Declaration) => {
+      if (!isTargetProperty(decl.prop, propertyTargets)) {
+        return;
+      }
+
       forEachVarFn(decl, result, severity, (varName, node, fallbackValue) => {
         // Report the issue
         utils.report({

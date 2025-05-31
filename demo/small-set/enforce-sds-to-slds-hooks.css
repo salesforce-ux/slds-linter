@@ -1,5 +1,5 @@
 .slds-expandable-section .sldc-section__content {
-        background: 0 3px var(--slds-g-color-brand-base-100, rgb(255, 255, 255));
+        background: 0 3px var(--sds-g-color-brand-base-100, rgb(255, 255, 255));
 }
 
 .replaceProp{

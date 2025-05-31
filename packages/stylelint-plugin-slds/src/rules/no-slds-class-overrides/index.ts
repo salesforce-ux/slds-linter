@@ -5,6 +5,7 @@ import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import { getClassNodesFromSelector } from '../../utils/selector-utils';
 import replacePlaceholders from '../../utils/util';
+import { hasMatchedProperty } from '../../utils/prop-utills';
 const { utils, createPlugin }: typeof stylelint = stylelint;
 const sldsClasses = metadata.sldsClasses;
 
@@ -19,10 +20,14 @@ const {
 
 const sldsSet = new Set(sldsClasses);
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
+function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity, propertyTargets = []}={}) {
   return (root: Root, result: PostcssResult) => {
 
     root.walkRules((rule) => {
+      if (!hasMatchedProperty(rule, propertyTargets)) {
+        return;
+      }
+
       const classNodes = getClassNodesFromSelector(rule.selector);
       const offsetIndex = rule.toString().indexOf(rule.selector);
       classNodes.forEach((classNode) => {
