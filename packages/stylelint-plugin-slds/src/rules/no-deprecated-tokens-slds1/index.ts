@@ -27,8 +27,9 @@ function shouldIgnoreDetection(token: string):boolean {
 
 function isAlreadyFixed(recommendation:string,functionNode:valueParser.FunctionNode, allNodes:valueParser.Node[]): boolean{
   const hasFixInFirstNode = allNodes[0].type == "word" && allNodes[0].value === recommendation;
+  const isInFallback = allNodes.length > 1 && isTokenFunction(allNodes[allNodes.length - 1]) && functionNode === allNodes[allNodes.length - 1];
   const sourceIndexMatched = functionNode.sourceIndex === allNodes[allNodes.length - 1].sourceIndex
-  return hasFixInFirstNode&& sourceIndexMatched;
+  return (hasFixInFirstNode || isInFallback) && sourceIndexMatched;
 }
 
 function transformTokenFunction(node:valueParser.Node, allNodes:valueParser.Node[]) {
