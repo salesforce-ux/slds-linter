@@ -13,6 +13,7 @@ coverage/
 .sldslinter/
 *.sarif
 *.tgz
+*.csv
 
 # IDE and editor files
 .idea/

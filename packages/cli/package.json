@@ -17,6 +17,10 @@
     "./executor": {
       "types": "./build/executor/index.d.ts",
       "default": "./build/executor/index.js"
+    },
+    "./utils": {
+      "types": "./build/utils/index.d.ts",
+      "default": "./build/utils/index.js"
     }
   },
   "files": [
