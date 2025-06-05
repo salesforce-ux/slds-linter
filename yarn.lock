@@ -1222,13 +1222,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salesforce-ux/eslint-plugin-slds@npm:0.2.0-alpha.2, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
+"@salesforce-ux/eslint-plugin-slds@npm:0.2.0-alpha.4, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds"
   dependencies:
     "@html-eslint/eslint-plugin": "npm:^0.34.0"
     "@html-eslint/parser": "npm:^0.34.0"
-    "@salesforce-ux/sds-metadata": "npm:~0.1.2"
+    "@salesforce-ux/sds-metadata": "npm:~0.2.1"
     "@types/jest": "npm:^29.5.14"
     eslint: "npm:^8.0.0"
     jest: "npm:^29.7.0"
@@ -1236,10 +1236,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/sds-metadata@npm:~0.1.2":
-  version: 0.1.2
-  resolution: "@salesforce-ux/sds-metadata@npm:0.1.2"
-  checksum: 10c0/5ee825fc6433ea15a2afa45a5f967836ad7c3df5740bd8c8de51b07385d2f34abf774f9e13c6bbdc86b153d339557c7861a841c02cb403bc847f7c4a25be2c29
+"@salesforce-ux/sds-metadata@npm:~0.2.1":
+  version: 0.2.1
+  resolution: "@salesforce-ux/sds-metadata@npm:0.2.1"
+  checksum: 10c0/36d7c85cfa31030b16fd3894adccde7411f3904c4195b988caf1395b6c8a37306b62ada40014aa735bb701cf865b580023efa88eaa4a610a239af99285b5c0e6
   languageName: node
   linkType: hard
 
@@ -1247,8 +1247,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/slds-linter@workspace:packages/cli"
   dependencies:
-    "@salesforce-ux/eslint-plugin-slds": "npm:0.2.0-alpha.2"
-    "@salesforce-ux/stylelint-plugin-slds": "npm:0.2.0-alpha.2"
+    "@salesforce-ux/eslint-plugin-slds": "npm:0.2.0-alpha.4"
+    "@salesforce-ux/stylelint-plugin-slds": "npm:0.2.0-alpha.4"
     "@types/jest": "npm:^29.5.14"
     "@typescript-eslint/eslint-plugin": "npm:^5.0.0"
     "@typescript-eslint/parser": "npm:^5.0.0"
@@ -1270,11 +1270,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/stylelint-plugin-slds@npm:0.2.0-alpha.2, @salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds":
+"@salesforce-ux/stylelint-plugin-slds@npm:0.2.0-alpha.4, @salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds"
   dependencies:
-    "@salesforce-ux/sds-metadata": "npm:~0.1.2"
+    "@salesforce-ux/sds-metadata": "npm:~0.2.1"
     "@types/jest": "npm:^29.0.0"
     "@types/postcss-plugins": "npm:1.13.2"
     chroma-js: "npm:^3.1.2"
