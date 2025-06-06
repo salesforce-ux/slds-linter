@@ -9,11 +9,13 @@ import semver from "semver";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
 import { generateReleaseNotes } from "./generate-release-notes.js";
+import { verifyTarballs } from "./verify-tarballs.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
 const isDryRun = process.argv.includes("--dry-run") || false; // Skips publishing npm, git operations
 const skipCheck = process.argv.includes("--skip-check") || false; // Skips checking working directory git status
+const skipNpmPublish = process.argv.includes("--skip-npm-publish") || false; // Skips npm publish
 
 async function getWorkspaceInfo() {
   try {
@@ -98,7 +100,14 @@ async function gitOperations(version) {
   execSync("git add .");
   execSync(`git commit -m "Release ${version}"`);
   execSync(`git push origin ${releaseBranch}`);
+  
+  return {
+    currentBranch,
+    releaseBranch
+  }
+}
 
+async function createPR(version, { currentBranch, releaseBranch }) {
   // Create PR from release branch to current branch
   const prUrl = execSync(
     `gh pr create --base ${currentBranch} --head ${releaseBranch} --title "Release ${version}" --body "Automated release PR"`
@@ -107,35 +116,44 @@ async function gitOperations(version) {
     .trim();
   console.log(chalk.green(`Created PR: ${prUrl}`));
 
-  // Auto-merge the PR
   execSync(`gh pr merge ${prUrl} --merge --delete-branch`);
   console.log(chalk.green(`Merged PR: ${prUrl}`));
 
-  // Switch back to the current branch
   execSync(`git checkout ${currentBranch}`);
 
-  // Create and push tag
-  execSync(`git tag ${version}`);
-  execSync(`git push origin ${version}`);
+  execSync(`git branch -D ${releaseBranch}`);
 }
 
-async function publishPackages(workspaceInfo, version, releaseType) {
+async function generateTarballs(workspaceInfo) {
+  const tarballs = [];
+  for (const [pkgName, info] of Object.entries(workspaceInfo)) {
+    const pkgPath = path.join(ROOT_DIR, info.location);
+    const tarball = execSync(`cd ${pkgPath} && npm pack`)
+        .toString()
+        .trim();
+    console.log(chalk.blue(`Generated tarball: ${tarball}`));
+    tarballs.push({
+      pkgName,
+      tarball: path.join(pkgPath, tarball),
+      pkgPath
+    });
+  }
+  return tarballs;
+}
+
+
+
+async function publishPackages(tarballs, version, releaseType) {
   const tag = releaseType === "final" ? "latest" : releaseType;
   let sldsLinterTarball = "";
 
-  for (const [pkgName, info] of Object.entries(workspaceInfo)) {
-    const pkgPath = path.join(ROOT_DIR, info.location);
-    
+  for (const { pkgName, tarball, pkgPath } of tarballs) {
     if (pkgName === "@salesforce-ux/slds-linter") {
-      // Generate tarball for slds-linter
-      sldsLinterTarball = execSync(`cd ${pkgPath} && npm pack`)
-        .toString()
-        .trim();
-      console.log(chalk.blue(`Generated tarball: ${sldsLinterTarball}`));
-      sldsLinterTarball = path.join(pkgPath, sldsLinterTarball);
+      sldsLinterTarball = tarball;
+      console.log(chalk.blue(`Using pre-generated tarball: ${sldsLinterTarball}`));
     }
     execSync(
-      `cd ${pkgPath} && NPM_TOKEN=${process.env.NPM_TOKEN} npm publish --tag ${tag} --access public ${isDryRun ? "--dry-run" : ""}`
+      `cd ${pkgPath} && NPM_TOKEN=${process.env.NPM_TOKEN} npm publish --tag ${tag} --access public ${isDryRun || skipNpmPublish ? "--dry-run" : ""}`
     );
     console.log(chalk.green(`Published ${pkgName}@${version}`));
   }
@@ -143,7 +161,23 @@ async function publishPackages(workspaceInfo, version, releaseType) {
   return sldsLinterTarball;
 }
 
+async function createTag(version) {
+  // skip if tag already exists
+  if (execSync(`git tag -l "${version}"`, { stdio: "pipe" }).toString().trim()) {
+    console.log(chalk.yellow(`Tag ${version} already exists, skipping tag creation`));
+    return;
+  }
+  execSync(`git tag ${version} && git push origin ${version}`);
+  console.log(chalk.green(`Created tag: ${version}`));
+}
+
 async function createGitHubRelease(version, tarballPath, releaseType) {
+  
+  if (releaseType !== "final") {
+    console.log(chalk.yellow("Skipping GitHub release for pre-release"));
+    return;
+  }
+
   const previousVersion = execSync("git describe --tags --abbrev=0")
     .toString()
     .trim();
@@ -267,28 +301,58 @@ async function main() {
           title: "Git operations",
           skip: () => isDryRun,
           task: async (ctx) => {
-            await gitOperations(ctx.finalVersion);
+            const { currentBranch, releaseBranch } = await gitOperations(ctx.finalVersion);
+            ctx.currentBranch = currentBranch;
+            ctx.releaseBranch = releaseBranch;
           },
         },
         {
           title: "Building workspace",
-          task: async () => {
-            return exec("CLI_BUILD_MODE=release yarn build");
+          task: async (ctx) => {
+            execSync(`CLI_BUILD_MODE=release yarn build`, {
+              stdio: 'inherit'
+            });
+          },
+        },
+        {
+          title: "Generate tarballs",
+          task: async (ctx) => {
+            ctx.tarballs = await generateTarballs(ctx.workspaceInfo);
+          },
+        },
+        {
+          title: "Verify tarballs",
+          task: async (ctx) => {
+            await verifyTarballs(ctx.tarballs, ctx.finalVersion);
           },
         },
         {
           title: "Publish packages",
           task: async (ctx) => {
             ctx.sldsLinterTarball = await publishPackages(
-              ctx.workspaceInfo,
+              ctx.tarballs,
               ctx.finalVersion,
               ctx.releaseType
             );            
           },
         },
         {
-          title: "Create GitHub release",
+          title: "Create PR",
+          skip: (ctx) => isDryRun || !ctx.sldsLinterTarball,
+          task: async (ctx) => {
+            await createPR(ctx.finalVersion, ctx);
+          },
+        },
+        {
+          title: "Create tag",
           skip: () => isDryRun || !ctx.sldsLinterTarball,
+          task: async (ctx) => {
+            await createTag(ctx.finalVersion);
+          },
+        },
+        {
+          title: "Create GitHub release",
+          skip: (ctx) => isDryRun || ctx.releaseType !== "final" || !ctx.sldsLinterTarball,
           task: async (ctx) => {
             await createGitHubRelease(
               ctx.finalVersion,
