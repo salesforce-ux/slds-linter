@@ -4,7 +4,7 @@
   "type": "module",
   "main": "build/index.js",
   "files": [
-    "build/*",
+    "build/**",
     "README.md",
     "RULES.MD",
     ".stylelintrc.yml"
