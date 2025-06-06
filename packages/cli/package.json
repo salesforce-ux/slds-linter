@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/slds-linter",
-  "version": "0.2.0-alpha.6",
+  "version": "0.2.1",
   "description": "SLDS Linter CLI tool for linting styles and components",
   "keywords": [
     "lightning design system linter",
@@ -17,13 +17,17 @@
     "./executor": {
       "types": "./build/executor/index.d.ts",
       "default": "./build/executor/index.js"
+    },
+    "./utils": {
+      "types": "./build/utils/index.d.ts",
+      "default": "./build/utils/index.js"
     }
   },
   "files": [
     "build/**",
     "README.md"
   ],
-  "bin": "./build/index.js",
+  "bin": "build/index.js",
   "scripts": {
     "prepublishOnly": "clean-pkg-json",
     "build": "gulp build",
@@ -32,8 +36,8 @@
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
-    "@salesforce-ux/eslint-plugin-slds": "0.2.0-alpha.6",
-    "@salesforce-ux/stylelint-plugin-slds": "0.2.0-alpha.6",
+    "@salesforce-ux/eslint-plugin-slds": "0.2.1",
+    "@salesforce-ux/stylelint-plugin-slds": "0.2.1",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "chalk": "^4.1.2",
