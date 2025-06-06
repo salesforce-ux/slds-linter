@@ -1222,7 +1222,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salesforce-ux/eslint-plugin-slds@npm:0.2.0-alpha.4, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
+"@salesforce-ux/eslint-plugin-slds@npm:0.2.0, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds"
   dependencies:
@@ -1247,8 +1247,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/slds-linter@workspace:packages/cli"
   dependencies:
-    "@salesforce-ux/eslint-plugin-slds": "npm:0.2.0-alpha.4"
-    "@salesforce-ux/stylelint-plugin-slds": "npm:0.2.0-alpha.4"
+    "@salesforce-ux/eslint-plugin-slds": "npm:0.2.0"
+    "@salesforce-ux/stylelint-plugin-slds": "npm:0.2.0"
     "@types/jest": "npm:^29.5.14"
     "@typescript-eslint/eslint-plugin": "npm:^5.0.0"
     "@typescript-eslint/parser": "npm:^5.0.0"
@@ -1266,11 +1266,11 @@ __metadata:
     stylelint: "npm:^16.10.0"
     ts-jest: "npm:^29.2.5"
   bin:
-    slds-linter: ./build/index.js
+    slds-linter: build/index.js
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/stylelint-plugin-slds@npm:0.2.0-alpha.4, @salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds":
+"@salesforce-ux/stylelint-plugin-slds@npm:0.2.0, @salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds"
   dependencies:

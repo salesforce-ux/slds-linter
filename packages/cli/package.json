@@ -27,7 +27,7 @@
     "build/**",
     "README.md"
   ],
-  "bin": "./build/index.js",
+  "bin": "build/index.js",
   "scripts": {
     "prepublishOnly": "clean-pkg-json",
     "build": "gulp build",
