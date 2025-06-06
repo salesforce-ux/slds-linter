@@ -1,10 +1,10 @@
 {
   "name": "@salesforce-ux/stylelint-plugin-slds",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "main": "build/index.js",
   "files": [
-    "build/*",
+    "build/**",
     "README.md",
     "RULES.MD",
     ".stylelintrc.yml"
