@@ -5,6 +5,7 @@ import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import { isTargetProperty } from '../../utils/prop-utills';
+import { forEachVarFunction } from '../../utils/decl-utils';
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
@@ -25,11 +26,6 @@ const messages = utils.ruleMessages(ruleName, {
     replacePlaceholders(errorMsg, { cssVar, recommendation }),
 });
 
-// Find a fallback value based on the CSS variable name
-function getFallbackValue(varName: string): string | null {
-  return sldsVariables[varName] || null;
-}
-
 /**
  * Check if a CSS variable name starts with --slds-
  */
@@ -42,65 +38,6 @@ function isSldsCssVariable(cssVar: string): boolean {
  */
 function hasFallbackValue(nodes: valueParser.Node[]): boolean {
   return nodes.some((arg) => arg.type === 'div' && arg.value === ',');
-}
-
-/**
- * Extract the variable name from a var() function
- */
-function extractVarName(node: valueParser.FunctionNode): string | null {
-  if (node.nodes.length === 0) return null;
-  
-  const varNameNode = node.nodes[0];
-  if (varNameNode.type !== 'word') return null;
-  
-  return varNameNode.value;
-}
-
-/**
- * Process a CSS var() function node
- */
-function processVarFunction(
-  node: valueParser.FunctionNode,
-  callback: (varName: string, node: valueParser.FunctionNode, fallbackValue: string) => void
-): void {
-  const varName = extractVarName(node);
-  
-  // Skip if not a valid variable name or not an SLDS variable
-  if (!varName || !isSldsCssVariable(varName)) return;
-  
-  // Skip if already has fallback
-  if (hasFallbackValue(node.nodes)) return;
-  
-  // Get fallback value from metadata
-  const fallbackValue = getFallbackValue(varName);
-  
-  // Only report if we have a fallback value from metadata
-  if (!fallbackValue) return;
-  
-  callback(varName, node, fallbackValue);
-}
-
-// Helper function to process CSS declarations
-function forEachVarFn(
-  decl: Declaration,
-  result: PostcssResult,
-  severity: RuleSeverity,
-  callback: (varName: string, node: valueParser.FunctionNode, fallbackValue: string) => void
-) {
-  if (!decl.value?.includes('var(')) return;
-
-  const parsedValue = valueParser(decl.value);
-  
-  parsedValue.walk((node) => {
-    if (node.type === 'function' && node.value === 'var') {
-      processVarFunction(node as valueParser.FunctionNode, callback);
-      // Continue walking to check for nested var() functions
-      return true;
-    }
-    return true;
-  });
-
-  return parsedValue;
 }
 
 /**
@@ -121,15 +58,29 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
         return;
       }
 
-      forEachVarFn(decl, result, severity, (varName, node, fallbackValue) => {
+      forEachVarFunction(decl, (node, startOffset) => {
+        const functionNode = node as valueParser.FunctionNode;
+        let cssVarNode = functionNode.nodes[0];
+        let cssVar = cssVarNode.value;
+  
+        if (!isSldsCssVariable(cssVar) || hasFallbackValue(functionNode.nodes)) return;
+
+        const fallbackValue = sldsVariables[cssVar] || null;
+
+        if (!fallbackValue) return;
+        const index = cssVarNode.sourceIndex + startOffset;
+        const endIndex = cssVarNode.sourceEndIndex + startOffset;
+        
         // Report the issue
         utils.report({
-          message: messages.expected(varName, fallbackValue),
+          message: messages.expected(cssVar, fallbackValue),
           node: decl,
           result,
           ruleName,
           severity,
-          fix: createFix(decl, node, varName, fallbackValue)
+          index,
+          endIndex,
+          fix: createFix(decl, functionNode, cssVar, fallbackValue)
         });
       });
     });

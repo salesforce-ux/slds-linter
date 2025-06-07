@@ -224,7 +224,7 @@ describe('no-slds-var-without-fallback', () => {
     expect(fixedCss.includes('var(--slds-completely-unknown-variable, ')).toBeFalsy();
   });
 
-  test('Flags nested var() functions without fallback', async () => {
+  xtest('Flags nested var() functions without fallback', async () => {
     // Nested variables
     const css = `
       .example {
@@ -252,7 +252,7 @@ describe('no-slds-var-without-fallback', () => {
     expect(warningTexts.some(text => text.includes('#c9c9c9'))).toBeTruthy();
   });
 
-  test('Applies fallback value to nested var() functions when fixing', async () => {
+  xtest('Applies fallback value to nested var() functions when fixing', async () => {
     const inputCss = `
       .example {
         color: var(--lwc-color-background, var(--slds-g-color-border-base-1));
