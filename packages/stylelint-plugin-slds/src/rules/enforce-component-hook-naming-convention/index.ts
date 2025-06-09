@@ -4,11 +4,11 @@ import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import metadata from '@salesforce-ux/sds-metadata';
-const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
+const slds1DeprecatedComponentHooks = metadata.deprecatedStylingHooks;
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
-const ruleName: string = 'slds/enforce-sds-to-slds-hooks';
+const ruleName: string = 'slds/enforce-component-hook-naming-convention';
 
 const ruleInfo = ruleMetadata(ruleName);
 
@@ -27,31 +27,18 @@ const messages = utils.ruleMessages(ruleName, {
     }),
 });
 
-// Generate values to hooks mapping using only global hooks
-// shared hooks are private/ undocumented APIs, so they should not be recommended to customers
-// Ref this thread: https://salesforce-internal.slack.com/archives/C071J0Q3FNV/p1743010620921339?thread_ts=1743009353.385429&cid=C071J0Q3FNV
-const allSldsHooks = [
-  ...sldsPlusStylingHooks.global,
-  ...sldsPlusStylingHooks.component,
-];
-
-const toSldsToken = (sdsToken: string) => sdsToken.replace('--sds-', '--slds-');
-
-function shouldIgnoreDetection(sdsToken: string) {
+function shouldIgnoreDetection(hook: string) {
   // Ignore if entry not found in the list
   return (
-    !sdsToken.startsWith('--sds-') ||
-    !allSldsHooks.includes(toSldsToken(sdsToken))
+    !hook.startsWith('--slds-c-') || !(hook in slds1DeprecatedComponentHooks)
   );
 }
 
 /**
- *
  * Example:
  *  .THIS .demo {
- *    border: 1px solid var(--sds-g-color-border-1));
+ *    border: 1px solid var(--slds-c-button-color-border));
  *  }
- *
  */
 function detectRightSide(
   decl: Declaration,
@@ -60,20 +47,19 @@ function detectRightSide(
   const parsedValue = valueParser(decl.value);
   // Usage on right side
   parsedValue.walk((node) => {
-    if (node.type !== 'word' || !node.value.startsWith('--sds-')) {
+    if (node.type !== 'word' || !node.value.startsWith('--slds-c-')) {
       return;
     }
 
     const oldValue = node.value;
 
     if (shouldIgnoreDetection(oldValue)) {
-      // Ignore if entry not found in the list or the token is marked to use further
       return;
     }
 
     const startIndex = decl.toString().indexOf(oldValue);
     const endIndex = startIndex + oldValue.length;
-    const suggestedMatch = toSldsToken(oldValue);
+    const suggestedMatch = slds1DeprecatedComponentHooks[oldValue];
     const message = messages.replace(oldValue, suggestedMatch);
 
     utils.report(<stylelint.Problem>{
@@ -87,12 +73,10 @@ function detectRightSide(
 }
 
 /**
- *
  * Example:
- *  .THIS  .demo {
- *    --sds-c-border-radius: 50%;
+ *  .THIS .demo {
+ *    --slds-c-button-color-border: 50%;
  *  }
- *
  */
 function detectLeftSide(
   decl: Declaration,
@@ -101,13 +85,12 @@ function detectLeftSide(
   // Usage on left side
   const { prop } = decl;
   if (shouldIgnoreDetection(prop)) {
-    // Ignore if entry not found in the list or the token is marked to use further
     return;
   }
   const startIndex = decl.toString().indexOf(prop);
   const endIndex = startIndex + prop.length;
 
-  const suggestedMatch = toSldsToken(prop);
+  const suggestedMatch = slds1DeprecatedComponentHooks[prop];
   const message = messages.replace(prop, suggestedMatch);
 
   utils.report(<stylelint.Problem>{

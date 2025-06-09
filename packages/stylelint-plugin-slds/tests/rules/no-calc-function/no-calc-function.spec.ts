@@ -15,7 +15,7 @@ describe('no-calc-function', () => {
         }
       `,
       expectedMessage:
-        'Don’t use the calc() function in the property width.',
+        "Don't use the calc() function in the property width.",
     },
     {
       description: 'Fixes calc() usage by removing it from the width property',
@@ -25,7 +25,7 @@ describe('no-calc-function', () => {
         }
       `,
       expectedMessage:
-        'Don’t use the calc() function in the property width.',
+        "Don't use the calc() function in the property width.",
       fix: true,
       expectedOutput: `
         .example {
@@ -58,7 +58,7 @@ describe('no-calc-function', () => {
         }
       `,
       expectedMessage:
-        'Don’t use the calc() function in the property width.',
+        "Don't use the calc() function in the property width.",
     },
   ];
 

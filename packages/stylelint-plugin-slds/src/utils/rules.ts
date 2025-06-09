@@ -18,7 +18,7 @@ const rulesMetadata = {
     name: "slds/no-deprecated-classes-slds2",
     severityLevel: "error",
     ruleDesc:
-      "Replace classes that aren’t available with SLDS 2 classes. See lightningdesignsystem.com for more info.",
+      "Replace classes that aren't available with SLDS 2 classes. See lightningdesignsystem.com for more info.",
   },
 
   // CHECKED
@@ -32,7 +32,7 @@ const rulesMetadata = {
   //   name: "slds/enforce-bem-usage", // BEM - Double Dash to BEM Notation
   //   severityLevel: "warning",
   //   warningMsg:
-  //     "The ${oldValue} class doesn’t follow the correct BEM naming convention. Update it to ${newValue}",
+  //     "The ${oldValue} class doesn't follow the correct BEM naming convention. Update it to ${newValue}",
   //   errorMsg:
   //     "${oldValue} has been retired. Update it to the new name ${newValue}",
   //   ruleDesc:
@@ -43,7 +43,7 @@ const rulesMetadata = {
   "slds/no-hardcoded-values-slds1": {
     name: "slds/no-hardcoded-values-slds1", //DESIGN_TOKEN - Design Token
     severityLevel: "warning",
-    //suggestedMsg: `There’s no replacement styling hook for the ${oldValue} static value. Remove the static value.` //TODO: How to handle this scenario.
+    //suggestedMsg: `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.` //TODO: How to handle this scenario.
     warningMsg:
       "Replace the ${oldValue} static value with an SLDS 1 styling hook: ${newValue}.",
     errorMsg:
@@ -55,7 +55,7 @@ const rulesMetadata = {
     name: "slds/no-hardcoded-values-slds2",
     severityLevel: "warning",
     // suggestedMsg:
-    //   "There’s no replacement SLDS 2 styling hook for the ${oldValue} static value. Remove the static value.",
+    //   "There's no replacement SLDS 2 styling hook for the ${oldValue} static value. Remove the static value.",
     warningMsg:
       "Consider replacing the ${oldValue} static value with an SLDS 2 styling hook that has a similar value: ${newValue}",
     errorMsg:
@@ -70,9 +70,9 @@ const rulesMetadata = {
     name: "slds/no-slds-class-overrides",
     severityLevel: "warning",
     warningMsg:
-      "Overriding ${selector} isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button",
+      "Overriding ${selector} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button",
     errorMsg:
-      "Overriding ${selector} isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button",
+      "Overriding ${selector} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button",
     ruleDesc:
       "Create new custom CSS classes instead of overriding SLDS selectors. For more information, see the Lightning Web Components Developer Guide.",
   },
@@ -109,6 +109,16 @@ const rulesMetadata = {
     ruleDesc:
       "Convert your existing --sds styling hooks to --slds styling hooks. See lightningdesignsystem.com for more info.",
   },
+
+  "slds/enforce-component-hook-naming-convention": {
+    name: "slds/enforce-component-hook-naming-convention",
+    severityLevel: "warning",
+    warningMsg: "This component hook is using a naming convention that is no longer supported. Please replace it with ${suggestedMatch} styling hook.",
+    errorMsg: "This component hook is using a naming convention that is no longer supported. Please replace it with ${suggestedMatch} styling hook.",
+    ruleDesc:
+      "Convert your existing SLDS1 component hooks to SLDS2 component hooks. See lightningdesignsystem.com for more info.",
+  },
+
   // Needs CX review
   "slds/no-deprecated-slds2-classes": {
     name: "slds/no-deprecated-slds2-classes",
@@ -118,7 +128,7 @@ const rulesMetadata = {
     errorMsg:
       "Selector: ${selector} is no longer available in SLDS2. Please update to a supported selector.",
     ruleDesc:
-      "We’ve found code that’s not currently compatible with the Cosmos.",
+      "We've found code that's not currently compatible with the Cosmos.",
   },
 
   // New rules
@@ -167,9 +177,9 @@ const rulesMetadata = {
     name: "slds/no-unsupported-hooks-slds2",
     severityLevel: "warning",
     warningMsg:
-      "The ${token} styling hook isn’t present in SLDS 2 and there\'s no equivalent replacement. Remove it or replace it with a styling hook with a similar effect.",
+      "The ${token} styling hook isn't present in SLDS 2 and there's no equivalent replacement. Remove it or replace it with a styling hook with a similar effect.",
     errorMsg:
-      "The ${token} styling hook isn’t present in SLDS 2. Replace it with ${newToken}.",
+      "The ${token} styling hook isn't present in SLDS 2. Replace it with ${newToken}.",
     ruleDesc:
       "Replace deprecated --slds styling hooks. See lightningdesignsystem.com for more info.",
   },
@@ -187,8 +197,8 @@ const rulesMetadata = {
   "slds/no-calc-function": {
     name: "slds/no-calc-function",
     severityLevel: "warning",
-    warningMsg: "Don’t use the calc() function in the property ${property}.",
-    errorMsg: "Don’t use the calc() function in the property ${property}.",
+    warningMsg: "Don't use the calc() function in the property ${property}.",
+    errorMsg: "Don't use the calc() function in the property ${property}.",
     ruleDesc: "Avoid using calc() functions.",
   },
   
