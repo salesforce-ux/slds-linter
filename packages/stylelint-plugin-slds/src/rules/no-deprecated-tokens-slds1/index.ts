@@ -4,6 +4,7 @@ import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { isTargetProperty } from '../../utils/prop-utills';
 const { utils, createPlugin }: typeof stylelint = stylelint;
 const ruleName: string = 'slds/no-deprecated-tokens-slds1';
 const tokenMapping = metadata.auraToLwcTokensMapping;
@@ -26,8 +27,9 @@ function shouldIgnoreDetection(token: string):boolean {
 
 function isAlreadyFixed(recommendation:string,functionNode:valueParser.FunctionNode, allNodes:valueParser.Node[]): boolean{
   const hasFixInFirstNode = allNodes[0].type == "word" && allNodes[0].value === recommendation;
+  const isInFallback = allNodes.length > 1 && isTokenFunction(allNodes[allNodes.length - 1]) && functionNode === allNodes[allNodes.length - 1];
   const sourceIndexMatched = functionNode.sourceIndex === allNodes[allNodes.length - 1].sourceIndex
-  return hasFixInFirstNode&& sourceIndexMatched;
+  return (hasFixInFirstNode || isInFallback) && sourceIndexMatched;
 }
 
 function transformTokenFunction(node:valueParser.Node, allNodes:valueParser.Node[]) {
@@ -57,9 +59,13 @@ function transformTokenFunction(node:valueParser.Node, allNodes:valueParser.Node
 }
 
 
-const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={})  => {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity, propertyTargets = []}={})  => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
+      if (!isTargetProperty(decl.prop, propertyTargets)) {
+        return;
+      }
+
       const parsedValue = valueParser(decl.value);
       const startIndex = decl.toString().indexOf(decl.value);
       

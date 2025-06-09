@@ -10,6 +10,7 @@ import generateSuggestionsList from '../../utils/generateSuggestionsList';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
+import { isTargetProperty } from '../../utils/prop-utills';
 const { utils, createPlugin } = stylelint;
 
 // Define the structure of a hook
@@ -225,10 +226,14 @@ export const createNoHardcodedValueRule = (
 
   const ruleFunction: Partial<stylelint.Rule> = (
     primaryOptions: boolean,
-    { severity = severityLevel as RuleSeverity } = {}
+    { severity = severityLevel as RuleSeverity, propertyTargets = [] } = {}
   ) => {
     return (root: Root, result: PostcssResult) => {
       root.walkDecls((decl) => {
+        if (!isTargetProperty(decl.prop, propertyTargets)) {
+          return;
+        }
+
         const cssProperty = decl.prop.toLowerCase();
         const cssValue = decl.value;
         const parsedValue = valueParser(cssValue);

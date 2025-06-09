@@ -4,6 +4,7 @@ import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import { getClassNodesFromSelector } from '../../utils/selector-utils';
 import replacePlaceholders from '../../utils/util';
+import { hasMatchedProperty } from '../../utils/prop-utills';
 
 const { utils, createPlugin } = stylelint;
 const deprecatedClasses = metadata.deprecatedClasses;
@@ -27,6 +28,7 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
     const deprecatedClassesSet = new Set(deprecatedClasses);
 
     root.walkRules((rule) => {
+      
       const classNodes = getClassNodesFromSelector(rule.selector);
       const offsetIndex = rule.toString().indexOf(rule.selector);
       classNodes.forEach((classNode) => {
