@@ -14,3 +14,18 @@ export function getClassNodesFromSelector(selector: string): CssClassNode[] {
   });
   return classNodes;
 }
+
+export function getClassNodesAtEnd(selector: string): CssClassNode[] {
+  const selectorParser = SelectorParser();
+  const selectorAst = selectorParser.astSync(selector);
+  const classNodes:CssClassNode[] = [];
+  for (const node of selectorAst.nodes) {
+      if(node.type === 'selector'){
+          let lastNode = node.last?.type === 'pseudo' ? node.last?.prev() : node.last;
+          if(lastNode?.type === 'class'){
+            classNodes.push(lastNode);
+          }
+      }
+  }
+  return classNodes;
+}
