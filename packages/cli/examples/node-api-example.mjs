@@ -7,6 +7,7 @@
  */
 
 import { lint, report } from '@salesforce-ux/slds-linter/executor';
+import { printLintResults } from '@salesforce-ux/slds-linter/utils';
 import fs from 'fs';
 import path from 'path';
 
@@ -23,10 +24,8 @@ async function lintDirectory() {
     console.log(`Found ${results.length} files with issues`);
     
     // Display summary of issues
-    results.forEach(result => {
-      console.log(`File: ${path.basename(result.filePath)}`);
-      console.log(`- Errors: ${result.errors.length}, Warnings: ${result.warnings.length}`);
-    });
+    printLintResults(results);
+
   } catch (error) {
     console.error('Linting failed:', error);
   }
@@ -48,14 +47,15 @@ async function generateSarifReport() {
         filePath: '../../demo/small-set/hardcoded-values.css',
         errors: [],
         warnings: [{
-          line: 1,
-          column: 1,
-          endColumn: 10,
-          message: 'Sample warning message for testing',
-          ruleId: 'test-rule',
+          line: 2,
+          column: 13,
+          endColumn: 17,
+          message: "There’s no replacement styling hook for the 100% static value. Remove the static value. (slds/no-hardcoded-values-slds2).",
+          ruleId: 'slds/no-hardcoded-values-slds2',
           severity: 1
         }]
       }];
+      printLintResults(lintResults);
     }
     
     const reportStream = await report({
@@ -93,11 +93,20 @@ async function generateCsvReport() {
           line: 1,
           column: 1,
           endColumn: 10,
-          message: 'Sample warning message for testing',
-          ruleId: 'test-rule',
+          message: "Overriding .slds-button__icon isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button.",
+          ruleId: 'slds/no-slds-class-overrides',
+          severity: 1
+        },
+        {
+          line: 2,
+          column: 13,
+          endColumn: 17,
+          message: "There’s no replacement styling hook for the 23% static value. Remove the static value. (slds/no-hardcoded-values-slds2).",
+          ruleId: 'slds/no-hardcoded-values-slds2',
           severity: 1
         }]
       }];
+      printLintResults(lintResults);
     }
     
     // Generate report using the lint results

@@ -11,8 +11,10 @@ dist/
 build/
 coverage/
 .sldslinter/
+temp-verify/
 *.sarif
 *.tgz
+*.csv
 
 # IDE and editor files
 .idea/
