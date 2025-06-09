@@ -20,14 +20,10 @@ const {
 
 const sldsSet = new Set(sldsClasses);
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity, propertyTargets = []}={}) {
+function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
   return (root: Root, result: PostcssResult) => {
 
     root.walkRules((rule) => {
-      if (!hasMatchedProperty(rule, propertyTargets)) {
-        return;
-      }
-
       const classNodes = getClassNodesAtEnd(rule.selector);
       const offsetIndex = rule.toString().indexOf(rule.selector);
       classNodes.forEach((classNode) => {

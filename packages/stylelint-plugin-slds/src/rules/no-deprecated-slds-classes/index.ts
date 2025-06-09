@@ -22,16 +22,13 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
 });
 
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity, propertyTargets = []}={}) {
+function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
   return (root: Root, result: PostcssResult) => {
     
     const deprecatedClassesSet = new Set(deprecatedClasses);
 
     root.walkRules((rule) => {
-      if (!hasMatchedProperty(rule, propertyTargets)) {
-        return;
-      }
-
+      
       const classNodes = getClassNodesFromSelector(rule.selector);
       const offsetIndex = rule.toString().indexOf(rule.selector);
       classNodes.forEach((classNode) => {

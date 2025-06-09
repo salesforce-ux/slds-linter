@@ -21,8 +21,8 @@ export function getClassNodesAtEnd(selector: string): CssClassNode[] {
   const classNodes:CssClassNode[] = [];
   for (const node of selectorAst.nodes) {
       if(node.type === 'selector'){
-          let lastNode = node.last.type === 'pseudo' ? node.last.prev() : node.last;
-          if(lastNode.type === 'class'){
+          let lastNode = node.last?.type === 'pseudo' ? node.last?.prev() : node.last;
+          if(lastNode?.type === 'class'){
             classNodes.push(lastNode);
           }
       }
