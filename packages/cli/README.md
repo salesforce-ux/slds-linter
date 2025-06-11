@@ -28,8 +28,23 @@ Install these items if they aren't installed already.
 - [VS Code](https://code.visualstudio.com/)
 - [SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=MS-SarifVSCode.sarif-viewer) VS Code extension. This extension enables you to view SLDS Linter violation reports.
 - [Node.js](https://nodejs.org/)
-  - The minimum supported version is **v18.4.0**
+  - The minimum supported version is **v18.18.0** (for ESLint 9.x compatibility)
   - We recommend using the latest [Active LTS](https://nodejs.org/en/about/previous-releases) version of Node.js.  
+
+## ESLint 9.x Compatibility
+
+SLDS Linter has been updated to work with ESLint 9.x and the new flat configuration format. Key changes include:
+
+- **ESLint 9.x Support**: Updated to work with ESLint 9.x and its flat config system
+- **Node.js Requirements**: Minimum Node.js version is now 18.18.0
+- **Configuration Format**: Uses the new flat config format (`eslint.config.js`) instead of `.eslintrc.*` files
+- **Plugin Structure**: Updated plugin architecture for better compatibility with ESLint 9.x
+
+### Migration Notes
+
+- The CLI automatically uses the appropriate ESLint configuration format
+- Custom configurations will use the new flat config structure
+- All existing rules and functionality remain the same
 
 ## Install SLDS Linter
 

@@ -7,7 +7,11 @@ function normalizeHTML(html) {
 }
 
 const ruleTester = new RuleTester({
-  parser: require.resolve("@html-eslint/parser"), // Specify the parser for HTML files
+  languageOptions: {
+    parser: require("@html-eslint/parser"), // Specify the parser for HTML files using flat config format
+    ecmaVersion: 2021,
+    sourceType: "module"
+  }
 });
 
 ruleTester.run("slds-modal-button-issue", rule, {

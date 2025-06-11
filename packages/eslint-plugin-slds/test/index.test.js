@@ -25,12 +25,13 @@ describe('ESLint Plugin Configurations', () => {
     });
   
     test('should define recommended configuration with parser', () => {
-      expect(index.configs.recommended).toHaveProperty('parser', '@html-eslint/parser');
+      expect(index.configs.recommended).toHaveProperty('languageOptions');
+      expect(index.configs.recommended.languageOptions).toHaveProperty('parser');
     });
   
     test('should define recommended configuration with plugins', () => {
       expect(index.configs.recommended).toHaveProperty('plugins');
-      expect(index.configs.recommended.plugins).toContain('@salesforce-ux/slds');
+      expect(index.configs.recommended.plugins).toHaveProperty('@salesforce-ux/slds');
     });
   
     test('should define recommended configuration with rules', () => {

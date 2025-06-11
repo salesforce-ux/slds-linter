@@ -6,7 +6,7 @@
     "build/**",
     "README.md",
     "RULES.md",
-    ".eslintrc.yml"
+    "eslint.config.js"
   ],
   "scripts": {
     "build": "gulp build",
@@ -26,7 +26,7 @@
     "@html-eslint/eslint-plugin": "^0.34.0",
     "@html-eslint/parser": "^0.34.0",
     "@salesforce-ux/sds-metadata": "~0.2.1",
-    "eslint": "^8.0.0"
+    "eslint": "^9.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
