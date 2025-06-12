@@ -46,11 +46,13 @@ const rules: Record<string, Rule.RuleModule> = {
 };
 
 /**
- * Package metadata for consistent versioning
+ * Package metadata dynamically loaded from package.json
+ * Ensures consistency between plugin metadata and package information
  */
+const packageJson = require('../package.json');
 const PLUGIN_META = {
-    name: "@salesforce-ux/eslint-plugin-slds",
-    version: "0.2.1"
+    name: packageJson.name,
+    version: packageJson.version
 } as const;
 
 /**
