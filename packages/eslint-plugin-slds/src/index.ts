@@ -13,8 +13,16 @@ interface PluginConfig {
 }
 
 /**
- * Determine configuration format based on environment
- * Uses ESLINT_USE_FLAT_CONFIG environment variable for explicit control
+ * Determine configuration format based on environment variable
+ * 
+ * @returns {boolean} True for flat config (ESLint v9), false for legacy config (ESLint v8)
+ * 
+ * Behavior:
+ * - ESLINT_USE_FLAT_CONFIG=true: Use flat config (ESLint v9 format)
+ * - ESLINT_USE_FLAT_CONFIG=false: Use legacy config (ESLint v8 format)
+ * - undefined: Defaults to flat config (ESLint v9 format)
+ * 
+ * Note: ESLint v8 users must explicitly set ESLINT_USE_FLAT_CONFIG=false
  */
 function shouldUseFlatConfig(): boolean {
     const envVar = process.env.ESLINT_USE_FLAT_CONFIG;
@@ -22,8 +30,8 @@ function shouldUseFlatConfig(): boolean {
         return envVar === 'true';
     }
     
-    // Default to flat config for new installations
-    // Can be overridden by environment variable for backward compatibility
+    // Default to flat config (ESLint v9 format)
+    // ESLint v8 users must set ESLINT_USE_FLAT_CONFIG=false for legacy format
     return true;
 }
 
@@ -132,7 +140,10 @@ function createPlugin(): PluginConfig {
 
 /**
  * Main plugin export
- * Supports both ESLint v8 and v9 configurations
+ * 
+ * Supports both ESLint v8 and v9 configurations:
+ * - ESLint v9: Uses flat config format by default
+ * - ESLint v8: Requires ESLINT_USE_FLAT_CONFIG=false for legacy format
  */
 const plugin = createPlugin();
 
