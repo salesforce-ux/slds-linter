@@ -23,11 +23,7 @@
     "eslint",
     "eslint-plugin",
     "lightning-design-system",
-    "slds2",
-    "salesforce",
-    "linting",
-    "html",
-    "markup"
+    "slds2"
   ],
   "author": "UXF Tooling Team",
   "license": "ISC",

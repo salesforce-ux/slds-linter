@@ -1,11 +1,3 @@
-/**
- * @fileoverview ESLint Plugin for Salesforce Lightning Design System (SLDS)
- * Provides custom linting rules for SLDS markup files with dual ESLint v8/v9 support
- * 
- * @author UXF Tooling Team
- * @version 0.2.1
- */
-
 import type { ESLint, Rule } from 'eslint';
 
 /**
