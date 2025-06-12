@@ -2,18 +2,20 @@ root: true
 env:
   es2021: true
   node: true
-parser: "@html-eslint/parser"
+parser: "@html-eslint/parser" # ✅ Ensure we are using the correct parser
 parserOptions:
   ecmaVersion: 2021
-  sourceType: "module"
+  sourceType: module
 ignorePatterns:
   - "node_modules/"
-plugins:
-  - "@salesforce-ux/slds"
 overrides:
   - files:
-      - "**/*.html"
-      - "**/*.cmp"
+      - "*.html"
+      - "*.cmp"
+    parser: "@html-eslint/parser" # ✅ Enforce HTML parser only for these files
+    plugins:
+      - "@html-eslint"
+      - "@salesforce-ux/slds"
     rules:
       "@salesforce-ux/slds/enforce-bem-usage": "error"
       "@salesforce-ux/slds/no-deprecated-classes-slds2": "error"
