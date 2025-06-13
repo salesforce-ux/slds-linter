@@ -1,18 +1,36 @@
-export = {
-    rules: {
-        "enforce-bem-usage": require('./rules/enforce-bem-usage'),
-        "no-deprecated-classes-slds2": require('./rules/no-deprecated-classes-slds2'),
-        "modal-close-button-issue": require('./rules/modal-close-button-issue')
-    },
-    configs: {
-        recommended: {
-            parser: "@html-eslint/parser", // Use HTML parser
-            plugins: ["@salesforce-ux/slds"],
-            rules: {
-                "@salesforce-ux/slds/enforce-bem-usage": "error",
-                "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
-                "@salesforce-ux/slds/modal-close-button-issue": "error"
-            },
-        },
-    },
-};
+import type { ESLint, Rule } from 'eslint';
+import type { PluginConfig } from './types';
+import { PLUGIN_META } from './constants';
+import { createFlatConfig, createLegacyConfig, shouldUseFlatConfig } from './config';
+import { rules } from './rules';
+
+/**
+ * Creates the plugin configuration based on the ESLint version
+ * @returns The plugin configuration in the appropriate format
+ */
+function createPlugin(): PluginConfig {
+    const useFlatConfig = shouldUseFlatConfig();
+    
+    // Base plugin structure
+    const plugin: PluginConfig = {
+        rules,
+        configs: {}
+    };
+    
+    // Add metadata for ESLint v9+ compatibility
+    if (useFlatConfig) {
+        plugin.meta = PLUGIN_META;
+    }
+    
+    // Configure recommended preset
+    Object.assign(plugin.configs, {
+        recommended: useFlatConfig 
+            ? createFlatConfig(plugin)
+            : createLegacyConfig()
+    });
+    
+    return plugin;
+}
+
+// Export the plugin configuration directly
+module.exports = createPlugin(); 
