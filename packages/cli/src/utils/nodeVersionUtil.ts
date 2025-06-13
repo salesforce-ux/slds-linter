@@ -5,6 +5,7 @@ import {resolve} from 'import-meta-resolve'; // This package is a ponyfill for i
 import { Logger } from './logger'; // Ensure this path is correct
 
 export const REQUIRED_NODE_VERSION = ">=18.4.0";
+//should we change above for Eslint v9 support >=18.18.0 
 
 /**
  * Checks if the current Node.js version meets the required version.
