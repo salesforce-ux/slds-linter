@@ -2,6 +2,28 @@
   "name": "@salesforce-ux/eslint-plugin-slds",
   "version": "0.2.1",
   "main": "build/index.js",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "import": "./build/index.js",
+      "require": "./build/index.js"
+    },
+    "./v8": {
+      "types": "./build/v8/index.d.ts",
+      "import": "./build/v8/index.js",
+      "require": "./build/v8/index.js"
+    },
+    "./v9": {
+      "types": "./build/v9/index.d.ts",
+      "import": "./build/v9/index.js",
+      "require": "./build/v9/index.js"
+    },
+    "./eslint.config.js": {
+      "types": "./build/eslint.config.d.ts",
+      "import": "./build/eslint.config.js",
+      "require": "./build/eslint.config.js"
+    }
+  },
   "files": [
     "build/**",
     "README.md",
@@ -15,8 +37,9 @@
   "scripts": {
     "build": "gulp build",
     "test": "jest",
-    "test:eslint8": "ESLINT_USE_FLAT_CONFIG=false jest",
-    "test:eslint9": "ESLINT_USE_FLAT_CONFIG=true jest",
+    "test:v8": "jest --testPathPattern='test/v8'",
+    "test:v9": "jest --testPathPattern='test/v9'",
+    "test:all": "jest --testPathPattern='test/(v8|v9)'",
     "prepublishOnly": "clean-pkg-json"
   },
   "keywords": [

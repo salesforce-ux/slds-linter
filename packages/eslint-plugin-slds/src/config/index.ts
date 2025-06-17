@@ -1,29 +1,5 @@
-import type { PluginConfig, RuleConfig, ParserConfig } from '../types';
+import type { PluginConfig, RuleConfig, ParserConfig, FlatConfig, LegacyConfig } from '../types';
 import { FILE_PATTERNS, RULE_CONFIG, PARSER_CONFIG } from '../constants';
-
-/**
- * Flat configuration type for ESLint v9+
- * @public
- */
-interface FlatConfig {
-    files: readonly string[];
-    plugins: Record<string, any>;
-    languageOptions: {
-        parser: any;
-        ecmaVersion: number;
-        sourceType: 'module';
-    };
-    rules: RuleConfig;
-}
-
-/**
- * Legacy configuration type for ESLint v8
- * @public
- */
-interface LegacyConfig extends ParserConfig {
-    plugins: string[];
-    rules: RuleConfig;
-}
 
 /**
  * Create ESLint v9+ flat configuration
@@ -57,17 +33,4 @@ export function createLegacyConfig(): LegacyConfig {
         plugins: ["@salesforce-ux/slds"],
         rules: RULE_CONFIG
     };
-}
-
-/**
- * Determine configuration format based on environment variable
- * @public
- * @returns {boolean} True for flat config (ESLint v9), false for legacy config (ESLint v8)
- */
-export function shouldUseFlatConfig(): boolean {
-    const envVar = process.env.ESLINT_USE_FLAT_CONFIG;
-    if (envVar !== undefined) {
-        return envVar === 'true';
-    }
-    return true;
 } 
