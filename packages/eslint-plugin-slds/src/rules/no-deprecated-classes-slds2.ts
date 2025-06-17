@@ -9,7 +9,7 @@ export = {
       category: "Best Practices",
       recommended: true,
       description: "Replace classes that aren’t available with SLDS 2 classes. See lightningdesignsystem.com for more info.",
-      url : ""
+      url : "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-classes-slds2"
     },
     schema: [], // No additional options needed
   },

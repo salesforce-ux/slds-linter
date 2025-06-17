@@ -23,7 +23,7 @@ export = {
       category: "Stylistic Issues",
       recommended: true,
       description: "Replace BEM double-dash syntax in class names with single underscore syntax.",
-      url : ""
+      url : "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-bem-usage"
     },
     fixable: "code", // This rule can be fixed automatically
     schema: [
