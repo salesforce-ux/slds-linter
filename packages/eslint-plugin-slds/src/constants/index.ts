@@ -1,10 +1,10 @@
 /**
- * Package metadata loaded from package.json
+ * Plugin metadata (updated by release script)
  * @public
  */
 export const PLUGIN_META = {
-    name: require('../../package.json').name,
-    version: require('../../package.json').version
+    name: "@salesforce-ux/eslint-plugin-slds",
+    version: "0.2.1"
 } as const;
 
 /**
