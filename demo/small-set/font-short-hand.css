@@ -1,0 +1,27 @@
+.test-font-1 {
+  font: 100 16px/1.5 sans-serif;
+}
+
+.test-font-2 {
+  font: normal 16px/1.5 sans-serif;
+}
+
+.test-font-3 {
+  font: bold 16px/1.5 sans-serif;
+}
+
+.test-font-4 {
+  font: normal 100 16px/1.5 sans-serif;
+}
+
+.test-font-5 {
+  font: italic normal 16px/1.5 sans-serif;
+}
+
+.test-font-6 {
+  font: normal bold 16px/1.5 sans-serif;
+}
+
+.test-font-6 {
+  font: normal var(--slds-g-font-weight-bold) var(--slds-g-font-scale-2)/1.5 sans-serif;
+}

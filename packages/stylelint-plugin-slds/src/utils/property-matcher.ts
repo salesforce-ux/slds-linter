@@ -28,6 +28,7 @@ export const colorProperties = [
 
 export const densificationProperties = [
   'font-size',
+  'font-weight',
   'border*',
   'margin*',
   'padding*',

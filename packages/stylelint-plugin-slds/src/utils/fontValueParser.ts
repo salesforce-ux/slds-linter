@@ -18,125 +18,88 @@ const FONT_WEIGHTS = [
   '900',
 ];
 
-interface FontValue {
-  fontFamily?: string[];
-  fontSize?: string;
-  lineHeight?: string;
-  fontStyle?: string;
-  fontWeight?: string;
-  fontVariant?: string;
+export interface FontValue {
+  'font-family'?: string;
+  'font-size'?: string;
+  'line-height'?: string;
+  'font-style'?: string;
+  'font-weight'?: string;
+  'font-variant'?: string;
 }
+
+function isKnownValue(value: string, knownValues: string[]): boolean {
+  return knownValues.includes(value.toLowerCase());
+}
+
+export function isKnownFontWeight(value: string): boolean {
+  return isKnownValue(value, FONT_WEIGHTS);
+}
+
+function findKnownValue(parts: string[], knownValues: string[]): string | undefined {
+  const index = parts.findIndex(part => isKnownValue(part, knownValues));
+  if (index !== -1) {
+    const value = parts[index];
+    parts.splice(index, 1);
+    return value.toLowerCase();
+  }
+  return undefined;
+}
+
 
 /**
- * Parses a font-family string into an array of font families
- * @param value - The font-family string to parse
- * @returns Array of font family names
+ * Parses a CSS font shorthand string into structured parts for analysis.
+ * 
+ * This function extracts the main components of a font shorthand declaration:
+ * - fontFamily: Everything after the first comma (handles quoted names, multiple families)
+ * - fontSize: The font size value (before any slash)
+ * - lineHeight: The line height value (after slash, if present)
+ * - rest: Remaining parts that could be font-style, font-weight, font-variant, or CSS variables
+ * 
+ * Handles complex cases including:
+ * - Quoted font family names (e.g., "Times New Roman")
+ * - Multiple font families separated by commas
+ * - CSS variables (var(--font-size))
+ * - Font-size/line-height shorthand (e.g., '16px/24px')
+ * - Nested CSS variables and fallbacks
+ * 
+ * @param fontString The CSS font shorthand string to parse (e.g., 'bold 12px/1.5 "Arial", sans-serif')
+ * @returns Object containing { fontFamily, fontSize, lineHeight, rest } where rest is an array of remaining parts
  */
-export function parseFontFamily(value: string): string[] {
-  const parsed = valueParser(value);
-  const families: string[] = [];
-  let currentFamily = '';
+function extractFontParts(fontString: string) {
+  const parsed = valueParser(fontString);
 
-  parsed.nodes.forEach((node) => {
-    if (node.type === 'string') {
-      // Remove quotes from string values
-      currentFamily = node.value.replace(/['"]/g, '');
-    } else if (node.type === 'word') {
-      currentFamily = node.value;
-    } else if (node.type === 'div' && node.value === ',') {
-      if (currentFamily) {
-        families.push(currentFamily.trim());
-        currentFamily = '';
-      }
-    }
-  });
+  let parts: valueParser.Node[] = parsed.nodes.filter((node) => node.type !== "space");
+  let fontFamily = "";
+  let fontSize = "";
+  let lineHeight = "";
 
-  // Add the last family if exists
-  if (currentFamily) {
-    families.push(currentFamily.trim());
+
+  const commaIndex = parts.findIndex(
+    (node) => node.type === "div" && node.value === ","
+  );
+  if (commaIndex !== -1) {
+    const firstNonSpaceIndex = commaIndex - 1;
+    fontFamily = valueParser.stringify(parts.slice(firstNonSpaceIndex));
+    parts = parts.slice(0, firstNonSpaceIndex);
   }
 
-  return families;
-}
-
-function splitFontParts(value: string): string[] {
-  const parsed = valueParser(value);
-  const parts: string[] = [];
-  let currentPart = '';
-
-  parsed.nodes.forEach((node) => {
-    if (node.type === 'div' && node.value === '/') {
-      if (currentPart) {
-        parts.push(currentPart.trim());
-        currentPart = '';
-      }
-    } else if (node.type === 'space') {
-      if (currentPart) {
-        parts.push(currentPart.trim());
-        currentPart = '';
-      }
-    } else {
-      currentPart += node.value;
-    }
-  });
-
-  if (currentPart) {
-    parts.push(currentPart.trim());
+  const divisionIndex = parts.findIndex(
+    (node) => node.type === "div" && node.value === "/"
+  );
+  if (divisionIndex !== -1) {
+    fontSize = valueParser.stringify(parts[divisionIndex - 1]);
+    lineHeight = valueParser.stringify(parts[divisionIndex + 1]);
+    parts.splice(divisionIndex - 1, 3);
   }
 
-  return parts;
-}
-
-function parseFontSizeAndLineHeight(parts: string[]): { fontSize?: string; lineHeight?: string; remainingParts: string[] } {
-  const result: { fontSize?: string; lineHeight?: string; remainingParts: string[] } = { remainingParts: [...parts] };
-  const slashIndex = parts.findIndex(part => part.includes('/'));
-
-  if (slashIndex !== -1) {
-    const [size, lineHeight] = parts[slashIndex].split('/');
-    result.fontSize = size.trim();
-    result.lineHeight = lineHeight.trim();
-    result.remainingParts.splice(slashIndex, 1);
-  } else if (parts.length > 0) {
-    result.fontSize = parts.pop()?.trim();
-  }
-
-  return result;
-}
-
-function parseFontStyle(parts: string[]): { fontStyle?: string; remainingParts: string[] } {
-  const result: { fontStyle?: string; remainingParts: string[] } = { remainingParts: [...parts] };
-  const style = parts[0]?.toLowerCase();
-
-  if (FONT_STYLES.includes(style)) {
-    result.fontStyle = style;
-    result.remainingParts.shift();
-  }
-
-  return result;
-}
-
-function parseFontVariant(parts: string[]): { fontVariant?: string; remainingParts: string[] } {
-  const result: { fontVariant?: string; remainingParts: string[] } = { remainingParts: [...parts] };
-  const variant = parts[0]?.toLowerCase();
-
-  if (FONT_VARIANTS.includes(variant)) {
-    result.fontVariant = variant;
-    result.remainingParts.shift();
-  }
-
-  return result;
-}
-
-function parseFontWeight(parts: string[]): { fontWeight?: string; remainingParts: string[] } {
-  const result: { fontWeight?: string; remainingParts: string[] } = { remainingParts: [...parts] };
-  const weight = parts[0]?.toLowerCase();
-
-  if (FONT_WEIGHTS.includes(weight)) {
-    result.fontWeight = weight;
-    result.remainingParts.shift();
-  }
-
-  return result;
+  return {
+    fontFamily,
+    fontSize,
+    lineHeight,
+    rest: parts.map((node) => {
+      return (node.type !== "word") ? valueParser.stringify(node) : node.value;
+    })
+  };
 }
 
 /**
@@ -145,25 +108,47 @@ function parseFontWeight(parts: string[]): { fontWeight?: string; remainingParts
  * @returns Object containing parsed font properties
  */
 export function parseFont(value: string): FontValue {
-  const parts = splitFontParts(value);
-  if (parts.length === 0) return {};
+  let { fontFamily, fontSize, lineHeight, rest } = extractFontParts(value);
 
-  const result: FontValue = {};
-  const fontFamilyPart = parts.pop() || '';
-  result.fontFamily = parseFontFamily(fontFamilyPart);
+  // Find all known fixed string values
+  let fontStyle = findKnownValue(rest, FONT_STYLES);
+  let fontWeight = findKnownValue(rest, FONT_WEIGHTS);  
+  let fontVariant = findKnownValue(rest, FONT_VARIANTS);
 
-  const { fontSize, lineHeight, remainingParts: sizeParts } = parseFontSizeAndLineHeight(parts);
-  if (fontSize) result.fontSize = fontSize;
-  if (lineHeight) result.lineHeight = lineHeight;
+  // Anything after this line is best effort may not be correct
 
-  const { fontStyle, remainingParts: styleParts } = parseFontStyle(sizeParts);
-  if (fontStyle) result.fontStyle = fontStyle;
 
-  const { fontVariant, remainingParts: variantParts } = parseFontVariant(styleParts);
-  if (fontVariant) result.fontVariant = fontVariant;
+  /* treat font string as following order:
+      font-style font-weight font-size font-family
+      https://developer.mozilla.org/en-US/docs/Web/CSS/font
+       - font-family must be the last value specified.
+      - font-style, font-variant and font-weight must precede font-size.
+  */
+  if (!fontFamily && rest.length > 0) {
+    fontFamily = rest.pop();
+  }
+  if (!fontSize && rest.length > 0) {
+    fontSize = rest.pop();
+  }
 
-  const { fontWeight } = parseFontWeight(variantParts);
-  if (fontWeight) result.fontWeight = fontWeight;
+  if (!fontWeight && rest.length > 0) {
+    fontWeight = rest.pop();
+  }
 
-  return result;
-} 
+  // If there are more than 1 rest value, then the last value is font-variant
+  if (rest.length > 1 && !fontVariant) {
+    fontVariant = rest.pop();
+  }
+  if (rest.length > 0 && !fontStyle) {
+    fontStyle = rest.pop();
+  }
+
+  return {
+    'font-family': fontFamily,
+    'font-size': fontSize,
+    'line-height': lineHeight,
+    'font-style': fontStyle,
+    'font-variant': fontVariant,
+    'font-weight': fontWeight,
+  };
+}
