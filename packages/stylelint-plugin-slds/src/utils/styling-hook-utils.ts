@@ -1,5 +1,7 @@
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { matchesCssProperty } from './property-matcher';
+import { addOnlyUnique } from './util';
+import { toAlternateUnitValue } from './value-utils';
 
 // Define the structure of a hook
 export interface Hook {
@@ -23,3 +25,24 @@ export const findExactMatchStylingHook = (
   }
   return matchedHooks;
 }; 
+
+export function getStylingHooksForDensityValue(
+  value: string,
+  supportedStylinghooks: ValueToStylingHooksMapping,
+  cssProperty: string
+): string[] {  
+    const alternateValue = toAlternateUnitValue(value);
+    let closestHooks = findExactMatchStylingHook(
+      value,
+      supportedStylinghooks,
+      cssProperty
+    );
+
+    const alternateHooks = alternateValue ? findExactMatchStylingHook(
+      alternateValue,
+      supportedStylinghooks,
+      cssProperty
+    ) : [];
+
+    return addOnlyUnique(closestHooks, alternateHooks);
+}

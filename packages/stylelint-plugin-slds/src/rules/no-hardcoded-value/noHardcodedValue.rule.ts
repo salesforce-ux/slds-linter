@@ -2,14 +2,15 @@ import { Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
-import { isTargetProperty } from '../../utils/prop-utills';
+import { isFontProperty, isTargetProperty } from '../../utils/prop-utills';
 import { handleBoxShadow } from './handlers/boxShadowHandler';
 import { handleColorProps } from './handlers/colorHandler';
-import { handleDensityProps } from './handlers/densityHandler';
-import { MessagesObj } from '../../utils/report-utils';
+import { handleDensityPropForNode } from './handlers/densityHandler';
 import { toRuleMessages } from '../../utils/rule-message-utils';
 import { colorProperties, densificationProperties, matchesCssProperty } from '../../utils/property-matcher';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
+import { handleFontProps } from './handlers/fontHandler';
+import { forEachDensifyValue } from '../../utils/density-utils';
 
 const { createPlugin } = stylelint;
 
@@ -59,6 +60,16 @@ export const createNoHardcodedValueRule = (
             reportProps,
             messages
           );
+        } else if(isFontProperty(cssProperty, cssValue)){
+          handleFontProps(
+            decl,
+            parsedValue,
+            cssValueStartIndex,
+            supportedStylinghooks,
+            cssProperty,
+            reportProps,
+            messages
+          );
         } else if (isColorProp) {
           handleColorProps(
             decl,
@@ -70,15 +81,9 @@ export const createNoHardcodedValueRule = (
             messages
           );
         } else if (isDensiProp) {
-          handleDensityProps(
-            decl,
-            parsedValue,
-            cssValueStartIndex,
-            supportedStylinghooks,
-            cssProperty,
-            reportProps,
-            messages
-          );
+          forEachDensifyValue(parsedValue, (node) => {
+            handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, cssProperty, reportProps, messages);
+          });
         }
       });
     };

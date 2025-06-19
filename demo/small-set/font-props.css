@@ -1,0 +1,60 @@
+
+/* Setting font weight to 100, 200, 300, 400, 500, 600, 700, 800, 900, normal, bold, bolder, lighter should report as violation*/
+.test-font-weight-1 {
+    font-weight: 100;
+  }
+  .test-font-weight-2 {
+    font-weight: 200;
+  }
+  .test-font-weight-3 {
+    font-weight: 300;
+  }
+  .test-font-weight-4 {
+    font-weight: 400;
+  }
+  .test-font-weight-5 {
+    font-weight: 500;
+  }
+  .test-font-weight-6 {
+    font-weight: 600;
+  }
+  .test-font-weight-7 {
+    font-weight: 700;
+  }
+  .test-font-weight-8 {
+    font-weight: 800;
+  }
+  .test-font-weight-9 {
+    font-weight: 900;
+  }
+  
+  .test-font-weight-normal{
+    font-weight: normal;
+  }
+  .test-font-weight-bold{
+    font-weight: bold;
+  }
+  .test-font-weight-bolder{
+    font-weight: bolder;
+  }
+  
+  .test-font-weight-lighter{
+    font-weight: lighter;
+  }
+  
+  /* Setting font weight to initial, inherit, unset, revert, revert-layer should not report as violation*/
+  .test-font-weight-initial{
+    font-weight: initial;
+  }
+  .test-font-weight-inherit{
+    font-weight: inherit;
+  }
+  .test-font-weight-unset{
+    font-weight: unset;
+  }
+  .test-font-weight-revert{
+    font-weight: revert;
+  }
+  .test-font-weight-revert-layer{
+    font-weight: revert-layer;
+  }

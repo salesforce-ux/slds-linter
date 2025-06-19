@@ -17,3 +17,11 @@ export default function replacePlaceholders(template: string, args: { [key: stri
         .replace(/\{\{(.*?)\}\}/g, (_, key) => args[key.trim()] || '');
 }
 
+
+// Use only for small arrays
+export function addOnlyUnique(arrayA: string[] = [], arrayB: string[] = []): string[] {
+    if(!arrayA.length){
+        return arrayB;
+    }
+    return arrayA.concat(arrayB.filter(v => !arrayA.includes(v)));
+}

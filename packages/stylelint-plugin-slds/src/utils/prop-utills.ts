@@ -13,3 +13,8 @@ export function hasMatchedProperty(rule: Rule, propertyTargets: string[] = []): 
         return node.type === "decl" && isTargetProperty(node.prop, propertyTargets);
     });
 }
+
+export function isFontProperty(property: string, value: string): boolean {
+    return property === 'font' 
+    || (property === 'font-weight' && (value==='normal' || value==='bold'));
+}
