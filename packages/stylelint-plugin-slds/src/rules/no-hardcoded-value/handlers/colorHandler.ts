@@ -17,7 +17,8 @@ export function handleColorProps(
 ) {
   forEachColorValue(parsedValue, (node) => {
     const hexValue = convertToHex(node.value);
-    if (!hexValue) {
+    // transparent is a special case, it should not be converted to a hook
+    if (node.value === 'transparent' || !hexValue) {
       return;
     }
     const closestHooks = findClosestColorHook(
