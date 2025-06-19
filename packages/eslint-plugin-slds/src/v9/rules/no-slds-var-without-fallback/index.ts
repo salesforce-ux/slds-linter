@@ -13,73 +13,38 @@ const sldsVariables = metadata.slds1ExcludedVars || {};
 const ruleInfo = getRuleMetadata(ruleName);
 
 /**
- * Parse var() functions using PostCSS value parser for robust parsing
+ * Checks if a var() function has a fallback value
  */
-function parseVarFunctionsRobust(cssString: string): Array<{
-  fullMatch: string;
-  varName: string;
-  hasFallback: boolean;
-  fallbackValue?: string;
-  startIndex: number;
-  endIndex: number;
-}> {
-  const results: Array<{
-    fullMatch: string;
-    varName: string;
-    hasFallback: boolean;
-    fallbackValue?: string;
-    startIndex: number;
-    endIndex: number;
-  }> = [];
-
-  try {
-    const parsedValue = valueParser(cssString);
-    let currentIndex = 0;
-
-    parsedValue.walk((node) => {
-      if (node.type === 'function' && node.value === 'var') {
-        const varFunctionStr = valueParser.stringify(node);
-        const varName = node.nodes[0]?.value || '';
-        
-        // Check if there's a fallback (comma separator)
-        const hasFallback = node.nodes.some((arg) => arg.type === 'div' && arg.value === ',');
-        
-        let fallbackValue: string | undefined;
-        if (hasFallback) {
-          // Extract fallback value (everything after the first comma)
-          const fallbackNodes = node.nodes.slice(2); // Skip var name and comma
-          fallbackValue = valueParser.stringify(fallbackNodes);
-        }
-
-        results.push({
-          fullMatch: varFunctionStr,
-          varName,
-          hasFallback,
-          fallbackValue,
-          startIndex: currentIndex + (node.sourceIndex || 0),
-          endIndex: currentIndex + (node.sourceEndIndex || 0),
-        });
-      }
-    });
-  } catch (error) {
-    // If PostCSS parsing fails, fall back to regex parsing
-    console.warn('PostCSS parsing failed, falling back to regex:', error);
-    return parseVarFunctionsRegex(cssString);
-  }
-
-  return results;
+function hasFallbackValue(nodes: valueParser.Node[]): boolean {
+  return nodes.some((arg) => arg.type === 'div' && arg.value === ',');
 }
 
 /**
- * Fallback regex-based parsing for edge cases
+ * Check if a fallback value contains another var() function
  */
-function parseVarFunctionsRegex(cssString: string): Array<{
+function fallbackContainsVarFunction(nodes: valueParser.Node[]): boolean {
+  // Find the comma separator
+  const commaIndex = nodes.findIndex((arg) => arg.type === 'div' && arg.value === ',');
+  if (commaIndex === -1) return false;
+  
+  // Check if any node after the comma is a var function
+  const fallbackNodes = nodes.slice(commaIndex + 1);
+  return fallbackNodes.some((node) => 
+    node.type === 'function' && node.value === 'var'
+  );
+}
+
+/**
+ * Parse only top-level var() functions in a CSS value (shallow, like Stylelint)
+ */
+function parseTopLevelVarFunctions(cssString: string): Array<{
   fullMatch: string;
   varName: string;
   hasFallback: boolean;
   fallbackValue?: string;
   startIndex: number;
   endIndex: number;
+  fallbackContainsVar: boolean;
 }> {
   const results: Array<{
     fullMatch: string;
@@ -88,28 +53,33 @@ function parseVarFunctionsRegex(cssString: string): Array<{
     fallbackValue?: string;
     startIndex: number;
     endIndex: number;
+    fallbackContainsVar: boolean;
   }> = [];
-
-  const varRegex = /var\(([^)]+)\)/g;
-  let match;
-
-  while ((match = varRegex.exec(cssString)) !== null) {
-    const fullMatch = match[0];
-    const args = match[1].split(',').map(arg => arg.trim());
-    const varName = args[0];
-    const hasFallback = args.length > 1;
-    const fallbackValue = hasFallback ? args.slice(1).join(',').trim() : undefined;
-
-    results.push({
-      fullMatch,
-      varName,
-      hasFallback,
-      fallbackValue,
-      startIndex: match.index,
-      endIndex: match.index + fullMatch.length,
-    });
+  const parsedValue = valueParser(cssString);
+  for (const node of parsedValue.nodes) {
+    if (node.type === 'function' && node.value === 'var') {
+      const varName = node.nodes[0]?.value || '';
+      const hasFallback = node.nodes.some((arg) => arg.type === 'div' && arg.value === ',');
+      const commaIndex = node.nodes.findIndex((arg) => arg.type === 'div' && arg.value === ',');
+      const fallbackContainsVar = hasFallback && commaIndex !== -1
+        ? node.nodes.slice(commaIndex + 1).some(n => n.type === 'function' && n.value === 'var')
+        : false;
+      let fallbackValue;
+      if (hasFallback) {
+        const fallbackNodes = node.nodes.slice(2);
+        fallbackValue = valueParser.stringify(fallbackNodes);
+      }
+      results.push({
+        fullMatch: valueParser.stringify(node),
+        varName,
+        hasFallback,
+        fallbackValue,
+        startIndex: node.sourceIndex || 0,
+        endIndex: node.sourceEndIndex || 0,
+        fallbackContainsVar,
+      });
+    }
   }
-
   return results;
 }
 
@@ -234,11 +204,11 @@ export = {
         return;
       }
 
-      // Parse var() functions using robust PostCSS-based parsing
-      const varFunctions = parseVarFunctionsRobust(declaration.value);
+      // Parse only top-level var() functions (shallow, like Stylelint)
+      const varFunctions = parseTopLevelVarFunctions(declaration.value);
       
-      varFunctions.forEach(({ varName, hasFallback, fullMatch, startIndex, endIndex }) => {
-        if (!isSldsCssVariable(varName) || hasFallback) return;
+      varFunctions.forEach(({ varName, hasFallback, fallbackContainsVar, fullMatch, startIndex, endIndex }) => {
+        if (!isSldsCssVariable(varName) || hasFallback || fallbackContainsVar) return;
 
         const fallbackValue = sldsVariables[varName];
         if (!fallbackValue) return;
