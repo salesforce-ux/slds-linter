@@ -22,6 +22,10 @@ export function handleFontProps(
         fontValue = {
             'font-weight': decl.value
         }
+    } else if (cssProperty === 'font-size') {
+        fontValue = {
+            'font-size': decl.value
+        }
     } else if (cssProperty === 'font') {
         fontValue = parseFont(decl.value);
     }

@@ -27,8 +27,6 @@ export const colorProperties = [
 ];
 
 export const densificationProperties = [
-  'font-size',
-  'font-weight',
   'border*',
   'margin*',
   'padding*',
@@ -36,6 +34,5 @@ export const densificationProperties = [
   'height',
   'top',
   'right',
-  'left',
-  'box-shadow',
+  'left'
 ]; 
