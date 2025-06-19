@@ -2,9 +2,11 @@ const v8Plugin = require('../src/v8');
 const v9Plugin = require('../src/v9');
 const enforceBemUsageRule = require('../src/rules/enforce-bem-usage');
 const noDeprecatedSldsClassesRule = require('../src/rules/no-deprecated-classes-slds2');
+const noSldsVarWithoutFallbackRule = require('../src/v9/rules/no-slds-var-without-fallback');
 
 jest.mock('../src/rules/enforce-bem-usage', () => jest.fn());
 jest.mock('../src/rules/no-deprecated-classes-slds2', () => jest.fn());
+jest.mock('../src/v9/rules/no-slds-var-without-fallback', () => jest.fn());
 
 describe('ESLint Plugin Rules', () => {
     test('should define enforce-bem-usage rule in both versions', () => {
@@ -15,6 +17,11 @@ describe('ESLint Plugin Rules', () => {
     test('should define no-deprecated-classes-slds2 rule in both versions', () => {
         expect(v8Plugin.rules).toHaveProperty('no-deprecated-classes-slds2');
         expect(v9Plugin.rules).toHaveProperty('no-deprecated-classes-slds2');
+    });
+
+    test('should define no-slds-var-without-fallback rule in v9 only', () => {
+        expect(v8Plugin.rules).not.toHaveProperty('no-slds-var-without-fallback');
+        expect(v9Plugin.rules).toHaveProperty('no-slds-var-without-fallback');
     });
 });
 
@@ -39,6 +46,7 @@ describe('ESLint v8 Plugin Configuration', () => {
         expect(v8Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/enforce-bem-usage', 'error');
         expect(v8Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/no-deprecated-classes-slds2', 'error');
         expect(v8Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/modal-close-button-issue', 'error');
+        expect(v8Plugin.configs.recommended.rules).not.toHaveProperty('@salesforce-ux/slds/no-slds-var-without-fallback');
     });
 
     test('should not have meta information for ESLint v8', () => {
@@ -73,6 +81,7 @@ describe('ESLint v9 Plugin Configuration', () => {
         expect(v9Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/enforce-bem-usage', 'error');
         expect(v9Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/no-deprecated-classes-slds2', 'error');
         expect(v9Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/modal-close-button-issue', 'error');
+        expect(v9Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/no-slds-var-without-fallback', 'error');
     });
 
     test('should have meta information for ESLint v9+', () => {
@@ -91,5 +100,9 @@ describe('ESLint Rules Implementation', () => {
     test('no-deprecated-classes-slds2 rule should be implemented in both versions', () => {
         expect(v8Plugin.rules['no-deprecated-classes-slds2']).toBe(noDeprecatedSldsClassesRule);
         expect(v9Plugin.rules['no-deprecated-classes-slds2']).toBe(noDeprecatedSldsClassesRule);
+    });
+
+    test('no-slds-var-without-fallback rule should be implemented in v9 only', () => {
+        expect(v9Plugin.rules['no-slds-var-without-fallback']).toBe(noSldsVarWithoutFallbackRule);
     });
 });

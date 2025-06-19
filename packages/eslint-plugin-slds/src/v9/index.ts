@@ -1,7 +1,7 @@
 import type { PluginConfig } from '../types';
 import { PLUGIN_META } from '../constants';
 import { createFlatConfig } from '../config';
-import { rules } from '../rules';
+import { rules } from './rules';
 
 /**
  * ESLint v9 compatible plugin configuration

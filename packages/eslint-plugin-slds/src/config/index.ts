@@ -1,5 +1,5 @@
 import type { PluginConfig, RuleConfig, ParserConfig, FlatConfig, LegacyConfig } from '../types';
-import { FILE_PATTERNS, RULE_CONFIG, PARSER_CONFIG } from '../constants';
+import { FILE_PATTERNS, V9_RULE_CONFIG, V8_RULE_CONFIG, PARSER_CONFIG } from '../constants';
 
 /**
  * Create ESLint v9+ flat configuration
@@ -18,7 +18,7 @@ export function createFlatConfig(plugin: PluginConfig): FlatConfig {
             ecmaVersion: 2021,
             sourceType: "module"
         },
-        rules: RULE_CONFIG
+        rules: V9_RULE_CONFIG
     };
 }
 
@@ -31,6 +31,6 @@ export function createLegacyConfig(): LegacyConfig {
     return {
         ...PARSER_CONFIG,
         plugins: ["@salesforce-ux/slds"],
-        rules: RULE_CONFIG
+        rules: V8_RULE_CONFIG
     };
 } 

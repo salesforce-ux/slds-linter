@@ -16,6 +16,10 @@ describe('ESLint v8 Plugin', () => {
             expect(v8Plugin.rules).toHaveProperty('no-deprecated-classes-slds2');
             expect(typeof v8Plugin.rules['no-deprecated-classes-slds2']).toBe('object');
         });
+
+        test('should not define no-slds-var-without-fallback rule (v9 only)', () => {
+            expect(v8Plugin.rules).not.toHaveProperty('no-slds-var-without-fallback');
+        });
     });
 
     describe('Configuration', () => {
@@ -39,6 +43,7 @@ describe('ESLint v8 Plugin', () => {
             expect(v8Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/enforce-bem-usage', 'error');
             expect(v8Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/no-deprecated-classes-slds2', 'error');
             expect(v8Plugin.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/modal-close-button-issue', 'error');
+            expect(v8Plugin.configs.recommended.rules).not.toHaveProperty('@salesforce-ux/slds/no-slds-var-without-fallback');
         });
 
         test('should not have meta information for ESLint v8', () => {
