@@ -2,7 +2,7 @@ import { Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
-import { isFontProperty, isTargetProperty } from '../../utils/prop-utills';
+import { isTargetProperty } from '../../utils/prop-utills';
 import { handleBoxShadow } from './handlers/boxShadowHandler';
 import { handleColorProps } from './handlers/colorHandler';
 import { handleDensityPropForNode } from './handlers/densityHandler';
@@ -11,6 +11,7 @@ import { colorProperties, densificationProperties, matchesCssProperty } from '..
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { handleFontProps } from './handlers/fontHandler';
 import { forEachDensifyValue } from '../../utils/density-utils';
+import { isFontProperty } from '../../utils/fontValueParser';
 
 const { createPlugin } = stylelint;
 
@@ -43,6 +44,7 @@ export const createNoHardcodedValueRule = (
         const cssValueStartIndex = decl.toString().indexOf(cssValue);
         const isColorProp = matchesCssProperty(colorProperties, cssProperty);
         const isDensiProp = matchesCssProperty(densificationProperties, cssProperty);
+        const isFontProp = isFontProperty(cssProperty, cssValue);
 
         const reportProps: Partial<stylelint.Problem> = {
           node: decl,
@@ -60,7 +62,7 @@ export const createNoHardcodedValueRule = (
             reportProps,
             messages
           );
-        } else if(isFontProperty(cssProperty, cssValue)){
+        } else if(isFontProp){
           handleFontProps(
             decl,
             parsedValue,

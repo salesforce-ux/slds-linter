@@ -1,5 +1,5 @@
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
-
+import stylelintPluginSlds from '../../../src/index';
 const { lint }: typeof stylelint = stylelint;
 
 describe('no-hardcoded-values-slds2', () => {
@@ -180,7 +180,7 @@ describe('no-hardcoded-values-slds2', () => {
       const linterResult: LinterResult = await lint({
         code: inputCss,
         config: {
-          plugins: ['./src/index.ts'], // Adjust the plugin path if needed
+          plugins: [stylelintPluginSlds], // Adjust the plugin path if needed
           rules: {
             [ruleName]: true,
           },
