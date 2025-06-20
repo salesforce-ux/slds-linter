@@ -9,6 +9,11 @@ const rgbColorFunctions = ['rgb', 'rgba', 'hsl', 'hsla'];
 const cssFunctionsRegex =
   /^(?:attr|calc|color-mix|conic-gradient|counter|cubic-bezier|linear-gradient|max|min|radial-gradient|repeating-conic-gradient|repeating-linear-gradient|repeating-radial-gradient|var)$/;
 
+
+export const isColorFunction = (value: string): boolean => {
+  return rgbColorFunctions.includes(value);
+}
+
 export const forEachColorValue = (
   parsedValue: valueParser.ParsedValue,
   cb: valueParser.WalkCallback
