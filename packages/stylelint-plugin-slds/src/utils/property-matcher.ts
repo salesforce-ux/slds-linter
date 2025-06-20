@@ -34,5 +34,6 @@ export const densificationProperties = [
   'height',
   'top',
   'right',
-  'left'
+  'left',
+  'bottom'
 ]; 
