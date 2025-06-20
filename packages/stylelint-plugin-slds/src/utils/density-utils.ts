@@ -1,9 +1,9 @@
 import valueParser from 'postcss-value-parser';
 import { isFunctionNode } from './decl-utils';
 
-const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
+export const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
 
-export function isDensifyValue(node: valueParser.Node): boolean {
+export function isDensifyValue(node: valueParser.Node, nonZeroOnly: boolean = true): boolean {
   
   const parsedValue = valueParser.unit(node.value);
   if (node.type !== 'word' || !parsedValue) {
@@ -18,7 +18,7 @@ export function isDensifyValue(node: valueParser.Node): boolean {
   } else if (isNaN(Number(parsedValue.number))) {
     // Consider only valid numeric values
     return false;
-  } else if (Number(parsedValue.number) === 0) {
+  } else if (nonZeroOnly && Number(parsedValue.number) === 0) {
     // Do not report zero value
     return false;
   }
@@ -49,3 +49,22 @@ export const forEachDensifyValue = (
     }
   );
 };
+
+export function normalizeLengthValue(value: string | undefined): string {
+  if (!value) return '';
+  
+  // Convert 0 to 0px for consistency
+  if (value === '0') return '0px';
+  
+  // If it already has a unit, return as is
+  if (/^-?\d+(\.\d+)?(px|em|rem|ch|ex|vh|vw|vmin|vmax|%)$/.test(value)) {
+      return value;
+  }
+  
+  // If it's a number without unit, assume px
+  if (/^-?\d+(\.\d+)?$/.test(value)) {
+      return value + 'px';
+  }
+  
+  return value;
+}

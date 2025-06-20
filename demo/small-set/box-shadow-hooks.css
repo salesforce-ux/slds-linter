@@ -1,0 +1,139 @@
+/* Box Shadow Classes for Linting Tests */
+
+/* Standard SLDS Shadow Variables */
+.shadow-slds-1 {
+  box-shadow: var(--slds-g-shadow-1);
+}
+
+.shadow-slds-2 {
+  box-shadow: var(--slds-g-shadow-2);
+}
+
+.shadow-slds-3 {
+  box-shadow: var(--slds-g-shadow-3);
+}
+
+.shadow-slds-4 {
+  box-shadow: var(--slds-g-shadow-4);
+}
+
+/* Custom Light Shadows */
+.shadow-custom-light {
+  box-shadow: 0 0 3px #f3f3f3;
+}
+
+/* Multi-layered Shadows - Down Direction */
+.shadow-multi-down-1 {
+  box-shadow: 0 0 1.5px 0 #00000017, 0 1.4px 1.5px 0 #00000017, 0 -1px 1px 0 #00000009;
+}
+
+.shadow-multi-down-2 {
+  box-shadow: 0 0 3px 0 #00000016, 0 2.8px 3px 0 #00000016, 0 -1px 1.2px 0 #00000009;
+}
+
+.shadow-multi-down-3 {
+  box-shadow: 0 0 4.5px 0 #00000014, 0 4.2px 4.5px 0 #00000017, 0 -1px 1.44px 0 #00000008;
+}
+
+.shadow-multi-down-4 {
+  box-shadow: 0 0 6.75px 0 #00000012, 0 6.3px 6.75px 0 #00000012, 0 -1px 1.7px 0 #00000007;
+}
+
+/* Multi-layered Shadows - Up Direction */
+.shadow-multi-up-1 {
+  box-shadow: 0 0 1.5px 0 #00000017, 0 -1.4px 1.5px 0 #00000017, 0 1px 1px 0 #00000009;
+}
+
+.shadow-multi-up-2 {
+  box-shadow: 0 0 3px 0 #00000016, 0 -2.8px 3px 0 #00000016, 0 1px 1.2px 0 #00000009;
+}
+
+.shadow-multi-up-3 {
+  box-shadow: 0 0 4.5px 0 #00000014, 0 -4.2px 4.5px 0 #00000017, 0 1px 1.44px 0 #00000008;
+}
+
+.shadow-multi-up-4 {
+  box-shadow: 0 0 6.75px 0 #00000012, 0 -6.3px 6.75px 0 #00000012, 0 1px 1.7px 0 #00000007;
+}
+
+/* Multi-layered Shadows - Right Direction */
+.shadow-multi-right-1 {
+  box-shadow: 0 0 1.5px 0 #00000017, 1.4px 0 1.5px 0 #00000017, -1px 0 1px 0 #00000009;
+}
+
+.shadow-multi-right-2 {
+  box-shadow: 0 0 3px 0 #00000016, 2.8px 0 3px 0 #00000016, -1px 0 1.2px 0 #00000009;
+}
+
+.shadow-multi-right-3 {
+  box-shadow: 0 0 4.5px 0 #00000014, 4.2px 0 4.5px 0 #00000017, -1px 0 1.44px 0 #00000008;
+}
+
+.shadow-multi-right-4 {
+  box-shadow: 0 0 6.75px 0 #00000012, 6.3px 0 6.75px 0 #00000012, -1px 0 1.7px 0 #00000007;
+}
+
+/* Multi-layered Shadows - Left Direction */
+.shadow-multi-left-1 {
+  box-shadow: 0 0 1.5px 0 #00000017, -1.4px 0 1.5px 0 #00000017, 1px 0 1px 0 #00000009;
+}
+
+.shadow-multi-left-2 {
+  box-shadow: 0 0 3px 0 #00000016, -2.8px 0 3px 0 #00000016, 1px 0 1.2px 0 #00000009;
+}
+
+.shadow-multi-left-3 {
+  box-shadow: 0 0 4.5px 0 #00000014, -4.2px 0 4.5px 0 #00000017, 1px 0 1.44px 0 #00000008;
+}
+
+.shadow-multi-left-4 {
+  box-shadow: 0 0 6.75px 0 #00000012, -6.3px 0 6.75px 0 #00000012, 1px 0 1.7px 0 #00000007;
+}
+
+/* Focus States with Brand Colors */
+.shadow-focus-outline {
+  box-shadow: 0 0 0 2px var(--slds-g-color-brand-base-15);
+}
+
+.shadow-focus-double {
+  box-shadow: 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15);
+}
+
+.shadow-focus-inset {
+  box-shadow: 0 0 0 2px var(--slds-g-color-brand-base-15) inset;
+}
+
+.shadow-focus-inset-double {
+  box-shadow: 0 0 0 2px var(--slds-g-color-brand-base-15) inset, 0 0 0 4px var(--slds-g-color-neutral-base-100) inset;
+}
+
+/* Invalid/Deprecated Examples for Linting */
+.shadow-deprecated-hardcoded {
+  box-shadow: 0 0 10 rgba(0, 0, 0, 0.5);
+}
+
+.shadow-deprecated-single-value {
+  box-shadow: 2px 2px 5px black;
+}
+
+.shadow-deprecated-no-spread {
+  box-shadow: 0 0 5px #333;
+}
+
+/* Complex Examples for Testing */
+.shadow-complex-mixed {
+  box-shadow: 
+    0 0 1.5px 0 #00000017, 
+    0 1.4px 1.5px 0 #00000017, 
+    0 -1px 1px 0 #00000009,
+    0 0 0 2px var(--slds-g-color-brand-base-15);
+}
+
+.shadow-complex-multi-line {
+  box-shadow: 
+    0 0 3px 0 #00000016, 
+    0 2.8px 3px 0 #00000016, 
+    0 -1px 1.2px 0 #00000009,
+    0 0 0 2px var(--slds-g-color-neutral-base-100), 
+    0 0 0 4px var(--slds-g-color-brand-base-15);
+}
