@@ -25,6 +25,15 @@ export function getVarToken(node: valueParser.Node): string {
   return isVarFunction(node)? (<valueParser.FunctionNode>node).nodes[0].value: '';
 }
 
+export function getFallbackFunction(node: valueParser.FunctionNode): valueParser.FunctionNode {
+  return node.nodes.find(isVarFunction) as valueParser.FunctionNode;
+}
+
+export function getFallbackToken(node: valueParser.FunctionNode): string {
+  const fallbackFunction = getFallbackFunction(node);
+  return fallbackFunction? getVarToken(fallbackFunction): '';
+}
+
 export function forEachVarFunction(decl:Declaration, callback: (node: valueParser.Node, startOffset: number) => void, shallow: boolean = true) {
     const startOffset = decl.toString().indexOf(decl.value);
     const parsedValue = valueParser(decl.value);
