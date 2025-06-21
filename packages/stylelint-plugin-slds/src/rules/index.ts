@@ -12,6 +12,7 @@ import reduceAnnotations from './reduce-annotations';
 import { noHardcodedValuesSlds, noHardcodedValuesSldsPlus } from './no-hardcoded-value';
 import noSldsVarWithoutFallback from './no-slds-var-without-fallback';
 import noSldsNamespace from './no-slds-namespace';
+import noUnsupportedVarFallback from './no-unsupported-var-fallback';
 
 export default [
   enforceSdsToSldsHooks,
@@ -28,5 +29,6 @@ export default [
   noImportantTag,
   reduceAnnotations,
   noSldsVarWithoutFallback,
-  noSldsNamespace
+  noSldsNamespace,
+  noUnsupportedVarFallback
 ];
