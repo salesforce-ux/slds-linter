@@ -55,6 +55,9 @@ overrides:
       slds/no-slds-namespace:
         - true
         - severity: warning
+      slds/no-unsupported-var-fallback:
+        - true
+        - severity: warning
 
     sourceMap:
       - false
