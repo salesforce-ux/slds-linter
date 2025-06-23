@@ -1,18 +1,42 @@
-import type { PluginConfig } from '../types';
-import { PLUGIN_META } from '../constants';
-import { createFlatConfig } from '../config';
-import { rules } from '../rules';
-
 /**
  * ESLint v9 compatible plugin configuration
+ * Uses flat config format with proper plugin structure
  */
-const plugin: PluginConfig = {
-  rules,
-  meta: PLUGIN_META,
-  configs: {}
+
+// Define rules once to avoid duplication
+const pluginRules = {
+    "enforce-bem-usage": require('../rules/enforce-bem-usage'),
+    "no-deprecated-classes-slds2": require('../rules/no-deprecated-classes-slds2'),
+    "modal-close-button-issue": require('../rules/modal-close-button-issue')
 };
 
-// Configure recommended preset
-plugin.configs.recommended = createFlatConfig(plugin);
+// Plugin object
+const plugin = {
+    rules: pluginRules,
+    meta: {
+        name: "@salesforce-ux/eslint-plugin-slds",
+        version: process.env.PLUGIN_VERSION
+    }
+};
 
-export = plugin; 
+export = {
+    ...plugin,
+    configs: {
+        recommended: {
+            languageOptions: {
+                parser: "@html-eslint/parser",
+                ecmaVersion: 2021,
+                sourceType: "module"
+            },
+            plugins: {
+                "@salesforce-ux/slds": plugin
+            },
+            files: ["**/*.html", "**/*.cmp"],
+            rules: {
+                "@salesforce-ux/slds/enforce-bem-usage": "error",
+                "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
+                "@salesforce-ux/slds/modal-close-button-issue": "error"
+            }
+        }
+    }
+}; 

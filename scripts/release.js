@@ -90,20 +90,6 @@ async function updatePackageVersions(version, workspaceInfo) {
   }
 }
 
-async function updatePluginMetaVersion(version, workspaceInfo) {
-  // Only update for eslint-plugin-slds
-  const sldsInfo = workspaceInfo["@salesforce-ux/eslint-plugin-slds"];
-  if (!sldsInfo) return;
-  const metaPath = path.join(ROOT_DIR, sldsInfo.location, "src/constants/index.ts");
-  let metaContent = await fs.readFile(metaPath, "utf8");
-  // Replace the version string in PLUGIN_META
-  metaContent = metaContent.replace(
-    /(version:\s*")[^"]+("\s*\})/,
-    `$1${version}$2`
-  );
-  await fs.writeFile(metaPath, metaContent);
-}
-
 async function gitOperations(version) {
   const currentBranch = execSync("git rev-parse --abbrev-ref HEAD")
     .toString()
@@ -307,7 +293,6 @@ async function main() {
           title: "Update all package versions",
           task: async (ctx) => {
             await updatePackageVersions(ctx.finalVersion, ctx.workspaceInfo);
-            await updatePluginMetaVersion(ctx.finalVersion, ctx.workspaceInfo);
           },
         },
         {
