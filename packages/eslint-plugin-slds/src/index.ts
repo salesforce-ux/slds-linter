@@ -3,4 +3,4 @@
 // For ESLint v9+ (flat config), import from '@salesforce-ux/eslint-plugin-slds/v9'.
 // See package.json "exports" field for details.
 
-module.exports = require('./v9');
+module.exports = require('./v8');

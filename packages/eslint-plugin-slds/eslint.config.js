@@ -1,5 +1,5 @@
 const htmlParser = require("@html-eslint/parser");
-const sldsPlugin = require("./build/index.js");
+const sldsPlugin = require("@salesforce-ux/eslint-plugin-slds/v9");
 
 module.exports = [
     {
