@@ -28,7 +28,7 @@ Install these items if they aren't installed already.
 - [VS Code](https://code.visualstudio.com/)
 - [SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=MS-SarifVSCode.sarif-viewer) VS Code extension. This extension enables you to view SLDS Linter violation reports.
 - [Node.js](https://nodejs.org/)
-  - The minimum supported version is **v18.4.0**
+  - The minimum supported version is **v18.18.0** 
   - We recommend using the latest [Active LTS](https://nodejs.org/en/about/previous-releases) version of Node.js.  
 
 ## Install SLDS Linter
