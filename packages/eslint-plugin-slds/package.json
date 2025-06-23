@@ -19,9 +19,8 @@
       "require": "./build/v9/index.js"
     },
     "./eslint.config.js": {
-      "types": "./build/eslint.config.d.ts",
-      "import": "./build/eslint.config.js",
-      "require": "./build/eslint.config.js"
+      "import": "./eslint.config.js",
+      "require": "./eslint.config.js"
     }
   },
   "files": [
