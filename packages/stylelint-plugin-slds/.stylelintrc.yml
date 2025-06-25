@@ -1,6 +1,6 @@
 plugins:
   - '@salesforce-ux/stylelint-plugin-slds'
-
+rules: {}
 overrides:
   - files:
       - '**/*.css'
