@@ -20,8 +20,13 @@
       "quantity": 0
     }
   },
-  "scripts": {
-    "postdeploy": "yarn coverage && yarn gen:sarif"
+  "environments": {
+    "test": {
+      "scripts": {
+        "test-setup": "yarn install && yarn build",
+        "test": "yarn coverage && yarn gen:sarif"
+      }
+    }
   },
   "addons": [],
   "stack": "heroku-24"
