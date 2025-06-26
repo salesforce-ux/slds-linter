@@ -16,7 +16,7 @@
     "prepare": "husky install",
     "preinstall": "./scripts/validate-setup.sh",
     "test": "yarn workspaces foreach -At run test",
-    "build": "yarn workspaces foreach -At  --jobs 1 run build",
+    "build": "node scripts/build.js",
     "release": "node scripts/release.js",
     "coverage": "yarn test --coverage && yarn gen:coverage-summary",
     "gen:coverage-summary": "node scripts/consolidate-coverage.js",
