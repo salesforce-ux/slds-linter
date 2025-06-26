@@ -10,7 +10,8 @@
     ".stylelintrc.yml"
   ],
   "scripts": {
-    "test": "NODE_OPTIONS=\"--experimental-vm-modules\" npx jest",
+    "test": "./jest-esm.sh",
+    "jest": "jest",
     "prepublishOnly": "clean-pkg-json",
     "build": "gulp build",
     "dev": "gulp dev"
