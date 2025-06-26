@@ -1,1 +1,1 @@
-web: yarn install && node scripts/start.js
+web: npm heroku:start
