@@ -21,6 +21,9 @@
       "size": "basic"
     }
   },
+  "scripts": {
+    "postdeploy": "yarn install"
+  },
   "environments": {
     "test": {
       "scripts": {
