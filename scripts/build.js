@@ -29,7 +29,7 @@ if (isHerokuReviewApp) {
 
   // Add your additional commands here
   const additionalCommands = [
-    'yarn test --coverage',
+    'yarn test --coverage --passWithNoTests',
     'node ./packages/cli/build/index.js report "demo/**"',
     'node scripts/sarif-to-html-report.js',
     'cp -rf ./packages/stylelint-plugin-slds/coverage/lcov-report ./site/stylelint-plugin-coverage',
