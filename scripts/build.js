@@ -5,7 +5,7 @@ import { generateIndex } from './generate-index.js';
 
 // Check if we're running in a Heroku review app environment
 const isHerokuReviewApp = process.env.HEROKU_REVIEW_APP === 'true' || 
-                          process.env.HEROKU_APP_NAME?.includes('pr-') ||
+                          process.env.HEROKU_APP_NAME?.includes('slds-linter') ||
                           process.env.HEROKU_PARENT_APP_NAME;
 
 console.log('🚀 Starting build process...');
@@ -38,7 +38,7 @@ if (isHerokuReviewApp) {
   
   // Add your additional commands here
   const additionalCommands = [
-    'yarn gen:sarif',
+    'node ./packages/cli/build/index.js report "demo/**"',
     'node scripts/sarif-to-html-report.js'
   ];
   
