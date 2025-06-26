@@ -21,9 +21,6 @@
       "size": "Private-S"
     }
   },
-  "scripts": {
-    "postdeploy": "yarn install"
-  },
   "environments": {
     "test": {
       "scripts": {

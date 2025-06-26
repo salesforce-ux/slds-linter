@@ -1,1 +1,1 @@
-web: node scripts/start.js
+web: yarn install && node scripts/start.js
