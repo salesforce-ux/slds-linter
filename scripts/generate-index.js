@@ -1,17 +1,4 @@
-#!/usr/bin/env node
-
-import { writeFile, readdir } from 'fs/promises';
-import { join, extname } from 'path';
-import { existsSync, mkdirSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Configuration
-const SITE_DIR = join(__dirname, '..', 'site');
-const INDEX_FILE = join(SITE_DIR, 'index.html');
+import { extname } from 'path';
 
 // File type descriptions
 const fileDescriptions = {
@@ -85,7 +72,7 @@ function generateFileList(files) {
   `;
 }
 
-function generateHTML(files) {
+export function generateHTML(files) {
   const fileList = generateFileList(files);
   const currentTime = new Date().toLocaleString();
   
@@ -222,38 +209,3 @@ function generateHTML(files) {
 </body>
 </html>`;
 }
-
-async function generateIndex() {
-  try {
-    console.log('🔧 Generating index.html for site folder...');
-    
-    // Check if site directory exists
-    if (!existsSync(SITE_DIR)) {
-      mkdirSync(SITE_DIR, { recursive: true });
-    }
-    
-    // Read files from site directory
-    const files = await readdir(SITE_DIR);
-    console.log(`📁 Found ${files.length} files in site directory`);
-    
-    // Generate HTML content
-    const htmlContent = generateHTML(files);
-    
-    // Write index.html file
-    await writeFile(INDEX_FILE, htmlContent, 'utf8');
-    
-    console.log(`✅ Successfully generated ${INDEX_FILE}`);
-    console.log(`📋 Files included: ${files.join(', ')}`);
-    
-  } catch (error) {
-    console.error('❌ Error generating index.html:', error.message);
-    process.exit(1);
-  }
-}
-
-// Run the script if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  generateIndex();
-}
-
-export { generateIndex }; 

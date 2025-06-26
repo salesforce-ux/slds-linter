@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
 import { createServer } from 'http';
-import { readFile } from 'fs/promises';
+import { readFile, readdir } from 'fs/promises';
 import { join, extname } from 'path';
 import { existsSync, readdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { generateHTML } from './generate-index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,6 +31,20 @@ const mimeTypes = {
   '.pdf': 'application/pdf'
 };
 
+function sendContent(res, content, ext) {
+  const contentType = mimeTypes[ext] || 'application/octet-stream';
+    
+  // Set response headers
+  res.writeHead(200, {
+    'Content-Type': contentType,
+    'Content-Length': content.length,
+    'Cache-Control': 'public, max-age=3600' // Cache for 1 hour
+  });
+  
+  // Send response
+  res.end(content);
+}
+
 // Create HTTP server
 const server = createServer(async (req, res) => {
   try {
@@ -39,7 +54,12 @@ const server = createServer(async (req, res) => {
     
     // Default to index.html if root path
     if (filePath === '/') {
-      filePath = '/index.html';
+      // Read files from site directory
+      const files = await readdir(SITE_DIR);
+      console.log(`📁 Found ${files.length} files in site directory`);
+      const content = generateHTML(files);
+      sendContent(res, content, '.html');
+      return;
     }
     
     // Resolve file path relative to site directory
@@ -81,17 +101,7 @@ const server = createServer(async (req, res) => {
     
     // Determine MIME type
     const ext = extname(filePath).toLowerCase();
-    const contentType = mimeTypes[ext] || 'application/octet-stream';
-    
-    // Set response headers
-    res.writeHead(200, {
-      'Content-Type': contentType,
-      'Content-Length': content.length,
-      'Cache-Control': 'public, max-age=3600' // Cache for 1 hour
-    });
-    
-    // Send response
-    res.end(content);
+    sendContent(res, content, ext);
     
   } catch (error) {
     console.error('Server error:', error);
