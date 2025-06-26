@@ -1276,11 +1276,11 @@ __metadata:
   resolution: "@salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds"
   dependencies:
     "@salesforce-ux/sds-metadata": "npm:~0.2.1"
-    "@types/jest": "npm:^29.0.0"
+    "@types/jest": "npm:^29.5.14"
     "@types/postcss-plugins": "npm:1.13.2"
     chroma-js: "npm:^3.1.2"
-    jest: "npm:^29.0.0"
-    ts-jest: "npm:^29.0.0"
+    jest: "npm:^29.7.0"
+    ts-jest: "npm:^29.2.5"
   peerDependencies:
     postcss: ^8.4.47
     postcss-selector-parser: ^7.1.0
@@ -1462,7 +1462,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^29.0.0, @types/jest@npm:^29.5.14":
+"@types/jest@npm:^29.5.14":
   version: 29.5.14
   resolution: "@types/jest@npm:29.5.14"
   dependencies:
@@ -4918,7 +4918,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest@npm:^29.0.0, jest@npm:^29.7.0":
+"jest@npm:^29.7.0":
   version: 29.7.0
   resolution: "jest@npm:29.7.0"
   dependencies:
@@ -7335,7 +7335,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:^29.0.0, ts-jest@npm:^29.2.5":
+"ts-jest@npm:^29.2.5":
   version: 29.2.6
   resolution: "ts-jest@npm:29.2.6"
   dependencies:
