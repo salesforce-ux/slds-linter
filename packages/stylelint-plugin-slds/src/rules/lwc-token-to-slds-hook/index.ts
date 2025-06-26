@@ -4,6 +4,8 @@ import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { isTargetProperty } from '../../utils/prop-utills';
+import { forEachVarFunction } from '../../utils/decl-utils';
 
 const { createPlugin }: typeof stylelint = stylelint;
 const lwcToSlds = metadata.lwcToSlds;
@@ -44,16 +46,6 @@ function getRecommendation(lwcToken: string) {
   return {hasRecommendation, recommendation};
 }
 
-function isVarFunction(node:valueParser.Node): boolean{
-  return (node.type === "function" && node.value === "var" && node.nodes.length>0);
-}
-
-function isAlreadyFixed(recommendation:string,functionNode:valueParser.FunctionNode, allNodes:valueParser.Node[]): boolean{
-  const hasFixInFirstNode = allNodes[0].type == "word" && allNodes[0].value === recommendation;
-  const sourceIndexMatched = functionNode.sourceIndex === allNodes[allNodes.length - 1].sourceIndex
-  return hasFixInFirstNode&& sourceIndexMatched;
-}
-
 function getReportMessage(cssVar:string, recommendation:string|string[]):string{
   if (!recommendation) {
     // Found a deprecated token but don't have any alternate recommendation then just report user to follow docs
@@ -65,10 +57,7 @@ function getReportMessage(cssVar:string, recommendation:string|string[]):string{
   return messages.errorWithStyleHooks(cssVar, recommendation);
 }
 
-function transformVarFunction(node:valueParser.Node, allNodes:valueParser.Node[]) {
-  if(!isVarFunction(node)){
-    return null;
-  }
+function transformVarFunction(node:valueParser.Node) {
   const functionNode = node as valueParser.FunctionNode;
   let cssVarNode = functionNode.nodes[0];
   let hasFallback = functionNode.nodes.length > 2; // Checking if fallback exists
@@ -83,19 +72,10 @@ function transformVarFunction(node:valueParser.Node, allNodes:valueParser.Node[]
   let replacement:string;
 
   let {hasRecommendation, recommendation} = getRecommendation(cssVar);
-  if (hasRecommendation) {
-    if(typeof recommendation ==='string' && recommendation.startsWith('--slds-')){
-      
-      if(isAlreadyFixed(recommendation,functionNode,allNodes)){ 
-        // Ignore if already fixed.
-        return null;
-      }
+  if (hasRecommendation && typeof recommendation ==='string' && recommendation.startsWith('--slds-')){
       replacement = hasFallback
       ? `var(${recommendation}, var(${cssVar}, ${valueParser.stringify(functionNode.nodes.slice(2))}))`
       : `var(${recommendation}, var(${cssVar}))`;
-    }
-  } else {
-    recommendation = null;
   }
   return {cssVar, replacement, recommendation, original: valueParser.stringify(node), index, endIndex};
 }
@@ -109,13 +89,11 @@ function transformVarFunction(node:valueParser.Node, allNodes:valueParser.Node[]
  * 
  */
 function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Problem>) {
-  const parsedValue = valueParser(decl.value);
-  const startIndex = decl.toString().indexOf(decl.value);
-  // Usage on right side
-  parsedValue.walk((node, i, allNodes) => {
-    const result = transformVarFunction(node, allNodes);
+  forEachVarFunction(decl, (node, startOffset) => {
+    const result = transformVarFunction(node);
     if(result){
       const {cssVar, replacement, recommendation, original, index, endIndex} = result;
+      
       const message = getReportMessage(cssVar, recommendation);
       let fix = null;
       
@@ -128,10 +106,10 @@ function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Pr
       stylelint.utils.report(<stylelint.Problem>{
         message,
         ...basicReportProps,
-        index: index+startIndex, endIndex: endIndex+startIndex, fix
+        index: index+startOffset, endIndex: endIndex+startOffset, fix
       });
     }
-  });
+  })
 }
 
 /**
@@ -171,9 +149,13 @@ function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Pro
 }
 
 // Define the main rule logic
-const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity, propertyTargets = [] } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((node) => {
+      if (!isTargetProperty(node.prop, propertyTargets)) {
+        return;
+      }
+
       const basicReportProps:Partial<stylelint.Problem> = {
         node,
         result,

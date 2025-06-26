@@ -3,7 +3,9 @@ import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { isTargetProperty } from '../../utils/prop-utills';
 import metadata from '@salesforce-ux/sds-metadata';
+import { forEachVarFunction } from '../../utils/decl-utils';
 const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
@@ -35,6 +37,8 @@ function shouldIgnoreDetection(sdsToken: string) {
   );
 }
 
+
+
 /**
  * 
  * Example:
@@ -44,31 +48,28 @@ function shouldIgnoreDetection(sdsToken: string) {
  * 
  */
 function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Problem>) {
-  const parsedValue = valueParser(decl.value);
-  // Usage on right side
-  parsedValue.walk((node) => {
-    if (node.type !== 'word' || !node.value.startsWith('--sds-')) {
-      return;
-    }
 
-    const oldValue = node.value;
-
+  forEachVarFunction(decl, (node: valueParser.FunctionNode, startOffset: number) => {    
+    const tokenNode = node.nodes[0];
+    const oldValue = tokenNode.value;
     if (shouldIgnoreDetection(oldValue)) {
       // Ignore if entry not found in the list or the token is marked to use further
       return;
     }
 
-    const startIndex = decl.toString().indexOf(oldValue);
-    const endIndex = startIndex + oldValue.length;
+    const index = startOffset + tokenNode.sourceIndex;
+    const endIndex = startOffset + tokenNode.sourceEndIndex;
     const suggestedMatch = toSldsToken(oldValue);
     const message = messages.replace(oldValue, suggestedMatch);
 
     utils.report(<stylelint.Problem>{
       message: JSON.stringify({message, suggestions:[suggestedMatch]}),
-      index: startIndex,
+      index,
       endIndex,
       ...basicReportProps,
-      fix: ()=> decl.value = decl.value.replace(oldValue, suggestedMatch)
+      fix: ()=> {
+        decl.value = decl.value.replace(oldValue, suggestedMatch);
+      }
     });
   });
 }
@@ -103,10 +104,15 @@ function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Pro
     });
 }
 
-const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) => {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity, propertyTargets = []}={}) => {
+
   return (root: Root, result: PostcssResult) => {
 
     root.walkDecls((decl) => {
+      if (!isTargetProperty(decl.prop, propertyTargets)) {
+        return;
+      }
+
       const basicReportProps = {
         node:decl,
         result,

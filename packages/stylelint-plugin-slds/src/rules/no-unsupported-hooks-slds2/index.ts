@@ -4,6 +4,8 @@ import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { isTargetProperty } from '../../utils/prop-utills';
+import { forEachVarFunction } from '../../utils/decl-utils';
 const { utils, createPlugin } = stylelint;
 
 const deprecatedHooks = new Set(metadata.deprecatedStylingHooks);
@@ -27,10 +29,6 @@ function shouldIgnoreDetection(sldsHook: string) {
   return !deprecatedHooks.has(sldsHook);
 }
 
-function isVarFunction(node:valueParser.Node): boolean{
-  return (node.type === "function" && node.value === "var" && node.nodes.length>0);
-}
-
 /**
  * 
  * Example:
@@ -41,26 +39,21 @@ function isVarFunction(node:valueParser.Node): boolean{
  */
 function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Problem>) {
   const parsedValue = valueParser(decl.value);
-  const startIndex = decl.toString().indexOf(decl.value);
-  // Usage on right side
-  parsedValue.walk((node) => {
-    if(!isVarFunction(node)){
-      return;
-    }
+  forEachVarFunction(decl, (node, startOffset) => {
     const functionNode = node as valueParser.FunctionNode;
     let cssVarNode = functionNode.nodes[0];
     let cssVar = cssVarNode.value;
     if (shouldIgnoreDetection(cssVar)) {
       return;
     }
-  
+
     const index = cssVarNode.sourceIndex;
     const endIndex = cssVarNode.sourceEndIndex;
 
     stylelint.utils.report(<stylelint.Problem>{
       message: messages.deprecated(cssVar),
       ...basicReportProps,
-      index: index+startIndex, endIndex: endIndex+startIndex
+      index: index+startOffset, endIndex: endIndex+startOffset
     });
 
   });
@@ -92,9 +85,13 @@ function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Pr
   stylelint.utils.report(<stylelint.Problem>reportProps);
 }
 
-const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity, propertyTargets = [] } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((node) => {
+      if (!isTargetProperty(node.prop, propertyTargets)) {
+        return;
+      }
+
       const basicReportProps:Partial<stylelint.Problem> = {
         node,
         result,

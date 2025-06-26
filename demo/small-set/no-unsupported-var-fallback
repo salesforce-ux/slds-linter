@@ -1,0 +1,17 @@
+.test-class-1{
+    color: var(--lwc-color-background-1, var(--slds-g-color-border-1));
+}
+
+.test-class-2{
+    color: var(--lwc-color-background-1, var(--slds-g-color-border-1));
+}
+
+.test-class-3{
+    color: var(--lwc-color-background-1, var(--slds-g-color-border-1, var(--lwc-color-background-2)));
+}
+
+
+.test-class-4{
+    color: var(--slds-g-color-border-1, var(--lwc-color-background-1, var(--slds-g-color-border-2)));
+}
+

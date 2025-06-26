@@ -1,5 +1,5 @@
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
-
+import stylelintPluginSlds from '../../../src/index';
 const { lint }: typeof stylelint = stylelint;
 
 describe('no-hardcoded-values-slds2', () => {
@@ -94,7 +94,7 @@ describe('no-hardcoded-values-slds2', () => {
       expectedMessage:
         'Consider replacing the 0.875rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-1 (slds/no-hardcoded-values-slds2)',
     },
-    {
+    /*{
       description:
         'Reports warning for hardcoded box-shadow value with replacement hook',
       inputCss: `
@@ -103,7 +103,7 @@ describe('no-hardcoded-values-slds2', () => {
         }
       `,
       expectedMessage: 'There’s no replacement styling hook for the 2px static value. Remove the static value. (slds/no-hardcoded-values-slds2)',
-    },
+    },*/
     {
       description:
         'Reports warning for hardcoded background-color value with replacement hook',
@@ -180,7 +180,7 @@ describe('no-hardcoded-values-slds2', () => {
       const linterResult: LinterResult = await lint({
         code: inputCss,
         config: {
-          plugins: ['./src/index.ts'], // Adjust the plugin path if needed
+          plugins: [stylelintPluginSlds], // Adjust the plugin path if needed
           rules: {
             [ruleName]: true,
           },

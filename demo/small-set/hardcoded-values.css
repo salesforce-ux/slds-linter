@@ -36,11 +36,11 @@
 }
 
 .test-cls2 {
-  box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15);
+  box-shadow: 0px 0px 1.5px 0px #00000017, 0px 1.4px 1.5px 0px #00000017, 0px -1px 1px 0px #00000009;
 }
 
 .test-cls2 {
-  box-shadow: 0 2px 8px -2px #18181814, 0 8px 12px -2px #18181828;
+  box-shadow: 0px 0px 4.5px 0px #00000014, 0px 4.2px 4.5px 0px #00000017, 0px -1px 1.44px 0px #00000008;
 }
 
 /* For text truncation with ellipsis
@@ -59,8 +59,8 @@
    .slds-col_padded
    .slds-gutters .slds-col */
 .test-cls4 {
-  padding-right: $spacingSmall;
-  padding-left: $spacingSmall;
+  padding-right: 1rem;
+  padding-left: 1rem;
 }
 
 /* For flex container with center alignment
@@ -86,15 +86,15 @@
 /* For media object figure with small spacing
    Possible util class: .slds-media_small .slds-media__figure */
 .test-cls7 {
-  margin-right: $spacingXxSmall;
+  margin-right: 0.5rem;
   flex-shrink: 0;
 }
 
 /* For vertical margin with medium spacing
    Possible util class: .slds-m-vertical_medium */
 .test-cls8 {
-  margin-top: $spacingMedium;
-  margin-bottom: $spacingMedium;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 /* For flex container with center vertical alignment
@@ -112,10 +112,10 @@
    .slds-col-rule_bottom
    .slds-col-rule_left */
 .test-cls10 {
-  border-top: $colorBorderSeparator;
-  border-right: $colorBorderSeparator;
-  border-bottom: $colorBorderSeparator;
-  border-left: $colorBorderSeparator;
+  border-top: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  border-left: 1px solid #e0e0e0;
 }
 
 /* For setting width to fixed 20rem

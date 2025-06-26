@@ -52,6 +52,12 @@ overrides:
       slds/no-slds-var-without-fallback:
         - true
         - severity: warning
+      slds/no-slds-namespace:
+        - true
+        - severity: warning
+      slds/no-unsupported-var-fallback:
+        - true
+        - severity: warning
 
     sourceMap:
       - false

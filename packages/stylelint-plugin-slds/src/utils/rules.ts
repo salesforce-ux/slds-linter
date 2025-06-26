@@ -200,6 +200,23 @@ const rulesMetadata = {
     errorMsg: "Your code uses the ${cssVar} styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To render your component correctly in all environments, add this fallback value: var(${cssVar}, ${recommendation}) . To make this fallback value brand-aware, use a branded design token instead of a static value. See Design Tokens on v1.lightningdesignsystem.com.",
     ruleDesc: "Add fallback values to SLDS styling hooks. The fallback values are used in Salesforce environments where styling hooks are unavailable.",
   },
+
+
+  "slds/no-slds-namespace": {
+    name: "slds/no-slds-namespace",
+    severityLevel: "warning",
+    warningMsg: "Using slds namespace for ${token} isn't supported. To differentiate SLDS and custom tokens, create a token in your namespace. Example: --myapp-${tokenWithoutNamespace}",
+    ruleDesc: "Create a token in your namespace to differentiate SLDS and custom tokens. For more information, see the Lightning Web Components Developer Guide.",
+  },
+
+  "slds/no-unsupported-var-fallback": {
+    name: "slds/no-unsupported-var-fallback",
+    severityLevel: "warning",
+    warningMsg: "Using ${sldsToken} as fallback value for ${lwcToken} isn't supported. For more information, see the Lightning Web Components Developer Guide.",
+    ruleDesc: "Using slds token as fallback value for lwc token is not supported.",
+  },
+
+
 } as const; // Ensures it's a readonly object
 
 export default rulesMetadata;

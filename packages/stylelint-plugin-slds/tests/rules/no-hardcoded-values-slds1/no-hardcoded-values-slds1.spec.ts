@@ -103,7 +103,7 @@ describe('no-hardcoded-values-slds1', () => {
       `,
       //expectedMessage: null, // No warning expected
       expectedMessage:
-        'There’s no replacement styling hook for the 20px static value. Remove the static value.',
+        "There's no replacement styling hook for the 20px static value. Remove the static value.",
     },
   ];
 

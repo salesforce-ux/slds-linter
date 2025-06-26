@@ -3,6 +3,7 @@ import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import valueParser from 'postcss-value-parser';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
+import { isTargetProperty } from '../../utils/prop-utills';
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
@@ -20,9 +21,13 @@ function isCalcFunction(node:valueParser.Node): boolean{
   return (node.type === "function" && node.value === "calc" && node.nodes.length>0);
 }
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
+function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity, propertyTargets = []}={}) {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
+      if (!isTargetProperty(decl.prop, propertyTargets)) {
+        return;
+      }
+
       const parsedValue = valueParser(decl.value);
       const startIndex = decl.toString().indexOf(decl.value);
       parsedValue.walk((node) => {

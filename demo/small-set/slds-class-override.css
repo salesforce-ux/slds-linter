@@ -1,0 +1,345 @@
+/* Simple SLDS class selectors */
+.slds-button {
+  border-radius: 8px;
+}
+
+.slds-card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e5e5;
+}
+
+.slds-modal {
+  z-index: 9999;
+}
+
+/* SLDS classes with pseudo-classes */
+.slds-button:hover {
+  transform: translateY(-1px);
+}
+
+.slds-input:focus {
+  border-color: #0176d3;
+  box-shadow: 0 0 0 2px rgba(1, 118, 211, 0.2);
+}
+
+/* Complex selectors with SLDS classes not at the end */
+.slds-grid .custom-component {
+  flex-grow: 2;
+}
+
+.slds-card .slds-button_brand {
+  margin-top: 1rem;
+}
+
+/* Child selector patterns */
+.slds-form-element > .slds-input {
+  background-color: #fafafa;
+}
+
+.slds-dropdown > .slds-listbox__option {
+  padding: 0.75rem;
+}
+
+/* Descendant selectors for overriding inner components */
+.slds-modal .slds-modal__content .slds-button {
+  min-width: 120px;
+}
+
+.slds-table .slds-th__action {
+  color: #0176d3;
+  font-weight: 600;
+}
+
+/* Multiple class combinations */
+.slds-button.slds-button_neutral {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.slds-card.slds-card_boundary {
+  border-left: 4px solid #0176d3;
+}
+
+/* Attribute selectors with SLDS classes */
+[data-role="primary"] .slds-button_brand {
+  box-shadow: 0 2px 4px rgba(1, 118, 211, 0.3);
+}
+
+input[type="checkbox"].slds-checkbox_faux {
+  appearance: none;
+  border-radius: 3px;
+}
+
+/* Complex multi-level selectors */
+.slds-page-header .slds-page-header__row .slds-button_icon {
+  opacity: 0.8;
+}
+
+.slds-tabs_default .slds-tabs_default__item.slds-is-active {
+  border-bottom: 3px solid #0176d3;
+}
+
+/* State-based selectors */
+.slds-listbox__option.slds-is-selected {
+  background-color: #e8f4fd;
+  font-weight: 500;
+}
+
+.slds-tree__item.slds-is-expanded {
+  border-left: 2px solid #04844b;
+}
+
+/* Responsive and utility combinations */
+.slds-show_medium .slds-grid_align-center {
+  justify-content: space-between;
+}
+
+.slds-size_1-of-2 .slds-form-element {
+  margin-bottom: 1.5rem;
+}
+
+/* Icon and visual element overrides */
+.slds-icon_container .slds-icon {
+  fill: currentColor;
+}
+
+.slds-avatar .slds-avatar__initials {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+/* Layout and spacing overrides */
+.slds-grid.slds-grid_vertical .slds-col {
+  margin-bottom: 0.5rem;
+}
+
+.slds-p-around_medium .slds-text-heading_medium {
+  color: #3e3e3c;
+}
+
+/* Form element specific overrides */
+.slds-combobox .slds-combobox__input {
+  cursor: pointer;
+  background-color: white;
+}
+
+.slds-form-element .slds-form-element__label {
+  font-weight: 600;
+  color: #444;
+}
+
+/* Navigation and menu overrides */
+.slds-context-bar .slds-context-bar__item.slds-is-active {
+  background-color: rgba(1, 118, 211, 0.1);
+}
+
+.slds-nav-vertical .slds-nav-vertical__action:hover {
+  background-color: #f3f3f3;
+  padding-left: 1.5rem;
+}
+
+/* Data table customizations */
+.slds-table.slds-table_striped tbody tr:nth-child(even) {
+  background-color: #fafbfc;
+}
+
+.slds-table .slds-cell-edit .slds-input {
+  border: none;
+  background: transparent;
+}
+
+/* Media and content overrides */
+.slds-media .slds-media__figure {
+  margin-right: 1rem;
+}
+
+.slds-rich-text-editor .slds-rich-text-editor__textarea {
+  min-height: 200px;
+}
+
+/* Notification and alert styling */
+.slds-notify.slds-notify_toast {
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+}
+
+.slds-scoped-notification.slds-scoped-notification_light {
+  border-left: 4px solid #ffc423;
+}
+
+/* Advanced component combinations */
+.slds-split-view .slds-split-view__list-item:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.slds-path .slds-path__item.slds-is-complete {
+  background: linear-gradient(45deg, #04844b, #2e844a);
+}
+
+/* Custom utility overrides */
+.slds-truncate.slds-truncate_container_75 {
+  max-width: 75ch;
+  overflow-wrap: break-word;
+}
+
+.slds-theme_inverse .slds-text-color_inverse {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Complex nested component styling */
+.slds-card .slds-card__header .slds-media .slds-button_icon {
+  margin-left: auto;
+}
+
+.slds-modal .slds-modal__container .slds-card .slds-card__footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Animation and transition effects */
+.slds-dropdown.slds-dropdown_fluid {
+  transition: all 0.2s ease-in-out;
+}
+
+.slds-spinner.slds-spinner_brand {
+  animation-duration: 1.2s;
+}
+
+/* Focus and accessibility improvements */
+.slds-button:focus-visible {
+  outline: 2px solid #0176d3;
+  outline-offset: 2px;
+}
+
+.slds-checkbox .slds-checkbox_faux:focus {
+  box-shadow: 0 0 0 3px rgba(1, 118, 211, 0.2);
+}
+
+/* Multiple selectors sharing common styles */
+.slds-button_brand,
+.slds-button_success,
+.slds-button_destructive {
+  font-weight: 600;
+}
+
+.slds-input,
+.slds-textarea,
+.slds-select {
+  border: 2px solid #e5e5e5;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.slds-card__header,
+.slds-card__footer,
+.slds-modal__header {
+  padding: 1.5rem;
+}
+
+.slds-icon_small,
+.slds-icon_x-small,
+.slds-icon_xx-small {
+  vertical-align: middle;
+}
+
+.slds-m-top_small,
+.slds-m-top_medium,
+.slds-m-top_large {
+  position: relative;
+}
+
+.slds-grid_align-center,
+.slds-grid_align-spread,
+.slds-grid_align-end {
+  min-height: 2rem;
+}
+
+.slds-text-heading_small,
+.slds-text-heading_medium,
+.slds-text-heading_large {
+  font-family: "Salesforce Sans", Arial, sans-serif;
+  font-weight: 700;
+}
+
+.slds-badge,
+.slds-pill,
+.slds-notification-badge {
+  display: inline-flex;
+  align-items: center;
+}
+
+.slds-popover_error,
+.slds-popover_warning,
+.slds-notify_alert {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.slds-dropdown__item,
+.slds-listbox__option,
+.slds-lookup__item {
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.slds-path__item.slds-is-current,
+.slds-wizard__item.slds-is-current,
+.slds-progress__item.slds-is-current {
+  border: 2px solid #0176d3;
+}
+
+.slds-tab__item.slds-is-active,
+.slds-vertical-tabs__nav-item.slds-is-active,
+.slds-context-bar__item.slds-is-active {
+  font-weight: 600;
+  color: #0176d3;
+}
+
+.slds-form-element_edit .slds-input,
+.slds-form-element_edit .slds-textarea,
+.slds-table .slds-cell-edit .slds-input {
+  background-color: #fffbf0;
+}
+
+.slds-tree__item:hover,
+.slds-nav-vertical__item:hover,
+.slds-list__item:hover {
+  background-color: #f8f9fa;
+}
+
+.slds-accordion__section,
+.slds-section,
+.slds-summary-detail {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+/* Complex multiple selectors with nested elements */
+.slds-modal .slds-button_brand,
+.slds-popover .slds-button_brand,
+.slds-panel .slds-button_brand {
+  margin-left: 0.5rem;
+}
+
+.slds-card .slds-icon_container,
+.slds-tile .slds-icon_container,
+.slds-media .slds-icon_container {
+  flex-shrink: 0;
+}
+
+.slds-table .slds-th__action:hover,
+.slds-table .slds-th__action:focus,
+.slds-table .slds-th__action.slds-is-sorted {
+  background-color: #f3f3f3;
+}
+
+.slds-form-element > .slds-form-element__label,
+.slds-form-element > .slds-form-element__legend,
+.slds-checkbox > .slds-checkbox__label {
+  margin-bottom: 0.25rem;
+}
+
+/* State combinations with multiple selectors */
+.slds-button.slds-is-selected,
+.slds-checkbox.slds-is-checked,
+.slds-radio.slds-is-checked {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
