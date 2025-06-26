@@ -15,6 +15,7 @@
   "scripts": {
     "prepare": "husky install",
     "preinstall": "./scripts/validate-setup.sh",
+    "start": "node scripts/start.js",
     "test": "yarn workspaces foreach -At run test",
     "build": "node scripts/build.js",
     "release": "node scripts/release.js",
