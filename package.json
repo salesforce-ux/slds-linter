@@ -16,11 +16,11 @@
     "prepare": "husky install",
     "preinstall": "./scripts/validate-setup.sh",
     "test": "yarn workspaces foreach -At run test",
-    "build": "yarn workspaces foreach -At  --jobs 1 run build",
+    "build": "node scripts/build.js",
     "release": "node scripts/release.js",
     "coverage": "yarn test --coverage && yarn gen:coverage-summary",
     "gen:coverage-summary": "node scripts/consolidate-coverage.js",
-    "gen:sarif": "node ./packages/cli/build/index.js report \"demo/**\"",
+    "gen:sarif": "npx slds-linter report \"demo/**\"",
     "validate:sarif": "yarn gen:sarif && node scripts/validate-sarif.js"
   },
   "devDependencies": {
@@ -33,6 +33,7 @@
     "conventional-commits-parser": "^3.0.0",
     "esbuild": "^0.25.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
+    "finalhandler": "^2.1.0",
     "glob": "^11.0.1",
     "gulp": "^5.0.0",
     "gulp-clean-dir": "^1.0.2",
@@ -44,6 +45,7 @@
     "prompts": "^2.4.2",
     "rimraf": "^6.0.1",
     "semver": "^7.7.1",
+    "serve-static": "^2.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },

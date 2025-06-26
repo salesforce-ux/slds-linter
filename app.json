@@ -1,0 +1,34 @@
+{
+  "name": "SLDS Linter Review App",
+  "description": "Review app for SLDS Linter project with automated testing and linting",
+  "repository": "https://github.com/salesforce-ux/slds-linter",
+  "keywords": ["node", "stylelint", "eslint", "salesforce", "lightning-design-system"],
+  "env": {
+    "NODE_ENV": "production",
+    "NPM_CONFIG_PRODUCTION": "false"
+  },
+  "engines": {
+    "node": "20.18.3"
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "environments": {
+    "test": {
+      "scripts": {
+        "test-setup": "yarn install && yarn build",
+        "test": "yarn coverage && yarn gen:sarif"
+      }
+    }
+  },
+  "addons": [],
+  "stack": "heroku-24"
+} 
