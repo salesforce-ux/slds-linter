@@ -73,7 +73,6 @@ function consolidateCoverage() {
   console.log('        Coverage summary       ');
   console.log('===============================');
   console.table(mergedCoverage.total);
-  console.log(`\n✅ Merged coverage report saved to:\n${outputPath}\n`);
 }
 
 consolidateCoverage();
