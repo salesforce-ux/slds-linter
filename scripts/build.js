@@ -4,7 +4,7 @@ import { execSync } from 'child_process';
 import { generateIndex } from './generate-index.js';
 
 
-try {
+/*try {
   console.log('📦 Running yarn install...');
   execSync('yarn install', { 
     stdio: 'inherit',
@@ -14,7 +14,7 @@ try {
 } catch (error) {
   console.error('❌ Yarn install failed:', error.message);
   process.exit(1);
-}
+}*/
 
 
 // Always run the main build command
