@@ -2,10 +2,10 @@
  * Tests for executor module functionality
  */
 
-import { lint, report } from '../index';
-import { LintConfig, ReportConfig, LintResult } from '../../types';
-import { LintRunner } from '../../services/lint-runner';
-import { FileScanner } from '../../services/file-scanner';
+import { lint, report } from '../src/executor';
+import { LintConfig, ReportConfig, LintResult } from '../src/types';
+import { LintRunner } from '../src/services/lint-runner';
+import { FileScanner } from '../src/services/file-scanner';
 import { Readable } from 'stream';
 import { jest } from '@jest/globals';
 
@@ -17,7 +17,7 @@ const mockLintResult: LintResult = {
 };
 
 // Use an alternative approach without generic typing that was causing issues
-jest.mock('../../services/lint-runner', () => {
+jest.mock('../src/services/lint-runner', () => {
   return {
     LintRunner: {
       runLinting: jest.fn().mockImplementation(() => {
@@ -27,7 +27,7 @@ jest.mock('../../services/lint-runner', () => {
   };
 });
 
-jest.mock('../../services/file-scanner', () => {
+jest.mock('../src/services/file-scanner', () => {
   return {
     FileScanner: {
       scanFiles: jest.fn().mockImplementation(() => {
@@ -93,7 +93,7 @@ xdescribe('Executor functions', () => {
     
     it('should use lint results to generate a report', async () => {
       // Create mock module for lint function to spy on
-      const lintMock = jest.spyOn(require('../index'), 'lint').mockResolvedValue([mockLintResult]);
+      const lintMock = jest.spyOn(require('../src/executor'), 'lint').mockResolvedValue([mockLintResult]);
       
       const config: ReportConfig = {
         directory: './src',
