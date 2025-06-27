@@ -239,3 +239,7 @@ export function generateIndex() {
   const html = generateHTML(files);
   writeFileSync(join(SITE_DIR, 'index.html'), html);
 }
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  generateIndex();
+}
