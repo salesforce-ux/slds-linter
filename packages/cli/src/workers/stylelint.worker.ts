@@ -19,32 +19,16 @@ class StylelintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
       const fileResult = result.results[0];
 
       // Convert stylelint results to our format
-      // Stylelint uses severity: "ignore", "warning", "error"
-      const warnings = fileResult.warnings
-        .filter(warning => warning.severity === 'warning')
-        .map(warning => ({
-          line: warning.line,
-          column: warning.column,
-          endColumn: warning.endColumn,
-          message: warning.text,
-          ruleId: warning.rule
-        }));
-
-      const errors = fileResult.warnings
-        .filter(warning => warning.severity === 'error')
-        .map(warning => ({
-          line: warning.line,
-          column: warning.column,
-          endColumn: warning.endColumn,
-          message: warning.text,
-          ruleId: warning.rule
-        }));
-
-      const combinedResults = [...warnings, ...errors].sort((a, b) => a.line - b.line);
       return {
         file: filePath,
-        warnings: combinedResults,
-        errors: []
+        warnings: fileResult.warnings.map(warning => ({
+          line: warning.line,
+          column: warning.column,
+          endColumn: warning.endColumn,
+          message: warning.text,
+          ruleId: warning.rule
+        })).sort((a, b) => a.line - b.line),
+        errors: [] // Stylelint doesn't differentiate between warnings and errors
       };
     } catch (error: any) {
       return {
