@@ -53,3 +53,8 @@
     color: var(--lwc-colorTextIconDefault);
     border-radius: var(--lwc-borderRadiusMedium);
 } 
+
+
+THIS .secondaryFields > li > *:last-child:before {
+    color: t(colorTextPlaceholder);
+}

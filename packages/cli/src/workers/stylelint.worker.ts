@@ -40,10 +40,11 @@ class StylelintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
           ruleId: warning.rule
         }));
 
+      const combinedResults = [...warnings, ...errors].sort((a, b) => a.line - b.line);
       return {
         file: filePath,
-        warnings,
-        errors
+        warnings: combinedResults,
+        errors: []
       };
     } catch (error: any) {
       return {
