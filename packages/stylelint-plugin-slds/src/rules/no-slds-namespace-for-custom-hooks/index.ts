@@ -4,7 +4,7 @@ import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import metadata from '@salesforce-ux/sds-metadata';
 import { isTargetProperty } from '../../utils/prop-utills';
-import { forEachVarFunction, getFallbackToken, getVarToken } from '../../utils/decl-utils';
+import { forEachVarFunction } from '../../utils/decl-utils';
 import valueParser from 'postcss-value-parser';
 
 const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
@@ -17,47 +17,48 @@ const allSldsHooks = [...sldsPlusStylingHooks.global, ...sldsPlusStylingHooks.co
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
-const ruleName: string = 'slds/no-unsupported-var-fallback';
+const ruleName: string = 'slds/no-slds-namespace-for-custom-hooks';
 
 const { severityLevel = 'error', warningMsg = '', errorMsg = '', ruleDesc = 'No description provided' } = ruleMetadata(ruleName) || {};
 
-const toSldsToken = (sdsToken: string='') => (sdsToken || '').replace('--sds-', '--slds-')
+const toSldsToken = (sdsToken: string) => sdsToken.replace('--sds-', '--slds-')
 
 const messages = stylelint.utils.ruleMessages(ruleName, {
-    expected: (lwcToken: string, sldsToken: string) => {
-        return replacePlaceholders(warningMsg, { lwcToken, sldsToken })
+    expected: (token: string) => {
+        const tokenWithoutNamespace = token.replace('--slds-', '').replace('--sds-', '');
+        return replacePlaceholders(warningMsg, { token, tokenWithoutNamespace })
     },
 });
 
-function hasUnsupportedFallback(lwcToken: string, sldsToken: string): boolean {
-    const safeSldsToken = toSldsToken(sldsToken);
-    return lwcToken && safeSldsToken 
-    && lwcToken.startsWith('--lwc-') 
-    && safeSldsToken.startsWith('--slds-') 
-    && allSldsHooks.includes(safeSldsToken);
+function shouldIgnoreDetection(sdsToken: string) {
+    // Ignore if entry found in the list or not starts with reserved namespace
+    if(sdsToken.startsWith('--sds-') || sdsToken.startsWith('--slds-')){
+        return allSldsHooks.includes(toSldsToken(sdsToken))
+    }
+    return true;
 }
 
 /**
  * 
  * Example:
  *  .THIS  .demo {
- *    color: var(--lwc-color-background-1, var(--sds-g-color-background-1));
+ *    border: 1px solid var(--slds-my-own-token));
  *  }
  * 
  */
 function detectRightSide(decl: Declaration, basicReportProps: Partial<stylelint.Problem>) {
 
     forEachVarFunction(decl, (node: valueParser.FunctionNode, startOffset: number) => {
-        const lwcToken = getVarToken(node);
-        const sldsToken = getFallbackToken(node);
-
-        if(!hasUnsupportedFallback(lwcToken, sldsToken)){
+        const tokenNode = node.nodes[0];
+        const oldValue = tokenNode.value;
+        if (shouldIgnoreDetection(oldValue)) {
+            // Ignore if entry not found in the list or the token is marked to use further
             return;
         }
 
-        const index = startOffset + node.sourceIndex;
-        const endIndex = startOffset + node.sourceEndIndex;
-        const message = messages.expected(lwcToken, sldsToken);
+        const index = startOffset + tokenNode.sourceIndex;
+        const endIndex = startOffset + tokenNode.sourceEndIndex;
+        const message = messages.expected(oldValue);
 
         utils.report(<stylelint.Problem>{
             message,
@@ -65,7 +66,35 @@ function detectRightSide(decl: Declaration, basicReportProps: Partial<stylelint.
             endIndex,
             ...basicReportProps
         });
-    }, false);
+    });
+}
+
+/**
+ * 
+ * Example:
+ *  .THIS  .demo {
+ *    --slds-my-own-token: 50%;
+ *  }
+ * 
+ */
+function detectLeftSide(decl: Declaration, basicReportProps: Partial<stylelint.Problem>) {
+    // Usage on left side
+    const { prop } = decl;
+    if (shouldIgnoreDetection(prop)) {
+        // Ignore if entry not found in the list or the token is marked to use further
+        return;
+    }
+    const startIndex = decl.toString().indexOf(prop);
+    const endIndex = startIndex + prop.length;
+
+    const message = messages.expected(prop);
+
+    utils.report(<stylelint.Problem>{
+        message,
+        index: startIndex,
+        endIndex,
+        ...basicReportProps
+    });
 }
 
 
@@ -86,6 +115,7 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
             };
 
             detectRightSide(decl, basicReportProps);
+            detectLeftSide(decl, basicReportProps);
         });
     };
 };

@@ -71,7 +71,7 @@ describe('no-slds-var-without-fallback', () => {
       expect(messages.length).toBeGreaterThan(0);
       // Check that one of the warnings contains text about styling hooks being unavailable
       const warningTexts = messages.map(w => w.text);
-      console.log('Warning texts:', warningTexts);
+      
       expect(warningTexts.some(text => text.includes('styling hook without a fallback value'))).toBeTruthy();
       
       // Check for each of the variables having the expected fallback value
@@ -87,7 +87,7 @@ describe('no-slds-var-without-fallback', () => {
         const hasVarWithFallback = warningTexts.some(
           text => text.includes(item.variable) && text.includes(item.fallback)
         );
-        console.log(`Checking for "${item.variable}" with value "${item.fallback}":`, hasVarWithFallback);
+        
         expect(hasVarWithFallback).toBeTruthy();
       });
     } else {
@@ -163,8 +163,7 @@ describe('no-slds-var-without-fallback', () => {
       },
     });
 
-    const warningTexts = result.results[0]?.warnings.map(w => w.text);
-    console.log('Unknown variable warnings:', warningTexts);
+    const warningTexts = result.results[0]?.warnings.map(w => w.text);    
 
     // Check that no warnings were generated for unknown variables
     expect(warningTexts?.length).toBe(0);
@@ -190,7 +189,6 @@ describe('no-slds-var-without-fallback', () => {
     });
 
     const warningTexts = result.results[0]?.warnings.map(w => w.text);
-    console.log('Unknown variable warning:', warningTexts);
 
     // Check that no warnings were generated for the unknown variable
     expect(warningTexts?.length).toBe(0);
@@ -247,7 +245,6 @@ describe('no-slds-var-without-fallback', () => {
     // We expect a warning for the nested SLDS variable
     expect(messages.length).toBeGreaterThan(0);
     const warningTexts = messages.map(w => w.text);
-    console.log('Nested var warning texts:', warningTexts);
     expect(warningTexts.some(text => text.includes('--slds-g-color-border-base-1'))).toBeTruthy();
     expect(warningTexts.some(text => text.includes('#c9c9c9'))).toBeTruthy();
   });
