@@ -58,6 +58,9 @@ overrides:
       slds/no-unsupported-var-fallback:
         - true
         - severity: warning
+      slds/enforce-component-hook-naming-convention:
+        - true
+        - severity: error
 
     sourceMap:
       - false
