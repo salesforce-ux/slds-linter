@@ -109,6 +109,15 @@ const rulesMetadata = {
     ruleDesc:
       "Convert your existing --sds styling hooks to --slds styling hooks. See lightningdesignsystem.com for more info.",
   },
+
+  "slds/enforce-component-hook-naming-convention": {
+    name: "slds/enforce-component-hook-naming-convention",
+    severityLevel: "warning",
+    warningMsg: "Replace the deprecated ${oldValue} component styling hook with ${suggestedMatch}.",
+    errorMsg: "Replace the deprecated ${oldValue} component styling hook with ${suggestedMatch}.",
+    ruleDesc: "Replace component styling hooks that use a deprecated naming convention.",
+  },
+
   // Needs CX review
   "slds/no-deprecated-slds2-classes": {
     name: "slds/no-deprecated-slds2-classes",
@@ -214,8 +223,7 @@ const rulesMetadata = {
     severityLevel: "warning",
     warningMsg: "Using ${sldsToken} as fallback value for ${lwcToken} isn't supported. For more information, see the Lightning Web Components Developer Guide.",
     ruleDesc: "Using slds token as fallback value for lwc token is not supported.",
-  },
-
+  }
 
 } as const; // Ensures it's a readonly object
 
