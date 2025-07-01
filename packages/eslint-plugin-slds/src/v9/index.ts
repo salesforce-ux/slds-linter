@@ -3,13 +3,18 @@
  * Uses flat config format with proper plugin structure
  */
 
-import { rules as sharedRules } from '../rules';
-import { rules as v9OnlyRules } from './rules';
+import type { Rule } from 'eslint';
 
-const allRules = { ...sharedRules, ...v9OnlyRules };
+const rules: Record<string, Rule.RuleModule> = {
+  "enforce-bem-usage": require('../rules/enforce-bem-usage'),
+  "no-deprecated-classes-slds2": require('../rules/no-deprecated-classes-slds2'),
+  "modal-close-button-issue": require('../rules/modal-close-button-issue'),
+  // Add v9-only rules here, e.g.:
+  // "no-slds-var-without-fallback": require('./rules/no-slds-var-without-fallback'),
+};
 
 export = {
-    rules: allRules,
+    rules,
     meta: {
         name: "@salesforce-ux/eslint-plugin-slds",
         version: process.env.PLUGIN_VERSION
@@ -23,7 +28,7 @@ export = {
             },
             plugins: {
                 "@salesforce-ux/slds": {
-                    rules: allRules,
+                    rules,
                     meta: {
                         name: "@salesforce-ux/eslint-plugin-slds",
                         version: process.env.PLUGIN_VERSION
@@ -32,6 +37,7 @@ export = {
             },
             files: ["**/*.html", "**/*.cmp"],
             rules: {
+                // Explicitly list all rules for clarity
                 "@salesforce-ux/slds/enforce-bem-usage": "error",
                 "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
                 "@salesforce-ux/slds/modal-close-button-issue": "error"
