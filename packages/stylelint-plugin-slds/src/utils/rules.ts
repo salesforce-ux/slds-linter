@@ -113,10 +113,10 @@ const rulesMetadata = {
   "slds/enforce-component-hook-naming-convention": {
     name: "slds/enforce-component-hook-naming-convention",
     severityLevel: "warning",
-    warningMsg: "This component hook is using a naming convention that is no longer supported. Please replace it with ${suggestedMatch} styling hook.",
-    errorMsg: "This component hook is using a naming convention that is no longer supported. Please replace it with ${suggestedMatch} styling hook.",
+    warningMsg: "Replace the deprecated ${oldValue} component styling hook with ${suggestedMatch}.",
+    errorMsg: "Replace the deprecated ${oldValue} component styling hook with ${suggestedMatch}.",
     ruleDesc:
-      "Convert your existing SLDS1 component hooks to SLDS2 component hooks. See lightningdesignsystem.com for more info.",
+      "Replace component styling hooks that use a deprecated naming convention.",
   },
 
   // Needs CX review
