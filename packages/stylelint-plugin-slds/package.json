@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/stylelint-plugin-slds",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "main": "build/index.js",
   "files": [
@@ -16,7 +16,7 @@
     "dev": "gulp dev"
   },
   "dependencies": {
-    "@salesforce-ux/sds-metadata": "~0.2.1",
+    "@salesforce-ux/sds-metadata": "^0.2.2",
     "chroma-js": "^3.1.2",
     "postcss": "^8.4.47",
     "postcss-selector-parser": "^7.1.0",

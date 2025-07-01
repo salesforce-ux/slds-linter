@@ -5,7 +5,6 @@ import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import { getClassNodesAtEnd } from '../../utils/selector-utils';
 import replacePlaceholders from '../../utils/util';
-import { hasMatchedProperty } from '../../utils/prop-utills';
 const { utils, createPlugin }: typeof stylelint = stylelint;
 const sldsClasses = metadata.sldsClasses;
 

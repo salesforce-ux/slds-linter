@@ -1,6 +1,6 @@
 plugins:
   - '@salesforce-ux/stylelint-plugin-slds'
-
+rules: {}
 overrides:
   - files:
       - '**/*.css'
@@ -53,6 +53,9 @@ overrides:
         - true
         - severity: warning
       slds/no-slds-namespace:
+        - true
+        - severity: warning
+      slds/no-unsupported-var-fallback:
         - true
         - severity: warning
 
