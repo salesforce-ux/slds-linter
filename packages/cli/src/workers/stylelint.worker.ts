@@ -27,7 +27,7 @@ class StylelintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
           endColumn: warning.endColumn,
           message: warning.text,
           ruleId: warning.rule
-        })),
+        })).sort((a, b) => a.line - b.line),
         errors: [] // Stylelint doesn't differentiate between warnings and errors
       };
     } catch (error: any) {
