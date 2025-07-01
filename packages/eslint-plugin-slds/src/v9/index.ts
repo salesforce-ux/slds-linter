@@ -3,24 +3,17 @@
  * Uses flat config format with proper plugin structure
  */
 
-// Define rules once to avoid duplication
-const pluginRules = {
-    "enforce-bem-usage": require('../rules/enforce-bem-usage'),
-    "no-deprecated-classes-slds2": require('../rules/no-deprecated-classes-slds2'),
-    "modal-close-button-issue": require('../rules/modal-close-button-issue')
-};
+import { rules as sharedRules } from '../rules';
+import { rules as v9OnlyRules } from './rules';
 
-// Plugin object
-const plugin = {
-    rules: pluginRules,
+const allRules = { ...sharedRules, ...v9OnlyRules };
+
+export = {
+    rules: allRules,
     meta: {
         name: "@salesforce-ux/eslint-plugin-slds",
         version: process.env.PLUGIN_VERSION
-    }
-};
-
-export = {
-    ...plugin,
+    },
     configs: {
         recommended: {
             languageOptions: {
@@ -29,7 +22,13 @@ export = {
                 sourceType: "module"
             },
             plugins: {
-                "@salesforce-ux/slds": plugin
+                "@salesforce-ux/slds": {
+                    rules: allRules,
+                    meta: {
+                        name: "@salesforce-ux/eslint-plugin-slds",
+                        version: process.env.PLUGIN_VERSION
+                    }
+                }
             },
             files: ["**/*.html", "**/*.cmp"],
             rules: {

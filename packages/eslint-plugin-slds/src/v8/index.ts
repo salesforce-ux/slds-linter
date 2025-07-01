@@ -1,12 +1,12 @@
 /**
  * ESLint v8 compatible plugin configuration
  */
+import { rules as sharedRules } from '../rules';
+
+const allRules = { ...sharedRules };
+
 export = {
-    rules: {
-        "enforce-bem-usage": require('../rules/enforce-bem-usage'),
-        "no-deprecated-classes-slds2": require('../rules/no-deprecated-classes-slds2'),
-        "modal-close-button-issue": require('../rules/modal-close-button-issue')
-    },
+    rules: allRules,
     configs: {
         recommended: {
             parser: "@html-eslint/parser", // Use HTML parser
