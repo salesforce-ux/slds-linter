@@ -1,4 +1,3 @@
-
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;
@@ -25,7 +24,7 @@ describe('no-hardcoded-values-slds1', () => {
           width: 0;
         }
       `,
-      expectedMessage: null,
+      expectedMessage: "There's no replacement styling hook for the 0 static value. Remove the static value.",
     },
     {
       description: 'Does not report for 0px as a value',
@@ -34,7 +33,7 @@ describe('no-hardcoded-values-slds1', () => {
           width: 0px;
         }
       `,
-      expectedMessage: null,
+      expectedMessage: "There's no replacement styling hook for the 0px static value. Remove the static value.",
     },
     {
       description: 'Does not report for 0.0 as a value',
@@ -43,7 +42,7 @@ describe('no-hardcoded-values-slds1', () => {
           width: 0.0;
         }
       `,
-      expectedMessage: null,
+      expectedMessage: "There's no replacement styling hook for the 0.0 static value. Remove the static value.",
     },
     {
       description: 'Reports warning for hardcoded font-size value with replacement hook',

@@ -10,8 +10,9 @@ import { toRuleMessages } from '../../utils/rule-message-utils';
 import { colorProperties, densificationProperties, matchesCssProperty } from '../../utils/property-matcher';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { handleFontProps } from './handlers/fontHandler';
-import { forEachDensifyValue } from '../../utils/density-utils';
+import { forEachDensifyValue, getFullValueFromNode } from '../../utils/density-utils';
 import { isFontProperty } from '../../utils/fontValueParser';
+import { forEachVarFunction } from '../../utils/decl-utils';
 
 const { createPlugin } = stylelint;
 
@@ -83,7 +84,25 @@ export const createNoHardcodedValueRule = (
             messages
           );
         } else if (isDensiProp) {
+          // Collect fallback nodes from var() functions
+          const fallbackNodes = new Set();
+          forEachVarFunction(decl, (varNode) => {
+            // All nodes after the first (token) are fallback(s)
+            const fnNode = varNode as valueParser.FunctionNode;
+            fnNode.nodes.slice(1).forEach(fallback => {
+              // Only add if it's a number or unit, not a keyword like 'solid'
+              const parsed = valueParser.unit(fallback.value);
+              if (parsed || /^\d+(\.\d+)?$/.test(fallback.value)) {
+                fallbackNodes.add(fallback.value);
+              }
+            });
+          });
           forEachDensifyValue(parsedValue, (node) => {
+            // Skip reporting if node is a fallback in var()
+            if (fallbackNodes.has(node.value)) return;
+            // Only report if node is numeric/unit
+            const parsed = valueParser.unit(node.value);
+            if (!(parsed || /^\d+(\.\d+)?$/.test(node.value))) return;
             handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, cssProperty, reportProps, messages);
           });
         }

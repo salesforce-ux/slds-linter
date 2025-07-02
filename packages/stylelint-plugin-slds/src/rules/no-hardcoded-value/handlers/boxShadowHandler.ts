@@ -47,6 +47,7 @@ export function handleBoxShadow(
       if (closestHooks.length > 0) {
         if (customReportMatchingHooks) {
           console.log('[boxShadowHandler] Using custom reportMatchingHooks');
+          console.log('[boxShadowHandler] Reporting value:', cssValue, 'Suggestions:', closestHooks);
           customReportMatchingHooks(
             decl,
             closestHooks,
@@ -57,6 +58,7 @@ export function handleBoxShadow(
           );
         } else {
           console.log('[boxShadowHandler] Using default reportMatchingHooks');
+          console.log('[boxShadowHandler] Reporting value:', cssValue, 'Suggestions:', closestHooks);
           reportMatchingHooks(
             decl,
             closestHooks,

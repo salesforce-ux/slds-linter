@@ -7,7 +7,7 @@ import { handleColorProps } from '../../../../stylelint-plugin-slds/src/rules/no
 import { handleDensityPropForNode } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/densityHandler';
 import { colorProperties, densificationProperties, matchesCssProperty } from '../../../../stylelint-plugin-slds/src/utils/property-matcher';
 import { handleFontProps } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/fontHandler';
-import { forEachDensifyValue } from '../../../../stylelint-plugin-slds/src/utils/density-utils';
+import { forEachDensifyValue, getFullValueFromNode, isDensifyValue } from '../../../../stylelint-plugin-slds/src/utils/density-utils';
 import { isFontProperty } from '../../../../stylelint-plugin-slds/src/utils/fontValueParser';
 import { makeReportMatchingHooks } from '../../../../stylelint-plugin-slds/src/utils/report-utils';
 import type { DeclarationPlain } from '@eslint/css-tree';
@@ -45,7 +45,27 @@ const rule: Rule.RuleModule = {
         if (node.value && node.value.range) {
           cssValue = sourceCode.text.slice(node.value.range[0], node.value.range[1]);
         } else if (node.value && node.value.children && Array.isArray(node.value.children)) {
-          cssValue = node.value.children.map(child => child.name || child.value || '').join(' ');
+          cssValue = node.value.children.map(child => {
+            if (child.type === 'Dimension' && child.value && child.unit) {
+              return `${child.value}${child.unit}`;
+            }
+            if (child.type === 'Percentage' && child.value) {
+              return `${child.value}%`;
+            }
+            if (child.type === 'Hash' && child.value) {
+              return `#${child.value}`;
+            }
+            if (child.value && child.unit) {
+              return `${child.value}${child.unit}`;
+            }
+            if (child.value) {
+              return child.value;
+            }
+            if (child.name) {
+              return child.name;
+            }
+            return '';
+          }).join(' ');
         }
         // Debug: Log property being checked
         console.log('[no-hardcoded-values-slds1] Checking property:', cssProperty);
@@ -156,16 +176,29 @@ const rule: Rule.RuleModule = {
         } else if (isDensiProp) {
           console.log('[no-hardcoded-values-slds1] Handling density property');
           forEachDensifyValue(parsedValue, (n) => {
+            // Skip reporting for 0 values (match stylelint behavior)
+            if (!isDensifyValue(n, true)) return;
+            console.log('[no-hardcoded-values-slds1] forEachDensifyValue node:', n);
+            console.log('[no-hardcoded-values-slds1] node.type:', n.type);
+            console.log('[no-hardcoded-values-slds1] getFullValueFromNode(n):', getFullValueFromNode(n));
+            // Extract the value substring from the original property value using sourceIndex and sourceEndIndex
+            let valueWithUnit = '';
+            if (typeof n.sourceIndex === 'number' && typeof n.sourceEndIndex === 'number') {
+              valueWithUnit = cssValue.slice(n.sourceIndex, n.sourceEndIndex);
+            } else {
+              valueWithUnit = getFullValueFromNode(n);
+            }
             handleDensityPropForNode(
               adaptedDecl,
               n,
-              n.value,
+              valueWithUnit,
               cssValueStartIndex,
               valueToStylinghookSlds,
               cssProperty,
               { node },
               messages,
-              reportMatchingHooks
+              reportMatchingHooks,
+              true
             );
           });
         } else {

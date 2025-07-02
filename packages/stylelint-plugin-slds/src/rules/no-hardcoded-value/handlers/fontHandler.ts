@@ -6,6 +6,8 @@ import { MessagesObj, reportMatchingHooks } from "../../../utils/report-utils";
 import { handleDensityPropForNode } from "./densityHandler";
 import { FontValue, isKnownFontWeight, parseFont } from "../../../utils/fontValueParser";
 import { isFunctionNode } from "../../../utils/decl-utils";
+import { normalizeCssValue } from '../../../utils/value-utils';
+import { getFullValueFromNode } from '../../../utils/density-utils';
 
 export function handleFontProps(
     decl: Declaration,
@@ -38,12 +40,14 @@ export function handleFontProps(
             continue;
         }
         if (key === 'font-weight' && isKnownFontWeight(value)) {
-            let cssValue = node.value === 'normal' ? '400' : node.value;
+            let cssValue = node.value === 'normal' ? '400' : getFullValueFromNode(node);
+            const normalizedNode = { ...node, value: getFullValueFromNode(node) };
             console.log('[fontHandler] Passing customReportMatchingHooks to handleDensityPropForNode');
-            handleDensityPropForNode(decl, node, cssValue, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages, customReportMatchingHooks);
+            handleDensityPropForNode(decl, normalizedNode, normalizedNode.value, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages, customReportMatchingHooks);
         } else if (key === 'font-size') {
             console.log('[fontHandler] Passing customReportMatchingHooks to handleDensityPropForNode');
-            handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages, customReportMatchingHooks);
+            const normalizedNode = { ...node, value: getFullValueFromNode(node) };
+            handleDensityPropForNode(decl, normalizedNode, normalizedNode.value, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages, customReportMatchingHooks);
         }
     }
 }

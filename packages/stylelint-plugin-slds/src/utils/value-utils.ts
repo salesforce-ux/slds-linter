@@ -1,4 +1,5 @@
 import valueParser from 'postcss-value-parser';
+import { convertToHex, isValidColor } from './color-lib-utils';
 
 
 /**
@@ -57,4 +58,28 @@ export function toAlternateUnitValue(value: string): string {
       }
     }
     return alternateValue;
+}
+
+/**
+ * General utility to normalize a CSS value for reporting:
+ * - For numbers, ensures a unit is present (default px)
+ * - For colors, returns hex value
+ * - Otherwise, returns as is
+ */
+export function normalizeCssValue(value: string | undefined): string {
+  if (!value) return '';
+  // Try color normalization first
+  if (isValidColor(value)) {
+    const hex = convertToHex(value);
+    return hex || value;
+  }
+  // Length normalization
+  if (value === '0') return '0px';
+  if (/^-?\d+(\.\d+)?(px|em|rem|ch|ex|vh|vw|vmin|vmax|%)$/.test(value)) {
+    return value;
+  }
+  if (/^-?\d+(\.\d+)?$/.test(value)) {
+    return value + 'px';
+  }
+  return value;
 }

@@ -3,6 +3,8 @@ import valueParser from 'postcss-value-parser';
 import stylelint from 'stylelint';
 import { getStylingHooksForDensityValue } from '../../../utils/styling-hook-utils';
 import { reportMatchingHooks, MessagesObj } from '../../../utils/report-utils';
+import { normalizeCssValue } from '../../../utils/value-utils';
+import { getFullValueFromNode } from '../../../utils/density-utils';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 
 
@@ -15,7 +17,8 @@ export function handleDensityPropForNode(
   cssProperty: string,
   reportProps: Partial<stylelint.Problem>,
   messages: MessagesObj,
-  customReportMatchingHooks?: typeof reportMatchingHooks
+  customReportMatchingHooks?: typeof reportMatchingHooks,
+  skipNormalization?: boolean
 ) {
     const closestHooks = getStylingHooksForDensityValue(cssValue, supportedStylinghooks, cssProperty);
 
@@ -29,8 +32,16 @@ export function handleDensityPropForNode(
 
     if (customReportMatchingHooks) {
       console.log('[densityHandler] Using custom reportMatchingHooks');
+      let reportValue;
+      if (skipNormalization) {
+        reportValue = cssValue;
+      } else {
+        reportValue = getFullValueFromNode(node);
+      }
+      console.log('[densityHandler] Reporting value:', reportValue, 'skipNormalization:', skipNormalization);
+      const reportNode = { ...node, value: reportValue };
       customReportMatchingHooks(
-        node,
+        reportNode,
         closestHooks,
         cssValueStartIndex,
         reportProps,
@@ -39,8 +50,16 @@ export function handleDensityPropForNode(
       );
     } else {
       console.log('[densityHandler] Using default reportMatchingHooks');
+      let reportValue;
+      if (skipNormalization) {
+        reportValue = cssValue;
+      } else {
+        reportValue = getFullValueFromNode(node);
+      }
+      console.log('[densityHandler] Reporting value:', reportValue, 'skipNormalization:', skipNormalization);
+      const reportNode = { ...node, value: reportValue };
       reportMatchingHooks(
-        node,
+        reportNode,
         closestHooks,
         cssValueStartIndex,
         reportProps,

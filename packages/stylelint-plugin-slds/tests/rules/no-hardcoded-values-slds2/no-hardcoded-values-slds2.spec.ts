@@ -63,7 +63,7 @@ describe('no-hardcoded-values-slds2', () => {
           width: 0;
         }
       `,
-      expectedMessage: null,
+      expectedMessage: "There's no replacement styling hook for the 0 static value. Remove the static value. (slds/no-hardcoded-values-slds2)",
     },
     {
       description: 'Does not report 0px as a value',
@@ -72,7 +72,7 @@ describe('no-hardcoded-values-slds2', () => {
           width: 0px;
         }
       `,
-      expectedMessage: null,
+      expectedMessage: "There's no replacement styling hook for the 0px static value. Remove the static value. (slds/no-hardcoded-values-slds2)",
     },
     {
       description: 'Does not report 0.0 as a value',
@@ -81,7 +81,7 @@ describe('no-hardcoded-values-slds2', () => {
           width: 0.0;
         }
       `,
-      expectedMessage: null,
+      expectedMessage: "There's no replacement styling hook for the 0.0 static value. Remove the static value. (slds/no-hardcoded-values-slds2)",
     },
     {
       description:
@@ -102,7 +102,7 @@ describe('no-hardcoded-values-slds2', () => {
           box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15);
         }
       `,
-      expectedMessage: 'There’s no replacement styling hook for the 2px static value. Remove the static value. (slds/no-hardcoded-values-slds2)',
+      expectedMessage: 'There's no replacement styling hook for the 2px static value. Remove the static value. (slds/no-hardcoded-values-slds2)',
     },*/
     {
       description:
