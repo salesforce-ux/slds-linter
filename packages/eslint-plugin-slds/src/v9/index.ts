@@ -13,6 +13,7 @@ const htmlRules: Record<string, Rule.RuleModule> = {
 
 const styleRules: Record<string, Rule.RuleModule> = {
     "no-hardcoded-values-slds1": require('./rules/no-hardcoded-values-slds1').default,
+    "no-hardcoded-values-slds2": require('./rules/no-hardcoded-values-slds2').default,
 };
 
 const cssPlugin = require("@eslint/css").default;
@@ -70,7 +71,8 @@ export = {
                 }
             },
             rules: {
-                "@salesforce-ux/slds/no-hardcoded-values-slds1": "warn"
+                "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
+                "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
             }
         }
     }

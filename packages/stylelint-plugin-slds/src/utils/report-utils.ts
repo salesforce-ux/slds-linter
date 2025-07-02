@@ -30,7 +30,6 @@ export function makeReportMatchingHooks(reportFn: Function) {
       endIndex,
       ...props,
     };
-    console.log('[report-utils] Using custom report function:', typeof reportFn);
     if (suggestions.length > 0) {
       reportFn({
         message: JSON.stringify({
@@ -75,7 +74,6 @@ export function reportMatchingHooks(
     endIndex,
     ...props,
   };
-  console.log('[report-utils] Using stylelint.utils.report');
   if (suggestions.length > 0) {
     stylelint.utils.report(<stylelint.Problem>{
       message: JSON.stringify({

@@ -31,14 +31,12 @@ export function handleDensityPropForNode(
     }
 
     if (customReportMatchingHooks) {
-      console.log('[densityHandler] Using custom reportMatchingHooks');
       let reportValue;
       if (skipNormalization) {
         reportValue = cssValue;
       } else {
         reportValue = getFullValueFromNode(node);
       }
-      console.log('[densityHandler] Reporting value:', reportValue, 'skipNormalization:', skipNormalization);
       const reportNode = { ...node, value: reportValue };
       customReportMatchingHooks(
         reportNode,
@@ -49,14 +47,12 @@ export function handleDensityPropForNode(
         fix
       );
     } else {
-      console.log('[densityHandler] Using default reportMatchingHooks');
       let reportValue;
       if (skipNormalization) {
         reportValue = cssValue;
       } else {
         reportValue = getFullValueFromNode(node);
       }
-      console.log('[densityHandler] Reporting value:', reportValue, 'skipNormalization:', skipNormalization);
       const reportNode = { ...node, value: reportValue };
       reportMatchingHooks(
         reportNode,

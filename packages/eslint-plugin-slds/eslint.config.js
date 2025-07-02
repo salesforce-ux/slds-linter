@@ -28,7 +28,8 @@ module.exports = [
             "@salesforce-ux/slds": sldsPlugin
         },
         rules: {
-            "@salesforce-ux/slds/no-hardcoded-values-slds1": "warn"
+            "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
+            "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
         }
     },
     {
