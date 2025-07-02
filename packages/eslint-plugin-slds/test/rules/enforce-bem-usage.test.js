@@ -2,7 +2,11 @@ const { RuleTester } = require("eslint"); // Import RuleTester
 const rule = require("../../src/rules/enforce-bem-usage"); // Import the rule
 
 const ruleTester = new RuleTester({
-  parser: require.resolve("@html-eslint/parser"), // Specify the parser for HTML files
+  languageOptions: {
+    parser: require("@html-eslint/parser"), // Specify the parser for HTML files using flat config format
+    ecmaVersion: 2021,
+    sourceType: "module"
+  }
 });
 
 ruleTester.run("enforce-bem-usage", rule, {

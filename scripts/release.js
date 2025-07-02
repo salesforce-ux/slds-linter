@@ -141,8 +141,6 @@ async function generateTarballs(workspaceInfo) {
   return tarballs;
 }
 
-
-
 async function publishPackages(tarballs, version, releaseType) {
   const tag = releaseType === "final" ? "latest" : releaseType;
   let sldsLinterTarball = "";
