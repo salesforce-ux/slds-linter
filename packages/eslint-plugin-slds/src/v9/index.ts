@@ -17,6 +17,15 @@ const styleRules: Record<string, Rule.RuleModule> = {
 
 const cssPlugin = require("@eslint/css").default;
 
+/*
+ * This plugin exports two recommended configs for ESLint v9 flat config:
+ *
+ * - recommended: For HTML and CMP files. Use this for linting Lightning Web Components, Aura, or other HTML-based files. It includes only the HTML-related rules and parser.
+ * - recommendedCss: For CSS and SCSS files. Use this for linting stylesheets. It merges the recommended config from @eslint/css and adds SLDS-specific rules.
+ *
+ * This separation allows consumers to include only the relevant config(s) for their project, or combine both for full coverage.
+ */
+
 export = {
     rules: { ...htmlRules, ...styleRules },
     meta: {

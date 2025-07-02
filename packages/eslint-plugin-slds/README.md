@@ -36,19 +36,41 @@ For ESLint v9+ (flat config), import from the explicit v9 entry point:
 const sldsPlugin = require('@salesforce-ux/eslint-plugin-slds/v9');
 
 module.exports = [
-  {
-    files: ['**/*.html', '**/*.cmp'],
-    plugins: {
-      '@salesforce-ux/slds': sldsPlugin
-    },
-    rules: {
-      '@salesforce-ux/slds/enforce-bem-usage': 'error',
-      '@salesforce-ux/slds/no-deprecated-classes-slds2': 'error',
-      '@salesforce-ux/slds/modal-close-button-issue': 'error'
-    }
-  }
+  // Use recommended config for HTML/CMP files
+  sldsPlugin.configs.recommended,
+  // Use recommendedCss config for CSS/SCSS files
+  sldsPlugin.configs.recommendedCss,
 ];
 ```
+
+#### Use Cases
+
+- **HTML/CMP Only:**
+  Use only the `recommended` config if you are linting Lightning Web Components, Aura, or other HTML-based files:
+  ```js
+  module.exports = [
+    sldsPlugin.configs.recommended
+  ];
+  ```
+
+- **CSS/SCSS Only:**
+  Use only the `recommendedCss` config if you are linting only stylesheets:
+  ```js
+  module.exports = [
+    sldsPlugin.configs.recommendedCss
+  ];
+  ```
+
+- **Both HTML and CSS:**
+  Use both configs together for full coverage:
+  ```js
+  module.exports = [
+    sldsPlugin.configs.recommended,
+    sldsPlugin.configs.recommendedCss
+  ];
+  ```
+
+This separation allows you to include only the relevant config(s) for your project, or combine both for full coverage.
 
 ### Version-Specific Imports
 

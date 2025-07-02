@@ -35,25 +35,3 @@ module.exports = [
         ignores: ["node_modules/"]
     }
 ];
-
-// try {
-//     config.push({
-//         files: ["**/*.{css,scss}"],
-//         language: "css/css",
-//         ...cssPlugin.configs.recommended,
-//         plugins: {
-//             css: cssPlugin,
-//             "@salesforce-ux/slds": sldsPlugin
-//         },
-//         rules: {
-//             "@salesforce-ux/slds/no-hardcoded-values-slds1": "warn"
-//         }
-//     });
-// } catch (e) {
-//     // eslint-disable-next-line no-console
-//     console.warn("[eslint-plugin-slds] @eslint/css is not installed. CSS/SCSS linting will be skipped.");
-// }
-
-// config.push({
-//     ignores: ["node_modules/"]
-// }); 
