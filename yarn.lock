@@ -685,6 +685,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint/css-tree@npm:^3.6.1":
+  version: 3.6.1
+  resolution: "@eslint/css-tree@npm:3.6.1"
+  dependencies:
+    mdn-data: "npm:2.21.0"
+    source-map-js: "npm:^1.0.1"
+  checksum: 10c0/bf482dd90061c8f1cd425f0f3da1322254525d96ab1fb5b542934703e349b29e72701bf394e3bb286d6eb2faa8b7172b29a86d8e1809be1038ce0c7367c4bac1
+  languageName: node
+  linkType: hard
+
+"@eslint/css@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "@eslint/css@npm:0.9.0"
+  dependencies:
+    "@eslint/core": "npm:^0.14.0"
+    "@eslint/css-tree": "npm:^3.6.1"
+    "@eslint/plugin-kit": "npm:^0.3.1"
+  checksum: 10c0/7e21ae2da2a484e6f3b02443a2ae5be17c789055aa06336c4f0d03c8c39b2491674b15d14a90f39a4b42c3ab28e87670b11944d952cdb298864d3439c921a3f7
+  languageName: node
+  linkType: hard
+
 "@eslint/eslintrc@npm:^3.3.1":
   version: 3.3.1
   resolution: "@eslint/eslintrc@npm:3.3.1"
@@ -1303,6 +1324,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds"
   dependencies:
+    "@eslint/css": "npm:^0.9.0"
     "@html-eslint/eslint-plugin": "npm:^0.34.0"
     "@html-eslint/parser": "npm:^0.34.0"
     "@salesforce-ux/sds-metadata": "npm:^0.2.2"
@@ -3666,9 +3688,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob-stream@npm:^8.0.0":
-  version: 8.0.2
-  resolution: "glob-stream@npm:8.0.2"
+"glob-stream@npm:^8.0.3":
+  version: 8.0.3
+  resolution: "glob-stream@npm:8.0.3"
   dependencies:
     "@gulpjs/to-absolute-glob": "npm:^4.0.0"
     anymatch: "npm:^3.1.3"
@@ -3678,7 +3700,7 @@ __metadata:
     is-negated-glob: "npm:^1.0.0"
     normalize-path: "npm:^3.0.0"
     streamx: "npm:^2.12.5"
-  checksum: 10c0/ba93be61b85d2143d2b21f35caaf5cb8450c5b72fa377353afabb4922862368be2366c45a998662eaa0098957bf1cc599e546a975767a32758c259093f5b069e
+  checksum: 10c0/feb45646aa346251eece096229282d574e106b343714618d6e5c60e9e53478e17d11a7304957dbbfc15314df607464025ddad206aa331dbcba73bacaa127b3f4
   languageName: node
   linkType: hard
 
@@ -3863,16 +3885,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gulp-cli@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "gulp-cli@npm:3.0.0"
+"gulp-cli@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "gulp-cli@npm:3.1.0"
   dependencies:
     "@gulpjs/messages": "npm:^1.1.0"
     chalk: "npm:^4.1.2"
     copy-props: "npm:^4.0.0"
     gulplog: "npm:^2.2.0"
     interpret: "npm:^3.1.1"
-    liftoff: "npm:^5.0.0"
+    liftoff: "npm:^5.0.1"
     mute-stdout: "npm:^2.0.0"
     replace-homedir: "npm:^2.0.0"
     semver-greatest-satisfied-range: "npm:^2.0.0"
@@ -3881,7 +3903,7 @@ __metadata:
     yargs: "npm:^16.2.0"
   bin:
     gulp: bin/gulp.js
-  checksum: 10c0/6e07684ad763009e449b3858c4b202d9dea7da52c8889635463ecaab2964085ca8a682f8ca73cf43f7008de900c4164364e3565ac78a99977a61cf0595311380
+  checksum: 10c0/6dc0ba7a35aa301ad4f6054be6948fb4f0fadd61ae9ee3fe8edba88eb1c2ef0af77edd51b29ab84b189bcb46fb25dc708eab0579bfee19e15fd891f1c0bbfe8a
   languageName: node
   linkType: hard
 
@@ -3904,16 +3926,16 @@ __metadata:
   linkType: hard
 
 "gulp@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "gulp@npm:5.0.0"
+  version: 5.0.1
+  resolution: "gulp@npm:5.0.1"
   dependencies:
     glob-watcher: "npm:^6.0.0"
-    gulp-cli: "npm:^3.0.0"
+    gulp-cli: "npm:^3.1.0"
     undertaker: "npm:^2.0.0"
-    vinyl-fs: "npm:^4.0.0"
+    vinyl-fs: "npm:^4.0.2"
   bin:
     gulp: bin/gulp.js
-  checksum: 10c0/b8d40cd1a9ec321bfccd0e80e587088269b65985328987be05053ed852dd0ce020b1697d0f7916401a0fd8f761b03ff234a317eb71160da68c79e03d291b1550
+  checksum: 10c0/261970fd4a2d628263b71c5b90a7d3b5c2e75db9050fffe1674b283ba258a7bda4f9d8d6ead1e514925349a554b56c2bba37af977bbba79f11365dc2fa24318c
   languageName: node
   linkType: hard
 
@@ -5120,9 +5142,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"liftoff@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "liftoff@npm:5.0.0"
+"liftoff@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "liftoff@npm:5.0.1"
   dependencies:
     extend: "npm:^3.0.2"
     findup-sync: "npm:^5.0.0"
@@ -5131,7 +5153,7 @@ __metadata:
     is-plain-object: "npm:^5.0.0"
     rechoir: "npm:^0.8.0"
     resolve: "npm:^1.20.0"
-  checksum: 10c0/3890be872644a43361620adaee3cc2512ba39ba1f4f96f65c8913918b6d31c6be2d0ef248701bae3c291e3926aa15d88ccdda4fcaf2fa88af9a1b830dbb400a6
+  checksum: 10c0/3807019b2272bdee55c15b726d430e16d65c815ffe37e0b4382345521e26c40ca4c2fa251218bde2b996ef76e0b1fa43baf0c8ce4218eb716d3cf22735fe24ee
   languageName: node
   linkType: hard
 
@@ -5360,6 +5382,13 @@ __metadata:
   version: 2.12.2
   resolution: "mdn-data@npm:2.12.2"
   checksum: 10c0/b22443b71d70f72ccc3c6ba1608035431a8fc18c3c8fc53523f06d20e05c2ac10f9b53092759a2ca85cf02f0d37036f310b581ce03e7b99ac74d388ef8152ade
+  languageName: node
+  linkType: hard
+
+"mdn-data@npm:2.21.0":
+  version: 2.21.0
+  resolution: "mdn-data@npm:2.21.0"
+  checksum: 10c0/cd26902551af2cc29f06f130893cb04bca9ee278939fce3ffbcb759497cc80d53a6f4abdef2ae2f3ed3c95ac8d651f53fc141defd580ebf4ae2f93aea325957b
   languageName: node
   linkType: hard
 
@@ -7526,12 +7555,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vinyl-fs@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "vinyl-fs@npm:4.0.0"
+"vinyl-fs@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "vinyl-fs@npm:4.0.2"
   dependencies:
     fs-mkdirp-stream: "npm:^2.0.1"
-    glob-stream: "npm:^8.0.0"
+    glob-stream: "npm:^8.0.3"
     graceful-fs: "npm:^4.2.11"
     iconv-lite: "npm:^0.6.3"
     is-valid-glob: "npm:^1.0.0"
@@ -7542,9 +7571,9 @@ __metadata:
     streamx: "npm:^2.14.0"
     to-through: "npm:^3.0.0"
     value-or-function: "npm:^4.0.0"
-    vinyl: "npm:^3.0.0"
+    vinyl: "npm:^3.0.1"
     vinyl-sourcemap: "npm:^2.0.0"
-  checksum: 10c0/c68a86ec8b48e60c5b31a881d2f39cebfe104518a1895f38ba658cfd890673a6cfa5d55de58eb15264fd2333e5b26099989e1de4e14aa6a8ad0f04529ff46a34
+  checksum: 10c0/8aeffc5beb9a7663113b5914b801e8c5b0b9ce27d20ec2f9b0dfd58068b0ff1e682ed8d9fe863e56422a997bff37990f9b460d6f84768e168d536a237765b9b7
   languageName: node
   linkType: hard
 
@@ -7572,6 +7601,18 @@ __metadata:
     replace-ext: "npm:^2.0.0"
     teex: "npm:^1.0.1"
   checksum: 10c0/566ab41a84c1a167023a07cb94110d40a07835a5239297e3266a11b0e9c522969a1e623ec2a4f9b05ac7fef596cf47685b410359e5b2ca00bd77400657808816
+  languageName: node
+  linkType: hard
+
+"vinyl@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "vinyl@npm:3.0.1"
+  dependencies:
+    clone: "npm:^2.1.2"
+    remove-trailing-separator: "npm:^1.1.0"
+    replace-ext: "npm:^2.0.0"
+    teex: "npm:^1.0.1"
+  checksum: 10c0/f1668e4c341948869d00a25082d96a3535050e7b7a174974820ee154065432c4b1a3dd1927bd8de96ffb470147e1ed8fc4a5458e010fe464698d4f987fca04ca
   languageName: node
   linkType: hard
 

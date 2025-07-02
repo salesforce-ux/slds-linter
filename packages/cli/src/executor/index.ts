@@ -3,7 +3,7 @@ import { FileScanner } from '../services/file-scanner';
 import { LintRunner, LintOptions } from '../services/lint-runner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
 import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
-import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
+import { DEFAULT_ESLINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
 import { LintResult, LintConfig, ReportConfig } from '../types';
 import { normalizeCliOptions } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
@@ -37,13 +37,13 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     // Configure linting options
     const lintOptions: LintOptions = {
       fix: normalizedConfig.fix,
-      configPath: normalizedConfig.configStylelint,
+      configPath: normalizedConfig.configEslint,
     };
     
     // Run linting on style files
     const styleResults = await LintRunner.runLinting(styleFiles, 'style', {
       ...lintOptions,
-      configPath: normalizedConfig.configStylelint,
+      configPath: normalizedConfig.configEslint,
     });
     
     // Run linting on component files
@@ -84,7 +84,6 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
     // Get lint results either from provided results parameter or by running lint
     const lintResults = results || await lint({
       directory: normalizedConfig.directory,
-      configStylelint: normalizedConfig.configStylelint,
       configEslint: normalizedConfig.configEslint,
     });
     

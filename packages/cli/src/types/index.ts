@@ -1,7 +1,6 @@
 export interface BaseConfig {
   directory?: string;
   files?: string[];
-  configStylelint?: string;
   configEslint?: string;
 }
 

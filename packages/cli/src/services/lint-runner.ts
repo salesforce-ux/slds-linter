@@ -24,7 +24,8 @@ export class LintRunner {
       const workerScript = path.resolve(
         resolveDirName(import.meta) ,
         '../workers',
-        workerType === 'style' ? 'stylelint.worker.js' : 'eslint.worker.js'
+        'eslint.worker.js'
+        // workerType === 'style' ? 'stylelint.worker.js' : 'eslint.worker.js'
       );
 
       const workerConfig: WorkerConfig = {

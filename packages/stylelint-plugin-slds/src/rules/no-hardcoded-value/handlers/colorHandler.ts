@@ -13,7 +13,8 @@ export function handleColorProps(
   supportedStylinghooks: ValueToStylingHooksMapping,
   cssProperty: string,
   reportProps: Partial<stylelint.Problem>,
-  messages: MessagesObj
+  messages: MessagesObj,
+  customReportMatchingHooks?: typeof reportMatchingHooks
 ) {
   forEachColorValue(parsedValue, (node) => {
     const hexValue = convertToHex(node.value);
@@ -34,13 +35,26 @@ export function handleColorProps(
       );
     };
 
-    reportMatchingHooks(
-      node,
-      closestHooks,
-      cssValueStartIndex,
-      reportProps,
-      messages,
-      fix
-    );
+    if (customReportMatchingHooks) {
+      console.log('[colorHandler] Using custom reportMatchingHooks');
+      customReportMatchingHooks(
+        node,
+        closestHooks,
+        cssValueStartIndex,
+        reportProps,
+        messages,
+        fix
+      );
+    } else {
+      console.log('[colorHandler] Using default reportMatchingHooks');
+      reportMatchingHooks(
+        node,
+        closestHooks,
+        cssValueStartIndex,
+        reportProps,
+        messages,
+        fix
+      );
+    }
   });
 } 

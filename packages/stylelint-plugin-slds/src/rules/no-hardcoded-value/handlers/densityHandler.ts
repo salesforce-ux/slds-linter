@@ -14,7 +14,8 @@ export function handleDensityPropForNode(
   supportedStylinghooks: ValueToStylingHooksMapping,
   cssProperty: string,
   reportProps: Partial<stylelint.Problem>,
-  messages: MessagesObj
+  messages: MessagesObj,
+  customReportMatchingHooks?: typeof reportMatchingHooks
 ) {
     const closestHooks = getStylingHooksForDensityValue(cssValue, supportedStylinghooks, cssProperty);
 
@@ -26,12 +27,25 @@ export function handleDensityPropForNode(
       }
     }
 
-    reportMatchingHooks(
-      node,
-      closestHooks,
-      cssValueStartIndex,
-      reportProps,
-      messages,
-      fix
-    );
+    if (customReportMatchingHooks) {
+      console.log('[densityHandler] Using custom reportMatchingHooks');
+      customReportMatchingHooks(
+        node,
+        closestHooks,
+        cssValueStartIndex,
+        reportProps,
+        messages,
+        fix
+      );
+    } else {
+      console.log('[densityHandler] Using default reportMatchingHooks');
+      reportMatchingHooks(
+        node,
+        closestHooks,
+        cssValueStartIndex,
+        reportProps,
+        messages,
+        fix
+      );
+    }
 }

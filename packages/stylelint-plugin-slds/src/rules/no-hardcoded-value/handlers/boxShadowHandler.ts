@@ -26,7 +26,8 @@ export function handleBoxShadow(
   cssValueStartIndex: number,
   supportedStylinghooks: ValueToStylingHooksMapping,
   reportProps: Partial<stylelint.Problem>,
-  messages: MessagesObj
+  messages: MessagesObj,
+  customReportMatchingHooks?: typeof reportMatchingHooks
 ) {
 
   const shadowHooks = shadowValueToHookEntries(supportedStylinghooks);
@@ -44,14 +45,27 @@ export function handleBoxShadow(
       };
   
       if (closestHooks.length > 0) {
-        reportMatchingHooks(
-          decl,
-          closestHooks,
-          cssValueStartIndex,
-          reportProps,
-          messages,
-          fix
-        );
+        if (customReportMatchingHooks) {
+          console.log('[boxShadowHandler] Using custom reportMatchingHooks');
+          customReportMatchingHooks(
+            decl,
+            closestHooks,
+            cssValueStartIndex,
+            reportProps,
+            messages,
+            fix
+          );
+        } else {
+          console.log('[boxShadowHandler] Using default reportMatchingHooks');
+          reportMatchingHooks(
+            decl,
+            closestHooks,
+            cssValueStartIndex,
+            reportProps,
+            messages,
+            fix
+          );
+        }
       }
       return;
     }
