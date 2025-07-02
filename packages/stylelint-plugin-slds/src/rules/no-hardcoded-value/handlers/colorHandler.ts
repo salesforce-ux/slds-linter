@@ -4,7 +4,6 @@ import stylelint from 'stylelint';
 import { findClosestColorHook, convertToHex } from '../../../utils/color-lib-utils';
 import { forEachColorValue } from '../../../utils/color-utils';
 import { reportMatchingHooks, MessagesObj } from '../../../utils/report-utils';
-import { normalizeCssValue } from '../../../utils/value-utils';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 
 export function handleColorProps(

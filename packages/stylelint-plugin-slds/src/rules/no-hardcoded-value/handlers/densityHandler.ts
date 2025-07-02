@@ -3,7 +3,6 @@ import valueParser from 'postcss-value-parser';
 import stylelint from 'stylelint';
 import { getStylingHooksForDensityValue } from '../../../utils/styling-hook-utils';
 import { reportMatchingHooks, MessagesObj } from '../../../utils/report-utils';
-import { normalizeCssValue } from '../../../utils/value-utils';
 import { getFullValueFromNode } from '../../../utils/density-utils';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 

@@ -6,7 +6,6 @@ import { MessagesObj, reportMatchingHooks } from "../../../utils/report-utils";
 import { handleDensityPropForNode } from "./densityHandler";
 import { FontValue, isKnownFontWeight, parseFont } from "../../../utils/fontValueParser";
 import { isFunctionNode } from "../../../utils/decl-utils";
-import { normalizeCssValue } from '../../../utils/value-utils';
 import { getFullValueFromNode } from '../../../utils/density-utils';
 
 export function handleFontProps(
