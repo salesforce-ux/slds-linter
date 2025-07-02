@@ -10,7 +10,7 @@ import { toRuleMessages } from '../../utils/rule-message-utils';
 import { colorProperties, densificationProperties, matchesCssProperty } from '../../utils/property-matcher';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { handleFontProps } from './handlers/fontHandler';
-import { forEachDensifyValue, getFullValueFromNode } from '../../utils/density-utils';
+import { forEachDensifyValue } from '../../utils/density-utils';
 import { isFontProperty } from '../../utils/fontValueParser';
 import { forEachVarFunction } from '../../utils/decl-utils';
 

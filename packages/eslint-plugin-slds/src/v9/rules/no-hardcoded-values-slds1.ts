@@ -29,14 +29,10 @@ const rule: Rule.RuleModule = {
   create(context) {
     return {
       Declaration(node: any) {
-        // Debug: Log file being linted
-        console.log('[no-hardcoded-values-slds1] Linting file:', context.filename);
         // Only run on CSS/SCSS files
         if (!context.filename.match(/\.(css|scss)$/)) {
-          console.log('[no-hardcoded-values-slds1] Skipping non-CSS/SCSS file:', context.filename);
           return;
         }
-        console.log('[no-hardcoded-values-slds1] Node:', JSON.stringify(node, null, 2));
 
         // Adapter: Convert ESLint node to PostCSS-like shape
         const sourceCode = context.sourceCode;
@@ -67,14 +63,9 @@ const rule: Rule.RuleModule = {
             return '';
           }).join(' ');
         }
-        // Debug: Log property being checked
-        console.log('[no-hardcoded-values-slds1] Checking property:', cssProperty);
         if (!isTargetProperty(cssProperty)) {
-          console.log('[no-hardcoded-values-slds1] Property not targeted:', cssProperty);
           return;
         }
-        // Debug: Log value being checked
-        console.log('[no-hardcoded-values-slds1] Property value:', cssValue);
         const parsedValue = valueParser(cssValue);
         const cssValueStartIndex = node.range ? node.range[0] : 0;
         const isColorProp = matchesCssProperty(colorProperties, cssProperty);
@@ -102,15 +93,11 @@ const rule: Rule.RuleModule = {
                     }
                     return { line, column: col + 1 };
                   }
-                  console.log('[no-hardcoded-values-slds1] About to manually calculate loc for index:', index, 'endIndex:', endIndex);
                   const valueStartOffset = node.value?.loc?.start?.offset ?? 0;
-                  console.log('[no-hardcoded-values-slds1] valueStartOffset:', valueStartOffset);
                   const absStart = valueStartOffset + (index ?? 0);
                   const absEnd = valueStartOffset + (endIndex ?? 0);
-                  console.log('[no-hardcoded-values-slds1] absStart:', absStart, 'absEnd:', absEnd);
                   const startLoc = getLocFromIndexManual(sourceCode.text, absStart);
                   const endLoc = getLocFromIndexManual(sourceCode.text, absEnd);
-                  console.log('[no-hardcoded-values-slds1] startLoc:', startLoc, 'endLoc:', endLoc);
                   return {
                     start: startLoc,
                     end: endLoc
@@ -138,7 +125,6 @@ const rule: Rule.RuleModule = {
         const ruleMeta = rulesMetadata[ruleId];
         const messages = toRuleMessages(ruleId, ruleMeta.warningMsg);
         if (cssProperty === 'box-shadow') {
-          console.log('[no-hardcoded-values-slds1] Handling box-shadow');
           handleBoxShadow(
             adaptedDecl,
             cssValue,
@@ -149,7 +135,6 @@ const rule: Rule.RuleModule = {
             reportMatchingHooks
           );
         } else if (isFontProp) {
-          console.log('[no-hardcoded-values-slds1] Handling font property');
           handleFontProps(
             adaptedDecl,
             parsedValue,
@@ -161,7 +146,6 @@ const rule: Rule.RuleModule = {
             reportMatchingHooks
           );
         } else if (isColorProp) {
-          console.log('[no-hardcoded-values-slds1] Handling color property');
           // Use the ESLint-compatible reportMatchingHooks
           handleColorProps(
             adaptedDecl,
@@ -174,13 +158,9 @@ const rule: Rule.RuleModule = {
             reportMatchingHooks
           );
         } else if (isDensiProp) {
-          console.log('[no-hardcoded-values-slds1] Handling density property');
           forEachDensifyValue(parsedValue, (n) => {
             // Skip reporting for 0 values (match stylelint behavior)
             if (!isDensifyValue(n, true)) return;
-            console.log('[no-hardcoded-values-slds1] forEachDensifyValue node:', n);
-            console.log('[no-hardcoded-values-slds1] node.type:', n.type);
-            console.log('[no-hardcoded-values-slds1] getFullValueFromNode(n):', getFullValueFromNode(n));
             // Extract the value substring from the original property value using sourceIndex and sourceEndIndex
             let valueWithUnit = '';
             if (typeof n.sourceIndex === 'number' && typeof n.sourceEndIndex === 'number') {
@@ -201,8 +181,6 @@ const rule: Rule.RuleModule = {
               true
             );
           });
-        } else {
-          console.log('[no-hardcoded-values-slds1] No handler matched for property:', cssProperty);
         }
       },
     };
