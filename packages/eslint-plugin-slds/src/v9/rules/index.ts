@@ -1,6 +1,8 @@
 import type { Rule } from 'eslint';
 import noHardcodedValuesSlds1 from './no-hardcoded-values-slds1';
 import noHardcodedValuesSlds2 from './no-hardcoded-values-slds2';
+const noImportantTag = require('./no-important-tag');
+const noSldsClassOverrides = require('./no-slds-class-overrides');
 
 /**
  * v9-only rules (e.g., migrated stylelint rules)
@@ -11,4 +13,6 @@ export const rules: Record<string, Rule.RuleModule> = {
   // "no-slds-var-without-fallback": require('./no-slds-var-without-fallback'),
   'slds/no-hardcoded-values-slds1': noHardcodedValuesSlds1,
   'slds/no-hardcoded-values-slds2': noHardcodedValuesSlds2,
+  'slds/no-important-tag': noImportantTag,
+  'slds/no-slds-class-overrides': noSldsClassOverrides,
 }; 
