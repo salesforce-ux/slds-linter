@@ -1,3 +1,4 @@
+
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;

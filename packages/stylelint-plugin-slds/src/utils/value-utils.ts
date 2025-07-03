@@ -1,5 +1,4 @@
 import valueParser from 'postcss-value-parser';
-import { convertToHex, isValidColor } from './color-lib-utils';
 
 
 /**
