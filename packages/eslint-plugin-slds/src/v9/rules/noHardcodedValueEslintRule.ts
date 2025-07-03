@@ -2,11 +2,6 @@ import { Rule } from 'eslint';
 import valueParser from 'postcss-value-parser';
 import {
   isTargetProperty,
-  handleBoxShadow,
-  handleColorProps,
-  handleDensityPropForNode,
-  handleFontProps,
-  GenericReportFn,
   colorProperties,
   densificationProperties,
   matchesCssProperty,
@@ -17,6 +12,12 @@ import {
   makeReportMatchingHooks,
   toRuleMessages,
 } from '../../../../stylelint-plugin-slds/src/shared';
+import {
+  handleBoxShadowEslintV9,
+  handleColorPropsEslintV9,
+  handleDensityPropForNodeEslintV9,
+  handleFontPropsEslintV9,
+} from '../../../../stylelint-plugin-slds/src/utils/shared/handlers';
 import {
   extractCssPropertyAndValue,
   createEslintReportFnFromNode,
@@ -68,7 +69,7 @@ export function createNoHardcodedValueEslintRule({
           };
 
           if (cssProperty === 'box-shadow') {
-            handleBoxShadow(
+            handleBoxShadowEslintV9(
               adaptedDecl,
               cssValue,
               cssValueStartIndex,
@@ -78,7 +79,7 @@ export function createNoHardcodedValueEslintRule({
               reportMatchingHooks
             );
           } else if (isFontProp) {
-            handleFontProps(
+            handleFontPropsEslintV9(
               adaptedDecl,
               parsedValue,
               cssValueStartIndex,
@@ -89,7 +90,7 @@ export function createNoHardcodedValueEslintRule({
               reportMatchingHooks
             );
           } else if (isColorProp) {
-            handleColorProps(
+            handleColorPropsEslintV9(
               adaptedDecl,
               parsedValue,
               cssValueStartIndex,
@@ -108,7 +109,7 @@ export function createNoHardcodedValueEslintRule({
               } else {
                 valueWithUnit = getFullValueFromNode(n);
               }
-              handleDensityPropForNode(
+              handleDensityPropForNodeEslintV9(
                 adaptedDecl,
                 n,
                 valueWithUnit,

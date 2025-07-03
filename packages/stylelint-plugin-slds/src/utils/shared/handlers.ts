@@ -6,6 +6,11 @@ import { getFullValueFromNode, isDensifyValue } from '../density-utils';
 import { FontValue, isKnownFontWeight, parseFont } from '../fontValueParser';
 import { isFunctionNode } from '../decl-utils';
 import valueParser from 'postcss-value-parser';
+// Import core logic for ESLint v9 wrappers from the correct handler files
+import { handleBoxShadow as coreHandleBoxShadow } from '../../rules/no-hardcoded-value/handlers/boxShadowHandler';
+import { handleColorProps as coreHandleColorProps } from '../../rules/no-hardcoded-value/handlers/colorHandler';
+import { handleDensityPropForNode as coreHandleDensityPropForNode } from '../../rules/no-hardcoded-value/handlers/densityHandler';
+import { handleFontProps as coreHandleFontProps } from '../../rules/no-hardcoded-value/handlers/fontHandler';
 
 // Generic types for reporting and messages
 export type GenericMessagesObj = {
@@ -38,7 +43,8 @@ function shadowValueToHookEntries(supportedStylinghooks: any): Array<[string, st
   });
 }
 
-export function handleBoxShadow(
+// ESLint v9 wrappers for custom behavior (if needed)
+export function handleBoxShadowEslintV9(
   decl: any,
   cssValue: string,
   cssValueStartIndex: number,
@@ -47,33 +53,19 @@ export function handleBoxShadow(
   messages: GenericMessagesObj,
   customReportMatchingHooks: GenericReportFn
 ) {
-  const shadowHooks = shadowValueToHookEntries(supportedStylinghooks);
-  const parsedCssValue = toBoxShadowValue(cssValue);
-  if(!parsedCssValue){
-    return;
-  }
-  for(const [shadow, closestHooks] of shadowHooks){
-    const parsedValueHook = toBoxShadowValue(shadow);
-    if (parsedValueHook && isBoxShadowMatch(parsedCssValue, parsedValueHook)) {
-      const fix = () => {
-        decl.value = `var(${closestHooks[0]}, ${cssValue})`;
-      };
-      if (closestHooks.length > 0) {
-        customReportMatchingHooks(
-          decl,
-          closestHooks,
-          cssValueStartIndex,
-          reportProps,
-          messages,
-          fix
-        );
-      }
-      return;
-    }
-  }
+  // Add custom ESLint v9 logic here if needed
+  return coreHandleBoxShadow(
+    decl,
+    cssValue,
+    cssValueStartIndex,
+    supportedStylinghooks,
+    reportProps,
+    messages,
+    customReportMatchingHooks
+  );
 }
 
-export function handleColorProps(
+export function handleColorPropsEslintV9(
   decl: any,
   parsedValue: valueParser.ParsedValue,
   cssValueStartIndex: number,
@@ -83,34 +75,20 @@ export function handleColorProps(
   messages: GenericMessagesObj,
   customReportMatchingHooks: GenericReportFn
 ) {
-  forEachColorValue(parsedValue, (node: any) => {
-    const hexValue = convertToHex(node.value);
-    if (node.value === 'transparent' || !hexValue) {
-      return;
-    }
-    const closestHooks = findClosestColorHook(
-      hexValue,
-      supportedStylinghooks,
-      cssProperty
-    );
-    const fix = () => {
-      decl.value = decl.value.replace(
-        valueParser.stringify(node),
-        `var(${closestHooks[0]}, ${hexValue})`
-      );
-    };
-    customReportMatchingHooks(
-      { ...node, value: node.value },
-      closestHooks,
-      cssValueStartIndex,
-      reportProps,
-      messages,
-      fix
-    );
-  });
+  // Add custom ESLint v9 logic here if needed
+  return coreHandleColorProps(
+    decl,
+    parsedValue,
+    cssValueStartIndex,
+    supportedStylinghooks,
+    cssProperty,
+    reportProps,
+    messages,
+    customReportMatchingHooks
+  );
 }
 
-export function handleDensityPropForNode(
+export function handleDensityPropForNodeEslintV9(
   decl: any,
   node: valueParser.Node,
   cssValue: string,
@@ -122,32 +100,22 @@ export function handleDensityPropForNode(
   customReportMatchingHooks: GenericReportFn,
   skipNormalization?: boolean
 ) {
-  const closestHooks = getStylingHooksForDensityValue(cssValue, supportedStylinghooks, cssProperty);
-  let fix: Function | undefined;
-  if(closestHooks.length > 0){
-    const replacementValue = `var(${closestHooks[0]}, ${node.value})`;
-    fix =  () => {
-      decl.value = decl.value.replace(valueParser.stringify(node),replacementValue);
-    }
-  }
-  let reportValue;
-  if (skipNormalization) {
-    reportValue = cssValue;
-  } else {
-    reportValue = getFullValueFromNode(node);
-  }
-  const reportNode = { ...node, value: reportValue };
-  customReportMatchingHooks(
-    reportNode,
-    closestHooks,
+  // Add custom ESLint v9 logic here if needed
+  return coreHandleDensityPropForNode(
+    decl,
+    node,
+    cssValue,
     cssValueStartIndex,
+    supportedStylinghooks,
+    cssProperty,
     reportProps,
     messages,
-    fix
+    customReportMatchingHooks,
+    skipNormalization
   );
 }
 
-export function handleFontProps(
+export function handleFontPropsEslintV9(
   decl: any,
   parsedValue: valueParser.ParsedValue,
   cssValueStartIndex: number,
@@ -157,30 +125,15 @@ export function handleFontProps(
   messages: GenericMessagesObj,
   customReportMatchingHooks: GenericReportFn
 ) {
-  let fontValue: FontValue = {};
-  if (cssProperty === 'font-weight') {
-    fontValue = {
-      'font-weight': decl.value
-    }
-  } else if (cssProperty === 'font-size') {
-    fontValue = {
-      'font-size': decl.value
-    }
-  } else if (cssProperty === 'font') {
-    fontValue = parseFont(decl.value);
-  }
-  for (let [key, value] of Object.entries(fontValue)) {
-    const node = !!value && parsedValue.nodes.find(node => node.type === 'word' && node.value === value);
-    const isValidNode = node && !isFunctionNode(node);
-    if (!isValidNode) {
-      continue;
-    }
-    if (key === 'font-weight' && isKnownFontWeight(value)) {
-      const normalizedNode = { ...node, value: getFullValueFromNode(node) };
-      handleDensityPropForNode(decl, normalizedNode, normalizedNode.value, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages, customReportMatchingHooks);
-    } else if (key === 'font-size') {
-      const normalizedNode = { ...node, value: getFullValueFromNode(node) };
-      handleDensityPropForNode(decl, normalizedNode, normalizedNode.value, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages, customReportMatchingHooks);
-    }
-  }
+  // Add custom ESLint v9 logic here if needed
+  return coreHandleFontProps(
+    decl,
+    parsedValue,
+    cssValueStartIndex,
+    supportedStylinghooks,
+    cssProperty,
+    reportProps,
+    messages,
+    customReportMatchingHooks
+  );
 } 
