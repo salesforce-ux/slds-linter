@@ -12,12 +12,10 @@ import {
   makeReportMatchingHooks,
   toRuleMessages,
 } from '../../../../stylelint-plugin-slds/src/shared';
-import {
-  handleBoxShadowEslintV9,
-  handleColorPropsEslintV9,
-  handleDensityPropForNodeEslintV9,
-  handleFontPropsEslintV9,
-} from '../../../../stylelint-plugin-slds/src/utils/shared/handlers';
+import { handleBoxShadow } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/boxShadowHandler';
+import { handleColorProps } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/colorHandler';
+import { handleDensityPropForNode } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/densityHandler';
+import { handleFontProps } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/fontHandler';
 import {
   extractCssPropertyAndValue,
   createEslintReportFnFromNode,
@@ -69,7 +67,7 @@ export function createNoHardcodedValueEslintRule({
           };
 
           if (cssProperty === 'box-shadow') {
-            handleBoxShadowEslintV9(
+            handleBoxShadow(
               adaptedDecl,
               cssValue,
               cssValueStartIndex,
@@ -79,7 +77,7 @@ export function createNoHardcodedValueEslintRule({
               reportMatchingHooks
             );
           } else if (isFontProp) {
-            handleFontPropsEslintV9(
+            handleFontProps(
               adaptedDecl,
               parsedValue,
               cssValueStartIndex,
@@ -90,7 +88,7 @@ export function createNoHardcodedValueEslintRule({
               reportMatchingHooks
             );
           } else if (isColorProp) {
-            handleColorPropsEslintV9(
+            handleColorProps(
               adaptedDecl,
               parsedValue,
               cssValueStartIndex,
@@ -109,7 +107,7 @@ export function createNoHardcodedValueEslintRule({
               } else {
                 valueWithUnit = getFullValueFromNode(n);
               }
-              handleDensityPropForNodeEslintV9(
+              handleDensityPropForNode(
                 adaptedDecl,
                 n,
                 valueWithUnit,
