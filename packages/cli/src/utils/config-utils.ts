@@ -89,6 +89,7 @@ export function normalizeCliOptions<T extends CliOptions | LintConfig | ReportCo
   const baseDefaults: Partial<CliOptions> = {
     files: [],
     configEslint: isNodeApi ? DEFAULT_ESLINT_CONFIG_PATH : "",
+    useEslintForStyles: true, // enable this to use eslint v9 rules for styles
   };
   
   // Add CLI-specific defaults

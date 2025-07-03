@@ -12,6 +12,10 @@ export interface CliOptions extends BaseConfig {
   fix?: boolean;  
   editor?: string;
   format?: string;
+  /**
+   * Feature flag: if true, use ESLint v9 for CSS/SCSS linting; if false, use stylelint
+   */
+  useEslintForStyles?: boolean;
 }
 
 /**
@@ -20,6 +24,10 @@ export interface CliOptions extends BaseConfig {
  */
 export interface LintConfig extends BaseConfig {
   fix?: boolean;
+  /**
+   * Feature flag: if true, use ESLint v9 for CSS/SCSS linting; if false, use stylelint
+   */
+  useEslintForStyles?: boolean;
 }
 
 /**

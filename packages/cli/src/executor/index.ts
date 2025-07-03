@@ -3,7 +3,7 @@ import { FileScanner } from '../services/file-scanner';
 import { LintRunner, LintOptions } from '../services/lint-runner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
 import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
-import { DEFAULT_ESLINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
+import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
 import { LintResult, LintConfig, ReportConfig } from '../types';
 import { normalizeCliOptions } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
@@ -21,6 +21,10 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     
     // Normalize configuration to ensure all required fields have values
     const normalizedConfig = normalizeCliOptions(config, {}, true);
+    const useEslintForStyles =
+      typeof normalizedConfig.useEslintForStyles === 'boolean'
+        ? normalizedConfig.useEslintForStyles
+        : true;
     
     // Scan directory for style files (CSS, SCSS, etc.)
     const styleFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
@@ -37,19 +41,26 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     // Configure linting options
     const lintOptions: LintOptions = {
       fix: normalizedConfig.fix,
-      configPath: normalizedConfig.configEslint,
+      configPath: useEslintForStyles ? normalizedConfig.configEslint : DEFAULT_STYLELINT_CONFIG_PATH,
     };
     
     // Run linting on style files
-    const styleResults = await LintRunner.runLinting(styleFiles, 'style', {
-      ...lintOptions,
-      configPath: normalizedConfig.configEslint,
-    });
+    const styleResults = await LintRunner.runLinting(
+      styleFiles,
+      'style',
+      {
+        ...lintOptions,
+        configPath: useEslintForStyles ? normalizedConfig.configEslint : DEFAULT_STYLELINT_CONFIG_PATH,
+        // Pass workerType override for LintRunner
+        workerOverride: useEslintForStyles ? 'eslint' : 'stylelint',
+      }
+    );
     
-    // Run linting on component files
+    // Run linting on component files (always ESLint)
     const componentResults = await LintRunner.runLinting(componentFiles, 'component', {
-      ...lintOptions,
+      fix: normalizedConfig.fix,
       configPath: normalizedConfig.configEslint,
+      workerOverride: 'eslint',
     });
     
     // Combine results from both linters
