@@ -3,16 +3,19 @@ import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import { isTargetProperty } from '../../utils/prop-utills';
-import { handleBoxShadow } from './handlers/boxShadowHandler';
-import { handleColorProps } from './handlers/colorHandler';
-import { handleDensityPropForNode } from './handlers/densityHandler';
+import {
+  handleBoxShadow,
+  handleColorProps,
+  handleDensityPropForNode,
+  handleFontProps
+} from '../../utils/shared/handlers';
 import { toRuleMessages } from '../../utils/rule-message-utils';
 import { colorProperties, densificationProperties, matchesCssProperty } from '../../utils/property-matcher';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
-import { handleFontProps } from './handlers/fontHandler';
 import { forEachDensifyValue } from '../../utils/density-utils';
 import { isFontProperty } from '../../utils/fontValueParser';
 import { forEachVarFunction } from '../../utils/decl-utils';
+import { reportMatchingHooks } from '../../utils/report-utils';
 
 const { createPlugin } = stylelint;
 
@@ -61,7 +64,8 @@ export const createNoHardcodedValueRule = (
             cssValueStartIndex,
             supportedStylinghooks,
             reportProps,
-            messages
+            messages,
+            reportMatchingHooks
           );
         } else if(isFontProp){
           handleFontProps(
@@ -71,7 +75,8 @@ export const createNoHardcodedValueRule = (
             supportedStylinghooks,
             cssProperty,
             reportProps,
-            messages
+            messages,
+            reportMatchingHooks
           );
         } else if (isColorProp) {
           handleColorProps(
@@ -81,7 +86,8 @@ export const createNoHardcodedValueRule = (
             supportedStylinghooks,
             cssProperty,
             reportProps,
-            messages
+            messages,
+            reportMatchingHooks
           );
         } else if (isDensiProp) {
           // Collect fallback nodes from var() functions
@@ -103,7 +109,7 @@ export const createNoHardcodedValueRule = (
             // Only report if node is numeric/unit
             const parsed = valueParser.unit(node.value);
             if (!(parsed || /^\d+(\.\d+)?$/.test(node.value))) return;
-            handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, cssProperty, reportProps, messages);
+            handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, cssProperty, reportProps, messages, reportMatchingHooks);
           });
         }
       });

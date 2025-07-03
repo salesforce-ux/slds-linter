@@ -1,15 +1,19 @@
 import { Rule } from 'eslint';
 import valueParser from 'postcss-value-parser';
-import { isTargetProperty } from '../../../../stylelint-plugin-slds/src/utils/prop-utills';
-import { handleBoxShadow } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/boxShadowHandler';
-import { handleColorProps } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/colorHandler';
-import { handleDensityPropForNode } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/densityHandler';
+import { isTargetProperty } from '../../../../stylelint-plugin-slds/src/utils/shared/general';
+import {
+  handleBoxShadow,
+  handleColorProps,
+  handleDensityPropForNode,
+  handleFontProps,
+  GenericMessagesObj,
+  GenericReportFn
+} from '../../../../stylelint-plugin-slds/src/utils/shared/handlers';
 import { colorProperties, densificationProperties, matchesCssProperty } from '../../../../stylelint-plugin-slds/src/utils/property-matcher';
-import { handleFontProps } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/fontHandler';
 import { forEachDensifyValue, getFullValueFromNode, isDensifyValue } from '../../../../stylelint-plugin-slds/src/utils/density-utils';
 import { isFontProperty } from '../../../../stylelint-plugin-slds/src/utils/fontValueParser';
-import { makeReportMatchingHooks } from '../../../../stylelint-plugin-slds/src/utils/report-utils';
-import { toRuleMessages } from '../../../../stylelint-plugin-slds/src/utils/rule-message-utils';
+import { makeReportMatchingHooks } from '../../../../stylelint-plugin-slds/src/utils/report-utils-generic';
+import { toRuleMessages } from '../../../../stylelint-plugin-slds/src/utils/rule-message-utils-generic';
 
 export function createNoHardcodedValueEslintRule({
   ruleId,
