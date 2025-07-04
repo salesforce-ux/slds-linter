@@ -20,6 +20,7 @@ import {
   extractCssPropertyAndValue,
   createEslintReportFnFromNode,
 } from '../utils/eslint-css-utils';
+import { adaptEslintDeclarationToPostcss } from '../utils/eslint-to-stylelint-adapter';
 
 export function createNoHardcodedValueEslintRule({
   ruleId,
@@ -61,10 +62,7 @@ export function createNoHardcodedValueEslintRule({
           const messages = toRuleMessages(ruleId, warningMsg);
           const reportMatchingHooks = makeReportMatchingHooks(eslintReportFn);
 
-          const adaptedDecl = {
-            ...node,
-            value: cssValue,
-          };
+          const adaptedDecl = adaptEslintDeclarationToPostcss(node, cssValue);
 
           if (cssProperty === 'box-shadow') {
             handleBoxShadow(
