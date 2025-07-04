@@ -14,6 +14,8 @@ const htmlRules: Record<string, Rule.RuleModule> = {
 const styleRules: Record<string, Rule.RuleModule> = {
     "no-hardcoded-values-slds1": require('./rules/no-hardcoded-values-slds1').default,
     "no-hardcoded-values-slds2": require('./rules/no-hardcoded-values-slds2').default,
+    "no-important-tag": require('./rules/no-important-tag'),
+    "no-slds-class-overrides": require('./rules/no-slds-class-overrides'),
 };
 
 const cssPlugin = require("@eslint/css").default;
@@ -53,7 +55,8 @@ export = {
             rules: {
                 "@salesforce-ux/slds/enforce-bem-usage": "error",
                 "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
-                "@salesforce-ux/slds/modal-close-button-issue": "error"
+                "@salesforce-ux/slds/modal-close-button-issue": "error",
+                "@salesforce-ux/slds/no-slds-class-overrides": "error"
             }
         },
         recommendedCss: {
@@ -72,7 +75,9 @@ export = {
             },
             rules: {
                 "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
-                "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
+                "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn",
+                "@salesforce-ux/slds/no-important-tag": "error",
+                "@salesforce-ux/slds/no-slds-class-overrides": "error"
             }
         }
     }
