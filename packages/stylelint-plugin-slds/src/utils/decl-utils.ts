@@ -1,16 +1,9 @@
 import { Declaration } from "postcss";
 import valueParser from "postcss-value-parser";
-
-/**
- * Regex pattern for matching CSS functions.
- */
-const cssFunctionsRegex =
-  /^(?:attr|calc|color-mix|conic-gradient|counter|cubic-bezier|linear-gradient|max|min|radial-gradient|repeating-conic-gradient|repeating-linear-gradient|repeating-radial-gradient|var)$/;
-
-const cssMathFunctionsRegex = /^(?:calc|min|max)$/;
+import { isCssFunction, isCssMathFunction } from './css-functions';
 
 export function isFunctionNode(node: valueParser.Node): boolean {
-  return node.type === 'function' && cssFunctionsRegex.test(node.value);
+  return node.type === 'function' && isCssFunction(node.value);
 }
 
 export function isVarFunction(node:valueParser.Node): boolean{
@@ -18,7 +11,7 @@ export function isVarFunction(node:valueParser.Node): boolean{
 }
 
 export function isMathFunction(node: valueParser.Node): boolean {
-  return node.type === 'function' && cssMathFunctionsRegex.test(node.value);
+  return node.type === 'function' && isCssMathFunction(node.value);
 }
 
 export function getVarToken(node: valueParser.Node): string {
