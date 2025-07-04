@@ -13,7 +13,8 @@ export function handleColorProps(
   supportedStylinghooks: ValueToStylingHooksMapping,
   cssProperty: string,
   reportProps: Partial<stylelint.Problem>,
-  messages: MessagesObj
+  messages: MessagesObj,
+  customReportMatchingHooks?: typeof reportMatchingHooks
 ) {
   forEachColorValue(parsedValue, (node) => {
     const hexValue = convertToHex(node.value);
@@ -34,7 +35,7 @@ export function handleColorProps(
       );
     };
 
-    reportMatchingHooks(
+    (customReportMatchingHooks || reportMatchingHooks)(
       node,
       closestHooks,
       cssValueStartIndex,

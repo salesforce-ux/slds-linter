@@ -21,6 +21,10 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     
     // Normalize configuration to ensure all required fields have values
     const normalizedConfig = normalizeCliOptions(config, {}, true);
+    const useEslintForStyles =
+      typeof normalizedConfig.useEslintForStyles === 'boolean'
+        ? normalizedConfig.useEslintForStyles
+        : true;
     
     // Scan directory for style files (CSS, SCSS, etc.)
     const styleFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
@@ -37,19 +41,26 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     // Configure linting options
     const lintOptions: LintOptions = {
       fix: normalizedConfig.fix,
-      configPath: normalizedConfig.configStylelint,
+      configPath: useEslintForStyles ? normalizedConfig.configEslint : DEFAULT_STYLELINT_CONFIG_PATH,
     };
     
     // Run linting on style files
-    const styleResults = await LintRunner.runLinting(styleFiles, 'style', {
-      ...lintOptions,
-      configPath: normalizedConfig.configStylelint,
-    });
+    const styleResults = await LintRunner.runLinting(
+      styleFiles,
+      'style',
+      {
+        ...lintOptions,
+        configPath: useEslintForStyles ? normalizedConfig.configEslint : DEFAULT_STYLELINT_CONFIG_PATH,
+        // Pass workerType override for LintRunner
+        workerOverride: useEslintForStyles ? 'eslint' : 'stylelint',
+      }
+    );
     
-    // Run linting on component files
+    // Run linting on component files (always ESLint)
     const componentResults = await LintRunner.runLinting(componentFiles, 'component', {
-      ...lintOptions,
+      fix: normalizedConfig.fix,
       configPath: normalizedConfig.configEslint,
+      workerOverride: 'eslint',
     });
     
     // Combine results from both linters
@@ -84,7 +95,6 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
     // Get lint results either from provided results parameter or by running lint
     const lintResults = results || await lint({
       directory: normalizedConfig.directory,
-      configStylelint: normalizedConfig.configStylelint,
       configEslint: normalizedConfig.configEslint,
     });
     

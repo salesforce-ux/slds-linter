@@ -1,4 +1,5 @@
 const htmlParser = require("@html-eslint/parser");
+const cssPlugin = require("@eslint/css").default;
 const sldsPlugin = require("@salesforce-ux/eslint-plugin-slds/v9");
 
 module.exports = [
@@ -19,6 +20,19 @@ module.exports = [
         }
     },
     {
+        files: ["**/*.{css,scss}"],
+        language: "css/css",
+        ...cssPlugin.configs.recommended,
+        plugins: {
+            css: cssPlugin,
+            "@salesforce-ux/slds": sldsPlugin
+        },
+        rules: {
+            "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
+            "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
+        }
+    },
+    {
         ignores: ["node_modules/"]
     }
-]; 
+];
