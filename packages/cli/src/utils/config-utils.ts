@@ -10,6 +10,7 @@ import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../se
 import { isDynamicPattern } from 'globby';
 import { accessSync } from 'fs';
 import { Logger } from './logger';
+import { detectCurrentEditor } from './editorLinkUtil';
 
 /**
  * Normalize and validate a file path
@@ -96,7 +97,7 @@ export function normalizeCliOptions<T extends CliOptions | LintConfig | ReportCo
   if (!isNodeApi) {
     Object.assign(baseDefaults, {
       fix: false,
-      editor: "vscode",
+      editor: detectCurrentEditor(),
       format: "sarif",
     });
   }

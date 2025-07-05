@@ -39,9 +39,9 @@ export function parseText(text: string): string {
  * Prints detailed lint results for each file that has issues.
  *
  * @param results - Array of lint results.
- * @param editor - The chosen editor for clickable links (e.g., "vscode", "atom", "sublime").
+ * @param editor - The chosen editor for clickable links (e.g., "vscode", "atom", "sublime"). If not provided, will auto-detect.
  */
-export function printLintResults(results: LintResult[], editor: string): void {
+export function printLintResults(results: LintResult[], editor?: string): void {
   results.forEach(result => {
     const hasErrors = result.errors && result.errors.length > 0;
     const hasWarnings = result.warnings && result.warnings.length > 0;

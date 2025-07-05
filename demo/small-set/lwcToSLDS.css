@@ -61,3 +61,7 @@
     /* Will be replaced with --slds-g-sizing-9 */
     height: var(--lwc-spinnerSizeMedium);
 } 
+
+.test-class {
+    padding: var(--lwc-spacingXxSmall) var(--lwc-spacingXxSmall) var(--lwc-spacingXxSmall) var(--lwc-spacingMedium);
+}

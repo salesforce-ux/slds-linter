@@ -1,0 +1,75 @@
+/* Line height for sales path text */
+.sales-path-text {
+  line-height: var(--lwc-lineHeightSalespath);
+}
+
+/* Icon sizing for medium content alternative */
+.medium-icon-alt {
+  width: var(--lwc-squareIconMediumContentAlt);
+  height: var(--lwc-squareIconMediumContentAlt);
+}
+
+/* Extra small icon sizing */
+.xx-small-icon {
+  width: var(--lwc-squareIconXxSmallContent);
+  height: var(--lwc-squareIconXxSmallContent);
+}
+
+/* Minimal spacing for compact layouts */
+.compact-spacing {
+  margin: var(--lwc-spacingXxxSmall);
+}
+
+/* Semi-transparent overlay */
+.overlay-8 {
+  opacity: var(--lwc-opacity-8);
+}
+
+/* Light transparency */
+.overlay-5 {
+  opacity: var(--lwc-opacity5);
+}
+
+/* Card body with proper padding */
+.card-body {
+  padding: var(--lwc-cardBodyPadding);
+}
+
+/* Card header with margin */
+.card-header {
+  margin: var(--lwc-cardHeaderMargin);
+}
+
+/* Table with rounded corners */
+.rounded-table {
+  border-radius: var(--lwc-tableBorderRadius);
+}
+
+/* Element with no spacing */
+.no-spacing {
+  margin: var(--lwc-spacingNone);
+  padding: var(--lwc-spacingNone);
+}
+
+/* Page header spacing */
+.page-header {
+  margin: var(--lwc-pageHeaderSpacingMargin);
+}
+
+/* Combined usage examples */
+.icon-button {
+  width: var(--lwc-squareIconXxSmallContent);
+  height: var(--lwc-squareIconXxSmallContent);
+  opacity: var(--lwc-opacity5);
+}
+
+.compact-card {
+  padding: var(--lwc-cardBodyPadding);
+  margin: var(--lwc-spacingXxxSmall);
+}
+
+.transparent-overlay {
+  opacity: var(--lwc-opacity-8);
+  line-height: var(--lwc-lineHeightSalespath);
+}
+
