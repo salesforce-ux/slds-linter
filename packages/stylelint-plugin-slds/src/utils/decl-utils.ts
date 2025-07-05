@@ -38,6 +38,12 @@ export function forEachVarFunction(decl:Declaration, callback: (node: valueParse
     });
   }
 
+// This function iterates over the immediate node (descendent nodes are not considered) to find the var function node with the given value
+export function getVarFunctionNode(decl:Declaration, nodeValue:string): valueParser.FunctionNode{
+  const parsedValue = valueParser(decl.value);
+  return <valueParser.FunctionNode>parsedValue.nodes.find(node=>(isVarFunction(node) && valueParser.stringify(node) === nodeValue));
+}
+
 export function isSpaceDivision(node: valueParser.Node): boolean {
   return node.type === 'space';
 }

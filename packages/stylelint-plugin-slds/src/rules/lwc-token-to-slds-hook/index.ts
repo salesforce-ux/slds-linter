@@ -5,7 +5,7 @@ import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import { isTargetProperty } from '../../utils/prop-utills';
-import { forEachVarFunction } from '../../utils/decl-utils';
+import { forEachVarFunction, getVarFunctionNode } from '../../utils/decl-utils';
 import { categorizeReplacement, ReplacementCategory } from '../../utils/replacement-categorizer';
 
 const { createPlugin }: typeof stylelint = stylelint;
@@ -90,7 +90,7 @@ function transformVarFunction(node:valueParser.Node) {
     }
   }
 
-  return {cssVar, replacement, replacementCategory, recommendation, original: valueParser.stringify(node), index, endIndex};
+  return { cssVar, replacement, replacementCategory, recommendation, original: valueParser.stringify(node), index, endIndex };
 }
 
 /**
@@ -112,7 +112,15 @@ function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Pr
       
       if(replacement){
         fix = () => {
-          decl.value = decl.value.replace(original, replacement);
+          const functionNode = getVarFunctionNode(decl, original);
+          if(!functionNode){
+            return;
+          }
+          const valueStartIndex = functionNode.sourceIndex;
+          const valueEndIndex = functionNode.sourceEndIndex;
+          const value = decl.value.slice(valueStartIndex, valueEndIndex);
+          console.log(value, valueStartIndex, valueEndIndex);
+          decl.value = decl.value.slice(0, valueStartIndex) + replacement + decl.value.slice(valueEndIndex);
         }
       }
       
