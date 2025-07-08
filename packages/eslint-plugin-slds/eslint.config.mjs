@@ -29,7 +29,9 @@ export default [
         },
         rules: {
             "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
-            "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
+            "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn",
+            "@salesforce-ux/slds/no-important-tag": "error",
+            "@salesforce-ux/slds/no-slds-class-overrides": "error"
         }
     },
     {

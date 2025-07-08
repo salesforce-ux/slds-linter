@@ -10,9 +10,9 @@ overrides:
       length-zero-no-unit:
         - true
         - severity: warning
-      slds/no-slds-class-overrides:
-        - true
-        - severity: warning
+      # slds/no-slds-class-overrides:
+      #   - true
+      #   - severity: warning
       # slds/no-important-tag:
       #   - true
       #   - severity: warning
