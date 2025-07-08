@@ -4,7 +4,7 @@ import { CliOptions } from '../types';
 import { printLintResults } from '../utils/lintResultsUtil';
 import { normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
-import { DEFAULT_ESLINT_CONFIG_PATH } from '../services/config.resolver';
+import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
 import { lint } from '../executor';
 
 export function registerLintCommand(program: Command): void {
@@ -21,6 +21,7 @@ export function registerLintCommand(program: Command): void {
     .addOption(new Option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns').hideHelp())
     .option('--fix', 'Automatically fix problems')
     .option('--config-eslint <path>', 'Path to eslint config file')
+    .option('--config-stylelint <path>', 'Path to stylelint config file')
     .option('--editor <editor>', 'Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode', 'vscode')
     .action(async (directory:string, options: CliOptions) => {
       const startTime = Date.now();
@@ -29,6 +30,7 @@ export function registerLintCommand(program: Command): void {
         // Parse CLI options with appropriate defaults
         const normalizedOptions = normalizeCliOptions(options, {
           configEslint: DEFAULT_ESLINT_CONFIG_PATH,
+          configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
         });
 
         if(directory){ // If argument is passed, ignore -d, --directory option
@@ -45,7 +47,8 @@ export function registerLintCommand(program: Command): void {
         const lintResults = await lint({
           directory: normalizedOptions.directory,
           fix: normalizedOptions.fix,
-          configEslint: normalizedOptions.configEslint
+          configEslint: normalizedOptions.configEslint,
+          configStylelint: normalizedOptions.configStylelint,
         });
 
         // Print detailed lint results only for files with issues

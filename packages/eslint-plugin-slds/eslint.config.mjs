@@ -1,8 +1,8 @@
-const htmlParser = require("@html-eslint/parser");
-const cssPlugin = require("@eslint/css").default;
-const sldsPlugin = require("@salesforce-ux/eslint-plugin-slds/v9");
+import htmlParser from "@html-eslint/parser";
+import cssPlugin from "@eslint/css";
+import sldsPlugin from "@salesforce-ux/eslint-plugin-slds/v9";
 
-module.exports = [
+export default [
     {
         files: ["**/*.html", "**/*.cmp"],
         languageOptions: {

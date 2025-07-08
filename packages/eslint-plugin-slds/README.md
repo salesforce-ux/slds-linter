@@ -32,7 +32,7 @@ module.exports = {
 For ESLint v9+ (flat config), import from the explicit v9 entry point:
 
 ```javascript
-// eslint.config.js
+// eslint.config.mjs
 const sldsPlugin = require('@salesforce-ux/eslint-plugin-slds/v9');
 
 module.exports = [
@@ -91,7 +91,7 @@ This package provides multiple entry points:
 - **`.`** (default): ESLint v8 plugin (legacy config format)
 - **`./v8`**: ESLint v8 plugin (legacy config format)
 - **`./v9`**: ESLint v9 plugin (flat config format)
-- **`./eslint.config.js`**: Pre-configured flat config file
+- **`./eslint.config.mjs`**: Pre-configured flat config file
 
 ## Peer Dependency: ESLint
 

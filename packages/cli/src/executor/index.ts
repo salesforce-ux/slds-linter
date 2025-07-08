@@ -21,7 +21,6 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     
     // Normalize configuration to ensure all required fields have values
     const normalizedConfig = normalizeCliOptions(config, {}, true);
-    const styleLinter = normalizedConfig.styleLinter || 'both';
     // Scan directory for style files (CSS, SCSS, etc.)
     const styleFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
       patterns: StyleFilePatterns,
@@ -38,34 +37,28 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
       configPath: normalizedConfig.configEslint,
     };
     let styleResults: LintResult[] = [];
-    if (styleLinter === 'both' || styleLinter === 'eslint') {
-      const eslintResults = await LintRunner.runLinting(
-        styleFiles,
-        'style',
-        {
-          ...lintOptions,
-          workerOverride: 'eslint',
-        }
-      );
-      styleResults = styleResults.concat(eslintResults);
-    }
-    if (styleLinter === 'both' || styleLinter === 'stylelint') {
-      const stylelintResults = await LintRunner.runLinting(
-        styleFiles,
-        'style',
-        {
-          ...lintOptions,
-          configPath: DEFAULT_STYLELINT_CONFIG_PATH,
-          workerOverride: 'stylelint',
-        }
-      );
-      styleResults = styleResults.concat(stylelintResults);
-    }
+    // Always run both ESLint and Stylelint for style files
+    const eslintResults = await LintRunner.runLinting(
+      styleFiles,
+      'eslint',
+      {
+        ...lintOptions
+      }
+    );
+    styleResults = styleResults.concat(eslintResults);
+    const stylelintResults = await LintRunner.runLinting(
+      styleFiles,
+      'stylelint',
+      {
+        ...lintOptions,
+        configPath: DEFAULT_STYLELINT_CONFIG_PATH
+      }
+    );
+    styleResults = styleResults.concat(stylelintResults);
     // Run linting on component files (always ESLint)
-    const componentResults = await LintRunner.runLinting(componentFiles, 'component', {
+    const componentResults = await LintRunner.runLinting(componentFiles, 'eslint', {
       fix: normalizedConfig.fix,
-      configPath: normalizedConfig.configEslint,
-      workerOverride: 'eslint',
+      configPath: normalizedConfig.configEslint
     });
     // Combine results from both linters
     const combinedResults = [...styleResults, ...componentResults];

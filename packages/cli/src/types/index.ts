@@ -17,7 +17,7 @@ export interface CliOptions extends BaseConfig {
    * Which linter(s) to use for style files: 'eslint', 'stylelint', or 'both'.
    * Defaults to 'both'.
    */
-  styleLinter?: 'eslint' | 'stylelint' | 'both';
+  // styleLinter?: 'eslint' | 'stylelint' | 'both';
 }
 
 /**
@@ -30,7 +30,7 @@ export interface LintConfig extends BaseConfig {
    * Which linter(s) to use for style files: 'eslint', 'stylelint', or 'both'.
    * Defaults to 'both'.
    */
-  styleLinter?: 'eslint' | 'stylelint' | 'both';
+  // styleLinter?: 'eslint' | 'stylelint' | 'both';
 }
 
 /**
