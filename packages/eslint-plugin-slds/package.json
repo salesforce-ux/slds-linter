@@ -18,16 +18,15 @@
       "import": "./build/v9/index.js",
       "require": "./build/v9/index.js"
     },
-    "./eslint.config.js": {
-      "import": "./eslint.config.js",
-      "require": "./eslint.config.js"
+    "./eslint.config.mjs": {
+      "import": "./eslint.config.mjs"
     }
   },
   "files": [
     "build/**",
     "README.md",
     "RULES.md",
-    "eslint.config.js",
+    "eslint.config.mjs",
     ".eslintrc.yml"
   ],
   "engines": {

@@ -4,7 +4,7 @@ import { CliOptions } from '../types';
 import { printLintResults } from '../utils/lintResultsUtil';
 import { normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
-import { DEFAULT_ESLINT_CONFIG_PATH } from '../services/config.resolver';
+import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
 import { lint } from '../executor';
 
 export function registerLintCommand(program: Command): void {
@@ -20,6 +20,7 @@ export function registerLintCommand(program: Command): void {
     .argument('[directory]', 'Target directory to scan (defaults to current directory). Support glob patterns')
     .addOption(new Option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns').hideHelp())
     .option('--fix', 'Automatically fix problems')
+    .option('--config-stylelint <path>', 'Path to stylelint config file')
     .option('--config-eslint <path>', 'Path to eslint config file')
     .option('--editor <editor>', 'Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode', 'vscode')
     .action(async (directory:string, options: CliOptions) => {
@@ -28,6 +29,7 @@ export function registerLintCommand(program: Command): void {
         Logger.info(chalk.blue('Starting lint process...'));
         // Parse CLI options with appropriate defaults
         const normalizedOptions = normalizeCliOptions(options, {
+          configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
           configEslint: DEFAULT_ESLINT_CONFIG_PATH,
         });
 
@@ -45,6 +47,7 @@ export function registerLintCommand(program: Command): void {
         const lintResults = await lint({
           directory: normalizedOptions.directory,
           fix: normalizedOptions.fix,
+          configStylelint: normalizedOptions.configStylelint,
           configEslint: normalizedOptions.configEslint
         });
 
