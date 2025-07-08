@@ -9,7 +9,6 @@ import enforceBemUsage from './enforce-bem-usage';
 import noCalcFunction from './no-calc-function';
 import enforceSdsToSldsHooks from './enforce-sds-to-slds-hooks';
 import reduceAnnotations from './reduce-annotations';
-import { noHardcodedValuesSlds, noHardcodedValuesSldsPlus } from './no-hardcoded-value';
 import noSldsVarWithoutFallback from './no-slds-var-without-fallback';
 import noSldsNamespace from './no-slds-namespace';
 import noUnsupportedVarFallback from './no-unsupported-var-fallback';
@@ -20,9 +19,7 @@ export default [
   noUnsupportedHooksSlds2,
   lwcTokenToSldsHook,
   noCalcFunction,
-  noHardcodedValuesSlds,
   noSldsClassOverrides,
-  noHardcodedValuesSldsPlus,
   noDeprecatedTokensSlds1,
   enforceBemUsage,
   noSldsPrivateVar,
