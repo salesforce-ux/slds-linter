@@ -70,9 +70,9 @@ const rulesMetadata = {
     name: "slds/no-slds-class-overrides",
     severityLevel: "warning",
     warningMsg:
-      "Overriding ${selector} isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button",
+      "Overriding .${selector} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button",
     errorMsg:
-      "Overriding ${selector} isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button",
+      "Overriding .${selector} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button",
     ruleDesc:
       "Create new custom CSS classes instead of overriding SLDS selectors. For more information, see the Lightning Web Components Developer Guide.",
   },

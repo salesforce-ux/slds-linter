@@ -6,6 +6,10 @@
     border-width: t(borderWidthThin);
 }
 
-.This .shortHand{
+.THIS .shortHand{
     padding: t(spacingXSmall) t(spacingXSmall);
+}
+
+.THIS .zeroSpace{
+    padding: t(spacingNone)
 }
