@@ -16,15 +16,15 @@ export function registerReportCommand(program: Command): void {
     .argument('[directory]', 'Target directory to scan (defaults to current directory). Support glob patterns')
     .addOption(new Option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns').hideHelp())    
     .option('-o, --output <path>', 'Output directory for reports (defaults to current directory)')
-    .option('--config-eslint <path>', 'Path to eslint config file')
     .option('--config-stylelint <path>', 'Path to stylelint config file')
+    .option('--config-eslint <path>', 'Path to eslint config file')
     .addOption(new Option('--format <type>', 'Output format').choices(['sarif', 'csv']).default('sarif'))
     .action(async (directory: string, options: CliOptions) => {
       const spinner = ora('Starting report generation...');
       try {        
         const normalizedOptions = normalizeCliOptions(options, {
-          configEslint: DEFAULT_ESLINT_CONFIG_PATH,
           configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
+          configEslint: DEFAULT_ESLINT_CONFIG_PATH
         });
 
         if(directory){ // If argument is passed, ignore -d, --directory option
@@ -44,8 +44,8 @@ export function registerReportCommand(program: Command): void {
         // First run linting to get results
         const lintResults = await lint({
           directory: normalizedOptions.directory,
-          configEslint: normalizedOptions.configEslint,
           configStylelint: normalizedOptions.configStylelint,
+          configEslint: normalizedOptions.configEslint
         });
         
         // Generate report using the lint results

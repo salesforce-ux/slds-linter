@@ -20,8 +20,8 @@ export function registerLintCommand(program: Command): void {
     .argument('[directory]', 'Target directory to scan (defaults to current directory). Support glob patterns')
     .addOption(new Option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns').hideHelp())
     .option('--fix', 'Automatically fix problems')
-    .option('--config-eslint <path>', 'Path to eslint config file')
     .option('--config-stylelint <path>', 'Path to stylelint config file')
+    .option('--config-eslint <path>', 'Path to eslint config file')
     .option('--editor <editor>', 'Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode', 'vscode')
     .action(async (directory:string, options: CliOptions) => {
       const startTime = Date.now();
@@ -29,8 +29,8 @@ export function registerLintCommand(program: Command): void {
         Logger.info(chalk.blue('Starting lint process...'));
         // Parse CLI options with appropriate defaults
         const normalizedOptions = normalizeCliOptions(options, {
-          configEslint: DEFAULT_ESLINT_CONFIG_PATH,
           configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
+          configEslint: DEFAULT_ESLINT_CONFIG_PATH,
         });
 
         if(directory){ // If argument is passed, ignore -d, --directory option
@@ -47,8 +47,8 @@ export function registerLintCommand(program: Command): void {
         const lintResults = await lint({
           directory: normalizedOptions.directory,
           fix: normalizedOptions.fix,
-          configEslint: normalizedOptions.configEslint,
           configStylelint: normalizedOptions.configStylelint,
+          configEslint: normalizedOptions.configEslint
         });
 
         // Print detailed lint results only for files with issues

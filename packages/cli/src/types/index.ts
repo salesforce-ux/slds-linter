@@ -13,11 +13,6 @@ export interface CliOptions extends BaseConfig {
   fix?: boolean;  
   editor?: string;
   format?: string;
-  /**
-   * Which linter(s) to use for style files: 'eslint', 'stylelint', or 'both'.
-   * Defaults to 'both'.
-   */
-  // styleLinter?: 'eslint' | 'stylelint' | 'both';
 }
 
 /**
@@ -26,11 +21,6 @@ export interface CliOptions extends BaseConfig {
  */
 export interface LintConfig extends BaseConfig {
   fix?: boolean;
-  /**
-   * Which linter(s) to use for style files: 'eslint', 'stylelint', or 'both'.
-   * Defaults to 'both'.
-   */
-  // styleLinter?: 'eslint' | 'stylelint' | 'both';
 }
 
 /**
