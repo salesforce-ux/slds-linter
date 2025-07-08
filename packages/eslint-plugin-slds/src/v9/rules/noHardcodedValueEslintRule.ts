@@ -11,14 +11,14 @@ import {
   isFontProperty,
   makeReportMatchingHooks,
   toRuleMessages,
-} from '../../../../stylelint-plugin-slds/src/shared';
-import { handleBoxShadow } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/boxShadowHandler';
-import { handleColorProps } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/colorHandler';
-import { handleDensityPropForNode } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/densityHandler';
-import { handleFontProps } from '../../../../stylelint-plugin-slds/src/rules/no-hardcoded-value/handlers/fontHandler';
+  handleBoxShadow,
+  handleColorProps,
+  handleDensityPropForNode,
+  handleFontProps
+} from '../../shared';
 import {
   extractCssPropertyAndValue,
-  createEslintReportFnFromNode,
+  createEslintReportFnFromNode
 } from '../utils/eslint-css-utils';
 import { adaptEslintDeclarationToPostcss } from '../utils/eslint-to-stylelint-adapter';
 
@@ -62,62 +62,19 @@ export function createNoHardcodedValueEslintRule({
           const messages = toRuleMessages(ruleId, warningMsg);
           const reportMatchingHooks = makeReportMatchingHooks(eslintReportFn);
 
-          const adaptedDecl = adaptEslintDeclarationToPostcss(node, cssValue);
+          // The adapter is responsible for robust value range calculation
+          const adaptedDecl = adaptEslintDeclarationToPostcss(node, cssValue, undefined, sourceCode);
 
-          if (cssProperty === 'box-shadow') {
-            handleBoxShadow(
-              adaptedDecl,
-              cssValue,
-              cssValueStartIndex,
-              valueToStylinghook,
-              { node },
-              messages,
-              reportMatchingHooks
-            );
-          } else if (isFontProp) {
-            handleFontProps(
-              adaptedDecl,
-              parsedValue,
-              cssValueStartIndex,
-              valueToStylinghook,
-              cssProperty,
-              { node },
-              messages,
-              reportMatchingHooks
-            );
-          } else if (isColorProp) {
-            handleColorProps(
-              adaptedDecl,
-              parsedValue,
-              cssValueStartIndex,
-              valueToStylinghook,
-              cssProperty,
-              { node },
-              messages,
-              reportMatchingHooks
-            );
+          if (isColorProp) {
+            handleColorProps(adaptedDecl, parsedValue, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
           } else if (isDensiProp) {
-            forEachDensifyValue(parsedValue, (n) => {
-              if (!isDensifyValue(n, true)) return;
-              let valueWithUnit = '';
-              if (typeof n.sourceIndex === 'number' && typeof n.sourceEndIndex === 'number') {
-                valueWithUnit = cssValue.slice(n.sourceIndex, n.sourceEndIndex);
-              } else {
-                valueWithUnit = getFullValueFromNode(n);
-              }
-              handleDensityPropForNode(
-                adaptedDecl,
-                n,
-                valueWithUnit,
-                cssValueStartIndex,
-                valueToStylinghook,
-                cssProperty,
-                { node },
-                messages,
-                reportMatchingHooks,
-                true
-              );
+            forEachDensifyValue(parsedValue, (valueNode: any) => {
+              handleDensityPropForNode(adaptedDecl, valueNode, valueNode.value, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
             });
+          } else if (isFontProp) {
+            handleFontProps(adaptedDecl, parsedValue, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
+          } else if (cssProperty === 'box-shadow') {
+            handleBoxShadow(adaptedDecl, cssValue, cssValueStartIndex, valueToStylinghook, {}, messages, eslintReportFn);
           }
         },
       };

@@ -1,6 +1,6 @@
 import { createNoHardcodedValueEslintRule } from './noHardcodedValueEslintRule';
 import metadata from '@salesforce-ux/sds-metadata';
-import rulesMetadata from '../../../../stylelint-plugin-slds/src/utils/rules';
+import rulesMetadata from '../../shared/rulesMetadata';
 
 const valueToStylinghookSldsPlus = metadata.valueToStylingHooksCosmos;
 
