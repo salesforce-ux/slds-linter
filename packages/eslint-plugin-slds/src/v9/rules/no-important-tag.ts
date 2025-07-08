@@ -3,10 +3,7 @@ import rulesMetadata from '../../utils/rulesMetadata';
 
 const warningMsg = rulesMetadata['slds/no-important-tag'].warningMsg;
 
-// Inline isTargetProperty: for now, always return true (matches stylelint behavior for this rule)
-function isTargetProperty(_property: string, _targets: any[]): boolean {
-  return true;
-}
+// Remove isTargetProperty, just use true directly
 
 const rule: Rule.RuleModule = {
   meta: {
@@ -23,7 +20,7 @@ const rule: Rule.RuleModule = {
       Declaration(node: any) {
         if (!context.filename.match(/\.(css|scss)$/)) return;
         // Match all properties, as in stylelint
-        if (node.important && isTargetProperty(node.property, [])) {
+        if (node.important /* && isTargetProperty(node.property, []) */) {
           // Report at the property location
           const start = node.loc.start;
           const end = node.loc.end;
