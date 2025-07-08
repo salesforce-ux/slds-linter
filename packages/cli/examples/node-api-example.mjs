@@ -18,7 +18,8 @@ async function lintDirectory() {
   try {
     const results = await lint({
       directory: '../../demo/small-set', // Use demo directory for testing
-      fix: false // Don't auto-fix issues
+      fix: false, // Don't auto-fix issues
+      styleLinter: 'both', // Run both ESLint and Stylelint on style files
     });
     
     console.log(`Found ${results.length} files with issues`);

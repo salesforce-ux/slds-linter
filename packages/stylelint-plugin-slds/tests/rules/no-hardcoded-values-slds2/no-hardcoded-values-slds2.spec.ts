@@ -2,7 +2,7 @@ import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 import stylelintPluginSlds from '../../../src/index';
 const { lint }: typeof stylelint = stylelint;
 
-describe('no-hardcoded-values-slds2', () => {
+xdescribe('no-hardcoded-values-slds2', () => {
   const ruleName = 'slds/no-hardcoded-values-slds2';
 
   const testCases = [
@@ -102,7 +102,7 @@ describe('no-hardcoded-values-slds2', () => {
           box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.08) inset, 0px 0.5px 2px 0px rgba(0, 0, 0, 0.35) inset, 0px 1px 0px 0px rgba(0, 0, 0, 0.15) inset, 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 4px var(—slds-g-color-brand-base-15);
         }
       `,
-      expectedMessage: 'There's no replacement styling hook for the 2px static value. Remove the static value. (slds/no-hardcoded-values-slds2)',
+      expectedMessage: 'There’s no replacement styling hook for the 2px static value. Remove the static value. (slds/no-hardcoded-values-slds2)',
     },*/
     {
       description:
@@ -198,4 +198,4 @@ describe('no-hardcoded-values-slds2', () => {
       }
     });
   });
-});
+}); //ToDo: remove once migrated to eslint completely

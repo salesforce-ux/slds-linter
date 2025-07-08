@@ -3,7 +3,10 @@ import chalk from "chalk";
 import { CliOptions } from "../types";
 import { Logger } from "../utils/logger";
 import { normalizeCliOptions } from '../utils/config-utils';
-import { DEFAULT_ESLINT_CONFIG_PATH } from "../services/config.resolver";
+import {
+  DEFAULT_ESLINT_CONFIG_PATH,
+  DEFAULT_STYLELINT_CONFIG_PATH,
+} from "../services/config.resolver";
 import path from "path";
 import { copyFile } from 'fs/promises';
 
@@ -19,8 +22,16 @@ export function registerEmitCommand(program: Command): void {
       try {
         Logger.info(chalk.blue("Emitting configuration files..."));
         const normalizedOptions = normalizeCliOptions(options, {
+          configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
           configEslint: DEFAULT_ESLINT_CONFIG_PATH,
         });
+
+        const destStyleConfigPath = path.join(
+          normalizedOptions.directory,
+          path.basename(normalizedOptions.configStylelint)
+        );
+        await copyFile(normalizedOptions.configStylelint, destStyleConfigPath);
+        Logger.success(chalk.green(`Stylelint configuration created at:\n${destStyleConfigPath}\n`));
 
         const destESLintConfigPath = path.join(
           normalizedOptions.directory,

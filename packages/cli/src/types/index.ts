@@ -1,6 +1,7 @@
 export interface BaseConfig {
   directory?: string;
   files?: string[];
+  configStylelint?: string;
   configEslint?: string;
 }
 
@@ -13,9 +14,10 @@ export interface CliOptions extends BaseConfig {
   editor?: string;
   format?: string;
   /**
-   * Feature flag: if true, use ESLint v9 for CSS/SCSS linting; if false, use stylelint
+   * Which linter(s) to use for style files: 'eslint', 'stylelint', or 'both'.
+   * Defaults to 'both'.
    */
-  useEslintForStyles?: boolean;
+  styleLinter?: 'eslint' | 'stylelint' | 'both';
 }
 
 /**
@@ -25,9 +27,10 @@ export interface CliOptions extends BaseConfig {
 export interface LintConfig extends BaseConfig {
   fix?: boolean;
   /**
-   * Feature flag: if true, use ESLint v9 for CSS/SCSS linting; if false, use stylelint
+   * Which linter(s) to use for style files: 'eslint', 'stylelint', or 'both'.
+   * Defaults to 'both'.
    */
-  useEslintForStyles?: boolean;
+  styleLinter?: 'eslint' | 'stylelint' | 'both';
 }
 
 /**
