@@ -1,10 +1,12 @@
 import { Rule } from 'eslint';
-import rulesMetadata from '../../../../stylelint-plugin-slds/src/utils/rules';
-import { isTargetProperty } from '../../../../stylelint-plugin-slds/src/utils/prop-utills';
+import rulesMetadata from '../../utils/rulesMetadata';
 
-const ruleId = 'slds/no-important-tag';
-const meta = rulesMetadata[ruleId] || {};
-const warningMsg = meta['warningMsg'] || "Avoid using '!important' unless absolutely necessary.";
+const warningMsg = rulesMetadata['slds/no-important-tag'].warningMsg;
+
+// Inline isTargetProperty: for now, always return true (matches stylelint behavior for this rule)
+function isTargetProperty(_property: string, _targets: any[]): boolean {
+  return true;
+}
 
 const rule: Rule.RuleModule = {
   meta: {

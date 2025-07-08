@@ -1,14 +1,14 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
-import rulesMetadata from '../../../../stylelint-plugin-slds/src/utils/rules';
-import { getClassNodesAtEnd } from '../../../../stylelint-plugin-slds/src/utils/selector-utils';
-import replacePlaceholders from '../../../../stylelint-plugin-slds/src/utils/util';
+import rulesMetadata from '../../utils/rulesMetadata';
 
-const ruleId = 'slds/no-slds-class-overrides';
-const meta = rulesMetadata[ruleId] || {};
-const warningMsg = meta['warningMsg'] || 'Overriding ${selector} isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button';
+const warningMsg = rulesMetadata['slds/no-slds-class-overrides'].warningMsg;
 const sldsClasses = metadata.sldsClasses;
 const sldsSet = new Set(sldsClasses);
+
+function replacePlaceholders(str: string, vars: Record<string, string>) {
+  return str.replace(/\$\{(\w+)\}/g, (_, k) => vars[k] || '');
+}
 
 const rule: Rule.RuleModule = {
   meta: {

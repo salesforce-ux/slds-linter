@@ -1,7 +1,5 @@
 import noDeprecatedSldsClasses from './no-deprecated-slds-classes';
 import noUnsupportedHooksSlds2 from './no-unsupported-hooks-slds2';
-import noImportantTag from './no-important-tag';
-import noSldsClassOverrides from './no-slds-class-overrides';
 import noSldsPrivateVar from './no-slds-private-var';
 import lwcTokenToSldsHook from './lwc-token-to-slds-hook';
 import noDeprecatedTokensSlds1 from './no-deprecated-tokens-slds1';
@@ -19,11 +17,9 @@ export default [
   noUnsupportedHooksSlds2,
   lwcTokenToSldsHook,
   noCalcFunction,
-  noSldsClassOverrides,
   noDeprecatedTokensSlds1,
   enforceBemUsage,
   noSldsPrivateVar,
-  noImportantTag,
   reduceAnnotations,
   noSldsVarWithoutFallback,
   noSldsNamespace,
