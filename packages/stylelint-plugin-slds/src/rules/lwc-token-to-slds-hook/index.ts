@@ -118,8 +118,6 @@ function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Pr
           }
           const valueStartIndex = functionNode.sourceIndex;
           const valueEndIndex = functionNode.sourceEndIndex;
-          const value = decl.value.slice(valueStartIndex, valueEndIndex);
-          console.log(value, valueStartIndex, valueEndIndex);
           decl.value = decl.value.slice(0, valueStartIndex) + replacement + decl.value.slice(valueEndIndex);
         }
       }

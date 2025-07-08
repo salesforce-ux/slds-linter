@@ -1,7 +1,11 @@
 .THIS{
     color: token(brandPrimary);
-    border: var(--slds-g-sizing-border-1, t(borderWidthThin)) solid transparent;
-    border-radius: var(--slds-s-button-radius-border, t(borderRadiusMedium));
-    font-size: var(--slds-g-font-size-base, t(fontSize3)); /* future sldsPlus work */  
-    border-width: var(--lwc-borderRadiusMedium, t(borderWidthThin));
+    border: t(borderWidthThin) solid transparent;
+    border-radius: t(borderRadiusMedium);
+    font-size: t(fontSize3); /* future sldsPlus work */  
+    border-width: t(borderWidthThin);
+}
+
+.This .shortHand{
+    padding: t(spacingXSmall) t(spacingXSmall);
 }
