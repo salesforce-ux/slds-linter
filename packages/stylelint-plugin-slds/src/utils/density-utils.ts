@@ -3,28 +3,8 @@ import { isFunctionNode } from './decl-utils';
 
 export const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
 
-export function getFullValueFromNode(node: valueParser.Node): string {
-  if (!node) return '';
-  const type = (node as any).type;
-  if (type === 'word' || type === 'string') {
-    // If the value is a number followed by a unit (e.g., '20rem', '50%'), return as-is
-    if (/^-?\d*\.?\d+(px|em|rem|%|vh|vw|vmin|vmax|ch|ex|cm|mm|in|pt|pc)?$/.test(node.value)) {
-      return node.value;
-    }
-    return node.value;
-  }
-  if (type.toLowerCase() === 'percentage') {
-    // Only append % if not zero
-    return (node as any).value === '0' || /^0+(\.0+)?$/.test((node as any).value) ? (node as any).value : (node as any).value + '%';
-  }
-  if (type.toLowerCase() === 'dimension') {
-    // Only append unit if not zero
-    return (node as any).value === '0' || /^0+(\.0+)?$/.test((node as any).value) ? (node as any).value : (node as any).value + ((node as any).unit || '');
-  }
-  return node.value;
-}
-
 export function isDensifyValue(node: valueParser.Node, nonZeroOnly: boolean = true): boolean {
+  
   const parsedValue = valueParser.unit(node.value);
   if (node.type !== 'word' || !parsedValue) {
     // Consider only node of type word and parsable by unit function
@@ -45,10 +25,17 @@ export function isDensifyValue(node: valueParser.Node, nonZeroOnly: boolean = tr
   return true;
 }
 
+
 export const forEachDensifyValue = (
   parsedValue: valueParser.ParsedValue,
   cb: valueParser.WalkCallback
 ) => {
+
+  /**
+   * Using valueParser.walk() without the bubble parameter (defaults to false),
+   * which means returning false in the callback prevents traversal of descendant nodes.
+   * See: https://www.npmjs.com/package/postcss-value-parser#valueparserwalknodes-callback-bubble
+   */
   parsedValue.walk(
     (node: valueParser.Node, index: number, nodes: valueParser.Node[]) => {
       if (isFunctionNode(node)) {
@@ -66,8 +53,8 @@ export const forEachDensifyValue = (
 export function normalizeLengthValue(value: string | undefined): string {
   if (!value) return '';
   
-  // If the value is exactly zero (0, 0.0, 0.00, etc.), return as-is (no unit)
-  if (/^0+(\.0+)?$/.test(value)) return value;
+  // Convert 0 to 0px for consistency
+  if (value === '0') return '0px';
   
   // If it already has a unit, return as is
   if (/^-?\d+(\.\d+)?(px|em|rem|ch|ex|vh|vw|vmin|vmax|%)$/.test(value)) {

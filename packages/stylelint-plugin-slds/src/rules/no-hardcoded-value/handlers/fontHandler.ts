@@ -14,8 +14,7 @@ export function handleFontProps(
     supportedStylinghooks: ValueToStylingHooksMapping,
     cssProperty: string,
     reportProps: Partial<stylelint.Problem>,
-    messages: MessagesObj,
-    customReportMatchingHooks?: any
+    messages: MessagesObj
 ) {
     let fontValue: FontValue = {};
 
@@ -39,9 +38,9 @@ export function handleFontProps(
         }
         if (key === 'font-weight' && isKnownFontWeight(value)) {
             let cssValue = node.value === 'normal' ? '400' : node.value;
-            handleDensityPropForNode(decl, node, cssValue, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages, customReportMatchingHooks);
+            handleDensityPropForNode(decl, node, cssValue, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages);
         } else if (key === 'font-size') {
-            handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages, customReportMatchingHooks);
+            handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages);
         }
     }
 }

@@ -26,22 +26,25 @@ export function handleBoxShadow(
   cssValueStartIndex: number,
   supportedStylinghooks: ValueToStylingHooksMapping,
   reportProps: Partial<stylelint.Problem>,
-  messages: MessagesObj,
-  customReportMatchingHooks?: typeof reportMatchingHooks
+  messages: MessagesObj
 ) {
+
   const shadowHooks = shadowValueToHookEntries(supportedStylinghooks);
+  
   const parsedCssValue = toBoxShadowValue(cssValue);
   if(!parsedCssValue){
     return;
   }
+
   for(const [shadow, closestHooks] of shadowHooks){
     const parsedValueHook = toBoxShadowValue(shadow);
     if (parsedValueHook && isBoxShadowMatch(parsedCssValue, parsedValueHook)) {
       const fix = () => {
         decl.value = `var(${closestHooks[0]}, ${cssValue})`;
       };
+  
       if (closestHooks.length > 0) {
-        (customReportMatchingHooks || reportMatchingHooks)(
+        reportMatchingHooks(
           decl,
           closestHooks,
           cssValueStartIndex,

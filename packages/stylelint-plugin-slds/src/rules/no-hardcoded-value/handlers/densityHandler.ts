@@ -5,6 +5,7 @@ import { getStylingHooksForDensityValue } from '../../../utils/styling-hook-util
 import { reportMatchingHooks, MessagesObj } from '../../../utils/report-utils';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 
+
 export function handleDensityPropForNode(
   decl: Declaration,
   node: valueParser.Node,
@@ -13,9 +14,7 @@ export function handleDensityPropForNode(
   supportedStylinghooks: ValueToStylingHooksMapping,
   cssProperty: string,
   reportProps: Partial<stylelint.Problem>,
-  messages: MessagesObj,
-  customReportMatchingHooks?: typeof reportMatchingHooks,
-  skipNormalization?: boolean
+  messages: MessagesObj
 ) {
     const closestHooks = getStylingHooksForDensityValue(cssValue, supportedStylinghooks, cssProperty);
 
@@ -27,7 +26,7 @@ export function handleDensityPropForNode(
       }
     }
 
-    (customReportMatchingHooks || reportMatchingHooks)(
+    reportMatchingHooks(
       node,
       closestHooks,
       cssValueStartIndex,
