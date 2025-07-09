@@ -109,6 +109,15 @@ const rulesMetadata = {
     ruleDesc:
       "Convert your existing --sds styling hooks to --slds styling hooks. See lightningdesignsystem.com for more info.",
   },
+
+  "slds/enforce-component-hook-naming-convention": {
+    name: "slds/enforce-component-hook-naming-convention",
+    severityLevel: "warning",
+    warningMsg: "Replace the deprecated ${oldValue} component styling hook with ${suggestedMatch}.",
+    errorMsg: "Replace the deprecated ${oldValue} component styling hook with ${suggestedMatch}.",
+    ruleDesc: "Replace component styling hooks that use a deprecated naming convention.",
+  },
+
   // Needs CX review
   "slds/no-deprecated-slds2-classes": {
     name: "slds/no-deprecated-slds2-classes",
@@ -202,20 +211,19 @@ const rulesMetadata = {
   },
 
 
-  "slds/no-slds-namespace": {
-    name: "slds/no-slds-namespace",
+  "slds/no-slds-namespace-for-custom-hooks": {
+    name: "slds/no-slds-namespace-for-custom-hooks",
     severityLevel: "warning",
-    warningMsg: "Using slds namespace for ${token} isn't supported. To differentiate SLDS and custom tokens, create a token in your namespace. Example: --myapp-${tokenWithoutNamespace}",
-    ruleDesc: "Create a token in your namespace to differentiate SLDS and custom tokens. For more information, see the Lightning Web Components Developer Guide.",
+    warningMsg: "Using the --slds namespace for ${token} isn't supported. Create the custom styling hook in your namespace. Example: --myapp-${tokenWithoutNamespace}",
+    ruleDesc: "To differentiate custom styling hooks from SLDS styling hooks, create custom styling hooks in your namespace.",
   },
 
-  "slds/no-unsupported-var-fallback": {
-    name: "slds/no-unsupported-var-fallback",
+  "slds/no-sldshook-fallback-for-lwctoken": {
+    name: "slds/no-sldshook-fallback-for-lwctoken",
     severityLevel: "warning",
-    warningMsg: "Using ${sldsToken} as fallback value for ${lwcToken} isn't supported. For more information, see the Lightning Web Components Developer Guide.",
-    ruleDesc: "Using slds token as fallback value for lwc token is not supported.",
-  },
-
+    warningMsg: "Remove the ${sldsToken} styling hook that is used as a fallback value for ${lwcToken}.",
+    ruleDesc: "Avoid using --slds styling hooks as fallback values for --lwc tokens.",
+  }
 
 } as const; // Ensures it's a readonly object
 

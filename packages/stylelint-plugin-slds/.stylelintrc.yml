@@ -52,12 +52,15 @@ overrides:
       slds/no-slds-var-without-fallback:
         - true
         - severity: warning
-      slds/no-slds-namespace:
+      slds/no-slds-namespace-for-custom-hooks:
         - true
         - severity: warning
-      slds/no-unsupported-var-fallback:
+      slds/no-sldshook-fallback-for-lwctoken:
         - true
         - severity: warning
+      slds/enforce-component-hook-naming-convention:
+        - true
+        - severity: error
 
     sourceMap:
       - false

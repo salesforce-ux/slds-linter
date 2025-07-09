@@ -50,7 +50,7 @@
     "node-sarif-builder": "^3.2.0",
     "ora": "^5.4.1",
     "semver": "^7.7.1",
-    "stylelint": "^16.10.0"
+    "stylelint": "16.14.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
