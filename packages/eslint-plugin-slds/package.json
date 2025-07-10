@@ -26,9 +26,6 @@
   "scripts": {
     "build": "gulp build",
     "test": "NODE_OPTIONS=\"--experimental-vm-modules\" npx jest",
-    "test:v8": "NODE_OPTIONS=\"--experimental-vm-modules\" npx jest --testPathPattern='test/v8'",
-    "test:v9": "NODE_OPTIONS=\"--experimental-vm-modules\" npxjest --testPathPattern='test/v9'",
-    "test:all": "NODE_OPTIONS=\"--experimental-vm-modules\" npxjest --testPathPattern='test/(v8|v9)'",
     "prepublishOnly": "clean-pkg-json"
   },
   "keywords": [
