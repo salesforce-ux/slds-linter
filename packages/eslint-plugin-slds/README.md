@@ -15,9 +15,7 @@ npm install @salesforce-ux/eslint-plugin-slds --save-dev
 
 ## Configuration
 
-### Default Export (ESLint v8)
-
-The main entry point (`@salesforce-ux/eslint-plugin-slds`) exports the ESLint v8 (legacy config) plugin by default for backward compatibility.
+### ESLint v8 (Legacy Config)
 
 ```javascript
 // .eslintrc.js
@@ -27,56 +25,27 @@ module.exports = {
 };
 ```
 
-### ESLint v9 (Flat Config)
-
-For ESLint v9+ (flat config), import from the explicit v9 entry point:
+### ESLint v9+ (Flat Config)
 
 ```javascript
 // eslint.config.js
-const sldsPlugin = require('@salesforce-ux/eslint-plugin-slds/v9');
+const { defineConfig } = require('eslint/config');
+const sldsPlugin = require('@salesforce-ux/eslint-plugin-slds');
 
-module.exports = [
+module.exports = defineConfig([
   {
-    files: ['**/*.html', '**/*.cmp'],
     plugins: {
       '@salesforce-ux/slds': sldsPlugin
     },
-    rules: {
-      '@salesforce-ux/slds/enforce-bem-usage': 'error',
-      '@salesforce-ux/slds/no-deprecated-classes-slds2': 'error',
-      '@salesforce-ux/slds/modal-close-button-issue': 'error'
-    }
+    extends: ['@salesforce-ux/slds/flat/recommended']
   }
-];
+]);
 ```
 
-### Version-Specific Imports
+## Migration Note
 
-You can explicitly import version-specific configurations:
-
-```javascript
-// ESLint v9 (flat config)
-const sldsPlugin = require('@salesforce-ux/eslint-plugin-slds/v9');
-
-// ESLint v8 (legacy config)
-import sldsPlugin from '@salesforce-ux/eslint-plugin-slds/v8';
-```
-
-## Package Exports
-
-This package provides multiple entry points:
-
-- **`.`** (default): ESLint v8 plugin (legacy config format)
-- **`./v8`**: ESLint v8 plugin (legacy config format)
-- **`./v9`**: ESLint v9 plugin (flat config format)
-- **`./eslint.config.js`**: Pre-configured flat config file
-
-## Peer Dependency: ESLint
-
-This plugin lists `eslint` as a peer dependency. This means:
-- **You must install `eslint` in your project.**
-- You can choose the version (v8 or v9) that matches your project needs.
-- This avoids version conflicts and ensures compatibility.
+> Always import the plugin from the root (`@salesforce-ux/eslint-plugin-slds`).
+> The plugin automatically supports both legacy and flat config systems.
 
 ## Rules
 

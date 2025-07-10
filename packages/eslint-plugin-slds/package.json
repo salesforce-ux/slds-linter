@@ -8,16 +8,6 @@
       "import": "./build/index.js",
       "require": "./build/index.js"
     },
-    "./v8": {
-      "types": "./build/v8/index.d.ts",
-      "import": "./build/v8/index.js",
-      "require": "./build/v8/index.js"
-    },
-    "./v9": {
-      "types": "./build/v9/index.d.ts",
-      "import": "./build/v9/index.js",
-      "require": "./build/v9/index.js"
-    },
     "./eslint.config.js": {
       "import": "./eslint.config.js",
       "require": "./eslint.config.js"
