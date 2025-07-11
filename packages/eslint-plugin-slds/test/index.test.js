@@ -1,7 +1,7 @@
-import plugin from '../src/index.js';
-import enforceBemUsageRule from '../src/rules/enforce-bem-usage.js';
-import noDeprecatedSldsClassesRule from '../src/rules/no-deprecated-classes-slds2.js';
-import modalCloseButtonIssueRule from '../src/rules/modal-close-button-issue.js';
+const plugin = require('../src');
+const enforceBemUsageRule = require('../src/rules/enforce-bem-usage');
+const noDeprecatedSldsClassesRule = require('../src/rules/no-deprecated-classes-slds2');
+const modalCloseButtonIssueRule = require('../src/rules/modal-close-button-issue');
 
 describe('Unified plugin export', () => {
   it('should export the correct meta', () => {
