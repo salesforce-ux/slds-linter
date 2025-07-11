@@ -9,7 +9,7 @@ export = {
       category: "Best Practices",
       recommended: true,
       description: "Update component attributes or CSS classes for the modal close button to comply with the modal component blueprint.",
-      url: ""
+      url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#modal-close-button-issue"
     },
     fixable: "code",
     schema: [],
