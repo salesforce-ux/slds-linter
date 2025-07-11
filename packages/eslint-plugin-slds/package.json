@@ -8,7 +8,7 @@
       "import": "./build/index.js",
       "require": "./build/index.js"
     },
-    "./eslint.config.mjs": {
+    "./config": {
       "import": "./eslint.config.mjs",
       "require": "./eslint.config.mjs"
     }
@@ -17,8 +17,7 @@
     "build/**",
     "README.md",
     "RULES.md",
-    "eslint.config.mjs",
-    ".eslintrc.yml"
+    "eslint.config.mjs"
   ],
   "engines": {
     "node": ">=18.18.0"
