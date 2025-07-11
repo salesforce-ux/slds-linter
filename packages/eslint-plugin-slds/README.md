@@ -37,7 +37,7 @@ module.exports = defineConfig([
     plugins: {
       '@salesforce-ux/slds': sldsPlugin
     },
-    extends: ['@salesforce-ux/slds/flat/recommended']
+    extends: ['@salesforce-ux/slds/recommended']
   }
 ]);
 ```

@@ -6,6 +6,7 @@ export default defineConfig([
     plugins: {
       "@salesforce-ux/slds": slds,
     },
-    extends: ["@salesforce-ux/slds/flat/recommended"],
+    extends: ["@salesforce-ux/slds/recommended"]
+    //defineConfig() helper helps which config to use internally.
   },
 ]);
