@@ -4,22 +4,28 @@ import enforceBemUsage from './rules/enforce-bem-usage';
 import noDeprecatedClassesSlds2 from './rules/no-deprecated-classes-slds2';
 import modalCloseButtonIssue from './rules/modal-close-button-issue';
 import htmlParser from "@html-eslint/parser";
+import noHardcodedValuesSlds1 from './v9/rules/no-hardcoded-values-slds1';
+import noHardcodedValuesSlds2 from './v9/rules/no-hardcoded-values-slds2';
+
+const rules = {
+  "enforce-bem-usage": enforceBemUsage,
+  "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
+  "modal-close-button-issue": modalCloseButtonIssue,
+  "no-hardcoded-values-slds1": noHardcodedValuesSlds1,
+  "no-hardcoded-values-slds2": noHardcodedValuesSlds2,
+};
 
 const plugin = {
   meta: {
     name: "@salesforce-ux/eslint-plugin-slds",
     version: process.env.PLUGIN_VERSION
   },
-  configs: {},
-  rules: {
-    "enforce-bem-usage": enforceBemUsage,
-    "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
-    "modal-close-button-issue": modalCloseButtonIssue
-  }
+  rules,
+  configs: {}
 };
 
 Object.assign(plugin.configs, {
-  // flat config format for ESLint v9+
+  // Flat config for ESLint v9+
   "flat/recommended": [
     {
       plugins: {
@@ -28,17 +34,19 @@ Object.assign(plugin.configs, {
       rules: {
         "@salesforce-ux/slds/enforce-bem-usage": "error",
         "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
-        "@salesforce-ux/slds/modal-close-button-issue": "error"
+        "@salesforce-ux/slds/modal-close-button-issue": "error",
+        "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
+        "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
       },
       languageOptions: {
         parser: htmlParser,
         ecmaVersion: 2021,
         sourceType: "module"
       },
-      files: ["**/*.html", "**/*.cmp"]
+      files: ["**/*.html", "**/*.cmp", "**/*.css", "**/*.scss"]
     }
   ],
-  // legacy config for ESLint v8-
+  // Legacy config for ESLint v8-
   recommended: {
     plugins: ["@salesforce-ux/slds"],
     rules: {

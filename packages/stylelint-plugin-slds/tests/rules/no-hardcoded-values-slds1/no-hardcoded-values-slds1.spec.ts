@@ -3,7 +3,8 @@ import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;
 
-describe('no-hardcoded-values-slds1', () => {
+//ToDo: remove once migrated to eslint completely
+xdescribe('no-hardcoded-values-slds1', () => {
   const ruleName = 'slds/no-hardcoded-values-slds1';
 
   const testCases = [

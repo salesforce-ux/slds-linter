@@ -9,6 +9,7 @@ export interface LintOptions {
   configPath?: string;
   maxWorkers?: number;
   timeoutMs?: number;
+  // workerOverride?: 'eslint' | 'stylelint';
 }
 
 export class LintRunner {
@@ -17,15 +18,25 @@ export class LintRunner {
    */
   static async runLinting(
     fileBatches: string[][],
-    workerType: 'style' | 'component',
+    workerType: 'stylelint' | 'eslint',
     options: LintOptions = {}
   ): Promise<LintResult[]> {
     try {
-      const workerScript = path.resolve(
-        resolveDirName(import.meta) ,
-        '../workers',
-        workerType === 'style' ? 'stylelint.worker.js' : 'eslint.worker.js'
-      );
+      let workerScript;
+      // Select worker script based on explicit workerType
+      if (workerType === 'stylelint') {
+        workerScript = path.resolve(
+          resolveDirName(import.meta),
+          '../workers',
+          'stylelint.worker.js'
+        );
+      } else {
+        workerScript = path.resolve(
+          resolveDirName(import.meta),
+          '../workers',
+          'eslint.worker.js'
+        );
+      }
 
       const workerConfig: WorkerConfig = {
         configPath: options.configPath,
