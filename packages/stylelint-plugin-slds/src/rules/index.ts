@@ -8,13 +8,15 @@ import noDeprecatedTokensSlds1 from './no-deprecated-tokens-slds1';
 import enforceBemUsage from './enforce-bem-usage';
 import noCalcFunction from './no-calc-function';
 import enforceSdsToSldsHooks from './enforce-sds-to-slds-hooks';
+import enforceComponentHookNamingConvention from './enforce-component-hook-naming-convention';
 import reduceAnnotations from './reduce-annotations';
 import noSldsVarWithoutFallback from './no-slds-var-without-fallback';
-import noSldsNamespace from './no-slds-namespace';
-import noUnsupportedVarFallback from './no-unsupported-var-fallback';
+import noSldsNamespaceForCustomHooks from './no-slds-namespace-for-custom-hooks';
+import noSldshookFallbackForLwcToken from './no-sldshook-fallback-for-lwctoken';
 
 export default [
   enforceSdsToSldsHooks,
+  enforceComponentHookNamingConvention,
   noDeprecatedSldsClasses,
   noUnsupportedHooksSlds2,
   lwcTokenToSldsHook,
@@ -26,6 +28,6 @@ export default [
   noImportantTag,
   reduceAnnotations,
   noSldsVarWithoutFallback,
-  noSldsNamespace,
-  noUnsupportedVarFallback
+  noSldsNamespaceForCustomHooks,
+  noSldshookFallbackForLwcToken
 ];

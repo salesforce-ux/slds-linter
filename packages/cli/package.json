@@ -38,8 +38,8 @@
   "dependencies": {
     "@salesforce-ux/eslint-plugin-slds": "0.2.2",
     "@salesforce-ux/stylelint-plugin-slds": "0.2.2",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.36.0",
+    "@typescript-eslint/parser": "^8.36.0",
     "chalk": "^4.1.2",
     "commander": "^13.1.0",
     "eslint": "^9.0.0",
@@ -50,7 +50,7 @@
     "node-sarif-builder": "^3.2.0",
     "ora": "^5.4.1",
     "semver": "^7.7.1",
-    "stylelint": "^16.10.0"
+    "stylelint": "16.14.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

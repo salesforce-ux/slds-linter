@@ -1,17 +1,31 @@
-// jest.config.mts
-import { createDefaultEsmPreset, type JestConfigWithTsJest } from 'ts-jest'
-
-const presetConfig = createDefaultEsmPreset({
-  tsconfig:"tsconfig.spec.json"
-})
+import { type JestConfigWithTsJest } from 'ts-jest'
 
 const jestConfig: JestConfigWithTsJest = {
-  ...presetConfig,
-  testPathIgnorePatterns:["build"],
+  preset: 'ts-jest/presets/default-esm',
+  extensionsToTreatAsEsm: ['.ts'],
+  transform: {
+    '^.+\\.ts$': ['ts-jest', {
+      useESM: true,
+      tsconfig: "tsconfig.spec.json"
+    }],
+  },
+  testPathIgnorePatterns: [
+    "<rootDir>/build/",
+    "<rootDir>/node_modules/"
+  ],
+  testMatch: [
+    "<rootDir>/tests/**/*.spec.ts",
+    "<rootDir>/tests/**/*.test.ts"
+  ],
   coverageReporters: [
     "lcov",
     "json-summary"
   ],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  roots: ['<rootDir>'],
+  testEnvironment: 'node',
+  verbose: true,
+  detectOpenHandles: true,
 }
 
 export default jestConfig
