@@ -1,51 +1,30 @@
-const index = require('../src/index');
-const { ESLint } = require('eslint');
+const plugin = require('../src');
 const enforceBemUsageRule = require('../src/rules/enforce-bem-usage');
 const noDeprecatedSldsClassesRule = require('../src/rules/no-deprecated-classes-slds2');
+const modalCloseButtonIssueRule = require('../src/rules/modal-close-button-issue');
 
-jest.mock('../src/rules/enforce-bem-usage', () => jest.fn());
-jest.mock('../src/rules/no-deprecated-classes-slds2', () => jest.fn());
-
-
-describe('ESLint Plugin Rules', () => {
-    test('should define enforce-bem-usage rule', () => {
-        expect(index.rules).toHaveProperty('enforce-bem-usage');
-        expect(typeof index.rules['enforce-bem-usage']).toBe('object');
-    });
-    
-    test('should define no-deprecated-classes-slds2 rule', () => {
-    expect(index.rules).toHaveProperty('no-deprecated-classes-slds2');
-    expect(typeof index.rules['no-deprecated-classes-slds2']).toBe('object');
-    });
-});
-
-describe('ESLint Plugin Configurations', () => {
-    test('should define recommended configuration', () => {
-      expect(index.configs).toHaveProperty('recommended');
-    });
-  
-    test('should define recommended configuration with parser', () => {
-      expect(index.configs.recommended).toHaveProperty('parser', '@html-eslint/parser');
-    });
-  
-    test('should define recommended configuration with plugins', () => {
-      expect(index.configs.recommended).toHaveProperty('plugins');
-      expect(index.configs.recommended.plugins).toContain('@salesforce-ux/slds');
-    });
-  
-    test('should define recommended configuration with rules', () => {
-      expect(index.configs.recommended).toHaveProperty('rules');
-      expect(index.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/enforce-bem-usage', 'error');
-      expect(index.configs.recommended.rules).toHaveProperty('@salesforce-ux/slds/no-deprecated-classes-slds2', 'error');
-    });
-});
-
-describe('ESLint Rules Implementation', () => {
-  test('enforce-bem-usage rule should be implemented', () => {
-    expect(index.rules['enforce-bem-usage']).toBe(enforceBemUsageRule);
+describe('Unified plugin export', () => {
+  it('should export the correct meta', () => {
+    expect(plugin.meta).toBeDefined();
+    expect(plugin.meta.name).toBe('@salesforce-ux/eslint-plugin-slds');
   });
 
-  test('no-deprecated-classes-slds2 rule should be implemented', () => {
-    expect(index.rules['no-deprecated-classes-slds2']).toBe(noDeprecatedSldsClassesRule);
+  it('should export all rules', () => {
+    expect(plugin.rules['enforce-bem-usage']).toBe(enforceBemUsageRule);
+    expect(plugin.rules['no-deprecated-classes-slds2']).toBe(noDeprecatedSldsClassesRule);
+    expect(plugin.rules['modal-close-button-issue']).toBe(modalCloseButtonIssueRule);
   });
-});
+
+  it('should export a legacy (v8) config', () => {
+    expect(plugin.configs.recommended).toBeDefined();
+    expect(plugin.configs.recommended.plugins).toContain('@salesforce-ux/slds');
+    expect(plugin.configs.recommended.rules['@salesforce-ux/slds/enforce-bem-usage']).toBe('error');
+  });
+
+  it('should export a flat (v9+) config', () => {
+    expect(plugin.configs['flat/recommended']).toBeDefined();
+    const flatConfig = plugin.configs['flat/recommended'][0];
+    expect(flatConfig.plugins['@salesforce-ux/slds']).toBe(plugin);
+    expect(flatConfig.rules['@salesforce-ux/slds/enforce-bem-usage']).toBe('error');
+  });
+}); 
