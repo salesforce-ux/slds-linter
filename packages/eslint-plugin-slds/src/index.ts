@@ -6,6 +6,7 @@ import modalCloseButtonIssue from './rules/modal-close-button-issue';
 import htmlParser from "@html-eslint/parser";
 import noHardcodedValuesSlds1 from './v9/rules/no-hardcoded-values-slds1';
 import noHardcodedValuesSlds2 from './v9/rules/no-hardcoded-values-slds2';
+import cssPlugin from "@eslint/css";
 
 const rules = {
   "enforce-bem-usage": enforceBemUsage,
@@ -28,22 +29,38 @@ Object.assign(plugin.configs, {
   // Flat config for ESLint v9+
   "flat/recommended": [
     {
-      plugins: {
-        "@salesforce-ux/slds": plugin,
-      },
-      rules: {
-        "@salesforce-ux/slds/enforce-bem-usage": "error",
-        "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
-        "@salesforce-ux/slds/modal-close-button-issue": "error",
-        "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
-        "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
-      },
+      files: ["**/*.html", "**/*.cmp"],
       languageOptions: {
         parser: htmlParser,
         ecmaVersion: 2021,
         sourceType: "module"
       },
-      files: ["**/*.html", "**/*.cmp", "**/*.css", "**/*.scss"]
+      plugins: {
+        "@salesforce-ux/slds": plugin
+      },
+      rules: {
+        "@salesforce-ux/slds/enforce-bem-usage": "error",
+        "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
+        "@salesforce-ux/slds/modal-close-button-issue": "error"
+      }
+    },
+    // CSS/SCSS config
+    {
+      files: ["**/*.{css,scss}"],
+      language: "css/css",
+      ...cssPlugin.configs.recommended,
+      plugins: {
+        css: cssPlugin,
+        "@salesforce-ux/slds": plugin
+      },
+      rules: {
+        ...cssPlugin.configs.recommended.rules,
+        "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
+        "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
+      }
+    },
+    {
+      ignores: ["node_modules/"]
     }
   ],
   // Legacy config for ESLint v8-
