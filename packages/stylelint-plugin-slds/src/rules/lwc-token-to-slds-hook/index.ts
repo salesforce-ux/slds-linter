@@ -1,7 +1,7 @@
 import metadata from '@salesforce-ux/sds-metadata';
 import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
-import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
+import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import { isTargetProperty } from '../../utils/prop-utills';

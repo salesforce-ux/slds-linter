@@ -21,7 +21,7 @@ function isCalcFunction(node:valueParser.Node): boolean{
   return (node.type === "function" && node.value === "calc" && node.nodes.length>0);
 }
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity, propertyTargets = []}={}) {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity, propertyTargets = []}={}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkDecls((decl) => {
       if (!isTargetProperty(decl.prop, propertyTargets)) {
@@ -49,5 +49,12 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
   };
 }
 
+ruleFunction.ruleName = ruleName;
+ruleFunction.messages = messages;
+ruleFunction.meta = {
+  url: '',
+  fixable: false
+};
+
 // Export the plugin
-export default createPlugin(ruleName, rule as unknown as Rule);
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);
