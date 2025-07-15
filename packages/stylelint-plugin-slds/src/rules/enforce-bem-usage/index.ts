@@ -70,7 +70,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity
 ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
 ruleFunction.meta = {
-  url: '',
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-bem-usage',
   fixable: true
 };
 

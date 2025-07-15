@@ -48,7 +48,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
 
 ruleFunction.ruleName = ruleName;
 ruleFunction.meta = {
-  url: '',
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#reduce-annotations',
   fixable: true
 };
 

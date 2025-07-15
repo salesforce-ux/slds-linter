@@ -126,7 +126,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity
 
 ruleFunction.ruleName = ruleName;
 ruleFunction.meta = {
-  url: '',
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-sds-to-slds-hooks',
   fixable: true
 };
 
