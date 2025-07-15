@@ -7,25 +7,38 @@ const ruleName = 'slds/reduce-annotations';
 
 // Fetch metadata
 const { severityLevel = 'warning', warningMsg = '' } = ruleMetadata(ruleName) || {};
-const annotationList = [
-  "@sldsValidatorAllow",
-  "@sldsValidatorIgnore",
-  "@sldsValidatorIgnoreNextLine"
-];
+
+// Mapping of SLDS validator comments to stylelint comments
+const annotationMapping: Record<string, string> = {
+  "@sldsValidatorIgnoreNextLine": "stylelint-disable-next-line",
+  "@sldsValidatorAllow": "stylelint-enable",
+  "@sldsValidatorIgnore": "stylelint-disable"
+};
+
+const annotationList = Object.keys(annotationMapping);
 
 // Rule function
 const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkComments((comment) => {
-      if (annotationList.some(annotation => comment.text.trim().includes(annotation))) {
+      const commentText = comment.text.trim();
+      const matchedAnnotation = annotationList.find(annotation => commentText.startsWith(annotation));
+      
+      if (matchedAnnotation) {
         utils.report({
-          message:  JSON.stringify({message: warningMsg, suggestions:[]}),
+          message: JSON.stringify({message: warningMsg, suggestions:[]}),
           node: comment,
           result,
           ruleName,
           severity,
-          fix:()=>{
-            comment.remove(); // Auto-fix by removing the comment
+          index: comment.source.start.offset,
+          endIndex: comment.source.end.offset,
+          fix: () => {
+            const stylelintComment = annotationMapping[matchedAnnotation];
+            // Replace the annotation but preserve any rule names that follow
+            const remainingText = commentText.substring(matchedAnnotation.length).trim();
+            const newCommentText = remainingText ? `${stylelintComment} ${remainingText}` : stylelintComment;
+            comment.text = newCommentText;
           }
         });
       }
