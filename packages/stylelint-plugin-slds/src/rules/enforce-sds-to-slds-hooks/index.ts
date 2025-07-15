@@ -1,6 +1,6 @@
 import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
-import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
+import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import { isTargetProperty } from '../../utils/prop-utills';
@@ -11,8 +11,6 @@ const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
 const ruleName: string = 'slds/enforce-sds-to-slds-hooks';
-
-const ruleInfo = ruleMetadata(ruleName);
 
 const { severityLevel = 'error', warningMsg = '', errorMsg = '', ruleDesc = 'No description provided' } = ruleMetadata(ruleName) || {};
 

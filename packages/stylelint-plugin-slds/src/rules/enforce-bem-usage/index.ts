@@ -5,7 +5,6 @@ import replacePlaceholders from '../../utils/util';
 import ruleMetadata from './../../utils/rulesMetadata';
 const { createPlugin } = stylelint;
 import metadata from '@salesforce-ux/sds-metadata';
-import { hasMatchedProperty } from '../../utils/prop-utills';
 const bemMappings = metadata.bemNaming;
 
 const ruleName: string = 'slds/enforce-bem-usage';

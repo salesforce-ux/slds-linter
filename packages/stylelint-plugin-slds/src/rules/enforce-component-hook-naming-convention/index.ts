@@ -1,6 +1,5 @@
 import { Declaration, Root } from 'postcss';
-import valueParser from 'postcss-value-parser';
-import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
+import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import metadata from '@salesforce-ux/sds-metadata';
@@ -9,8 +8,6 @@ const slds1DeprecatedComponentHooks = metadata.slds1DeprecatedComponentHooks;
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
 const ruleName: string = 'slds/enforce-component-hook-naming-convention';
-
-const ruleInfo = ruleMetadata(ruleName);
 
 const {
   severityLevel = 'error',
