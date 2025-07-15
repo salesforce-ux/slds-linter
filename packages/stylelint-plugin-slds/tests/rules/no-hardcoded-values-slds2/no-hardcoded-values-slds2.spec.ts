@@ -2,7 +2,7 @@ import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 import stylelintPluginSlds from '../../../src/index';
 const { lint }: typeof stylelint = stylelint;
 
-xdescribe('no-hardcoded-values-slds2', () => {
+describe('no-hardcoded-values-slds2', () => {
   const ruleName = 'slds/no-hardcoded-values-slds2';
 
   const testCases = [
@@ -198,4 +198,4 @@ xdescribe('no-hardcoded-values-slds2', () => {
       }
     });
   });
-}); //ToDo: remove once migrated to eslint completely
+});
