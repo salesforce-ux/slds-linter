@@ -56,7 +56,8 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
 ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
 ruleFunction.meta = {
-    url: ''
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides',
+  fixable: false
 };
 
 // Export the plugin
