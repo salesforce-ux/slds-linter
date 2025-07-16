@@ -3,6 +3,7 @@ export interface BaseConfig {
   files?: string[];
   configStylelint?: string;
   configEslint?: string;
+  internal?: boolean;
 }
 
 /**
@@ -31,6 +32,14 @@ export interface ReportConfig extends BaseConfig {
   format?: 'sarif' | 'csv';
 }
 
+export interface LintRunnerOptions {
+  fix?: boolean;
+  configPath?: string;
+  internal?: boolean;
+  maxWorkers?: number;
+  timeoutMs?: number;
+}
+
 export interface LintResultEntry {
   line: number;
   column: number;
@@ -51,6 +60,7 @@ export type ExitCode = 0 | 1 | 2;
 export interface WorkerConfig {
   configPath?: string;
   fix?: boolean;
+  internal?: boolean;
 }
 
 export interface WorkerResult {

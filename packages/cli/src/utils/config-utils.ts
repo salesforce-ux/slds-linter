@@ -6,7 +6,6 @@
  */
 import path from 'path';
 import { LintConfig, ReportConfig, CliOptions } from '../types';
-import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
 import { isDynamicPattern } from 'globby';
 import { accessSync } from 'fs';
 import { Logger } from './logger';
@@ -78,49 +77,30 @@ export function normalizeDirectoryPath(directory?: string): string {
  * 
  * @param options Options to normalize
  * @param defaultOptions Default options to apply
- * @param isNodeApi Whether this is being called from the Node API
  * @returns Normalized options with appropriate defaults
  */
 export function normalizeCliOptions<T extends CliOptions | LintConfig | ReportConfig>(
   options: T,
   defaultOptions: Partial<T> = {},
-  isNodeApi = false
 ): T {
   // Set up defaults based on context
   const baseDefaults: Partial<CliOptions> = {
     files: [],
-    configStylelint: isNodeApi ? DEFAULT_STYLELINT_CONFIG_PATH : "",
-    configEslint: isNodeApi ? DEFAULT_ESLINT_CONFIG_PATH : "",
+    configStylelint: "",
+    configEslint: "",
+    fix: false,
+    editor: detectCurrentEditor(),
+    format: "sarif",
+    internal: false
   };
-  
-  // Add CLI-specific defaults
-  if (!isNodeApi) {
-    Object.assign(baseDefaults, {
-      fix: false,
-      editor: detectCurrentEditor(),
-      format: "sarif",
-    });
-  }
   
   // Create normalized options with proper precedence
   const normalizedOptions = {
     ...baseDefaults,
     ...defaultOptions,
     ...options,
-    directory: normalizeDirectoryPath(options.directory),
+    directory: normalizeDirectoryPath(options.directory)
   };
-  
-  // Handle output path for CLI options
-  if (!isNodeApi) {
-    (normalizedOptions as any).output = (options as any).output 
-      ? normalizeAndValidatePath((options as any).output)
-      : process.cwd();
-  }
-  
-  // Handle ReportConfig specific fields
-  if ('format' in options && !options.format && isNodeApi) {
-    (normalizedOptions as any).format = 'sarif';
-  }
   
   return normalizedOptions as T;
 }

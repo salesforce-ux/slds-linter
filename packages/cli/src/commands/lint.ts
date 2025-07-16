@@ -23,13 +23,13 @@ export function registerLintCommand(program: Command): void {
     .option('--config-stylelint <path>', 'Path to stylelint config file')
     .option('--config-eslint <path>', 'Path to eslint config file')
     .option('--editor <editor>', 'Editor to open files with (e.g., vscode, atom, sublime). Auto-detects if not specified')
+    .option('--internal', 'Execute linting for internal persona')
     .action(async (directory:string, options: CliOptions) => {
       const startTime = Date.now();
       try {
         Logger.info(chalk.blue('Starting lint process...'));
         // Parse CLI options with appropriate defaults
         const normalizedOptions = normalizeCliOptions(options, {
-          configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
           configEslint: DEFAULT_ESLINT_CONFIG_PATH,
         });
 
@@ -44,12 +44,7 @@ export function registerLintCommand(program: Command): void {
         }
 
         // Use Node API to perform the linting
-        const lintResults = await lint({
-          directory: normalizedOptions.directory,
-          fix: normalizedOptions.fix,
-          configStylelint: normalizedOptions.configStylelint,
-          configEslint: normalizedOptions.configEslint
-        });
+        const lintResults = await lint(normalizedOptions);
 
         // Print detailed lint results only for files with issues
         printLintResults(lintResults, normalizedOptions.editor);
