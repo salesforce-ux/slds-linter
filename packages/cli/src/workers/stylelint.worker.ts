@@ -1,6 +1,8 @@
 import stylelint from 'stylelint';
 import { BaseWorker } from './base.worker';
 import { WorkerConfig, WorkerResult } from '../types';
+import stylelintPluginSlds from '@salesforce-ux/stylelint-plugin-slds';
+import { getStylelintRulesForPersona, Persona } from '../services/persona-manager';
 
 class StylelintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
   protected async processFile(filePath: string): Promise<WorkerResult> {
@@ -13,6 +15,11 @@ class StylelintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
       // Load custom config if provided
       if (this.task.config.configPath) {
         options.configFile = this.task.config.configPath;
+      } else {
+        options.config = {
+          plugins: stylelintPluginSlds,
+          rules: getStylelintRulesForPersona(this.task.config.internal ? Persona.INTERNAL : Persona.EXTERNAL)
+        }
       }
 
       const result = await stylelint.lint(options);

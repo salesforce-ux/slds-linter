@@ -1,16 +1,24 @@
 import { ESLint } from 'eslint';
 import { BaseWorker } from './base.worker';
 import { WorkerConfig, WorkerResult } from '../types';
+import { canExecuteRule, Persona } from '../services/persona-manager';
 
 class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
   private eslint: ESLint;
 
   constructor() {
     super();
-    this.eslint = new ESLint({
+
+    const options: ESLint.Options = {
       overrideConfigFile: this.task.config.configPath,
       fix: this.task.config.fix
-    });
+    }
+    
+    options.ruleFilter = ({ruleId}) => {
+      return canExecuteRule(ruleId, this.task.config.internal ? Persona.INTERNAL : Persona.EXTERNAL);
+    }
+
+    this.eslint = new ESLint(options);
   }
 
   protected async processFile(filePath: string): Promise<WorkerResult> {

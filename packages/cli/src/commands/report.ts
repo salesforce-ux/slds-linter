@@ -4,7 +4,7 @@ import ora from 'ora';
 import chalk from 'chalk';
 import fs from 'fs';
 import { CliOptions } from '../types';
-import { normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
+import { normalizeAndValidatePath, normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
 import { report, lint } from '../executor';
@@ -19,12 +19,13 @@ export function registerReportCommand(program: Command): void {
     .option('--config-stylelint <path>', 'Path to stylelint config file')
     .option('--config-eslint <path>', 'Path to eslint config file')
     .addOption(new Option('--format <type>', 'Output format').choices(['sarif', 'csv']).default('sarif'))
+    .option('--internal', 'Execute linting for internal persona')
     .action(async (directory: string, options: CliOptions) => {
       const spinner = ora('Starting report generation...');
       try {        
         const normalizedOptions = normalizeCliOptions(options, {
-          configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
-          configEslint: DEFAULT_ESLINT_CONFIG_PATH
+          configEslint: DEFAULT_ESLINT_CONFIG_PATH,
+          output: normalizeAndValidatePath(options.output)
         });
 
         if(directory){ // If argument is passed, ignore -d, --directory option
@@ -42,11 +43,7 @@ export function registerReportCommand(program: Command): void {
         const reportFormat = normalizedOptions.format?.toLowerCase() || 'sarif';
         
         // First run linting to get results
-        const lintResults = await lint({
-          directory: normalizedOptions.directory,
-          configStylelint: normalizedOptions.configStylelint,
-          configEslint: normalizedOptions.configEslint
-        });
+        const lintResults = await lint(normalizedOptions);
         
         // Generate report using the lint results
         const reportStream = await report({
