@@ -5,6 +5,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "declaration": true,
+    "emitDeclarationOnly": true,
     "noEmitOnError": true,
     "esModuleInterop": true,
     "skipLibCheck": true

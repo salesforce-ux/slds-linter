@@ -10,13 +10,12 @@ const args = {
 
 const result = replacePlaceholders(templateString, args);
 */
-export default function replacePlaceholders(template: string, args: { [key: string]: string }): string {
+export function replacePlaceholders(template: string, args: { [key: string]: string }): string {
     // Handle both ${key} and {{key}} formats
     return template
         .replace(/\${(.*?)}/g, (_, key) => args[key.trim()] || '')
         .replace(/\{\{(.*?)\}\}/g, (_, key) => args[key.trim()] || '');
 }
-
 
 // Use only for small arrays
 export function addOnlyUnique(arrayA: string[] = [], arrayB: string[] = []): string[] {
@@ -24,4 +23,4 @@ export function addOnlyUnique(arrayA: string[] = [], arrayB: string[] = []): str
         return arrayB;
     }
     return arrayA.concat(arrayB.filter(v => !arrayA.includes(v)));
-}
+} 

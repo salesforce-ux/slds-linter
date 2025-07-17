@@ -39,7 +39,8 @@ ruleTester.run('no-hardcoded-values', rule, {
       filename: 'test.css',
       errors: [{
         message: /#ff0000.*slds-g-color-palette-red-50|slds-g-color-error-base-50|slds-g-color-palette-hot-orange-50|slds-g-color-palette-hot-orange-60/i
-      }]
+      }],
+      output: `.example { color: var(--slds-g-color-palette-red-50, #ff0000); }`
     },
     {
       code: `.example { font-size: 0.875rem; }`,
@@ -64,14 +65,16 @@ ruleTester.run('no-hardcoded-values', rule, {
       filename: 'test.css',
       errors: [{
         message: /#123456.*slds-g-color-palette-cloud-blue-20|slds-g-color-palette-blue-15|slds-g-color-brand-base-15|slds-g-color-palette-cloud-blue-30|slds-g-color-palette-blue-20/i
-      }]
+      }],
+      output: `.example { background-color: var(--slds-g-color-palette-cloud-blue-20, #123456); }`
     },
     {
       code: `.example { padding: 20px; }`,
       filename: 'test.css',
       errors: [{
-        message: /20px.*no replacement styling hook|Remove the static value/i
+        message: /Replace the 20px static value: no replacement styling hook found\. \(slds\/no-hardcoded-values-slds1\)/i
       }]
+      // No output property because this is not auto-fixable
     }
   ]
 });

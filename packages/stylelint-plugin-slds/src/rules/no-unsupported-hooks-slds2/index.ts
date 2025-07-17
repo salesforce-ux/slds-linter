@@ -3,9 +3,8 @@ import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
-import replacePlaceholders from '../../utils/util';
+import { replacePlaceholders, forEachVarFunction } from 'slds-shared-utils';
 import { isTargetProperty } from '../../utils/prop-utills';
-import { forEachVarFunction } from '../../utils/decl-utils';
 const { utils, createPlugin } = stylelint;
 
 const deprecatedHooks = new Set(metadata.deprecatedStylingHooks);

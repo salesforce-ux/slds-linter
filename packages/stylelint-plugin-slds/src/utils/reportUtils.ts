@@ -1,6 +1,6 @@
 import { Declaration } from 'postcss';
 import stylelint from 'stylelint';
-import generateSuggestionsList from './generateSuggestionsList';
+import { generateSuggestionsList } from 'slds-shared-utils';
 
 export interface MessagesObj {
   rejected: (oldValue: string, newValue: string) => string;

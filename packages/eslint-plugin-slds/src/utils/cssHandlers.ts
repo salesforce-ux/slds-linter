@@ -1,13 +1,20 @@
 // Shared CSS value handlers for ESLint plugin (decoupled from stylelint)
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import valueParser from 'postcss-value-parser';
-import { makeReportMatchingHooks } from './reportUtilsGeneric';
-import { parseBoxShadowValue, isBoxShadowMatch, BoxShadowValue } from './boxShadowValueParser';
-import { findClosestColorHook, convertToHex } from './colorLibUtils';
-import { forEachColorValue } from './colorUtils';
-import { getStylingHooksForDensityValue } from './stylingHookUtils';
-import { FontValue, isKnownFontWeight, parseFont } from './fontValueParser';
-import { isFunctionNode } from './declUtils';
+import {
+  parseBoxShadowValue,
+  isBoxShadowMatch,
+  BoxShadowValue,
+  findClosestColorHook,
+  convertToHex,
+  forEachColorValue,
+  getStylingHooksForDensityValue,
+  FontValue,
+  isKnownFontWeight,
+  parseFont,
+  isFunctionNode,
+  handleBoxShadowShared
+} from 'slds-shared-utils';
 
 // Helper to robustly get the range for fixer.replaceTextRange
 function getNodeRange(node: any, declValueRange: [number, number]) {
@@ -37,41 +44,37 @@ export function handleBoxShadow(
   messages: any,
   reportFn: Function
 ) {
-  const reportMatchingHooks = makeReportMatchingHooks(reportFn);
-  const shadowHooks = Object.entries(supportedStylinghooks).filter(([_, value]) => {
-    return value.some((hook) => hook.properties.includes('box-shadow'));
-  }).map(([key, value]) => [key, value.map((hook) => hook.name)]);
-  const parsedCssValue = parseBoxShadowValue(decl.value.value);
-  if(!parsedCssValue){
-    return;
-  }
-  for(const [shadow, closestHooks] of shadowHooks){
-    const parsedValueHook = parseBoxShadowValue(shadow as string);
-    if (parsedValueHook && isBoxShadowMatch(parsedCssValue, parsedValueHook)) {
-      const fix = (fixer: any, sourceCode: any) => {
-        // Defensive: Only apply fix if range is valid
+  return handleBoxShadowShared(
+    decl,
+    cssValue,
+    cssValueStartIndex,
+    supportedStylinghooks,
+    reportProps,
+    messages,
+    (reportObjOrNode: any, closestHooks: string[], value: string, fix: any) => {
+      // Always provide a fix function if possible, using the original full value as fallback
+      const fixFn = (fixer: any, sourceCode: any) => {
         const range = decl.value.range;
         if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
           return null;
         }
         return fixer.replaceTextRange(
           range,
-          `var(${closestHooks[0]}, ${decl.value.value})`
+          `var(${closestHooks[0]}, ${cssValue})`
         );
       };
-      if (closestHooks.length > 0) {
-        reportMatchingHooks(
-          decl,
-          Array.isArray(closestHooks) ? closestHooks : [closestHooks],
-          cssValueStartIndex,
-          reportProps,
-          messages,
-          fix
-        );
-      }
-      return;
-    }
-  }
+      reportFn({
+        node: reportObjOrNode,
+        message: messages && messages.rejected ? messages.rejected(value, Array.isArray(closestHooks) ? closestHooks.join(', ') : closestHooks) : 'Replace static value with SLDS styling hook.',
+        index: cssValueStartIndex,
+        endIndex: cssValueStartIndex + (typeof value === 'string' ? value.length : 0),
+        fix: fixFn,
+        ...reportProps
+      });
+    },
+    // The makeFix function is not used for ESLint, as we provide fixFn above
+    () => undefined
+  );
 }
 
 // Color Handler
@@ -85,7 +88,6 @@ export function handleColorProps(
   messages: any,
   reportFn: Function
 ) {
-  const reportMatchingHooks = makeReportMatchingHooks(reportFn);
   forEachColorValue(parsedValue, (node) => {
     const hexValue = convertToHex(node.value);
     if (node.value === 'transparent' || !hexValue) {
@@ -97,7 +99,6 @@ export function handleColorProps(
       cssProperty
     );
     const fix = (fixer: any, sourceCode: any) => {
-      // Defensive: Only apply fix if range is valid
       const range = getNodeRange(node, decl.value.range);
       if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
         return null;
@@ -107,14 +108,14 @@ export function handleColorProps(
         `var(${closestHooks[0]}, ${hexValue})`
       );
     };
-    reportMatchingHooks(
+    reportFn({
       node,
-      Array.isArray(closestHooks) ? closestHooks : [closestHooks],
-      cssValueStartIndex,
-      reportProps,
-      messages,
-      fix
-    );
+      message: messages && messages.rejected ? messages.rejected(node.value, Array.isArray(closestHooks) ? closestHooks.join(', ') : closestHooks) : 'Replace static value with SLDS styling hook.',
+      index: cssValueStartIndex,
+      endIndex: cssValueStartIndex + node.value.length,
+      fix: typeof fix === 'function' ? fix : undefined,
+      ...reportProps
+    });
   });
 }
 
@@ -131,13 +132,11 @@ export function handleDensityPropForNode(
   reportFn: Function,
   skipNormalization?: boolean
 ) {
-    const reportMatchingHooks = makeReportMatchingHooks(reportFn);
     const closestHooks = getStylingHooksForDensityValue(cssValue, supportedStylinghooks, cssProperty);
     let fix: any;
     if(closestHooks.length > 0){
       const replacementValue = `var(${closestHooks[0]}, ${node.value})`;
       fix =  (fixer: any, sourceCode: any) => {
-        // Defensive: Only apply fix if range is valid
         const range = getNodeRange(node, decl.value.range);
         if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
           return null;
@@ -148,14 +147,14 @@ export function handleDensityPropForNode(
         );
       }
     }
-    reportMatchingHooks(
+    reportFn({
       node,
-      Array.isArray(closestHooks) ? closestHooks : [closestHooks],
-      cssValueStartIndex,
-      reportProps,
-      messages,
-      fix
-    );
+      message: messages && messages.rejected ? messages.rejected(node.value, Array.isArray(closestHooks) ? closestHooks.join(', ') : closestHooks) : 'Replace static value with SLDS styling hook.',
+      index: cssValueStartIndex,
+      endIndex: cssValueStartIndex + node.value.length,
+      fix: typeof fix === 'function' ? fix : undefined,
+      ...reportProps
+    });
 }
 
 // Font Handler
@@ -169,7 +168,6 @@ export function handleFontProps(
     messages: any,
     reportFn: Function
 ) {
-    const reportMatchingHooks = makeReportMatchingHooks(reportFn);
     let fontValue: FontValue = {};
     if (cssProperty === 'font-weight') {
         fontValue = {

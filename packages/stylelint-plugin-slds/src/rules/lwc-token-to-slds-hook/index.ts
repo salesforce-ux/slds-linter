@@ -3,10 +3,9 @@ import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
-import replacePlaceholders from '../../utils/util';
-import { isTargetProperty } from '../../utils/prop-utills';
-import { forEachVarFunction, getVarFunctionNode } from '../../utils/decl-utils';
+import { replacePlaceholders, forEachVarFunction, getVarFunctionNode } from 'slds-shared-utils';
 import { categorizeReplacement, ReplacementCategory } from '../../utils/replacement-categorizer';
+import { isTargetProperty } from '../../utils/prop-utills';
 
 const { createPlugin }: typeof stylelint = stylelint;
 const lwcToSlds = metadata.lwcToSlds;

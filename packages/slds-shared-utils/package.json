@@ -1,0 +1,26 @@
+{
+  "name": "slds-shared-utils",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "chroma-js": "^3.1.2",
+    "postcss": "^8.4.31",
+    "postcss-value-parser": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/chroma-js": "^2.4.4",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.4",
+    "ts-jest": "^29.4.0"
+  }
+}

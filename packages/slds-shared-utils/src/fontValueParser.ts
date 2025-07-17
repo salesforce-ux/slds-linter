@@ -45,7 +45,6 @@ function findKnownValue(parts: string[], knownValues: string[]): string | undefi
   return undefined;
 }
 
-
 /**
  * Parses a CSS font shorthand string into structured parts for analysis.
  * 
@@ -72,7 +71,6 @@ function extractFontParts(fontString: string) {
   let fontFamily = "";
   let fontSize = "";
   let lineHeight = "";
-
 
   const commaIndex = parts.findIndex(
     (node) => node.type === "div" && node.value === ","
@@ -117,7 +115,6 @@ export function parseFont(value: string): FontValue {
 
   // Anything after this line is best effort may not be correct
 
-
   /* treat font string as following order:
       font-style font-weight font-size font-family
       https://developer.mozilla.org/en-US/docs/Web/CSS/font
@@ -125,22 +122,22 @@ export function parseFont(value: string): FontValue {
       - font-style, font-variant and font-weight must precede font-size.
   */
   if (!fontFamily && rest.length > 0) {
-    fontFamily = rest.pop();
+    fontFamily = rest.pop() || '';
   }
   if (!fontSize && rest.length > 0) {
-    fontSize = rest.pop();
+    fontSize = rest.pop() || '';
   }
 
   if (!fontWeight && rest.length > 0) {
-    fontWeight = rest.pop();
+    fontWeight = rest.pop() || '';
   }
 
   // If there are more than 1 rest value, then the last value is font-variant
   if (rest.length > 1 && !fontVariant) {
-    fontVariant = rest.pop();
+    fontVariant = rest.pop() || '';
   }
   if (rest.length > 0 && !fontStyle) {
-    fontStyle = rest.pop();
+    fontStyle = rest.pop() || '';
   }
 
   return {
@@ -157,4 +154,4 @@ export function isFontProperty(property: string, value: string): boolean {
   return property === 'font' 
   || (property === 'font-weight' && isKnownFontWeight(value))
   || (property === 'font-size');
-}
+} 

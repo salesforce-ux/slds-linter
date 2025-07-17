@@ -1,26 +1,25 @@
 import { Rule } from 'eslint';
 import valueParser from 'postcss-value-parser';
 import {
-  isTargetProperty,
   colorProperties,
   densificationProperties,
   matchesCssProperty,
   forEachDensifyValue,
-  getFullValueFromNode,
   isDensifyValue,
-  isFontProperty,
-  makeReportMatchingHooks,
-  toRuleMessages,
+  isFontProperty
+} from 'slds-shared-utils';
+import {
   handleBoxShadow,
   handleColorProps,
   handleDensityPropForNode,
   handleFontProps
-} from '../../utils';
+} from '../../utils/cssHandlers';
 import {
   extractCssPropertyAndValue,
   createEslintReportFnFromNode
 } from '../utils/eslint-css-utils';
 import { adaptEslintDeclarationToPostcss } from '../utils/eslint-to-stylelint-adapter';
+import { isTargetProperty } from '../../utils/general';
 
 export function createNoHardcodedValueEslintRule({
   ruleId,
@@ -59,8 +58,15 @@ export function createNoHardcodedValueEslintRule({
           const isFontProp = isFontProperty(cssProperty, cssValue);
 
           const eslintReportFn = createEslintReportFnFromNode(context, node, sourceCode);
-          const messages = toRuleMessages(ruleId, warningMsg);
-          const reportMatchingHooks = makeReportMatchingHooks(eslintReportFn);
+          // Create simple message functions for ESLint (not stylelint)
+          const messages = {
+            rejected: (oldValue: string, newValue: string) =>
+              newValue && newValue.trim()
+                ? warningMsg.replace('${oldValue}', oldValue).replace('${newValue}', newValue)
+                : `Replace the ${oldValue} static value: no replacement styling hook found. (${ruleId})`,
+            suggested: (oldValue: string) =>
+              `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
+          };
 
           // The adapter is responsible for robust value range calculation
           const adaptedDecl = adaptEslintDeclarationToPostcss(node, cssValue, undefined, sourceCode);

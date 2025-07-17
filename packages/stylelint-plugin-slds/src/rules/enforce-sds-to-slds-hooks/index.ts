@@ -2,10 +2,9 @@ import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
-import replacePlaceholders from '../../utils/util';
-import { isTargetProperty } from '../../utils/prop-utills';
+import { replacePlaceholders, forEachVarFunction } from 'slds-shared-utils';
 import metadata from '@salesforce-ux/sds-metadata';
-import { forEachVarFunction } from '../../utils/decl-utils';
+import { isTargetProperty } from '../../utils/prop-utills';
 const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
