@@ -11,9 +11,11 @@
   ],
   "scripts": {
     "test": "NODE_OPTIONS=\"--experimental-vm-modules\" npx jest",
-    "prepublishOnly": "clean-pkg-json",
     "build": "gulp build",
-    "dev": "gulp dev"
+    "dev": "gulp dev",
+    "prepack": "npm pkg delete dependencies.slds-shared-utils",
+    "postpack": "npm pkg set dependencies.slds-shared-utils='*'",
+    "prepublishOnly": "npm pkg delete dependencies.slds-shared-utils && clean-pkg-json"
   },
   "dependencies": {
     "@salesforce-ux/sds-metadata": "^0.2.4",

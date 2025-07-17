@@ -58,7 +58,7 @@ export function createNoHardcodedValueEslintRule({
           const isFontProp = isFontProperty(cssProperty, cssValue);
 
           const eslintReportFn = createEslintReportFnFromNode(context, node, sourceCode);
-          // Create simple message functions for ESLint (not stylelint)
+          // Create simple message functions for ESLint
           const messages = {
             rejected: (oldValue: string, newValue: string) =>
               newValue && newValue.trim()

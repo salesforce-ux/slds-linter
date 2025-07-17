@@ -24,7 +24,9 @@
   "scripts": {
     "build": "gulp build",
     "test": "NODE_OPTIONS=\"--experimental-vm-modules\" npx jest",
-    "prepublishOnly": "clean-pkg-json"
+    "prepack": "npm pkg delete dependencies.slds-shared-utils",
+    "postpack": "npm pkg set dependencies.slds-shared-utils='*'",
+    "prepublishOnly": "npm pkg delete dependencies.slds-shared-utils && clean-pkg-json"
   },
   "keywords": [
     "eslint",
