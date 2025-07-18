@@ -12,7 +12,8 @@ import {
   FontValue,
   isKnownFontWeight,
   parseFont,
-  isFunctionNode
+  isFunctionNode,
+  handleBoxShadowShared
 } from 'slds-shared-utils';
 
 // Helper to robustly get the range for fixer.replaceTextRange
@@ -29,11 +30,11 @@ function getNodeRange(node: any, declValueRange: [number, number]) {
       return [start, end];
     }
   }
-  // Fallback to the full value range
+  // Fallback to full decl range
   return declValueRange;
 }
 
-// Box Shadow Handler
+// Box Shadow Handler - now uses shared logic
 export function handleBoxShadow(
   decl: any, // ESLint/PostCSS-like decl
   cssValue: string,
@@ -43,40 +44,52 @@ export function handleBoxShadow(
   messages: any,
   reportFn: Function
 ) {
-  const shadowHooks = Object.entries(supportedStylinghooks)
-    .filter(([_, value]) => value.some((hook) => hook.properties.includes('box-shadow')))
-    .map(([key, value]) => [key, value.map((hook) => hook.name)]);
+  // ESLint-specific reporting function
+  const eslintReportFn = (
+    decl: any,
+    closestHooks: string[],
+    cssValueStartIndex: number,
+    reportProps: any,
+    messages: any,
+    fix: any
+  ) => {
+    reportFn({
+      node: decl,
+      message: messages && messages.rejected ? 
+        messages.rejected(cssValue, closestHooks.join(', ')) : 
+        'Replace static value with SLDS styling hook.',
+      index: cssValueStartIndex,
+      endIndex: cssValueStartIndex + cssValue.length,
+      fix: fix,
+      ...reportProps
+    });
+  };
 
-  const parsedCssValue = parseBoxShadowValue(cssValue);
-  if (!parsedCssValue) return;
-
-  for (const [shadow, closestHooks] of shadowHooks) {
-    const parsedValueHook = parseBoxShadowValue(shadow as string);
-    if (parsedValueHook && isBoxShadowMatch(parsedCssValue, parsedValueHook)) {
-      const fix = (fixer: any, sourceCode: any) => {
-        const range = decl.value.range;
-        if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
-          return null;
-        }
-        return fixer.replaceTextRange(
-          range,
-          `var(${(closestHooks as string[])[0]}, ${cssValue})`
-        );
-      };
-      
-      if ((closestHooks as string[]).length > 0) {
-        reportFn({
-          node: decl,
-          message: messages && messages.rejected ? messages.rejected(cssValue, Array.isArray(closestHooks) ? closestHooks.join(', ') : closestHooks) : 'Replace static value with SLDS styling hook.',
-          index: cssValueStartIndex,
-          endIndex: cssValueStartIndex + cssValue.length,
-          fix: fix,
-          ...reportProps
-        });
+  // ESLint-specific fix factory
+  const makeFix = (decl: any, closestHooks: string[], value: string) => {
+    return (fixer: any, sourceCode: any) => {
+      const range = decl.value.range;
+      if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
+        return null;
       }
-      return;
-    }
-  }
+      return fixer.replaceTextRange(
+        range,
+        `var(${closestHooks[0]}, ${value})`
+      );
+    };
+  };
+
+  // Use shared box-shadow logic
+  return handleBoxShadowShared(
+    decl,
+    cssValue,
+    cssValueStartIndex,
+    supportedStylinghooks,
+    reportProps,
+    messages,
+    eslintReportFn,
+    makeFix
+  );
 }
 
 // Color Handler

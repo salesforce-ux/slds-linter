@@ -38,12 +38,19 @@ export const forEachDensifyValue = (
 
 export function normalizeLengthValue(value: string | undefined): string {
   if (!value) return '';
+  
+  // Convert 0 to 0px for consistency
   if (value === '0') return '0px';
+  
+  // If it already has a unit, return as is
   if (/^-?\d+(\.\d+)?(px|em|rem|ch|ex|vh|vw|vmin|vmax|%)$/.test(value)) {
       return value;
   }
+  
+  // If it's a number without unit, assume px
   if (/^-?\d+(\.\d+)?$/.test(value)) {
       return value + 'px';
   }
+  
   return value;
 } 
