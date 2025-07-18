@@ -2,9 +2,6 @@
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import valueParser from 'postcss-value-parser';
 import {
-  parseBoxShadowValue,
-  isBoxShadowMatch,
-  BoxShadowValue,
   findClosestColorHook,
   convertToHex,
   forEachColorValue,
