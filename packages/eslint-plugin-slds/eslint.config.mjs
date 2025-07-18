@@ -7,6 +7,5 @@ export default defineConfig([
       "@salesforce-ux/slds": slds,
     },
     extends: ["@salesforce-ux/slds/recommended"]
-    //defineConfig() helper helps which config to use internally.
   },
 ]);
