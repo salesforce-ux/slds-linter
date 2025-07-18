@@ -22,7 +22,7 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
 });
 
 
-function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) {
+const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity = severityLevel as RuleSeverity}={}) => {
   return (root: Root, result: PostcssResult) => {
     
     const deprecatedClassesSet = new Set(deprecatedClasses);
@@ -51,4 +51,11 @@ function rule(primaryOptions: boolean, {severity = severityLevel as RuleSeverity
   };
 }
 
-export default createPlugin(ruleName, rule as unknown as Rule);
+ruleFunction.ruleName = ruleName;
+ruleFunction.messages = messages;
+ruleFunction.meta = {
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-slds-classes',
+  fixable: false
+};
+
+export default createPlugin(ruleName, <stylelint.Rule>ruleFunction);
