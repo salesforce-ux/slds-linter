@@ -7,7 +7,7 @@
     "build/**",
     "README.md",
     "RULES.MD",
-    ".stylelintrc.yml"
+    ".stylelintrc.mjs"
   ],
   "scripts": {
     "test": "NODE_OPTIONS=\"--experimental-vm-modules\" npx jest",
@@ -16,7 +16,7 @@
     "dev": "gulp dev"
   },
   "dependencies": {
-    "@salesforce-ux/sds-metadata": "^0.2.4",
+    "@salesforce-ux/sds-metadata": "^0.3.0",
     "chroma-js": "^3.1.2"
   },
   "devDependencies": {
