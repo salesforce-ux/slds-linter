@@ -6,7 +6,8 @@ import {
   matchesCssProperty,
   forEachDensifyValue,
   isDensifyValue,
-  isFontProperty
+  isFontProperty,
+  replacePlaceholders
 } from 'slds-shared-utils';
 import {
   handleBoxShadow,
@@ -58,12 +59,12 @@ export function createNoHardcodedValueEslintRule({
           const isFontProp = isFontProperty(cssProperty, cssValue);
 
           const eslintReportFn = createEslintReportFnFromNode(context, node, sourceCode);
-          // Create simple message functions for ESLint
+          // Create proper message functions using replacePlaceholders like stylelint plugin
           const messages = {
             rejected: (oldValue: string, newValue: string) =>
               newValue && newValue.trim()
-                ? warningMsg.replace('${oldValue}', oldValue).replace('${newValue}', newValue)
-                : `Replace the ${oldValue} static value: no replacement styling hook found. (${ruleId})`,
+                ? replacePlaceholders(warningMsg, { oldValue, newValue })
+                : `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
             suggested: (oldValue: string) =>
               `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
           };
@@ -82,8 +83,8 @@ export function createNoHardcodedValueEslintRule({
           } else if (cssProperty === 'box-shadow') {
             handleBoxShadow(adaptedDecl, cssValue, cssValueStartIndex, valueToStylinghook, {}, messages, eslintReportFn);
           }
-        },
+        }
       };
-    },
+    }
   };
 } 

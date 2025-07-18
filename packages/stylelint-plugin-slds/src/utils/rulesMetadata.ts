@@ -1,5 +1,4 @@
-// Import rulesMetadata directly instead of loading from a file
-import rulesData from './rules';
+import { rulesMetadata } from 'slds-shared-utils';
 
 // Define the structure of the rules
 export interface Rule {
@@ -21,7 +20,7 @@ class RuleManager {
   private rules: Rules;
 
   private constructor() {
-    this.rules = rulesData; // Directly use imported rulesMetadata
+    this.rules = rulesMetadata; // Directly use imported rulesMetadata
   }
 
   // Method to get the singleton instance

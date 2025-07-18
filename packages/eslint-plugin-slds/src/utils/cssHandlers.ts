@@ -12,8 +12,7 @@ import {
   FontValue,
   isKnownFontWeight,
   parseFont,
-  isFunctionNode,
-  handleBoxShadowShared
+  isFunctionNode
 } from 'slds-shared-utils';
 
 // Helper to robustly get the range for fixer.replaceTextRange
@@ -44,37 +43,40 @@ export function handleBoxShadow(
   messages: any,
   reportFn: Function
 ) {
-  return handleBoxShadowShared(
-    decl,
-    cssValue,
-    cssValueStartIndex,
-    supportedStylinghooks,
-    reportProps,
-    messages,
-    (reportObjOrNode: any, closestHooks: string[], value: string, fix: any) => {
-      // Always provide a fix function if possible, using the original full value as fallback
-      const fixFn = (fixer: any, sourceCode: any) => {
+  const shadowHooks = Object.entries(supportedStylinghooks)
+    .filter(([_, value]) => value.some((hook) => hook.properties.includes('box-shadow')))
+    .map(([key, value]) => [key, value.map((hook) => hook.name)]);
+
+  const parsedCssValue = parseBoxShadowValue(cssValue);
+  if (!parsedCssValue) return;
+
+  for (const [shadow, closestHooks] of shadowHooks) {
+    const parsedValueHook = parseBoxShadowValue(shadow as string);
+    if (parsedValueHook && isBoxShadowMatch(parsedCssValue, parsedValueHook)) {
+      const fix = (fixer: any, sourceCode: any) => {
         const range = decl.value.range;
         if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
           return null;
         }
         return fixer.replaceTextRange(
           range,
-          `var(${closestHooks[0]}, ${cssValue})`
+          `var(${(closestHooks as string[])[0]}, ${cssValue})`
         );
       };
-      reportFn({
-        node: reportObjOrNode,
-        message: messages && messages.rejected ? messages.rejected(value, Array.isArray(closestHooks) ? closestHooks.join(', ') : closestHooks) : 'Replace static value with SLDS styling hook.',
-        index: cssValueStartIndex,
-        endIndex: cssValueStartIndex + (typeof value === 'string' ? value.length : 0),
-        fix: fixFn,
-        ...reportProps
-      });
-    },
-    // The makeFix function is not used for ESLint, as we provide fixFn above
-    () => undefined
-  );
+      
+      if ((closestHooks as string[]).length > 0) {
+        reportFn({
+          node: decl,
+          message: messages && messages.rejected ? messages.rejected(cssValue, Array.isArray(closestHooks) ? closestHooks.join(', ') : closestHooks) : 'Replace static value with SLDS styling hook.',
+          index: cssValueStartIndex,
+          endIndex: cssValueStartIndex + cssValue.length,
+          fix: fix,
+          ...reportProps
+        });
+      }
+      return;
+    }
+  }
 }
 
 // Color Handler
