@@ -17,6 +17,7 @@ temp-verify/
 *.tgz
 *.csv
 
+
 # IDE and editor files
 .idea/
 .vscode/
@@ -47,3 +48,6 @@ logs/
 # SARIF files
 slds-linter-report.csv
 sarif-validation-report.html
+
+# Generated files
+**/.stylelintrc.mjs

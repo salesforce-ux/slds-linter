@@ -39,7 +39,7 @@
   "dependencies": {
     "@html-eslint/eslint-plugin": "^0.34.0",
     "@html-eslint/parser": "^0.34.0",
-    "@salesforce-ux/sds-metadata": "^0.2.4"
+    "@salesforce-ux/sds-metadata": "^0.3.0"
   },
   "peerDependencies": {
     "eslint": "^8.0.0 || ^9.0.0"
