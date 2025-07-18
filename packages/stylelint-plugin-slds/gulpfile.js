@@ -3,6 +3,7 @@ import { esbuildPluginFilePathExtensions } from "esbuild-plugin-file-path-extens
 import { series, watch } from 'gulp';
 import { task } from "gulp-execa";
 import { rimraf } from 'rimraf';
+import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 
 const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE!=='release';
 
@@ -18,6 +19,28 @@ function cleanDirs(){
   * Compile typescript files
   * */ 
 const compileTs = async ()=>{
+  const isInternal = process.env.TARGET_PERSONA === 'internal';
+  
+  const plugins = [
+    esbuildPluginFilePathExtensions({
+      esmExtension:"js"
+    })
+  ];
+  
+  if (isInternal) {
+    plugins.unshift(
+      conditionalReplacePlugin({
+        filter: /\.ts$/,
+        replacements: [
+          {
+            search: /from\s+['"]@salesforce-ux\/sds-metadata['"]/g,
+            replace: "from '@salesforce-ux/sds-metadata/preview'"
+          }
+        ]
+      })
+    );
+  }
+  
   await esbuild.build({
     entryPoints: ["./src/**/*.ts"],
     bundle:true,
@@ -26,9 +49,7 @@ const compileTs = async ()=>{
     format:"esm",
     packages:'external',
     sourcemap:ENABLE_SOURCE_MAPS,
-    plugins:[esbuildPluginFilePathExtensions({
-      esmExtension:"js"
-    })]
+    plugins
   })
 };
 

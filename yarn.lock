@@ -2922,6 +2922,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"esbuild-plugin-conditional-replace@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "esbuild-plugin-conditional-replace@npm:0.1.0"
+  peerDependencies:
+    esbuild: ">=0.14.0"
+  checksum: 10c0/c8552a110f2700562577282e1e679d6c2eff28e642d84c7bc8e8c2cb74c58d21be07511a5dbb6a806739fec2079910dbb0223b5c9e58a5fd2ecc4cc85aad47e0
+  languageName: node
+  linkType: hard
+
 "esbuild-plugin-file-path-extensions@npm:^2.1.4":
   version: 2.1.4
   resolution: "esbuild-plugin-file-path-extensions@npm:2.1.4"
@@ -6726,6 +6735,7 @@ __metadata:
     clean-pkg-json: "npm:^1.2.0"
     conventional-commits-parser: "npm:^3.0.0"
     esbuild: "npm:^0.25.0"
+    esbuild-plugin-conditional-replace: "npm:^0.1.0"
     esbuild-plugin-file-path-extensions: "npm:^2.1.4"
     finalhandler: "npm:^2.1.0"
     glob: "npm:^11.0.1"

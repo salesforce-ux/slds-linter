@@ -59,6 +59,7 @@ async function checkExistingTag(version) {
 async function incrementPreReleaseVersion(baseVersion, type) {
   let version = baseVersion;
   let increment = 0;
+  
 
   while (await checkExistingTag(`${version}-${type}.${increment}`)) {
     increment++;
@@ -88,6 +89,10 @@ async function updatePackageVersions(version, workspaceInfo) {
 
     await fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
   }
+  // Install dependencies to update the yarn.lock file
+  execSync(`yarn install`, {
+    stdio: 'inherit'
+  });
 }
 
 async function gitOperations(version) {
@@ -246,6 +251,25 @@ async function main() {
           },
         },
         {
+          title:"Prompt for target persona",
+          task: async (ctx, task) => {
+            const prompt = task.prompt(ListrInquirerPromptAdapter);
+            const targetPersona = await prompt.run(select, {
+              message: "Select target persona:",
+              choices: [
+                { name: "Internal", value: "internal" },
+                { name: "External", value: "external" },  
+              ],
+              default: "internal",
+            });
+
+            if (!targetPersona) {
+              throw new Error("Input valid target persona. Skipping release.");
+            }
+            ctx.targetPersona = targetPersona;
+          },
+        },
+        {
           title: "Prompt for version and release type",
           task: async (ctx, task) => {
             const prompt = task.prompt(ListrInquirerPromptAdapter);
@@ -260,14 +284,14 @@ async function main() {
             }
 
             const releaseType = await prompt.run(select, {
-              message: "Select release type:",
-              choices: [
-                { name: "Final", value: "final" },
-                { name: "Alpha", value: "alpha" },
-                { name: "Beta", value: "beta" },
-              ],
-              default: "final",
-            });
+                message: "Select release type:",
+                choices: [
+                  { name: "Final", value: "final" },
+                  { name: "Alpha", value: "alpha" },
+                  { name: "Beta", value: "beta" },
+                ],
+                default: "final",
+              });
 
             if (!releaseType) {
               throw new Error("Input valid release type. Skipping release.");
@@ -281,9 +305,11 @@ async function main() {
           title: "Handle version generation",
           task: async (ctx) => {
             ctx.finalVersion = ctx.version;
+            const suffix = ctx.targetPersona === "external" ? "" : `-${ctx.targetPersona}`;
+            const version = ctx.version + suffix;
             if (ctx.releaseType !== "final") {
               ctx.finalVersion = await incrementPreReleaseVersion(
-                ctx.version,
+                version,
                 ctx.releaseType
               );
             }
@@ -307,7 +333,11 @@ async function main() {
         {
           title: "Building workspace",
           task: async (ctx) => {
-            execSync(`CLI_BUILD_MODE=release yarn build`, {
+            const envVar = ["CLI_BUILD_MODE=release"];
+            if(ctx.targetPersona !== "external") {
+              envVar.push(`TARGET_PERSONA=${ctx.targetPersona}`);
+            }           
+            execSync(`${envVar.join(" ")} yarn build`, {
               stdio: 'inherit'
             });
           },
