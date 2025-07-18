@@ -1306,7 +1306,7 @@ __metadata:
   dependencies:
     "@html-eslint/eslint-plugin": "npm:^0.34.0"
     "@html-eslint/parser": "npm:^0.34.0"
-    "@salesforce-ux/sds-metadata": "npm:^0.2.4"
+    "@salesforce-ux/sds-metadata": "npm:^0.3.0"
     "@types/eslint": "npm:^8.56.0"
     "@types/jest": "npm:^29.5.14"
     jest: "npm:^29.7.0"
@@ -1319,10 +1319,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/sds-metadata@npm:^0.2.4":
-  version: 0.2.4
-  resolution: "@salesforce-ux/sds-metadata@npm:0.2.4"
-  checksum: 10c0/159555e2ae5b59ed9cbc4fa9f2010e466ca6d9e6fe820779fe2212fc63be6c6e4698952b6de2a386d8827ca57c145842ccfcd46ea8d1013bb5c754dba287d363
+"@salesforce-ux/sds-metadata@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@salesforce-ux/sds-metadata@npm:0.3.0"
+  checksum: 10c0/eb2d5934ded5356ea07d88b93fa78d6175e36ec2d572f109a928a3557c90fda2b85a97123f1cfbae0c0032f481af22418a5161d1e4ae64f11aadbb967ff4f5ab
   languageName: node
   linkType: hard
 
@@ -1357,7 +1357,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds"
   dependencies:
-    "@salesforce-ux/sds-metadata": "npm:^0.2.4"
+    "@salesforce-ux/sds-metadata": "npm:^0.3.0"
     "@types/jest": "npm:^29.5.14"
     "@types/postcss-plugins": "npm:1.13.2"
     chroma-js: "npm:^3.1.2"

@@ -51,6 +51,28 @@ const compileTs = async ()=>{
     sourcemap:ENABLE_SOURCE_MAPS,
     plugins
   })
+
+  //use esbuild to generate .stylelintrc.mjs from stylelint.config.mjs
+  // out file name should be .stylelintrc.mjs
+  await esbuild.build({
+    entryPoints: ["./stylelint.config.mjs"],
+    bundle:true,
+    outfile:".stylelintrc.mjs",
+    platform: "node",
+    format:"esm",
+    packages:'external',
+    plugins: isInternal ? [
+      conditionalReplacePlugin({
+        filter: /\.mjs$/,
+        replacements: [
+          {
+            search: /import\s+rules\s+from\s+['"]\.\/stylelint\.rules\.json['"]/g,
+            replace: "import rules from './stylelint.rules.internal.json'"
+          }
+        ]
+      })
+    ] : []
+  })
 };
 
 /**
