@@ -71,7 +71,7 @@ export function handleBoxShadow(
       }
       return fixer.replaceTextRange(
         range,
-        `var(${closestHooks[0]}, ${value})`
+        `var(${closestHooks[0]}, ${decl.value.value})`
       );
     };
   };

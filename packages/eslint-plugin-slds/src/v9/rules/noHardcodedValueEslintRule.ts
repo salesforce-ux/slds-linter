@@ -58,30 +58,38 @@ export function createNoHardcodedValueEslintRule({
           const isDensiProp = matchesCssProperty(densificationProperties, cssProperty);
           const isFontProp = isFontProperty(cssProperty, cssValue);
 
-          const eslintReportFn = createEslintReportFnFromNode(context, node, sourceCode);
-          // Create proper message functions using replacePlaceholders like stylelint plugin
-          const messages = {
-            rejected: (oldValue: string, newValue: string) =>
-              newValue && newValue.trim()
-                ? replacePlaceholders(warningMsg, { oldValue, newValue })
-                : `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
-            suggested: (oldValue: string) =>
-              `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
-          };
+          if (cssValue && parsedValue) {
+            // Skip if the value is already a CSS variable to prevent circular fixes
+            // Handle both "var(...)" and just "var" (when parsed as individual tokens)
+            if (cssValue.trim().startsWith('var(') || cssValue.trim() === 'var') {
+              return;
+            }
 
-          // The adapter is responsible for robust value range calculation
-          const adaptedDecl = adaptEslintDeclarationToPostcss(node, cssValue, undefined, sourceCode);
+            const eslintReportFn = createEslintReportFnFromNode(context, node, sourceCode);
+            // Create proper message functions using replacePlaceholders like stylelint plugin
+            const messages = {
+              rejected: (oldValue: string, newValue: string) =>
+                newValue && newValue.trim()
+                  ? replacePlaceholders(warningMsg, { oldValue, newValue })
+                  : `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
+              suggested: (oldValue: string) =>
+                `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
+            };
 
-          if (isColorProp) {
-            handleColorProps(adaptedDecl, parsedValue, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
-          } else if (isDensiProp) {
-            forEachDensifyValue(parsedValue, (valueNode: any) => {
-              handleDensityPropForNode(adaptedDecl, valueNode, valueNode.value, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
-            });
-          } else if (isFontProp) {
-            handleFontProps(adaptedDecl, parsedValue, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
-          } else if (cssProperty === 'box-shadow') {
-            handleBoxShadow(adaptedDecl, cssValue, cssValueStartIndex, valueToStylinghook, {}, messages, eslintReportFn);
+            // The adapter is responsible for robust value range calculation
+            const adaptedDecl = adaptEslintDeclarationToPostcss(node, cssValue, undefined, sourceCode);
+
+            if (isColorProp) {
+              handleColorProps(adaptedDecl, parsedValue, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
+            } else if (isDensiProp) {
+              forEachDensifyValue(parsedValue, (valueNode: any) => {
+                handleDensityPropForNode(adaptedDecl, valueNode, valueNode.value, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
+              });
+            } else if (isFontProp) {
+              handleFontProps(adaptedDecl, parsedValue, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
+            } else if (cssProperty === 'box-shadow') {
+              handleBoxShadow(adaptedDecl, cssValue, cssValueStartIndex, valueToStylinghook, {}, messages, eslintReportFn);
+            }
           }
         }
       };
