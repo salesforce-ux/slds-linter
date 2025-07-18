@@ -44,12 +44,7 @@ export function registerLintCommand(program: Command): void {
         }
 
         // Use Node API to perform the linting
-        const lintResults = await lint({
-          directory: normalizedOptions.directory,
-          fix: normalizedOptions.fix,
-          configStylelint: normalizedOptions.configStylelint,
-          configEslint: normalizedOptions.configEslint
-        });
+        const lintResults = await lint(normalizedOptions);
 
         // Print detailed lint results only for files with issues
         printLintResults(lintResults, normalizedOptions.editor);

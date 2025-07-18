@@ -31,6 +31,13 @@ export interface ReportConfig extends BaseConfig {
   format?: 'sarif' | 'csv';
 }
 
+export interface LintRunnerOptions {
+  fix?: boolean;
+  configPath?: string;
+  maxWorkers?: number;
+  timeoutMs?: number;
+}
+
 export interface LintResultEntry {
   line: number;
   column: number;
