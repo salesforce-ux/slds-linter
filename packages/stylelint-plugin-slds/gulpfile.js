@@ -23,9 +23,15 @@ const compileTs = async ()=>{
     bundle:true,
     outdir:"build",
     platform: "node",
-    format:"esm",
-    packages:'external',
-    sourcemap:ENABLE_SOURCE_MAPS,
+    format: "esm",
+    preserveSymlinks: false, // Follow symlinks and bundle workspace packages
+    absWorkingDir: process.cwd(), // Set working directory for resolution
+    nodePaths: ["../../node_modules"], // Help find workspace packages
+    metafile: true,
+    minify: false,
+    treeShaking: true,
+    external: ["stylelint", "postcss", "postcss-selector-parser", "@salesforce-ux/sds-metadata"], // External deps for stylelint plugin but bundle slds-shared-utils and postcss-value-parser
+    sourcemap: ENABLE_SOURCE_MAPS,
     plugins:[esbuildPluginFilePathExtensions({
       esmExtension:"js"
     })]
@@ -36,9 +42,9 @@ const compileTs = async ()=>{
   * ESBuild bydefault won't generate definition file. There are multiple ways 
   * to generate definition files. But we are reliying on tsc for now
   * */ 
-const generateDefinitions = task('tsc --project tsconfig.json');
+// const generateDefinitions = task('tsc --project tsconfig.json --emitDeclarationOnly');
 
-export const build = series(cleanDirs, compileTs, generateDefinitions);
+export const build = series(cleanDirs, compileTs); // Skip TypeScript declarations for now due to path resolution issues
 
 const watchChanges = ()=>{
   watch(["./src/**/*.ts"], function(cb) {

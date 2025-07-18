@@ -6,12 +6,12 @@ import { isTargetProperty } from '../../utils/prop-utills';
 import { handleBoxShadow } from './handlers/boxShadowHandler';
 import { handleColorProps } from './handlers/colorHandler';
 import { handleDensityPropForNode } from './handlers/densityHandler';
-import { toRuleMessages } from '../../utils/rule-message-utils';
-import { colorProperties, densificationProperties, matchesCssProperty } from '../../utils/property-matcher';
+import { toRuleMessages } from '../../utils/ruleMessageUtils';
+import { colorProperties, densificationProperties, matchesCssProperty } from 'slds-shared-utils';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { handleFontProps } from './handlers/fontHandler';
-import { forEachDensifyValue } from '../../utils/density-utils';
-import { isFontProperty } from '../../utils/fontValueParser';
+import { forEachDensifyValue } from 'slds-shared-utils';
+import { isFontProperty } from 'slds-shared-utils';
 
 const { createPlugin } = stylelint;
 

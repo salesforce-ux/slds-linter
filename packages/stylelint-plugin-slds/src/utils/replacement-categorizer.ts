@@ -7,7 +7,7 @@ export enum ReplacementCategory {
     SPACE_SEPARATED = 'SPACE_SEPARATED'
 }
 
-import { containsCssFunction } from './css-functions';
+import { containsCssFunction } from 'slds-shared-utils';
 
 /**
  * Categorizes a replacement value from lwc-to-slds.json

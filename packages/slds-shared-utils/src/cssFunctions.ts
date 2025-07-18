@@ -18,9 +18,7 @@ const CSS_FUNCTIONS = [
   'var'
 ];
 
-
 const CSS_MATH_FUNCTIONS = ['calc', 'min', 'max'];
-
 
 const RGB_COLOR_FUNCTIONS = ['rgb', 'rgba', 'hsl', 'hsla'];
 
@@ -30,9 +28,7 @@ const RGB_COLOR_FUNCTIONS = ['rgb', 'rgba', 'hsl', 'hsla'];
  */
 const cssFunctionsRegex = new RegExp(`(?:${CSS_FUNCTIONS.join('|')})`);
 
-
 const cssFunctionsExactRegex = new RegExp(`^(?:${CSS_FUNCTIONS.join('|')})$`);
-
 
 const cssMathFunctionsRegex = new RegExp(`^(?:${CSS_MATH_FUNCTIONS.join('|')})$`);
 

@@ -1,6 +1,6 @@
 import { createNoHardcodedValueEslintRule } from './noHardcodedValueEslintRule';
 import metadata from '@salesforce-ux/sds-metadata';
-import rulesMetadata from '../../utils/rulesMetadata';
+import { rulesMetadata } from 'slds-shared-utils';
 
 export default createNoHardcodedValueEslintRule({
   ruleId: 'slds/no-hardcoded-values-slds1',

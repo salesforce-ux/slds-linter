@@ -4,7 +4,7 @@ import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import { getClassNodesAtEnd } from '../../utils/selector-utils';
-import replacePlaceholders from '../../utils/util';
+import { replacePlaceholders } from 'slds-shared-utils';
 const { utils, createPlugin }: typeof stylelint = stylelint;
 const sldsClasses = metadata.sldsPlusClasses;
 

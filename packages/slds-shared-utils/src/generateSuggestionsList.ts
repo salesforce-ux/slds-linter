@@ -1,5 +1,5 @@
 // Helper function to format suggestions as a well-aligned table
-export default function generateSuggestionsList(suggestions: any[]): string {
+export function generateSuggestionsList(suggestions: any[]): string {
 
   if(suggestions.length==1){
     return `${suggestions[0]}`;
@@ -7,4 +7,4 @@ export default function generateSuggestionsList(suggestions: any[]): string {
 
   // Loop through suggestions and append each class and confidence as a list item
   return '\n'+suggestions.map((suggestion, index) => `${index + 1}. ${suggestion}`).join('\n');
-}
+} 

@@ -1,13 +1,17 @@
 // Shared CSS value handlers for ESLint plugin (decoupled from stylelint)
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import valueParser from 'postcss-value-parser';
-import { makeReportMatchingHooks } from './reportUtilsGeneric';
-import { parseBoxShadowValue, isBoxShadowMatch, BoxShadowValue } from './boxShadowValueParser';
-import { findClosestColorHook, convertToHex } from './colorLibUtils';
-import { forEachColorValue } from './colorUtils';
-import { getStylingHooksForDensityValue } from './stylingHookUtils';
-import { FontValue, isKnownFontWeight, parseFont } from './fontValueParser';
-import { isFunctionNode } from './declUtils';
+import {
+  findClosestColorHook,
+  convertToHex,
+  forEachColorValue,
+  getStylingHooksForDensityValue,
+  FontValue,
+  isKnownFontWeight,
+  parseFont,
+  isFunctionNode,
+  handleBoxShadowShared
+} from 'slds-shared-utils';
 
 // Helper to robustly get the range for fixer.replaceTextRange
 function getNodeRange(node: any, declValueRange: [number, number]) {
@@ -27,7 +31,41 @@ function getNodeRange(node: any, declValueRange: [number, number]) {
   return declValueRange;
 }
 
-// Box Shadow Handler
+/**
+ * Generic ESLint v9 report utility that follows the pattern:
+ * closestHooks.length === 1 ? fix : null
+ * 
+ * Only provides auto-fix when there's exactly one suggestion to avoid ambiguity.
+ */
+function createEslintReportWithConditionalFix(
+  reportFn: Function,
+  messages: any,
+  reportProps: Partial<any>
+) {
+  return (
+    node: any,
+    closestHooks: string[],
+    cssValue: string,
+    cssValueStartIndex: number,
+    fixFactory?: () => any
+  ) => {
+    // ESLint v9 pattern: only provide fix when there's exactly one suggestion
+    const fix = (closestHooks.length === 1 && fixFactory) ? fixFactory() : null;
+
+    reportFn({
+      node,
+      message: messages && messages.rejected ? 
+        messages.rejected(cssValue, closestHooks.join(', ')) : 
+        'Replace static value with SLDS styling hook.',
+      index: cssValueStartIndex,
+      endIndex: cssValueStartIndex + cssValue.length,
+      fix: fix,
+      ...reportProps
+    });
+  };
+}
+
+// Box Shadow Handler - uses shared logic with proper ESLint context
 export function handleBoxShadow(
   decl: any, // ESLint/PostCSS-like decl
   cssValue: string,
@@ -37,41 +75,58 @@ export function handleBoxShadow(
   messages: any,
   reportFn: Function
 ) {
-  const reportMatchingHooks = makeReportMatchingHooks(reportFn);
-  const shadowHooks = Object.entries(supportedStylinghooks).filter(([_, value]) => {
-    return value.some((hook) => hook.properties.includes('box-shadow'));
-  }).map(([key, value]) => [key, value.map((hook) => hook.name)]);
-  const parsedCssValue = parseBoxShadowValue(decl.value.value);
-  if(!parsedCssValue){
-    return;
-  }
-  for(const [shadow, closestHooks] of shadowHooks){
-    const parsedValueHook = parseBoxShadowValue(shadow as string);
-    if (parsedValueHook && isBoxShadowMatch(parsedCssValue, parsedValueHook)) {
-      const fix = (fixer: any, sourceCode: any) => {
-        // Defensive: Only apply fix if range is valid
-        const range = decl.value.range;
-        if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
-          return null;
-        }
-        return fixer.replaceTextRange(
-          range,
-          `var(${closestHooks[0]}, ${decl.value.value})`
-        );
-      };
-      if (closestHooks.length > 0) {
-        reportMatchingHooks(
-          decl,
-          Array.isArray(closestHooks) ? closestHooks : [closestHooks],
-          cssValueStartIndex,
-          reportProps,
-          messages,
-          fix
-        );
+  // Create generic report function with ESLint v9 pattern: closestHooks.length === 1 ? fix : null
+  const eslintReport = createEslintReportWithConditionalFix(reportFn, messages, reportProps);
+
+  // ESLint-specific reporting function that uses the generic utility
+  const eslintReportFn = (
+    decl: any,
+    closestHooks: string[],
+    cssValueStartIndex: number,
+    reportProps: any,
+    messages: any,
+    fix: any
+  ) => {
+    // Create fix factory
+    const fixFactory = () => (fixer: any, sourceCode: any) => {
+      const range = decl.value.range;
+      if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
+        return null;
       }
-      return;
-    }
-  }
+      return fixer.replaceTextRange(
+        range,
+        `var(${closestHooks[0]}, ${decl.value.value})`
+      );
+    };
+
+    eslintReport(decl, closestHooks, cssValue, cssValueStartIndex, fixFactory);
+  };
+
+  // ESLint-specific fix factory - kept for backward compatibility with shared handler
+  const makeFix = (decl: any, closestHooks: string[], value: string) => {
+    return (fixer: any, sourceCode: any) => {
+      const range = decl.value.range;
+      if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
+        return null;
+      }
+      return fixer.replaceTextRange(
+        range,
+        `var(${closestHooks[0]}, ${decl.value.value})`
+      );
+    };
+  };
+
+  // Use shared box-shadow logic
+  return handleBoxShadowShared(
+    decl,
+    cssValue,
+    cssValueStartIndex,
+    supportedStylinghooks,
+    reportProps,
+    messages,
+    eslintReportFn,
+    makeFix
+  );
 }
 
 // Color Handler
@@ -85,7 +140,9 @@ export function handleColorProps(
   messages: any,
   reportFn: Function
 ) {
-  const reportMatchingHooks = makeReportMatchingHooks(reportFn);
+  // Create generic report function with ESLint v9 pattern: closestHooks.length === 1 ? fix : null
+  const eslintReport = createEslintReportWithConditionalFix(reportFn, messages, reportProps);
+
   forEachColorValue(parsedValue, (node) => {
     const hexValue = convertToHex(node.value);
     if (node.value === 'transparent' || !hexValue) {
@@ -96,8 +153,9 @@ export function handleColorProps(
       supportedStylinghooks,
       cssProperty
     );
-    const fix = (fixer: any, sourceCode: any) => {
-      // Defensive: Only apply fix if range is valid
+
+    // Create fix factory
+    const fixFactory = () => (fixer: any, sourceCode: any) => {
       const range = getNodeRange(node, decl.value.range);
       if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
         return null;
@@ -107,14 +165,8 @@ export function handleColorProps(
         `var(${closestHooks[0]}, ${hexValue})`
       );
     };
-    reportMatchingHooks(
-      node,
-      Array.isArray(closestHooks) ? closestHooks : [closestHooks],
-      cssValueStartIndex,
-      reportProps,
-      messages,
-      fix
-    );
+
+    eslintReport(node, closestHooks, node.value, cssValueStartIndex, fixFactory);
   });
 }
 
@@ -131,31 +183,27 @@ export function handleDensityPropForNode(
   reportFn: Function,
   skipNormalization?: boolean
 ) {
-    const reportMatchingHooks = makeReportMatchingHooks(reportFn);
-    const closestHooks = getStylingHooksForDensityValue(cssValue, supportedStylinghooks, cssProperty);
-    let fix: any;
-    if(closestHooks.length > 0){
-      const replacementValue = `var(${closestHooks[0]}, ${node.value})`;
-      fix =  (fixer: any, sourceCode: any) => {
-        // Defensive: Only apply fix if range is valid
-        const range = getNodeRange(node, decl.value.range);
-        if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
-          return null;
-        }
-        return fixer.replaceTextRange(
-          range,
-          replacementValue
-        );
+  // Create generic report function with ESLint v9 pattern: closestHooks.length === 1 ? fix : null
+  const eslintReport = createEslintReportWithConditionalFix(reportFn, messages, reportProps);
+
+  const closestHooks = getStylingHooksForDensityValue(cssValue, supportedStylinghooks, cssProperty);
+
+  // Create fix factory
+  const fixFactory = () => {
+    const replacementValue = `var(${closestHooks[0]}, ${node.value})`;
+    return (fixer: any, sourceCode: any) => {
+      const range = getNodeRange(node, decl.value.range);
+      if (!Array.isArray(range) || range.length !== 2 || range[0] === range[1]) {
+        return null;
       }
-    }
-    reportMatchingHooks(
-      node,
-      Array.isArray(closestHooks) ? closestHooks : [closestHooks],
-      cssValueStartIndex,
-      reportProps,
-      messages,
-      fix
-    );
+      return fixer.replaceTextRange(
+        range,
+        replacementValue
+      );
+    };
+  };
+
+  eslintReport(node, closestHooks, node.value, cssValueStartIndex, fixFactory);
 }
 
 // Font Handler
@@ -169,7 +217,6 @@ export function handleFontProps(
     messages: any,
     reportFn: Function
 ) {
-    const reportMatchingHooks = makeReportMatchingHooks(reportFn);
     let fontValue: FontValue = {};
     if (cssProperty === 'font-weight') {
         fontValue = {
