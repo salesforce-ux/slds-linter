@@ -14,7 +14,7 @@ const ruleTester = new RuleTester({
   language: 'css/css',
 });
 
-ruleTester.run('no-hardcoded-values', rule, {
+ruleTester.run('no-hardcoded-values-slds1', rule, {
   valid: [
     {
       code: `.example { width: 0; }`,
@@ -39,8 +39,8 @@ ruleTester.run('no-hardcoded-values', rule, {
       filename: 'test.css',
       errors: [{
         message: /Replace the #ff0000 static value with an SLDS 1 styling hook: .*slds-g-color-palette-red-50|slds-g-color-error-base-50|slds-g-color-palette-hot-orange-50|slds-g-color-palette-hot-orange-60/i
-      }],
-      output: `.example { color: var(--slds-g-color-palette-red-50, #ff0000); }`
+      }]
+      // No output property because this has multiple suggestions (4 hooks) - ESLint v9 strict pattern
     },
     {
       code: `.example { font-size: 0.875rem; }`,
@@ -65,8 +65,8 @@ ruleTester.run('no-hardcoded-values', rule, {
       filename: 'test.css',
       errors: [{
         message: /Replace the #123456 static value with an SLDS 1 styling hook: .*slds-g-color-palette-cloud-blue-20|slds-g-color-palette-blue-15|slds-g-color-brand-base-15|slds-g-color-palette-cloud-blue-30|slds-g-color-palette-blue-20/i
-      }],
-      output: `.example { background-color: var(--slds-g-color-palette-cloud-blue-20, #123456); }`
+      }]
+      // No output property because this has multiple suggestions (5 hooks) - ESLint v9 strict pattern
     },
     {
       code: `.example { padding: 20px; }`,
