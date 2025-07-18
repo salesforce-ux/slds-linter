@@ -8,14 +8,8 @@ const ruleName = 'slds/reduce-annotations';
 // Fetch metadata
 const { severityLevel = 'warning', warningMsg = '' } = ruleMetadata(ruleName) || {};
 
-// Mapping of SLDS validator comments to stylelint comments
-const annotationMapping: Record<string, string> = {
-  "@sldsValidatorIgnoreNextLine": "stylelint-disable-next-line",
-  "@sldsValidatorAllow": "stylelint-enable",
-  "@sldsValidatorIgnore": "stylelint-disable"
-};
 
-const annotationList = Object.keys(annotationMapping);
+const annotationList = ["@sldsValidatorIgnoreNextLine", "@sldsValidatorAllow", "@sldsValidatorIgnore"];
 
 // Rule function
 const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
@@ -26,20 +20,13 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
       
       if (matchedAnnotation) {
         utils.report({
-          message: JSON.stringify({message: warningMsg, suggestions:[]}),
+          message: warningMsg,
           node: comment,
           result,
           ruleName,
           severity,
           index: comment.source.start.offset,
-          endIndex: comment.source.end.offset,
-          fix: () => {
-            const stylelintComment = annotationMapping[matchedAnnotation];
-            // Replace the annotation but preserve any rule names that follow
-            const remainingText = commentText.substring(matchedAnnotation.length).trim();
-            const newCommentText = remainingText ? `${stylelintComment} ${remainingText}` : stylelintComment;
-            comment.text = newCommentText;
-          }
+          endIndex: comment.source.end.offset          
         });
       }
     });
@@ -49,7 +36,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
 ruleFunction.ruleName = ruleName;
 ruleFunction.meta = {
   url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#reduce-annotations',
-  fixable: true
+  fixable: false
 };
 
 // Export the plugin
