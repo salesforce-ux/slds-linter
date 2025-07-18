@@ -92,8 +92,8 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
 ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
 ruleFunction.meta = {
-    url: '',
-    fixable: true
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-sldshook-fallback-for-lwctoken',
+  fixable: true
 };
 
 // Export the plugin
