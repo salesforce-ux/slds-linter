@@ -1300,7 +1300,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salesforce-ux/eslint-plugin-slds@npm:^0.3.0, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
+"@salesforce-ux/eslint-plugin-slds@npm:0.3.1-internal-beta.2, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds"
   dependencies:
@@ -1330,8 +1330,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/slds-linter@workspace:packages/cli"
   dependencies:
-    "@salesforce-ux/eslint-plugin-slds": "npm:^0.3.0"
-    "@salesforce-ux/stylelint-plugin-slds": "npm:^0.3.0"
+    "@salesforce-ux/eslint-plugin-slds": "npm:0.3.1-internal-beta.2"
+    "@salesforce-ux/stylelint-plugin-slds": "npm:0.3.1-internal-beta.2"
     "@types/jest": "npm:^29.5.14"
     "@typescript-eslint/eslint-plugin": "npm:^8.36.0"
     "@typescript-eslint/parser": "npm:^8.36.0"
@@ -1353,7 +1353,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/stylelint-plugin-slds@npm:^0.3.0, @salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds":
+"@salesforce-ux/stylelint-plugin-slds@npm:0.3.1-internal-beta.2, @salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/stylelint-plugin-slds@workspace:packages/stylelint-plugin-slds"
   dependencies:
@@ -2919,6 +2919,15 @@ __metadata:
   version: 1.0.0-alpha.8
   resolution: "es-html-parser@npm:1.0.0-alpha.8"
   checksum: 10c0/8858b4127304bdd6f3c70fd550951bbfb39ffcbc90e60da15400a1d6765386b6e4c35207d4c4720120ef45b6a7d1b6bc97f30a464f7ff747f687aa9ac94cae31
+  languageName: node
+  linkType: hard
+
+"esbuild-plugin-conditional-replace@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "esbuild-plugin-conditional-replace@npm:0.1.0"
+  peerDependencies:
+    esbuild: ">=0.14.0"
+  checksum: 10c0/c8552a110f2700562577282e1e679d6c2eff28e642d84c7bc8e8c2cb74c58d21be07511a5dbb6a806739fec2079910dbb0223b5c9e58a5fd2ecc4cc85aad47e0
   languageName: node
   linkType: hard
 
@@ -6726,6 +6735,7 @@ __metadata:
     clean-pkg-json: "npm:^1.2.0"
     conventional-commits-parser: "npm:^3.0.0"
     esbuild: "npm:^0.25.0"
+    esbuild-plugin-conditional-replace: "npm:^0.1.0"
     esbuild-plugin-file-path-extensions: "npm:^2.1.4"
     finalhandler: "npm:^2.1.0"
     glob: "npm:^11.0.1"

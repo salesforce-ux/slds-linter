@@ -13,7 +13,7 @@
     "node": ">=20.18.3"
   },
   "scripts": {
-    "prepare": "husky install",
+    "postinstall": "husky install",
     "preinstall": "./scripts/validate-setup.sh",
     "test": "yarn workspaces foreach -At --jobs 1 run test",
     "build": "yarn workspaces foreach -At  --jobs 1 run build",
@@ -34,6 +34,7 @@
     "clean-pkg-json": "^1.2.0",
     "conventional-commits-parser": "^3.0.0",
     "esbuild": "^0.25.0",
+    "esbuild-plugin-conditional-replace": "^0.1.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
     "finalhandler": "^2.1.0",
     "glob": "^11.0.1",

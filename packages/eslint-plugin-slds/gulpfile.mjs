@@ -3,6 +3,7 @@ import { series, src, dest } from 'gulp';
 import { rimraf} from 'rimraf'
 import {task} from "gulp-execa";
 import pkg from "./package.json" with {type:"json"};
+import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 
 /**
  * Clean all generated folder
@@ -16,6 +17,24 @@ function cleanDirs(){
   * Compile typescript files with version injection
   * */
 const compileTs = async () => {
+  const isInternal = process.env.TARGET_PERSONA === 'internal';
+  
+  const plugins = [];
+  
+  if (isInternal) {
+    plugins.push(
+      conditionalReplacePlugin({
+        filter: /\.ts$/,
+        replacements: [
+          {
+            search: /from\s+['"]@salesforce-ux\/sds-metadata['"]/g,
+            replace: "from '@salesforce-ux/sds-metadata/preview'"
+          }
+        ]
+      })
+    );
+  }
+  
   await esbuild.build({
     entryPoints: ["./src/**/*.ts"],
     bundle: true,
@@ -26,7 +45,8 @@ const compileTs = async () => {
     sourcemap: process.env.NODE_ENV !== 'production',
     define: {
       'process.env.PLUGIN_VERSION': `"${pkg.version}"`
-    }
+    },
+    plugins
   });
 };
 
