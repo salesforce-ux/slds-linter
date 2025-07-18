@@ -4,7 +4,7 @@ import ora from 'ora';
 import chalk from 'chalk';
 import fs from 'fs';
 import { CliOptions } from '../types';
-import { normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
+import { normalizeAndValidatePath, normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
 import { report, lint } from '../executor';
@@ -24,7 +24,8 @@ export function registerReportCommand(program: Command): void {
       try {        
         const normalizedOptions = normalizeCliOptions(options, {
           configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
-          configEslint: DEFAULT_ESLINT_CONFIG_PATH
+          configEslint: DEFAULT_ESLINT_CONFIG_PATH,
+          output: normalizeAndValidatePath(options.output)
         });
 
         if(directory){ // If argument is passed, ignore -d, --directory option
@@ -42,11 +43,7 @@ export function registerReportCommand(program: Command): void {
         const reportFormat = normalizedOptions.format?.toLowerCase() || 'sarif';
         
         // First run linting to get results
-        const lintResults = await lint({
-          directory: normalizedOptions.directory,
-          configStylelint: normalizedOptions.configStylelint,
-          configEslint: normalizedOptions.configEslint
-        });
+        const lintResults = await lint(normalizedOptions);
         
         // Generate report using the lint results
         const reportStream = await report({
