@@ -1,12 +1,15 @@
 import { Declaration } from 'postcss';
 import stylelint from 'stylelint';
-import { generateSuggestionsList } from 'slds-shared-utils';
+import { generateSuggestionsList, reportMatchingHooksStylelint, MessagesObj } from 'slds-shared-utils';
 
-export interface MessagesObj {
-  rejected: (oldValue: string, newValue: string) => string;
-  suggested: (oldValue: string) => string;
-}
+// Re-export for backward compatibility
+export { MessagesObj } from 'slds-shared-utils';
 
+/**
+ * Backward-compatible wrapper for reportMatchingHooks.
+ * 
+ * @deprecated Consider migrating to the shared reportMatchingHooksStylelint function directly.
+ */
 export function reportMatchingHooks(
   valueNode: any,
   suggestions: string[],
@@ -15,38 +18,15 @@ export function reportMatchingHooks(
   messages: MessagesObj,
   fix?: stylelint.FixCallback
 ) {
-  let index = offsetIndex;
-  const value = valueNode.value;
-  let endIndex = offsetIndex + valueNode.value.length;
-  const node = valueNode as any;
-  if ('sourceIndex' in valueNode && 'sourceEndIndex' in valueNode) {
-    index = valueNode.sourceIndex + offsetIndex;
-    endIndex = valueNode.sourceEndIndex + offsetIndex;
-  }
-
-  const reportProps = {
-    node,
-    index,
-    endIndex,
-    ...props,
-  };
-
-  if (suggestions.length > 0) {
-    stylelint.utils.report(<stylelint.Problem>{
-      message: JSON.stringify({
-        message: messages.rejected(value, generateSuggestionsList(suggestions)),
-        suggestions,
-      }),
-      ...reportProps,
-      fix: suggestions.length === 1 ? fix : null,
-    });
-  } else {
-    stylelint.utils.report(<stylelint.Problem>{
-      message: JSON.stringify({
-        message: messages.suggested(value),
-        suggestions: [],
-      }),
-      ...reportProps,
-    });
-  }
+  // Use the new platform-specific function
+  reportMatchingHooksStylelint({
+    valueNode,
+    suggestions,
+    offsetIndex,
+    reportProps: props,
+    messages,
+    stylelintUtils: stylelint.utils,
+    generateSuggestionsList,
+    fixFactory: fix ? () => fix : undefined
+  });
 } 
