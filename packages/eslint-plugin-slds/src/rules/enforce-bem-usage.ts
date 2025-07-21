@@ -1,4 +1,5 @@
 import { findAttr, isAttributesEmpty } from "./utils/node";
+import { ruleMetadata } from "./utils/common-utils";
 import metadata from '@salesforce-ux/sds-metadata';
 const bemMapping = metadata.bemNaming;
 const deprecatedClasses = metadata.deprecatedClasses;
@@ -16,13 +17,16 @@ const isDeprecatedClass = (className : string) => {
   return (deprecatedClasses.includes(className) || deprecatedClasses.includes(bemMapping[className]))
 }
 
+const ruleDesc = ruleMetadata("slds/enforce-bem-usage").ruleDesc;
+//const ruleDesc = "Replace BEM double-dash syntax in class names with single underscore syntax.";
+
 export = {
   meta: {
     type: "problem", // The rule type
     docs: {
       category: "Stylistic Issues",
       recommended: true,
-      description: "Replace BEM double-dash syntax in class names with single underscore syntax.",
+      description: ruleDesc,
       url : "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-bem-usage"
     },
     fixable: "code", // This rule can be fixed automatically
