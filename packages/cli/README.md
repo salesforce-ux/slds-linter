@@ -10,7 +10,7 @@ SLDS Linter checks your Aura and Lightning web components' CSS and markup files 
 
 SLDS Linter is a custom-built linting solution based on open source [Stylelint](https://stylelint.io/) and [ESLint](https://eslint.org/) projects. It supports linting for both types of Lightning components. 
 
-By default, SLDS Linter runs **both** ESLint and Stylelint on style files (CSS, SCSS, etc.) for maximum coverage. This behavior can be controlled programmatically via the `styleLinter` option in the Node API.
+By default, SLDS Linter runs **both** ESLint and Stylelint on style files (CSS, SCSS, etc.) for maximum coverage.
 
 SLDS Linter runs on these types of files.
 
@@ -191,7 +191,6 @@ import { lint, report } from '@salesforce-ux/slds-linter/executor';
 const results = await lint({
   directory: './src',
   fix: false, // Set to true to auto-fix issues where possible
-  styleLinter: 'both', // Run both linters on style files (default)
 });
 
 console.log(`Found ${results.length} files with issues`);
