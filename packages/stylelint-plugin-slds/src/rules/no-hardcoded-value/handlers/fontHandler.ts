@@ -2,10 +2,9 @@ import { Declaration } from "postcss";
 import valueParser from "postcss-value-parser";
 import type { ValueToStylingHooksMapping } from "@salesforce-ux/sds-metadata";
 import stylelint from "stylelint";
-import { MessagesObj } from "../../../utils/report-utils";
+import { FontValue, isKnownFontWeight, parseFont, isFunctionNode } from "slds-shared-utils";
+import { MessagesObj } from "../../../utils/reportUtils";
 import { handleDensityPropForNode } from "./densityHandler";
-import { FontValue, isKnownFontWeight, parseFont } from "../../../utils/fontValueParser";
-import { isFunctionNode } from "../../../utils/decl-utils";
 
 export function handleFontProps(
     decl: Declaration,

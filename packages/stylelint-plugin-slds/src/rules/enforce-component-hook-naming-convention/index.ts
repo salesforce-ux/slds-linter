@@ -1,7 +1,7 @@
 import { Declaration, Root } from 'postcss';
 import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
-import replacePlaceholders from '../../utils/util';
+import { replacePlaceholders } from 'slds-shared-utils';
 import metadata from '@salesforce-ux/sds-metadata';
 const slds1DeprecatedComponentHooks = metadata.slds1DeprecatedComponentHooks;
 

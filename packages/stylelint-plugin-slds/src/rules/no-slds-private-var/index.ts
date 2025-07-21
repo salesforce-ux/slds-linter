@@ -1,7 +1,7 @@
 import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
-import replacePlaceholders from '../../utils/util';
+import { replacePlaceholders } from 'slds-shared-utils';
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 

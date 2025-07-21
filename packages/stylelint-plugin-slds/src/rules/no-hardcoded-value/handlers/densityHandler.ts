@@ -1,8 +1,8 @@
-import { Declaration } from 'postcss';
-import valueParser from 'postcss-value-parser';
 import stylelint from 'stylelint';
-import { getStylingHooksForDensityValue } from '../../../utils/styling-hook-utils';
-import { reportMatchingHooks, MessagesObj } from '../../../utils/report-utils';
+import { Declaration } from 'postcss';
+import { getStylingHooksForDensityValue } from 'slds-shared-utils';
+import { reportMatchingHooks, MessagesObj } from '../../../utils/reportUtils';
+import valueParser from 'postcss-value-parser';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 
 

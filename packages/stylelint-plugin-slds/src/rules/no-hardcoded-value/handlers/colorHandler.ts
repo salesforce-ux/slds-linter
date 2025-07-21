@@ -1,9 +1,8 @@
 import { Declaration } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint from 'stylelint';
-import { findClosestColorHook, convertToHex } from '../../../utils/color-lib-utils';
-import { forEachColorValue } from '../../../utils/color-utils';
-import { reportMatchingHooks, MessagesObj } from '../../../utils/report-utils';
+import { findClosestColorHook, convertToHex, forEachColorValue } from 'slds-shared-utils';
+import { reportMatchingHooks, MessagesObj } from '../../../utils/reportUtils';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 
 export function handleColorProps(

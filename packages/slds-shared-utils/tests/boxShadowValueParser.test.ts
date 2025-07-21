@@ -1,4 +1,7 @@
-import { parseBoxShadowValue } from '../../src/utils/boxShadowValueParser';
+let parseBoxShadowValue: any;
+beforeAll(async () => {
+  ({ parseBoxShadowValue } = await import('../src/boxShadowValueParser'));
+});
 
 describe('boxShadowValueParser', () => {
     describe('parseBoxShadow', () => {

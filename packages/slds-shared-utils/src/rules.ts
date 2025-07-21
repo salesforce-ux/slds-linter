@@ -1,4 +1,4 @@
-const rulesMetadata = {
+export const rulesMetadata = {
   //eslint
   "slds/enforce-bem-usage": {
     name: "slds/enforce-bem-usage", // BEM - Double Dash to BEM Notation

@@ -1,7 +1,7 @@
 import valueParser from 'postcss-value-parser';
-import { isValidColor } from './color-lib-utils';
-import { isCommaDivision, isSpaceDivision, isInsetKeyword, getVarToken, isFunctionNode, isMathFunction } from './decl-utils';
-import { isDensifyValue, normalizeLengthValue } from './density-utils';
+import { isValidColor } from './colorLibUtils';
+import { isCommaDivision, isSpaceDivision, isInsetKeyword, getVarToken, isFunctionNode, isMathFunction } from './declUtils';
+import { isDensifyValue, normalizeLengthValue } from './densityUtils';
 
 export interface BoxShadowValue {
     offsetX?: string;
@@ -27,9 +27,9 @@ function isLengthValue(node: valueParser.Node): boolean {
 }
 
 function extractShadowParts(nodes: valueParser.Node[]): ShadowParts[] {
-    const shadows: ShadowParts[] = []
+    const shadows: ShadowParts[] = [];
     const nodesCount = nodes.length - 1;
-    let shadowParts: ShadowParts;
+    let shadowParts: ShadowParts | undefined;
 
     nodes.forEach((node, index) => {  
         shadowParts = shadowParts || {
@@ -49,7 +49,7 @@ function extractShadowParts(nodes: valueParser.Node[]): ShadowParts[] {
         } 
         // exit condition
         if(index === nodesCount || isCommaDivision(node)){
-            shadows.push(shadowParts);
+            if (shadowParts) shadows.push(shadowParts);
             shadowParts = undefined;
         }
     })
@@ -61,16 +61,8 @@ export function parseBoxShadowValue(value: string): BoxShadowValue[] {
     const shadows: ShadowParts[] = extractShadowParts(parsed.nodes);
 
     return shadows.map((shadow) => {
-        /**
-         * Two, three, or four <length> values.
-            If only two values are given, they are interpreted as <offset-x> and <offset-y> values.
-            If a third value is given, it is interpreted as a <blur-radius>.
-            If a fourth value is given, it is interpreted as a <spread-radius>.
-            Optionally, the inset keyword.
-            Optionally, a <color> value.
-         */
         const shadowValue: BoxShadowValue = {};
-        ['offsetX', 'offsetY', 'blurRadius', 'spreadRadius'].forEach((key, index) => {
+        (['offsetX', 'offsetY', 'blurRadius', 'spreadRadius'] as const).forEach((key, index) => {
             if(shadow.lengthParts.length > index){
                 shadowValue[key] = shadow.lengthParts[index];
             }
@@ -85,32 +77,25 @@ export function parseBoxShadowValue(value: string): BoxShadowValue[] {
     })
 }
 
-
-
 export function isBoxShadowMatch(parsedCssValue: BoxShadowValue[], parsedValueHook: BoxShadowValue[]): boolean {
-    // If the number of shadows doesn't match, they're not equal
     if (parsedCssValue.length !== parsedValueHook.length) {
         return false;
     }
-
-    // Compare each shadow in the array
     for (let i = 0; i < parsedCssValue.length; i++) {
         const cssShadow = parsedCssValue[i];
         const hookShadow = parsedValueHook[i];
-
         if(cssShadow.color !== hookShadow.color ||
             cssShadow.inset !== hookShadow.inset){
             return false;
         }
-
-        // Compare length properties using a loop
-        const lengthProps = ['offsetX', 'offsetY', 'blurRadius', 'spreadRadius'] as const;
+        const lengthProps: (keyof BoxShadowValue)[] = ['offsetX', 'offsetY', 'blurRadius', 'spreadRadius'];
         for (const prop of lengthProps) {
-            if (normalizeLengthValue(cssShadow[prop]) !== normalizeLengthValue(hookShadow[prop])) {
+            const cssVal = typeof cssShadow[prop] === 'string' ? cssShadow[prop] as string : undefined;
+            const hookVal = typeof hookShadow[prop] === 'string' ? hookShadow[prop] as string : undefined;
+            if (normalizeLengthValue(cssVal) !== normalizeLengthValue(hookVal)) {
                 return false;
             }
         }
     }
-
     return true;
-}
+} 
