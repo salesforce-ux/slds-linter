@@ -3,7 +3,7 @@ import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
-import { getClassNodesFromSelector } from '../../utils/selector-utils';
+import { getClassNodesAtEnd } from '../../utils/selector-utils';
 import { replacePlaceholders } from 'slds-shared-utils';
 const { utils, createPlugin }: typeof stylelint = stylelint;
 const sldsClasses = metadata.sldsPlusClasses;
@@ -30,7 +30,7 @@ const ruleFunction: Partial<stylelint.Rule> = (primaryOptions: boolean, { severi
   return (root: Root, result: PostcssResult) => {
 
     root.walkRules((rule) => {
-      const classNodes = getClassNodesFromSelector(rule.selector);
+      const classNodes = getClassNodesAtEnd(rule.selector);
       const offsetIndex = rule.toString().indexOf(rule.selector);
       classNodes.forEach((classNode) => {
         if (!classNode.value.startsWith('slds-') || !sldsSet.has(classNode.value)) {
