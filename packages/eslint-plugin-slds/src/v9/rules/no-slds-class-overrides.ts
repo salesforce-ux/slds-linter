@@ -1,14 +1,10 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
-import { rulesMetadata } from 'slds-shared-utils';
+import { rulesMetadata, replacePlaceholders } from 'slds-shared-utils';
 
 const warningMsg = rulesMetadata['slds/no-slds-class-overrides'].warningMsg;
-const sldsClasses = metadata.sldsClasses;
+const sldsClasses = metadata.sldsPlusClasses; // ← Using correct dataset for parity
 const sldsSet = new Set(sldsClasses);
-
-function replacePlaceholders(str: string, vars: Record<string, string>) {
-  return str.replace(/\$\{(\w+)\}/g, (_, k) => vars[k] || '');
-}
 
 const rule: Rule.RuleModule = {
   meta: {

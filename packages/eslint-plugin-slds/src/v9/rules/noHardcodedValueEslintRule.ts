@@ -20,7 +20,7 @@ import {
   createEslintReportFnFromNode
 } from '../utils/eslint-css-utils';
 import { adaptEslintDeclarationToPostcss } from '../utils/eslint-to-stylelint-adapter';
-import { isTargetProperty } from '../../utils/general';
+import { isTargetProperty } from 'slds-shared-utils';
 
 export function createNoHardcodedValueEslintRule({
   ruleId,
