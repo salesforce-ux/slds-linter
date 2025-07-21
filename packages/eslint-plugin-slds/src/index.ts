@@ -6,14 +6,29 @@ import modalCloseButtonIssue from './rules/modal-close-button-issue';
 import htmlParser from "@html-eslint/parser";
 import noHardcodedValuesSlds1 from './v9/rules/no-hardcoded-values-slds1';
 import noHardcodedValuesSlds2 from './v9/rules/no-hardcoded-values-slds2';
+import noImportantTag from './v9/rules/no-important-tag';
+import noSldsClassOverrides from './v9/rules/no-slds-class-overrides';
 import cssPlugin from "@eslint/css";
 
-const rules = {
+// HTML-specific rules
+const htmlRules = {
   "enforce-bem-usage": enforceBemUsage,
   "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
   "modal-close-button-issue": modalCloseButtonIssue,
+};
+
+// CSS-specific rules (v9 only)
+const styleRules = {
   "no-hardcoded-values-slds1": noHardcodedValuesSlds1,
   "no-hardcoded-values-slds2": noHardcodedValuesSlds2,
+  "no-important-tag": noImportantTag,
+  "no-slds-class-overrides": noSldsClassOverrides,
+};
+
+// Combined rules for the plugin
+const rules = {
+  ...htmlRules,
+  ...styleRules,
 };
 
 const plugin = {
@@ -28,6 +43,7 @@ const plugin = {
 Object.assign(plugin.configs, {
   // Flat config for ESLint v9+
   "flat/recommended": [
+    // HTML and CMP files configuration
     {
       files: ["**/*.html", "**/*.cmp"],
       languageOptions: {
@@ -44,7 +60,7 @@ Object.assign(plugin.configs, {
         "@salesforce-ux/slds/modal-close-button-issue": "error"
       }
     },
-    // CSS/SCSS config
+    // CSS/SCSS files configuration
     {
       files: ["**/*.{css,scss}"],
       language: "css/css",
@@ -56,7 +72,9 @@ Object.assign(plugin.configs, {
       rules: {
         ...cssPlugin.configs.recommended.rules,
         "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
-        "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
+        "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn",
+        "@salesforce-ux/slds/no-important-tag": "warn",
+        "@salesforce-ux/slds/no-slds-class-overrides": "warn"
       }
     },
     {
