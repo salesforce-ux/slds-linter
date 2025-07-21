@@ -42,9 +42,9 @@ const compileTs = async ()=>{
   * ESBuild bydefault won't generate definition file. There are multiple ways 
   * to generate definition files. But we are reliying on tsc for now
   * */ 
-// const generateDefinitions = task('tsc --project tsconfig.json --emitDeclarationOnly');
+const generateDefinitions = task('tsc --project tsconfig.json --emitDeclarationOnly');
 
-export const build = series(cleanDirs, compileTs); // Skip TypeScript declarations for now due to path resolution issues
+export const build = series(cleanDirs, compileTs, generateDefinitions);
 
 const watchChanges = ()=>{
   watch(["./src/**/*.ts"], function(cb) {
