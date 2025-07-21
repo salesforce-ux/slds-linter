@@ -3,7 +3,6 @@ import assert from 'assert';
 
 const ruleName = 'slds/no-slds-class-overrides';
 
-//ToDo: remove once tests migrated to eslint completely
 describe('slds/no-slds-class-overrides rule', () => {
   it('should report an error when overriding .slds- class styles', async () => {
     const css = `
