@@ -3,9 +3,8 @@ import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
-import replacePlaceholders from '../../utils/util';
+import { replacePlaceholders, forEachVarFunction } from 'slds-shared-utils';
 import { isTargetProperty } from '../../utils/prop-utills';
-import { forEachVarFunction } from '../../utils/decl-utils';
 const { utils, createPlugin } = stylelint;
 
 const deprecatedHooks = new Set(metadata.deprecatedStylingHooks);
@@ -107,7 +106,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
 ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
 ruleFunction.meta = {
-  url: '',
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-unsupported-hooks-slds2',
   fixable: false
 };
 

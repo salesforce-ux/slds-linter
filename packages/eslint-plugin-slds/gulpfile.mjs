@@ -2,6 +2,7 @@ import * as esbuild from 'esbuild';
 import { series, src, dest } from 'gulp';
 import { rimraf} from 'rimraf'
 import {task} from "gulp-execa";
+import path from 'path';
 import pkg from "./package.json" with {type:"json"};
 
 /**
@@ -22,7 +23,11 @@ const compileTs = async () => {
     outdir: "build",
     platform: "node",
     format: "cjs",
-    packages: 'external',
+    preserveSymlinks: false, // Follow symlinks and bundle workspace packages
+    absWorkingDir: process.cwd(), // Set working directory for resolution
+    nodePaths: ["../../node_modules"], // Help find workspace packages
+    metafile: true, // Generate metadata for debugging
+    external: ["@html-eslint/parser", "@html-eslint/eslint-plugin", "@eslint/css", "@salesforce-ux/sds-metadata"], // External deps but bundle slds-shared-utils and chroma-js for independence
     sourcemap: process.env.NODE_ENV !== 'production',
     define: {
       'process.env.PLUGIN_VERSION': `"${pkg.version}"`

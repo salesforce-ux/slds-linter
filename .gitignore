@@ -9,6 +9,7 @@ package-lock.json
 # Build output
 dist/
 build/
+site/
 coverage/
 .sldslinter/
 temp-verify/

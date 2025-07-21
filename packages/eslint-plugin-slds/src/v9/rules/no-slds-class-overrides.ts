@@ -1,6 +1,6 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
-import rulesMetadata from '../../utils/rulesMetadata';
+import { rulesMetadata } from 'slds-shared-utils';
 
 const warningMsg = rulesMetadata['slds/no-slds-class-overrides'].warningMsg;
 const sldsClasses = metadata.sldsClasses;
@@ -44,4 +44,4 @@ const rule: Rule.RuleModule = {
   },
 };
 
-module.exports = rule; 
+export default rule; 

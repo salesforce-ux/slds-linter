@@ -10,7 +10,7 @@ SLDS Linter checks your Aura and Lightning web components' CSS and markup files 
 
 SLDS Linter is a custom-built linting solution based on open source [Stylelint](https://stylelint.io/) and [ESLint](https://eslint.org/) projects. It supports linting for both types of Lightning components. 
 
-By default, SLDS Linter runs **both** ESLint and Stylelint on style files (CSS, SCSS, etc.) for maximum coverage. This behavior can be controlled programmatically via the `styleLinter` option in the Node API.
+By default, SLDS Linter runs **both** ESLint and Stylelint on style files (CSS, SCSS, etc.) for maximum coverage.
 
 SLDS Linter runs on these types of files.
 
@@ -104,7 +104,7 @@ These options are available on SLDS Linter commands.
 | `--fix`                  | Automatically fix problems                                                   | `lint`         |
 | `--config-stylelint <path>`  | Path to stylelint config file             | `lint`, `report`|
 | `--config-eslint <path>` | Path to eslint config file                    | `lint`, `report`|
-| `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode | `lint` |
+| `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Auto-detects if not specified | `lint` |
 | `--format <type>`        | Output format (sarif, csv). Defaults to sarif | `report` |
 
 To view help for these options, add `--help` to each command. For example, run `npx @salesforce-ux/slds-linter lint --help` to see which options you can use with `lint`.
@@ -191,7 +191,6 @@ import { lint, report } from '@salesforce-ux/slds-linter/executor';
 const results = await lint({
   directory: './src',
   fix: false, // Set to true to auto-fix issues where possible
-  styleLinter: 'both', // Run both linters on style files (default)
 });
 
 console.log(`Found ${results.length} files with issues`);

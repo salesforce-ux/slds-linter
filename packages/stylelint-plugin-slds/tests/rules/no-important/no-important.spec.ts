@@ -3,7 +3,7 @@ import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 const { lint }: typeof stylelint = stylelint;
 
 //ToDo: remove once tests migrated to eslint completely
-xdescribe('no-important', () => {
+describe('no-important', () => {
   [
     "Avoid using '!important' unless absolutely necessary.",
     "Avoid using '!important' unless absolutely necessary.",

@@ -1,40 +1,11 @@
-import htmlParser from "@html-eslint/parser";
-import cssPlugin from "@eslint/css";
-import sldsPlugin from "@salesforce-ux/eslint-plugin-slds/v9";
+import { defineConfig } from "eslint/config";
+import slds from "@salesforce-ux/eslint-plugin-slds";
 
-export default [
-    {
-        files: ["**/*.html", "**/*.cmp"],
-        languageOptions: {
-            parser: htmlParser,
-            ecmaVersion: 2021,
-            sourceType: "module"
-        },
-        plugins: {
-            "@salesforce-ux/slds": sldsPlugin
-        },
-        rules: {
-            "@salesforce-ux/slds/enforce-bem-usage": "error",
-            "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
-            "@salesforce-ux/slds/modal-close-button-issue": "error"
-        }
+export default defineConfig([
+  {
+    plugins: {
+      "@salesforce-ux/slds": slds,
     },
-    {
-        files: ["**/*.{css,scss}"],
-        language: "css/css",
-        ...cssPlugin.configs.recommended,
-        plugins: {
-            css: cssPlugin,
-            "@salesforce-ux/slds": sldsPlugin
-        },
-        rules: {
-            "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
-            "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn",
-            "@salesforce-ux/slds/no-important-tag": "error",
-            "@salesforce-ux/slds/no-slds-class-overrides": "error"
-        }
-    },
-    {
-        ignores: ["node_modules/"]
-    }
-];
+    extends: ["@salesforce-ux/slds/recommended"]
+  },
+]);

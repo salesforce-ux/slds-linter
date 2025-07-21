@@ -4,7 +4,7 @@ import assert from 'assert';
 const ruleName = 'slds/no-slds-class-overrides';
 
 //ToDo: remove once tests migrated to eslint completely
-xdescribe('slds/no-slds-class-overrides rule', () => {
+describe('slds/no-slds-class-overrides rule', () => {
   it('should report an error when overriding .slds- class styles', async () => {
     const css = `
       .foo {
@@ -31,8 +31,8 @@ xdescribe('slds/no-slds-class-overrides rule', () => {
     const warnings = result.results[0].warnings;
     
     assert.strictEqual(warnings.length, 2);
-    assert.strictEqual(warnings[0].text, `{"message":"Overriding .slds-button isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button","suggestions":[]}`);
-    assert.strictEqual(warnings[1].text, `{\"message\":\"Overriding .slds-textarea isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button\",\"suggestions\":[]}`);
+    assert.strictEqual(warnings[0].text, "Overriding .slds-button isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button (slds/no-slds-class-overrides)");
+    assert.strictEqual(warnings[1].text, "Overriding .slds-textarea isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button (slds/no-slds-class-overrides)");
   });
 
   it('should not report an error when custom classes are used', async () => {
@@ -89,8 +89,8 @@ xdescribe('slds/no-slds-class-overrides rule', () => {
     const warnings = result.results[0].warnings;
     
     assert.strictEqual(warnings.length, 2);
-    assert.strictEqual(warnings[0].text, `{"message":"Overriding .slds-button isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button","suggestions":[]}`);
-    assert.strictEqual(warnings[1].text, `{"message":"Overriding .slds-button-group isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button","suggestions":[]}`);
+    assert.strictEqual(warnings[0].text, "Overriding .slds-button isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button (slds/no-slds-class-overrides)");
+    assert.strictEqual(warnings[1].text, "Overriding .slds-button-group isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button (slds/no-slds-class-overrides)");
   });
 
   it('should not report an error for custom .slds class', async () => {
@@ -122,7 +122,7 @@ xdescribe('slds/no-slds-class-overrides rule', () => {
     const warnings = result.results[0].warnings;
     
     assert.strictEqual(warnings.length, 2);
-    assert.strictEqual(warnings[0].text, `{"message":"Overriding .slds-button isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button","suggestions":[]}`);
-    assert.strictEqual(warnings[1].text, `{"message":"Overriding .slds-button-group isn’t supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button","suggestions":[]}`);
+    assert.strictEqual(warnings[0].text, "Overriding .slds-button isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button (slds/no-slds-class-overrides)");
+    assert.strictEqual(warnings[1].text, "Overriding .slds-button-group isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button (slds/no-slds-class-overrides)");
   });
 });

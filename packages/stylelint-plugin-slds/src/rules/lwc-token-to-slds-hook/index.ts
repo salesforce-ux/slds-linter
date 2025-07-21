@@ -1,11 +1,11 @@
 import metadata from '@salesforce-ux/sds-metadata';
 import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
-import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
+import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
-import replacePlaceholders from '../../utils/util';
+import { replacePlaceholders, forEachVarFunction, getVarFunctionNode } from 'slds-shared-utils';
+import { categorizeReplacement, ReplacementCategory } from '../../utils/replacement-categorizer';
 import { isTargetProperty } from '../../utils/prop-utills';
-import { forEachVarFunction } from '../../utils/decl-utils';
 
 const { createPlugin }: typeof stylelint = stylelint;
 const lwcToSlds = metadata.lwcToSlds;
@@ -22,6 +22,9 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
   replaced: (oldValue: string, newValue: string) =>
     replacePlaceholders(errorMsg, { oldValue, newValue }),
   warning: (oldValue: string) => replacePlaceholders(warningMsg, { oldValue }),
+
+  errorWithReplacement: (oldValue, newValue) =>
+    `The '${oldValue}' design token is deprecated. Replace it with '${newValue}'. For more info, see Global Styling Hooks on lightningdesignsystem.com.`,
 
   errorWithStyleHooks: (oldValue, newValue) =>
     `The '${oldValue}' design token is deprecated. Replace it with the SLDS 2 '${newValue}' styling hook and set the fallback to '${oldValue}'. For more info, see Global Styling Hooks on lightningdesignsystem.com.`,
@@ -41,20 +44,23 @@ function shouldIgnoreDetection(lwcToken: string) {
 
 function getRecommendation(lwcToken: string) {
   const oldValue = lwcToken;
-  const recommendation = lwcToSlds[oldValue].replacement;
-  const hasRecommendation = recommendation && recommendation !== '--';
-  return {hasRecommendation, recommendation};
+  const recommendation = lwcToSlds[oldValue]?.replacement || '';
+  const replacementCategory = categorizeReplacement(recommendation);
+  const hasRecommendation = oldValue in lwcToSlds && replacementCategory !== ReplacementCategory.EMPTY;
+  return {hasRecommendation, recommendation, replacementCategory};
 }
 
-function getReportMessage(cssVar:string, recommendation:string|string[]):string{
+function getReportMessage(cssVar:string, replacementCategory:ReplacementCategory, recommendation:string | string[]):string{
   if (!recommendation) {
     // Found a deprecated token but don't have any alternate recommendation then just report user to follow docs
     return messages.errorWithNoRecommendation(cssVar);
-  } else if(Array.isArray(recommendation)){
-    return messages.errorWithStyleHooks(cssVar, recommendation.join(' or '));   
+  } else if(replacementCategory === ReplacementCategory.ARRAY){
+    return messages.errorWithStyleHooks(cssVar, (<string[]>recommendation).join(' or '));   
+  } else if(replacementCategory === ReplacementCategory.SLDS_TOKEN){
+    return messages.errorWithStyleHooks(cssVar, <string>recommendation);
+  } else {
+    return messages.errorWithReplacement(cssVar, <string>recommendation);
   }
-
-  return messages.errorWithStyleHooks(cssVar, recommendation);
 }
 
 function transformVarFunction(node:valueParser.Node) {
@@ -71,13 +77,19 @@ function transformVarFunction(node:valueParser.Node) {
   const endIndex = cssVarNode.sourceEndIndex;
   let replacement:string;
 
-  let {hasRecommendation, recommendation} = getRecommendation(cssVar);
-  if (hasRecommendation && typeof recommendation ==='string' && recommendation.startsWith('--slds-')){
+  let {hasRecommendation, recommendation, replacementCategory} = getRecommendation(cssVar);
+  
+  if(hasRecommendation){
+    if(replacementCategory === ReplacementCategory.SLDS_TOKEN){
       replacement = hasFallback
       ? `var(${recommendation}, var(${cssVar}, ${valueParser.stringify(functionNode.nodes.slice(2))}))`
       : `var(${recommendation}, var(${cssVar}))`;
+    } else if(replacementCategory !== ReplacementCategory.ARRAY){
+      replacement = recommendation;
+    }
   }
-  return {cssVar, replacement, recommendation, original: valueParser.stringify(node), index, endIndex};
+
+  return { cssVar, replacement, replacementCategory, recommendation, original: valueParser.stringify(node), index, endIndex };
 }
 
 /**
@@ -92,14 +104,20 @@ function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Pr
   forEachVarFunction(decl, (node, startOffset) => {
     const result = transformVarFunction(node);
     if(result){
-      const {cssVar, replacement, recommendation, original, index, endIndex} = result;
+      const {cssVar, replacement, replacementCategory, recommendation, original, index, endIndex} = result;
       
-      const message = getReportMessage(cssVar, recommendation);
+      const message = getReportMessage(cssVar, replacementCategory, recommendation);
       let fix = null;
       
       if(replacement){
         fix = () => {
-          decl.value = decl.value.replace(original, replacement);
+          const functionNode = getVarFunctionNode(decl, original);
+          if(!functionNode){
+            return;
+          }
+          const valueStartIndex = functionNode.sourceIndex;
+          const valueEndIndex = functionNode.sourceEndIndex;
+          decl.value = decl.value.slice(0, valueStartIndex) + replacement + decl.value.slice(valueEndIndex);
         }
       }
       
@@ -135,11 +153,11 @@ function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Pro
     endIndex,
     ...basicReportProps,
   };
-  const {hasRecommendation, recommendation} = getRecommendation(prop);
+  const {hasRecommendation, recommendation, replacementCategory} = getRecommendation(prop);
   // for any raw values, color-mix, calc just recommend as deprecated, suggest only if recommendation is string or array of strings
-  const canSuggest = (hasRecommendation && (Array.isArray(recommendation) || recommendation.startsWith('--slds-')));
-  reportProps.message = getReportMessage(prop, canSuggest?recommendation:null);
-  if(typeof recommendation ==='string' && recommendation.startsWith('--slds-')){
+  const canSuggest = (hasRecommendation && (replacementCategory === ReplacementCategory.SLDS_TOKEN || replacementCategory === ReplacementCategory.ARRAY));
+  reportProps.message = getReportMessage(prop, replacementCategory, canSuggest?recommendation:null);
+  if(replacementCategory === ReplacementCategory.SLDS_TOKEN){
     reportProps.fix = () => {
       decl.prop = recommendation;
     }
@@ -170,7 +188,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
 ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
 ruleFunction.meta = {
-  url: '',
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#lwc-token-to-slds-hook',
   fixable: true
 };
 

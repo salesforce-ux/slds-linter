@@ -2,7 +2,7 @@ import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 import stylelintPluginSlds from '../../../src/index';
 const { lint }: typeof stylelint = stylelint;
 
-xdescribe('no-hardcoded-values-slds2', () => {
+describe('no-hardcoded-values-slds2', () => {
   const ruleName = 'slds/no-hardcoded-values-slds2';
 
   const testCases = [
@@ -112,7 +112,7 @@ xdescribe('no-hardcoded-values-slds2', () => {
           background-color: #ffffff;
         }
       `,
-      expectedMessage: "Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)",
+      expectedMessage: "Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-neutral-base-100\n3. --slds-g-color-brand-base-100\n4. --slds-g-color-error-base-100\n5. --slds-g-color-warning-base-100 (slds/no-hardcoded-values-slds2)",
     },
     {
       description:
@@ -122,7 +122,7 @@ xdescribe('no-hardcoded-values-slds2', () => {
           color: #ffffff;
         }
       `,
-      expectedMessage: "Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)",
+      expectedMessage: "Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-neutral-base-100\n3. --slds-g-color-brand-base-100\n4. --slds-g-color-error-base-100\n5. --slds-g-color-warning-base-100 (slds/no-hardcoded-values-slds2)",
     },
     {
       description:
@@ -132,7 +132,7 @@ xdescribe('no-hardcoded-values-slds2', () => {
           border-color: #fff;
         }
       `,
-      expectedMessage: `Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-brand-base-100\n3. --slds-g-color-error-base-100\n4. --slds-g-color-warning-base-100\n5. --slds-g-color-success-base-100 (slds/no-hardcoded-values-slds2)`,    
+      expectedMessage: `Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-neutral-100\n2. --slds-g-color-neutral-base-100\n3. --slds-g-color-brand-base-100\n4. --slds-g-color-error-base-100\n5. --slds-g-color-warning-base-100 (slds/no-hardcoded-values-slds2)`,    
     },
     {
       description:
@@ -161,7 +161,7 @@ xdescribe('no-hardcoded-values-slds2', () => {
           background-color: #123456;
         }
       `,
-      expectedMessage:`Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-cloud-blue-20\n2. --slds-g-color-palette-blue-15\n3. --slds-g-color-palette-cloud-blue-30\n4. --slds-g-color-palette-blue-20\n5. --slds-g-color-palette-cloud-blue-15 (slds/no-hardcoded-values-slds2)`,
+      expectedMessage:`Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: \n1. --slds-g-color-palette-cloud-blue-20\n2. --slds-g-color-palette-blue-15\n3. --slds-g-color-on-surface-3\n4. --slds-g-color-surface-inverse-2\n5. --slds-g-color-surface-container-inverse-2 (slds/no-hardcoded-values-slds2)`,
     },
     {
       description:
@@ -198,4 +198,4 @@ xdescribe('no-hardcoded-values-slds2', () => {
       }
     });
   });
-}); //ToDo: remove once migrated to eslint completely
+});

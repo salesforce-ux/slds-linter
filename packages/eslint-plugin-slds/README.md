@@ -15,9 +15,7 @@ npm install @salesforce-ux/eslint-plugin-slds --save-dev
 
 ## Configuration
 
-### Default Export (ESLint v8)
-
-The main entry point (`@salesforce-ux/eslint-plugin-slds`) exports the ESLint v8 (legacy config) plugin by default for backward compatibility.
+### ESLint v8 (Legacy Config)
 
 ```javascript
 // .eslintrc.js
@@ -27,78 +25,27 @@ module.exports = {
 };
 ```
 
-### ESLint v9 (Flat Config)
-
-For ESLint v9+ (flat config), import from the explicit v9 entry point:
+### ESLint v9+ (Flat Config)
 
 ```javascript
-// eslint.config.mjs
-const sldsPlugin = require('@salesforce-ux/eslint-plugin-slds/v9');
+// eslint.config.js
+const { defineConfig } = require('eslint/config');
+const sldsPlugin = require('@salesforce-ux/eslint-plugin-slds');
 
-module.exports = [
-  // Use recommended config for HTML/CMP files
-  sldsPlugin.configs.recommended,
-  // Use recommendedCss config for CSS/SCSS files
-  sldsPlugin.configs.recommendedCss,
-];
+module.exports = defineConfig([
+  {
+    plugins: {
+      '@salesforce-ux/slds': sldsPlugin
+    },
+    extends: ['@salesforce-ux/slds/recommended']
+  }
+]);
 ```
 
-#### Use Cases
+## Migration Note
 
-- **HTML/CMP Only:**
-  Use only the `recommended` config if you are linting Lightning Web Components, Aura, or other HTML-based files:
-  ```js
-  module.exports = [
-    sldsPlugin.configs.recommended
-  ];
-  ```
-
-- **CSS/SCSS Only:**
-  Use only the `recommendedCss` config if you are linting only stylesheets:
-  ```js
-  module.exports = [
-    sldsPlugin.configs.recommendedCss
-  ];
-  ```
-
-- **Both HTML and CSS:**
-  Use both configs together for full coverage:
-  ```js
-  module.exports = [
-    sldsPlugin.configs.recommended,
-    sldsPlugin.configs.recommendedCss
-  ];
-  ```
-
-This separation allows you to include only the relevant config(s) for your project, or combine both for full coverage.
-
-### Version-Specific Imports
-
-You can explicitly import version-specific configurations:
-
-```javascript
-// ESLint v9 (flat config)
-const sldsPlugin = require('@salesforce-ux/eslint-plugin-slds/v9');
-
-// ESLint v8 (legacy config)
-import sldsPlugin from '@salesforce-ux/eslint-plugin-slds/v8';
-```
-
-## Package Exports
-
-This package provides multiple entry points:
-
-- **`.`** (default): ESLint v8 plugin (legacy config format)
-- **`./v8`**: ESLint v8 plugin (legacy config format)
-- **`./v9`**: ESLint v9 plugin (flat config format)
-- **`./eslint.config.mjs`**: Pre-configured flat config file
-
-## Peer Dependency: ESLint
-
-This plugin lists `eslint` as a peer dependency. This means:
-- **You must install `eslint` in your project.**
-- You can choose the version (v8 or v9) that matches your project needs.
-- This avoids version conflicts and ensures compatibility.
+> Always import the plugin from the root (`@salesforce-ux/eslint-plugin-slds`).
+> The plugin automatically supports both legacy and flat config systems.
 
 ## Rules
 

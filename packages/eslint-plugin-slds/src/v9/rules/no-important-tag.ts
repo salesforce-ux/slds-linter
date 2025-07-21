@@ -1,5 +1,5 @@
 import { Rule } from 'eslint';
-import rulesMetadata from '../../utils/rulesMetadata';
+import { rulesMetadata } from 'slds-shared-utils';
 
 const warningMsg = rulesMetadata['slds/no-important-tag'].warningMsg;
 
@@ -45,4 +45,4 @@ const rule: Rule.RuleModule = {
   },
 };
 
-module.exports = rule; 
+export default rule; 
