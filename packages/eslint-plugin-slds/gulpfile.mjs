@@ -28,7 +28,7 @@ const compileTs = async () => {
         replacements: [
           {
             search: /from\s+['"]@salesforce-ux\/sds-metadata['"]/g,
-            replace: "from '@salesforce-ux/sds-metadata/preview'"
+            replace: "from '@salesforce-ux/sds-metadata/next'"
           }
         ]
       })

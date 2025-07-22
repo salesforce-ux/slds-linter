@@ -146,8 +146,10 @@ async function generateTarballs(workspaceInfo) {
   return tarballs;
 }
 
-async function publishPackages(tarballs, version, releaseType) {
+async function publishPackages(tarballs, version, releaseType, targetPersona) {
   const tag = releaseType === "final" ? "latest" : releaseType;
+  // all internal packages are published to the internal tag
+  const personaTag = targetPersona === "external" ? tag : `internal${tag==="latest" ? "" : `-${tag}`}`;
   let sldsLinterTarball = "";
 
   for (const { pkgName, tarball, pkgPath } of tarballs) {
@@ -156,7 +158,7 @@ async function publishPackages(tarballs, version, releaseType) {
       console.log(chalk.blue(`Using pre-generated tarball: ${sldsLinterTarball}`));
     }
     execSync(
-      `cd ${pkgPath} && NPM_TOKEN=${process.env.NPM_TOKEN} npm publish --tag ${tag} --access public ${isDryRun || skipNpmPublish ? "--dry-run" : ""}`
+      `cd ${pkgPath} && NPM_TOKEN=${process.env.NPM_TOKEN} npm publish --tag ${personaTag} --access public ${isDryRun || skipNpmPublish ? "--dry-run" : ""}`
     );
     console.log(chalk.green(`Published ${pkgName}@${version}`));
   }
@@ -360,7 +362,8 @@ async function main() {
             ctx.sldsLinterTarball = await publishPackages(
               ctx.tarballs,
               ctx.finalVersion,
-              ctx.releaseType
+              ctx.releaseType,
+              ctx.targetPersona
             );            
           },
         },
