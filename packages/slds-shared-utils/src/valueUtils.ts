@@ -1,4 +1,4 @@
-const valueParser = require('postcss-value-parser');
+import valueParser from 'postcss-value-parser';
 
 /**
  * Checks if a value is a CSS global value.
@@ -53,5 +53,5 @@ export function toAlternateUnitValue(value: string): string {
         alternateValue = `${intValue}px`;
       }
     }
-    return alternateValue || '';
+    return alternateValue;
 } 

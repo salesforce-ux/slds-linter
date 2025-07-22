@@ -7,4 +7,4 @@ export function generateSuggestionsList(suggestions: any[]): string {
 
   // Loop through suggestions and append each class and confidence as a list item
   return '\n'+suggestions.map((suggestion, index) => `${index + 1}. ${suggestion}`).join('\n');
-} 
+}
