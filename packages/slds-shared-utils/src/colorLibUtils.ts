@@ -92,6 +92,7 @@ for (const group of closesthookGroups) {
   }
 }
 
+
   return Array.from(new Set(returnStylingHooks));
 };
 
@@ -104,4 +105,4 @@ for (const group of closesthookGroups) {
  */
 const isValidColor = (val:string):boolean => chroma.valid(val);
 
-export { findClosestColorHook, convertToHex, isHexCode, isHardCodedColor, isValidColor }; 
+export { findClosestColorHook, convertToHex, isHexCode, isHardCodedColor, isValidColor };
