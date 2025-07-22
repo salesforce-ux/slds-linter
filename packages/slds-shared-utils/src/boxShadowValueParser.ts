@@ -27,7 +27,7 @@ function isLengthValue(node: valueParser.Node): boolean {
 }
 
 function extractShadowParts(nodes: valueParser.Node[]): ShadowParts[] {
-    const shadows: ShadowParts[] = [];
+    const shadows: ShadowParts[] = []
     const nodesCount = nodes.length - 1;
     let shadowParts: ShadowParts;
 
@@ -85,7 +85,10 @@ export function parseBoxShadowValue(value: string): BoxShadowValue[] {
     })
 }
 
+
+
 export function isBoxShadowMatch(parsedCssValue: BoxShadowValue[], parsedValueHook: BoxShadowValue[]): boolean {
+    // If the number of shadows doesn't match, they're not equal
     if (parsedCssValue.length !== parsedValueHook.length) {
         return false;
     }
@@ -94,7 +97,7 @@ export function isBoxShadowMatch(parsedCssValue: BoxShadowValue[], parsedValueHo
     for (let i = 0; i < parsedCssValue.length; i++) {
         const cssShadow = parsedCssValue[i];
         const hookShadow = parsedValueHook[i];
-        
+
         if(cssShadow.color !== hookShadow.color ||
             cssShadow.inset !== hookShadow.inset){
             return false;
@@ -110,5 +113,4 @@ export function isBoxShadowMatch(parsedCssValue: BoxShadowValue[], parsedValueHo
     }
 
     return true;
-
-} 
+}

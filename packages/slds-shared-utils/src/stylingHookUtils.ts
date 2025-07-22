@@ -3,6 +3,7 @@ import { matchesCssProperty } from './propertyMatcher';
 import { addOnlyUnique } from './util';
 import { toAlternateUnitValue } from './valueUtils';
 
+// Define the structure of a hook
 export interface Hook {
   name: string;
   properties: string[];
@@ -23,7 +24,7 @@ export const findExactMatchStylingHook = (
       .map((hook) => hook.name);
   }
   return matchedHooks;
-};
+}; 
 
 export function getStylingHooksForDensityValue(
   value: string,
@@ -44,4 +45,4 @@ export function getStylingHooksForDensityValue(
     ) : [];
 
     return addOnlyUnique(closestHooks, alternateHooks);
-} 
+}

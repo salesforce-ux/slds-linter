@@ -1,5 +1,6 @@
 import valueParser from 'postcss-value-parser';
 
+
 /**
  * Checks if a value is a CSS global value.
  *
@@ -35,7 +36,9 @@ import valueParser from 'postcss-value-parser';
  */
 export function isGlobalValue(value: string): boolean {
     return value === 'initial' || value === 'inherit' || value === 'unset' || value === 'revert' || value === 'revert-layer';
-}
+  }
+
+
 
 export function toAlternateUnitValue(value: string): string {
     const parsedValue = valueParser.unit(value);
@@ -54,4 +57,4 @@ export function toAlternateUnitValue(value: string): string {
       }
     }
     return alternateValue;
-} 
+}
