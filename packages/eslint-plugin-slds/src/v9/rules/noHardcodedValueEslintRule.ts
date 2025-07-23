@@ -15,7 +15,7 @@ import {
   handleColorProps,
   handleDensityPropForNode,
   handleFontProps
-} from '../../utils/cssHandlers';
+} from '../../handlers';
 import {
   extractCssPropertyAndValue,
   createEslintReportFnFromNode
