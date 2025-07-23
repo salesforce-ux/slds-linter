@@ -72,7 +72,7 @@ export = {
                 actual: className,
                 newValue
               },
-              message: JSON.stringify({message: "{{actual}} has been retired. Update it to the new name {{newValue}}.", suggestions:[newValue]}),
+              message: "{{actual}} has been retired. Update it to the new name {{newValue}}.",
               fix(fixer) {
                 if (newValue) {
                   const newClassValue = classAttr.value.value.replace(

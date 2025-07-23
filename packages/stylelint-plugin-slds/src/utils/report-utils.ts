@@ -33,19 +33,13 @@ export function reportMatchingHooks(
 
   if (suggestions.length > 0) {
     stylelint.utils.report(<stylelint.Problem>{
-      message: JSON.stringify({
-        message: messages.rejected(value, generateSuggestionsList(suggestions)),
-        suggestions,
-      }),
+      message: messages.rejected(value, generateSuggestionsList(suggestions)),
       ...reportProps,
       fix: suggestions.length === 1 ? fix : null,
     });
   } else {
     stylelint.utils.report(<stylelint.Problem>{
-      message: JSON.stringify({
-        message: messages.suggested(value),
-        suggestions: [],
-      }),
+      message: messages.suggested(value),
       ...reportProps,
     });
   }

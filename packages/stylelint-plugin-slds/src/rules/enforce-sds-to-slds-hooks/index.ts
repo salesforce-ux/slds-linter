@@ -61,7 +61,7 @@ function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Pr
     const message = messages.replace(oldValue, suggestedMatch);
 
     utils.report(<stylelint.Problem>{
-      message: JSON.stringify({message, suggestions:[suggestedMatch]}),
+      message,
       index,
       endIndex,
       ...basicReportProps,
@@ -94,7 +94,7 @@ function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Pro
   const message = messages.replace(prop, suggestedMatch);
 
     utils.report(<stylelint.Problem>{
-      message: JSON.stringify({message, suggestions:[suggestedMatch]}),
+      message,
       index: startIndex,
       endIndex,
       ...basicReportProps,
