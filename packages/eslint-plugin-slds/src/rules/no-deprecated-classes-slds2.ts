@@ -47,7 +47,7 @@ export = {
               data: {
                 className,
               },
-              message: JSON.stringify({message:"The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information.", suggestions:[]}),
+              message: "The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information.",
             });
           }
         });

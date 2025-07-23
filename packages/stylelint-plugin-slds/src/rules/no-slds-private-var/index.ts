@@ -23,7 +23,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
         const index = decl.toString().indexOf(decl.prop);
         const endIndex = index + decl.prop.length;
         stylelint.utils.report({
-          message: JSON.stringify({message:messages.expected(decl.prop), suggestions:[decl.prop.replace("--_slds-", "--slds-")]}),
+          message: messages.expected(decl.prop),
           node: decl,
           index,
           endIndex,
