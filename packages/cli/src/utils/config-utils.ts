@@ -6,7 +6,7 @@
  */
 import path from 'path';
 import { LintConfig, ReportConfig, CliOptions } from '../types';
-import { DEFAULT_ESLINT_CONFIG_PATH } from '../services/config.resolver';
+import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH } from '../services/config.resolver';
 import { isDynamicPattern } from 'globby';
 import { accessSync } from 'fs';
 import { Logger } from './logger';
@@ -89,6 +89,7 @@ export function normalizeCliOptions<T extends CliOptions | LintConfig | ReportCo
   // Set up defaults based on context
   const baseDefaults: Partial<CliOptions> = {
     files: [],
+    configStylelint: isNodeApi ? DEFAULT_STYLELINT_CONFIG_PATH : "",
     configEslint: isNodeApi ? DEFAULT_ESLINT_CONFIG_PATH : "",
   };
   

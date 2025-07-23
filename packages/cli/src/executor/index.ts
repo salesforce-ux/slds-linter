@@ -21,48 +21,42 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     
     // Normalize configuration to ensure all required fields have values
     const normalizedConfig = normalizeCliOptions(config, {}, true);
+    
     // Scan directory for style files (CSS, SCSS, etc.)
     const styleFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
       patterns: StyleFilePatterns,
       batchSize: 100,
     });
+    
     // Scan directory for component files (HTML, etc.)
     const componentFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
       patterns: ComponentFilePatterns,
       batchSize: 100,
     });
-    // Configure linting options
+    
+    // Combine all files into a single array for unified processing
+    const allFiles = [...styleFiles, ...componentFiles];
+    
+    // Configure linting options for ESLint worker
     const lintOptions: LintOptions = {
       fix: normalizedConfig.fix,
       configPath: normalizedConfig.configEslint,
     };
-    let styleResults: LintResult[] = [];
-    // Always run both ESLint and Stylelint for style files
-    const eslintResults = await LintRunner.runLinting(
-      styleFiles,
-      'eslint',
-      {
-        ...lintOptions
-      }
-    );
-    styleResults = styleResults.concat(eslintResults);
-    const stylelintResults = await LintRunner.runLinting(
-      styleFiles,
-      'stylelint',
-      {
-        ...lintOptions,
-        configPath: DEFAULT_STYLELINT_CONFIG_PATH
-      }
-    );
-    styleResults = styleResults.concat(stylelintResults);
-    // Run linting on component files (always ESLint)
-    const componentResults = await LintRunner.runLinting(componentFiles, 'eslint', {
-      fix: normalizedConfig.fix,
-      configPath: normalizedConfig.configEslint
+
+    // Run linting on style files
+    const styleResults = await LintRunner.runLinting(styleFiles, 'style', {
+      ...lintOptions,
+      configPath: normalizedConfig.configStylelint,
     });
-    // Combine results from both linters
-    const combinedResults = [...styleResults, ...componentResults];
-    return standardizeLintMessages(combinedResults);
+    
+    // Run ESLint on all files (both style and component files)
+    const allResults = await LintRunner.runLinting(
+      allFiles,
+      'component', // Use ESLint worker for all files
+      lintOptions
+    );
+    
+    return standardizeLintMessages([...styleResults, ...allResults]);
   } catch (error: any) {
     // Enhance error with context for better debugging
     const errorMessage = `Linting failed: ${error.message}`;
@@ -92,6 +86,7 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
     // Get lint results either from provided results parameter or by running lint
     const lintResults = results || await lint({
       directory: normalizedConfig.directory,
+      configStylelint: normalizedConfig.configStylelint,
       configEslint: normalizedConfig.configEslint,
     });
     
