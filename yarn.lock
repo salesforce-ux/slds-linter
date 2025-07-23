@@ -1646,6 +1646,7 @@ __metadata:
     jest: "npm:^29.7.0"
     postcss: "npm:^8.4.31"
     postcss-value-parser: "npm:^4.2.0"
+    slds-shared-utils: "workspace:*"
     ts-jest: "npm:^29.2.5"
   peerDependencies:
     eslint: ^8.0.0 || ^9.0.0
@@ -1701,6 +1702,7 @@ __metadata:
     postcss: "npm:^8.4.47"
     postcss-selector-parser: "npm:^7.1.0"
     postcss-value-parser: "npm:^4.2.0"
+    slds-shared-utils: "workspace:*"
     stylelint: "npm:^16.10.0"
     ts-jest: "npm:^29.2.5"
   peerDependencies:
@@ -7844,7 +7846,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"slds-shared-utils@workspace:packages/slds-shared-utils":
+"slds-shared-utils@workspace:*, slds-shared-utils@workspace:packages/slds-shared-utils":
   version: 0.0.0-use.local
   resolution: "slds-shared-utils@workspace:packages/slds-shared-utils"
   dependencies:
