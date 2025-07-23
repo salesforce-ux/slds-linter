@@ -51,7 +51,7 @@ function detectLeftSide(
   const suggestedMatch = slds1DeprecatedComponentHooks[prop];
   const message = messages.replace(prop, suggestedMatch);
   utils.report(<stylelint.Problem>{
-    message: JSON.stringify({ message, suggestions: [suggestedMatch] }),
+    message,
     index: startIndex,
     endIndex,
     ...basicReportProps,

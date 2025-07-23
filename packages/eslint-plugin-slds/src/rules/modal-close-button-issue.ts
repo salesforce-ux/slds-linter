@@ -43,7 +43,7 @@ export = {
                         context.report({
                             node,
                             loc: classAttr.loc,
-                            message: JSON.stringify({message: messages["removeClass"], suggestions: [`class="${newClassList}"`]}),
+                            message: messages["removeClass"],
                             fix(fixer) {                         
                                 return fixer.replaceText(classAttr, // Replace the full attribute
                                 `class="${newClassList}"` // Updated class list
@@ -85,7 +85,7 @@ export = {
                             context.report({
                                 node,
                                 loc: attribute.loc,
-                                message: JSON.stringify({message:messages["removeClass"],suggestions:[`${attrName}="${newClassList}"`]}),
+                                message: messages["removeClass"],
                                 fix(fixer) {
                                     return fixer.replaceText(attribute, // Replace the full attribute
                                     `${attrName}="${newClassList}"` // Correctly modifies the respective attribute
@@ -111,7 +111,7 @@ export = {
               context.report({
                 node: attribute,
                 loc: attribute.value.loc,
-                message: JSON.stringify({message:messages["ensureButtonClasses"],suggestions:[newClassList]}),
+                message: messages["ensureButtonClasses"],
                 fix(fixer) {
                   return fixer.replaceText(attribute.value, `${newClassList}`);
                 },
@@ -121,7 +121,7 @@ export = {
             if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
               context.report({
                 node: variantAttr,
-                message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}),
+                message: messages["changeVariant"],
                 loc: variantAttr.value.loc,
                 fix(fixer) {
                     return fixer.replaceText(variantAttr.value, `bare`);
@@ -166,7 +166,7 @@ export = {
           if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
             context.report({
               node: variantAttr,
-              message: JSON.stringify({message:messages["changeVariant"], suggestions:["bare"]}),
+              message: messages["changeVariant"],
               loc: variantAttr.value.loc,
               fix(fixer) {
                   return fixer.replaceText(variantAttr.value, `bare`);

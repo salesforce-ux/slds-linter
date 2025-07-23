@@ -69,6 +69,7 @@ export function reportMatchingHooksESLint(config: {
 /**
  * Simple stylelint reporting utility with conditional fix pattern.
  * Only applies auto-fix when there's exactly one suggestion to avoid ambiguity.
+ * Updated to return plain text messages (not JSON) per PR #224.
  */
 export function reportMatchingHooksStylelint(config: {
   valueNode: any;
@@ -109,19 +110,13 @@ export function reportMatchingHooksStylelint(config: {
 
   if (suggestions.length > 0) {
     stylelintUtils.report({
-      message: JSON.stringify({
-        message: messages.rejected(value, generateSuggestionsList(suggestions)),
-        suggestions,
-      }),
+      message: messages.rejected(value, generateSuggestionsList(suggestions)),
       ...reportData,
       fix: suggestions.length === 1 ? fixFactory?.() : null,
     });
   } else {
     stylelintUtils.report({
-      message: JSON.stringify({
-        message: messages.suggested(value),
-        suggestions: [],
-      }),
+      message: messages.suggested(value),
       ...reportData,
     });
   }

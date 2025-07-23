@@ -28,7 +28,7 @@ export function registerEmitCommand(program: Command): void {
 
         const destStyleConfigPath = path.join(
           normalizedOptions.directory,
-          path.basename(normalizedOptions.configStylelint)
+          'stylelint.config.mjs'
         );
         await copyFile(normalizedOptions.configStylelint, destStyleConfigPath);
         Logger.success(chalk.green(`Stylelint configuration created at:\n${destStyleConfigPath}\n`));

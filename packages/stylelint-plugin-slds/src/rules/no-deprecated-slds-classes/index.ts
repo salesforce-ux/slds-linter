@@ -3,8 +3,8 @@ import { Root } from 'postcss';
 import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import { getClassNodesFromSelector } from '../../utils/selector-utils';
+
 import { replacePlaceholders } from 'slds-shared-utils';
-import { hasMatchedProperty } from '../../utils/prop-utills';
 
 const { utils, createPlugin } = stylelint;
 const deprecatedClasses = metadata.deprecatedClasses;

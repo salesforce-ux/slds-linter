@@ -7,7 +7,7 @@ describe('no-slds-private-var', () => {
   const testCases = [
     {
       message:
-        '{\"message\":\"This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector --_slds-deprecated-var. For more information, look up private CSS in lightningdesignsystem.com. (slds/no-slds-private-var)\",\"suggestions\":[\"--slds-deprecated-var\"]}',
+        "This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector --_slds-deprecated-var. For more information, look up private CSS in lightningdesignsystem.com. (slds/no-slds-private-var)",
       code: `
         .example {
           --_slds-deprecated-var: #fff;
@@ -15,7 +15,7 @@ describe('no-slds-private-var', () => {
       `,
       ruleName: 'slds/no-slds-private-var',
       expectedMessages: [
-        '{\"message\":\"This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector --_slds-deprecated-var. For more information, look up private CSS in lightningdesignsystem.com. (slds/no-slds-private-var)\",\"suggestions\":[\"--slds-deprecated-var\"]}',
+        "This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector --_slds-deprecated-var. For more information, look up private CSS in lightningdesignsystem.com. (slds/no-slds-private-var)",
       ],
     },
     {
@@ -42,14 +42,14 @@ describe('no-slds-private-var', () => {
         },
       } as LinterOptions);
 
-      const messages = linterResult.results[0]._postcssResult.messages;
+      const messages = linterResult?.results[0]?._postcssResult?.messages;
 
       // Test for the presence or absence of the message
       if (testCase.message) {
-        expect(messages.length).toEqual(1);
-        expect(messages[0].text).toEqual(testCase.message);
+        expect(messages?.length).toEqual(1);
+         expect(messages?.[0]?.text).toEqual(testCase.message);
       } else {
-        expect(messages.length).toEqual(0);
+        expect(messages?.length).toEqual(0);
       }
     });
   });
