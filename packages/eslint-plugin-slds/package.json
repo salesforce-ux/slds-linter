@@ -9,7 +9,8 @@
       "require": "./build/index.js"
     },
     "./config": {
-      "import": "./eslint.config.mjs"
+      "import": "./eslint.config.mjs",
+      "require": "./eslint.config.mjs"
     }
   },
   "files": [

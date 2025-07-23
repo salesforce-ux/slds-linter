@@ -2,7 +2,6 @@ import * as esbuild from 'esbuild';
 import { series, src, dest } from 'gulp';
 import { rimraf} from 'rimraf'
 import {task} from "gulp-execa";
-import path from 'path';
 import { bundleSldsSharedUtilsPlugin } from '../../scripts/shared-plugin/esbuild-plugins.mjs';
 import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
