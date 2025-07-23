@@ -1,5 +1,4 @@
 import * as esbuild from 'esbuild';
-import { esbuildPluginFilePathExtensions } from "esbuild-plugin-file-path-extensions";
 import { series, watch } from 'gulp';
 import { task } from "gulp-execa";
 import { rimraf } from 'rimraf';
@@ -19,12 +18,7 @@ function cleanDirs(){
   * Compile typescript files
   * */ 
 const compileTs = async ()=>{
-  const plugins = [
-    bundleSldsSharedUtilsPlugin,
-    esbuildPluginFilePathExtensions({
-      esmExtension:"js"
-    })
-  ];
+  const plugins = [bundleSldsSharedUtilsPlugin];
 
   await esbuild.build({
     entryPoints: ["./src/**/*.ts"],
