@@ -16,6 +16,20 @@ export function matchesCssProperty(
   });
 }
 
+/**
+ * Checks if a property is a target property for SLDS linting
+ * @param property - CSS property name to check
+ * @param propertyTargets - Optional array of specific properties to target
+ * @returns true if property should be linted
+ */
+export function isTargetProperty(property: string, propertyTargets: string[] = []): boolean {
+    return property.startsWith('--sds-')
+    || property.startsWith('--slds-')
+    || property.startsWith('--lwc-')
+    || propertyTargets.length === 0
+    || propertyTargets.includes(property);
+}
+
 export const colorProperties = [
   'color',
   'fill',

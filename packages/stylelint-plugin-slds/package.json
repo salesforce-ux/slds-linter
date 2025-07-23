@@ -12,14 +12,13 @@
   "scripts": {
     "test": "NODE_OPTIONS=\"--experimental-vm-modules\" npx jest",
     "build": "gulp build",
-    "dev": "gulp dev",
-    "prepack": "npm pkg delete dependencies.slds-shared-utils",
-    "postpack": "npm pkg set dependencies.slds-shared-utils='*'",
-    "prepublishOnly": "npm pkg delete dependencies.slds-shared-utils && clean-pkg-json"
+    "dev": "gulp dev"
   },
   "dependencies": {
     "@salesforce-ux/sds-metadata": "^0.2.4",
-    "slds-shared-utils": "*"
+    "chroma-js": "^3.1.2",
+    "postcss": "^8.4.47",
+    "postcss-value-parser": "^4.2.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -32,9 +31,7 @@
     "ts-jest": "^29.2.5"
   },
   "peerDependencies": {
-    "postcss": "^8.4.47",
     "postcss-selector-parser": "^7.1.0",
-    "postcss-value-parser": "^4.2.0",
     "stylelint": "^16.10.0"
   },
   "keywords": [],
