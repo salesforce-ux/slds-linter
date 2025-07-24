@@ -24,7 +24,6 @@ export function extractCssPropertyAndValue(node: any, sourceCode: Rule.RuleConte
     return { cssProperty, cssValue };
   }
   
-  // Last resort
   return { 
     cssProperty, 
     cssValue: node.value?.raw || String(node.value || '') 
@@ -78,7 +77,6 @@ function getLocFromIndexManual(text: string, idx: number) {
 
 /**
  * Creates ESLint report function with precise location calculation.
- * Restored the working manual approach for accurate error positions.
  */
 export function createEslintReportFnFromNode(
   context: Rule.RuleContext, 
@@ -88,9 +86,6 @@ export function createEslintReportFnFromNode(
   return (reportObj: any) => {
     const { index, endIndex } = reportObj;
     
-    // Extract location information for precise error reporting
-    
-    // Calculate precise location when index/endIndex are provided (the working approach)
     const preciseLoc = (typeof index === 'number' && typeof endIndex === 'number' && sourceCode?.text)
       ? (() => {
           // ESLint CSS uses .loc.start.offset instead of .range[0]
