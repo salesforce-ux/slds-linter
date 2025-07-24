@@ -18,9 +18,9 @@ import {
 } from '../../handlers';
 import {
   extractCssPropertyAndValue,
-  createEslintReportFnFromNode
+  createEslintReportFnFromNode,
+  adaptEslintDeclarationToPostcss
 } from '../../utils/eslint-css-utils';
-import { adaptEslintDeclarationToPostcss } from '../../utils/eslint-to-stylelint-adapter';
 
 export function createNoHardcodedValueEslintRule({
   ruleId,
@@ -77,7 +77,7 @@ export function createNoHardcodedValueEslintRule({
             };
 
             // The adapter is responsible for robust value range calculation
-            const adaptedDecl = adaptEslintDeclarationToPostcss(node, cssValue, undefined, sourceCode);
+            const adaptedDecl = adaptEslintDeclarationToPostcss(node, cssValue, sourceCode);
 
             if (isColorProp) {
               handleColorProps(adaptedDecl, parsedValue, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);

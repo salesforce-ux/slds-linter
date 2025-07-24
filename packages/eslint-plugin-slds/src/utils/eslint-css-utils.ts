@@ -2,104 +2,117 @@ import { Rule } from 'eslint';
 
 /**
  * Extracts the CSS property and value from an ESLint CSS AST node.
+ * Simplified to follow standard ESLint CSS patterns.
  */
 export function extractCssPropertyAndValue(node: any, sourceCode: Rule.RuleContext['sourceCode']) {
-  let cssProperty = node.property && node.property.toLowerCase();
-  let cssValue = '';
-  if (node.value && node.value.range) {
-    cssValue = sourceCode.text.slice(node.value.range[0], node.value.range[1]);
-  } else if (node.value && node.value.children && Array.isArray(node.value.children)) {
-    cssValue = node.value.children.map(child => {
-      if (child.type === 'Dimension' && child.value && child.unit) {
-        return `${child.value}${child.unit}`;
-      }
-      if (child.type === 'Percentage' && child.value) {
-        return `${child.value}%`;
-      }
-      if (child.type === 'Hash' && child.value) {
-        return `#${child.value}`;
-      }
-      if (child.value && child.unit) {
-        return `${child.value}${child.unit}`;
-      }
-      if (child.value) {
-        return child.value;
-      }
-      if (child.name) {
-        return child.name;
-      }
-      return '';
+  const cssProperty = node.property?.toLowerCase() || '';
+  
+  // Primary: use range to slice source
+  if (node.value?.range && sourceCode?.text) {
+    const cssValue = sourceCode.text.slice(node.value.range[0], node.value.range[1]);
+    return { cssProperty, cssValue };
+  }
+  
+  // Fallback: basic token reconstruction
+  if (node.value?.children) {
+    const cssValue = node.value.children.map(child => {
+      if (child.type === 'Dimension') return `${child.value}${child.unit || ''}`;
+      if (child.type === 'Percentage') return `${child.value}%`;
+      if (child.type === 'Hash') return `#${child.value}`;
+      return child.value || child.name || '';
     }).join(' ');
+    return { cssProperty, cssValue };
   }
-  return { cssProperty, cssValue };
-}
-
-/**
- * Maps value-relative indices to ESLint loc using the exact working logic from the rule.
- */
-export function getLocFromValueIndex(sourceText: string, valueNode: any, index: number, endIndex: number) {
-  function getLocFromIndexManual(text: string, idx: number) {
-    let line = 1, col = 0, i = 0;
-    while (i < idx && i < text.length) {
-      if (text[i] === '\n') {
-        line++;
-        col = 0;
-      } else {
-        col++;
-      }
-      i++;
-    }
-    return { line, column: col + 1 };
-  }
-  const valueStartOffset = valueNode && valueNode.range ? valueNode.range[0] : 0;
-  const absStart = valueStartOffset + (index ?? 0);
-  const absEnd = valueStartOffset + (endIndex ?? 0);
-  return {
-    start: getLocFromIndexManual(sourceText, absStart),
-    end: getLocFromIndexManual(sourceText, absEnd),
+  
+  // Last resort
+  return { 
+    cssProperty, 
+    cssValue: node.value?.raw || String(node.value || '') 
   };
 }
 
 /**
- * ESLint report function with exact working location logic, extracted as a utility.
+ * Creates PostCSS-like declaration for shared handlers.
+ * Simplified to focus on what actually works.
  */
-export function createEslintReportFnFromNode(context: any, node: any, sourceCode: any) {
+export function adaptEslintDeclarationToPostcss(
+  node: any, 
+  cssValue: string, 
+  sourceCode?: Rule.RuleContext['sourceCode']
+): any {
+  // Use the most reliable range source
+  const valueRange = node.value?.range || 
+                    [node.value?.loc?.start?.offset, node.value?.loc?.end?.offset] || 
+                    [0, 0];
+  
+  return {
+    ...node,
+    type: 'decl',
+    prop: node.property || node.prop,
+    value: { value: cssValue, range: valueRange },
+    important: node.important || false,
+    raws: node.raws || {},
+    parent: node.parent || null,
+    source: node.source || null,
+    variable: node.variable || false
+  };
+}
+
+/**
+ * Manual line/column calculation from text offset.
+ * This approach works correctly for precise error locations.
+ */
+function getLocFromIndexManual(text: string, idx: number) {
+  let line = 1, col = 0, i = 0;
+  while (i < idx && i < text.length) {
+    if (text[i] === '\n') {
+      line++;
+      col = 0;
+    } else {
+      col++;
+    }
+    i++;
+  }
+  return { line, column: col + 1 };
+}
+
+/**
+ * Creates ESLint report function with precise location calculation.
+ * Restored the working manual approach for accurate error positions.
+ */
+export function createEslintReportFnFromNode(
+  context: Rule.RuleContext, 
+  node: any, 
+  sourceCode: Rule.RuleContext['sourceCode']
+) {
   return (reportObj: any) => {
     const { index, endIndex } = reportObj;
+    
+    // Extract location information for precise error reporting
+    
+    // Calculate precise location when index/endIndex are provided (the working approach)
+    const preciseLoc = (typeof index === 'number' && typeof endIndex === 'number' && sourceCode?.text)
+      ? (() => {
+          // ESLint CSS uses .loc.start.offset instead of .range[0]
+          const valueStartOffset = node.value?.loc?.start?.offset ?? 0;
+          const absStart = valueStartOffset + index;
+          const absEnd = valueStartOffset + endIndex;
+          
+          const startLoc = getLocFromIndexManual(sourceCode.text, absStart);
+          const endLoc = getLocFromIndexManual(sourceCode.text, absEnd);
+          
+          return {
+            start: startLoc,
+            end: endLoc
+          };
+        })()
+              : undefined;
+    
     context.report({
       node,
-      message: typeof reportObj.message === 'string' ? reportObj.message : JSON.stringify(reportObj.message),
-      loc: (typeof index === 'number' && typeof endIndex === 'number')
-        ? (() => {
-            function getLocFromIndexManual(text: string, idx: number) {
-              let line = 1, col = 0, i = 0;
-              while (i < idx && i < text.length) {
-                if (text[i] === '\n') {
-                  line++;
-                  col = 0;
-                } else {
-                  col++;
-                }
-                i++;
-              }
-              return { line, column: col + 1 };
-            }
-            const valueStartOffset = node.value?.loc?.start?.offset ?? 0;
-            const absStart = valueStartOffset + (index ?? 0);
-            const absEnd = valueStartOffset + (endIndex ?? 0);
-            const startLoc = getLocFromIndexManual(sourceCode.text, absStart);
-            const endLoc = getLocFromIndexManual(sourceCode.text, absEnd);
-            return {
-              start: startLoc,
-              end: endLoc
-            };
-          })()
-        : undefined,
-      fix: reportObj.fix
-        ? (fixer: any) => {
-            return reportObj.fix(fixer, sourceCode) || null;
-          }
-        : null,
+      loc: preciseLoc || reportObj.loc || node.loc,
+      message: String(reportObj.message),
+      fix: reportObj.fix ? (fixer: any) => reportObj.fix(fixer, sourceCode) || null : null,
     });
   };
 } 
