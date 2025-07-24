@@ -5,7 +5,6 @@ import {
   densificationProperties,
   matchesCssProperty,
   forEachDensifyValue,
-  isDensifyValue,
   isFontProperty,
   replacePlaceholders,
   isTargetProperty
@@ -16,11 +15,7 @@ import {
   handleDensityPropForNode,
   handleFontProps
 } from '../../handlers';
-import {
-  extractCssPropertyAndValue,
-  createEslintReportFnFromNode,
-  adaptEslintDeclarationToPostcss
-} from '../../utils/eslint-css-utils';
+import { createSimpleAdapter } from '../../utils/eslint-adapters';
 
 export function createNoHardcodedValueEslintRule({
   ruleId,
@@ -40,55 +35,56 @@ export function createNoHardcodedValueEslintRule({
       },
       fixable: 'code',
       schema: [],
+      messages: {
+        hardcodedValue: warningMsg,
+        noReplacement: "There's no replacement styling hook for the {{value}} static value. Remove the static value."
+      }
     },
     create(context) {
-      return {
+      // Skip non-CSS files
+      if (!context.filename?.match(/\.(css|scss)$/)) {
+        return {};
+      }
+
+      // Create message functions
+      const messages = {
+        rejected: (oldValue: string, newValue: string) =>
+          newValue && newValue.trim()
+            ? replacePlaceholders(warningMsg, { oldValue, newValue })
+            : `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
+        suggested: (oldValue: string) =>
+          `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
+      };
+
+            return {
         Declaration(node: any) {
-          if (!context.filename.match(/\.(css|scss)$/)) {
-            return;
-          }
-          const sourceCode = context.sourceCode;
-          const { cssProperty, cssValue } = extractCssPropertyAndValue(node, sourceCode);
+          const { declAdapter, reportFn, cssProperty, cssValue } = createSimpleAdapter(node, context);
+          
           if (!isTargetProperty(cssProperty)) {
             return;
           }
+          
+          // Skip CSS variables  
+          if (cssValue?.trim().startsWith('var(') || cssValue?.trim() === 'var') {
+            return;
+          }
+          
           const parsedValue = valueParser(cssValue);
-          const cssValueStartIndex = node.range ? node.range[0] : 0;
           const isColorProp = matchesCssProperty(colorProperties, cssProperty);
           const isDensiProp = matchesCssProperty(densificationProperties, cssProperty);
           const isFontProp = isFontProperty(cssProperty, cssValue);
 
           if (cssValue && parsedValue) {
-            // Skip if the value is already a CSS variable to prevent circular fixes
-            // Handle both "var(...)" and just "var" (when parsed as individual tokens)
-            if (cssValue.trim().startsWith('var(') || cssValue.trim() === 'var') {
-              return;
-            }
-
-            const eslintReportFn = createEslintReportFnFromNode(context, node, sourceCode);
-            // Create proper message functions using replacePlaceholders like stylelint plugin
-            const messages = {
-              rejected: (oldValue: string, newValue: string) =>
-                newValue && newValue.trim()
-                  ? replacePlaceholders(warningMsg, { oldValue, newValue })
-                  : `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
-              suggested: (oldValue: string) =>
-                `There's no replacement styling hook for the ${oldValue} static value. Remove the static value.`,
-            };
-
-            // The adapter is responsible for robust value range calculation
-            const adaptedDecl = adaptEslintDeclarationToPostcss(node, cssValue, sourceCode);
-
             if (isColorProp) {
-              handleColorProps(adaptedDecl, parsedValue, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
+              handleColorProps(declAdapter, parsedValue, 0, valueToStylinghook, cssProperty, {}, messages, reportFn);
             } else if (isDensiProp) {
               forEachDensifyValue(parsedValue, (valueNode: any) => {
-                handleDensityPropForNode(adaptedDecl, valueNode, valueNode.value, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
+                handleDensityPropForNode(declAdapter, valueNode, valueNode.value, 0, valueToStylinghook, cssProperty, {}, messages, reportFn);
               });
             } else if (isFontProp) {
-              handleFontProps(adaptedDecl, parsedValue, cssValueStartIndex, valueToStylinghook, cssProperty, {}, messages, eslintReportFn);
+              handleFontProps(declAdapter, parsedValue, 0, valueToStylinghook, cssProperty, {}, messages, reportFn);
             } else if (cssProperty === 'box-shadow') {
-              handleBoxShadow(adaptedDecl, cssValue, cssValueStartIndex, valueToStylinghook, {}, messages, eslintReportFn);
+              handleBoxShadow(declAdapter, cssValue, 0, valueToStylinghook, {}, messages, reportFn);
             }
           }
         }
