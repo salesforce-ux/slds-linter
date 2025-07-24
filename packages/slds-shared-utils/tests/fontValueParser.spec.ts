@@ -1,4 +1,7 @@
-import { parseFont } from '../../src/utils/fontValueParser';
+let parseFont: any;
+beforeAll(async () => {
+  ({ parseFont } = await import('../src/fontValueParser'));
+});
 
 describe('fontValueParser', () => {
   describe('parseFont', () => {

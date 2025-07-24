@@ -1,5 +1,5 @@
 import valueParser from 'postcss-value-parser';
-import { isFunctionNode } from './decl-utils';
+import { isFunctionNode } from './declUtils';
 
 export const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
 

@@ -1,12 +1,7 @@
 import { Rule } from "postcss";
+import { isTargetProperty } from 'slds-shared-utils';
 
-export function isTargetProperty(property: string, propertyTargets: string[] = []): boolean {
-    return property.startsWith('--sds-') 
-    || property.startsWith('--slds-') 
-    || property.startsWith('--lwc-') 
-    || propertyTargets.length === 0
-    || propertyTargets.includes(property);
-}
+export { isTargetProperty };
 
 export function hasMatchedProperty(rule: Rule, propertyTargets: string[] = []): boolean {
     return propertyTargets.length === 0 || rule.nodes.some((node) => {

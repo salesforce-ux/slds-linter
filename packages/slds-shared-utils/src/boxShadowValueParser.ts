@@ -1,7 +1,7 @@
 import valueParser from 'postcss-value-parser';
-import { isValidColor } from './color-lib-utils';
-import { isCommaDivision, isSpaceDivision, isInsetKeyword, getVarToken, isFunctionNode, isMathFunction } from './decl-utils';
-import { isDensifyValue, normalizeLengthValue } from './density-utils';
+import { isValidColor } from './colorLibUtils';
+import { isCommaDivision, isSpaceDivision, isInsetKeyword, getVarToken, isFunctionNode, isMathFunction } from './declUtils';
+import { isDensifyValue, normalizeLengthValue } from './densityUtils';
 
 export interface BoxShadowValue {
     offsetX?: string;

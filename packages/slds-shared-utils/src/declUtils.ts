@@ -1,6 +1,6 @@
 import { Declaration } from "postcss";
 import valueParser from "postcss-value-parser";
-import { isCssFunction, isCssMathFunction } from './css-functions';
+import { isCssFunction, isCssMathFunction } from './cssFunctions';
 
 export function isFunctionNode(node: valueParser.Node): boolean {
   return node.type === 'function' && isCssFunction(node.value);

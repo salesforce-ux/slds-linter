@@ -1,7 +1,7 @@
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
-import { matchesCssProperty } from './property-matcher';
+import { matchesCssProperty } from './propertyMatcher';
 import { addOnlyUnique } from './util';
-import { toAlternateUnitValue } from './value-utils';
+import { toAlternateUnitValue } from './valueUtils';
 
 // Define the structure of a hook
 export interface Hook {

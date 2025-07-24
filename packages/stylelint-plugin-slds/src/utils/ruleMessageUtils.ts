@@ -1,6 +1,6 @@
 import stylelint from 'stylelint';
-import replacePlaceholders from './util';
-import { MessagesObj } from './report-utils';
+import { replacePlaceholders } from 'slds-shared-utils';
+import { MessagesObj } from './reportUtils';
 
 export function toRuleMessages(ruleName: string, warningMsg: string): MessagesObj {
   return stylelint.utils.ruleMessages(ruleName, {

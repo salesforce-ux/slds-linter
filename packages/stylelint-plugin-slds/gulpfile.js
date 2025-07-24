@@ -1,8 +1,8 @@
 import * as esbuild from 'esbuild';
-import { esbuildPluginFilePathExtensions } from "esbuild-plugin-file-path-extensions";
 import { series, watch } from 'gulp';
 import { task } from "gulp-execa";
 import { rimraf } from 'rimraf';
+import { bundleSldsSharedUtilsPlugin } from '../../scripts/shared-plugin/esbuild-plugins.mjs';
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 
 const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE!=='release';
@@ -19,13 +19,9 @@ function cleanDirs(){
   * Compile typescript files
   * */ 
 const compileTs = async ()=>{
+  const plugins = [bundleSldsSharedUtilsPlugin];
+
   const isInternal = process.env.TARGET_PERSONA === 'internal';
-  
-  const plugins = [
-    esbuildPluginFilePathExtensions({
-      esmExtension:"js"
-    })
-  ];
   
   if (isInternal) {
     plugins.unshift(
@@ -79,7 +75,7 @@ const compileTs = async ()=>{
   * ESBuild bydefault won't generate definition file. There are multiple ways 
   * to generate definition files. But we are reliying on tsc for now
   * */ 
-const generateDefinitions = task('tsc --project tsconfig.json');
+const generateDefinitions = task('tsc --project tsconfig.json --emitDeclarationOnly');
 
 export const build = series(cleanDirs, compileTs, generateDefinitions);
 

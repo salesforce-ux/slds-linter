@@ -1,7 +1,6 @@
 import valueParser from 'postcss-value-parser';
-import { isValidColor } from './color-lib-utils';
-import { isCssColorFunction, isCssFunction } from './css-functions';
-
+import { isValidColor } from './colorLibUtils';
+import { isCssColorFunction, isCssFunction } from './cssFunctions';
 
 export const isColorFunction = (value: string): boolean => {
   return isCssColorFunction(value);

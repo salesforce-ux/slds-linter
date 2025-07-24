@@ -3,9 +3,8 @@ import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
 import valueParser from 'postcss-value-parser';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
-import replacePlaceholders from '../../utils/util';
+import { replacePlaceholders, forEachVarFunction } from 'slds-shared-utils';
 import { isTargetProperty } from '../../utils/prop-utills';
-import { forEachVarFunction } from '../../utils/decl-utils';
 
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
