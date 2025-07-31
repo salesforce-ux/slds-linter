@@ -306,9 +306,9 @@ async function main() {
         {
           title: "Handle version generation",
           task: async (ctx) => {
-            ctx.finalVersion = ctx.version;
             const suffix = ctx.targetPersona === "external" ? "" : `-${ctx.targetPersona}`;
             const version = ctx.version + suffix;
+            ctx.finalVersion = version;
             if (ctx.releaseType !== "final") {
               ctx.finalVersion = await incrementPreReleaseVersion(
                 version,
