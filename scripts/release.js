@@ -383,7 +383,7 @@ async function main() {
         },
         {
           title: "Create GitHub release",
-          skip: (ctx) => isDryRun || ctx.releaseType !== "final" || !ctx.sldsLinterTarball,
+          skip: (ctx) => isDryRun || ctx.releaseType !== "final" || !ctx.sldsLinterTarball || ctx.targetPersona !== "external",
           task: async (ctx) => {
             await createGitHubRelease(
               ctx.finalVersion,
