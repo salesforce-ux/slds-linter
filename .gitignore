@@ -9,12 +9,14 @@ package-lock.json
 # Build output
 dist/
 build/
+site/
 coverage/
 .sldslinter/
 temp-verify/
 *.sarif
 *.tgz
 *.csv
+
 
 # IDE and editor files
 .idea/
@@ -46,3 +48,6 @@ logs/
 # SARIF files
 slds-linter-report.csv
 sarif-validation-report.html
+
+# Generated files
+**/.stylelintrc.mjs

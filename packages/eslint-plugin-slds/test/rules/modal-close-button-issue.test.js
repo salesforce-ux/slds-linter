@@ -7,7 +7,11 @@ function normalizeHTML(html) {
 }
 
 const ruleTester = new RuleTester({
-  parser: require.resolve("@html-eslint/parser"), // Specify the parser for HTML files
+  languageOptions: {
+    parser: require("@html-eslint/parser"), // Specify the parser for HTML files using flat config format
+    ecmaVersion: 2021,
+    sourceType: "module"
+  }
 });
 
 ruleTester.run("slds-modal-button-issue", rule, {
@@ -50,14 +54,14 @@ ruleTester.run("slds-modal-button-issue", rule, {
     // ❌ Scenario 1: Remove slds-button_icon-inverse from a modal close button
     {
       code: `<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"></button>`,
-      errors: [{ message: JSON.stringify({message: messages["removeClass"], suggestions: [`class="slds-button slds-button_icon slds-modal__close"`]}), type: "Tag" }],
+      errors: [{ message: messages["removeClass"], type: "Tag" }],
       output: `<button class="slds-button slds-button_icon slds-modal__close"></button>`,
     },
 
     // ❌ Scenario 2: Fix variant="bare-inverse" and ensure size="large" in lightning-button-icon
     {
       code: `<lightning-button-icon variant="bare-inverse" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>`,
-      errors: [{ message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}) }],
+      errors: [{ message: messages["changeVariant"]}],
       output: `<lightning-button-icon variant="bare" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>`,
     },
 
@@ -66,14 +70,14 @@ ruleTester.run("slds-modal-button-issue", rule, {
       code: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare-inverse" size="medium"></lightning-icon></button>`,
       errors: [
         //{ messageId: "ensureSizeAttribute", type: "Tag" },
-        { message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}) }
+        { message: messages["changeVariant"]}
       ],
       output: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare" size="medium"></lightning-icon></button>`,
     },
     {
       code: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare-inverse"></lightning-icon></button>`,
       errors: [
-        { message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}) }
+        { message: messages["changeVariant"]}
       ],
       output: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare"></lightning-icon></button>`,
     },
@@ -91,8 +95,8 @@ ruleTester.run("slds-modal-button-issue", rule, {
                 <span class="slds-assistive-text">{cancelButtonLabel}</span>
             </button>`,
       errors: [
-        { message: JSON.stringify({message: messages["removeClass"], suggestions: [`class="slds-button slds-button_icon slds-modal__close"`]})},
-        { message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}), }
+        { message: messages["removeClass"]},
+        { message: messages["changeVariant"] }
       ],
       output: `<button class="slds-button slds-button_icon slds-modal__close">
                 <lightning-icon
@@ -113,8 +117,8 @@ ruleTester.run("slds-modal-button-issue", rule, {
                 class="slds-button slds-button_icon slds-modal__close slds-button--icon-inverse" variant="bare-inverse" size="large">
             </lightning-button-icon>`,
       errors: [
-        { message: JSON.stringify({message: messages["removeClass"], suggestions: [`class="slds-button slds-button_icon slds-modal__close"`]})},
-        { message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}) }
+        { message: messages["removeClass"]},
+        { message: messages["changeVariant"]}
       ],
       output: `<lightning-button-icon
                 title={labels.closeButton} icon-name="utility:close"
@@ -132,9 +136,9 @@ ruleTester.run("slds-modal-button-issue", rule, {
                 variant="bare-inverse" size="large">
             </lightning-button-icon>`,
       errors: [
-        { message: JSON.stringify({message: messages["removeClass"], suggestions: [`icon-class="slds-button slds-button_icon slds-modal__close"`]})},
-        { message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}) },
-        { message: JSON.stringify({message:messages["changeVariant"],suggestions:["bare"]}) },
+        { message: messages["removeClass"]},
+        { message: messages["changeVariant"]},
+        { message: messages["changeVariant"]},
       ],
       output: `<lightning-button-icon
                 title={labels.closeButton} icon-name="utility:close"
@@ -156,7 +160,7 @@ ruleTester.run("slds-modal-button-issue", rule, {
                 <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{heading}</h2>
             </header>`,
       errors: [
-        { message: JSON.stringify({message: messages["removeClass"], suggestions: [`class="slds-button slds-button_icon slds-modal__close"`]}) }
+        { message: messages["removeClass"]}
       ],
       output: `<header class="slds-modal__header">
                 <button class="slds-button slds-button_icon slds-modal__close" title={labels.Close} onclick={close}>

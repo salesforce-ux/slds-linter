@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 import { FileScanner } from '../services/file-scanner';
-import { LintRunner, LintOptions } from '../services/lint-runner';
+import { LintRunner } from '../services/lint-runner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
 import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
 import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
@@ -20,7 +20,10 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     Logger.debug('Starting linting with Node API');
     
     // Normalize configuration to ensure all required fields have values
-    const normalizedConfig = normalizeCliOptions(config, {}, true);
+    const normalizedConfig = normalizeCliOptions(config, {
+      configEslint: DEFAULT_ESLINT_CONFIG_PATH,
+      configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
+    });
     
     // Scan directory for style files (CSS, SCSS, etc.)
     const styleFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
@@ -34,22 +37,18 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
       batchSize: 100,
     });
     
-    // Configure linting options
-    const lintOptions: LintOptions = {
-      fix: normalizedConfig.fix,
-      configPath: normalizedConfig.configStylelint,
-    };
+    const { fix, configStylelint, configEslint } = normalizedConfig;
     
     // Run linting on style files
     const styleResults = await LintRunner.runLinting(styleFiles, 'style', {
-      ...lintOptions,
-      configPath: normalizedConfig.configStylelint,
+      fix,
+      configPath: configStylelint,
     });
     
     // Run linting on component files
     const componentResults = await LintRunner.runLinting(componentFiles, 'component', {
-      ...lintOptions,
-      configPath: normalizedConfig.configEslint,
+      fix,
+      configPath: configEslint,
     });
     
     // Combine results from both linters
@@ -76,17 +75,16 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
     Logger.debug('Starting report generation with Node API');
     
     // Normalize configuration to ensure all required fields have values
-    const normalizedConfig = normalizeCliOptions(config, {}, true);
+    const normalizedConfig = normalizeCliOptions(config, {
+      configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
+      configEslint: DEFAULT_ESLINT_CONFIG_PATH,
+    });
     
     // Determine report format with default
     const format = normalizedConfig.format || 'sarif';
     
     // Get lint results either from provided results parameter or by running lint
-    const lintResults = results || await lint({
-      directory: normalizedConfig.directory,
-      configStylelint: normalizedConfig.configStylelint,
-      configEslint: normalizedConfig.configEslint,
-    });
+    const lintResults = results || await lint(normalizedConfig);
     
     // Process based on requested format
     switch (format) {

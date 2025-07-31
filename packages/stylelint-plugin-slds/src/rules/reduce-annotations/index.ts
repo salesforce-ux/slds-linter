@@ -7,26 +7,26 @@ const ruleName = 'slds/reduce-annotations';
 
 // Fetch metadata
 const { severityLevel = 'warning', warningMsg = '' } = ruleMetadata(ruleName) || {};
-const annotationList = [
-  "@sldsValidatorAllow",
-  "@sldsValidatorIgnore",
-  "@sldsValidatorIgnoreNextLine"
-];
+
+
+const annotationList = ["@sldsValidatorIgnoreNextLine", "@sldsValidatorAllow", "@sldsValidatorIgnore"];
 
 // Rule function
 const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severity = severityLevel as RuleSeverity } = {}) => {
   return (root: Root, result: PostcssResult) => {
     root.walkComments((comment) => {
-      if (annotationList.some(annotation => comment.text.trim().includes(annotation))) {
+      const commentText = comment.text.trim();
+      const matchedAnnotation = annotationList.find(annotation => commentText.startsWith(annotation));
+      
+      if (matchedAnnotation) {
         utils.report({
-          message:  JSON.stringify({message: warningMsg, suggestions:[]}),
+          message: warningMsg,
           node: comment,
           result,
           ruleName,
           severity,
-          fix:()=>{
-            comment.remove(); // Auto-fix by removing the comment
-          }
+          index: comment.source.start.offset,
+          endIndex: comment.source.end.offset          
         });
       }
     });
@@ -35,8 +35,8 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, { severit
 
 ruleFunction.ruleName = ruleName;
 ruleFunction.meta = {
-  url: '',
-  fixable: true
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#reduce-annotations',
+  fixable: false
 };
 
 // Export the plugin

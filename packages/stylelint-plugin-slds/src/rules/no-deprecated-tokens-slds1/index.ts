@@ -1,10 +1,11 @@
-import { Root } from 'postcss';
+import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
 import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import { isTargetProperty } from '../../utils/prop-utills';
+import { forEachTokenFunction, getTokenFunctionNode, isTokenFunction } from '../../utils/decl-utils';
 const { utils, createPlugin }: typeof stylelint = stylelint;
 const ruleName: string = 'slds/no-deprecated-tokens-slds1';
 const tokenMapping = metadata.auraToLwcTokensMapping;
@@ -17,22 +18,12 @@ const messages = utils.ruleMessages(ruleName, {
     replacePlaceholders(warningMsg, { oldValue, newValue }),
 });
 
-function isTokenFunction(node:valueParser.Node): boolean{
-  return (node.type === "function" && (node.value === "token" || node.value === "t") && node.nodes.length>0);
-}
-
 function shouldIgnoreDetection(token: string):boolean {
   return (!(token in tokenMapping) || !tokenMapping[token].startsWith('--lwc-'))
 }
 
-function isAlreadyFixed(recommendation:string,functionNode:valueParser.FunctionNode, allNodes:valueParser.Node[]): boolean{
-  const hasFixInFirstNode = allNodes[0].type == "word" && allNodes[0].value === recommendation;
-  const isInFallback = allNodes.length > 1 && isTokenFunction(allNodes[allNodes.length - 1]) && functionNode === allNodes[allNodes.length - 1];
-  const sourceIndexMatched = functionNode.sourceIndex === allNodes[allNodes.length - 1].sourceIndex
-  return (hasFixInFirstNode || isInFallback) && sourceIndexMatched;
-}
 
-function transformTokenFunction(node:valueParser.Node, allNodes:valueParser.Node[]) {
+function transformTokenFunction(node:valueParser.Node) {
   if(!isTokenFunction(node)){
     return null;
   }
@@ -49,10 +40,6 @@ function transformTokenFunction(node:valueParser.Node, allNodes:valueParser.Node
   let replacement:string;
   const recommendation:string = tokenMapping[cssVar];
 
-  if(isAlreadyFixed(recommendation,functionNode,allNodes)){
-    // Ignore if already fixed.
-    return null;
-  }
   replacement = `var(${recommendation}, ${valueParser.stringify(node)})`;
 
   return {cssVar, replacement, recommendation, original: valueParser.stringify(node), index, endIndex};
@@ -66,12 +53,8 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity
         return;
       }
 
-      const parsedValue = valueParser(decl.value);
-      const startIndex = decl.toString().indexOf(decl.value);
-      
-      parsedValue.walk((node, i, allNodes) => {
-        const data = transformTokenFunction(node, allNodes);
-
+      forEachTokenFunction(decl, (node, startOffset) => {
+        const data = transformTokenFunction(node);
         if(data){
           const {cssVar, replacement, recommendation, original, index, endIndex} = data;
           const message = recommendation?messages.replaced(original, replacement):messages.deprecatedMsg;
@@ -79,7 +62,13 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity
           
           if(replacement){
             fix = () => {
-              decl.value = decl.value.replace(original, replacement);
+              const functionNode = getTokenFunctionNode(decl, original);
+              if(!functionNode){
+                return;
+              }
+              const valueStartIndex = functionNode.sourceIndex;
+              const valueEndIndex = functionNode.sourceEndIndex;
+              decl.value = decl.value.slice(0, valueStartIndex) + replacement + decl.value.slice(valueEndIndex);
             }
           }
           
@@ -89,8 +78,8 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity
             result,
             ruleName,
             severity,
-            index: index+startIndex, 
-            endIndex: endIndex+startIndex, 
+            index: index+startOffset, 
+            endIndex: endIndex+startOffset, 
             fix
           });
         }
@@ -102,7 +91,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity
 ruleFunction.ruleName = ruleName;
 ruleFunction.messages = messages;
 ruleFunction.meta = {
-  url: '',
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-tokens-slds1',
   fixable: true
 };
 

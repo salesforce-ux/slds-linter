@@ -1,15 +1,9 @@
 import path from 'path';
 import { BatchProcessor, BatchResult } from './batch-processor';
-import { WorkerConfig, WorkerResult, LintResult } from '../types';
+import { WorkerConfig, WorkerResult, LintResult, LintRunnerOptions } from '../types';
 import { Logger } from '../utils/logger';
 import { resolveDirName } from '../utils/nodeVersionUtil';
 
-export interface LintOptions {
-  fix?: boolean;
-  configPath?: string;
-  maxWorkers?: number;
-  timeoutMs?: number;
-}
 
 export class LintRunner {
   /**
@@ -18,7 +12,7 @@ export class LintRunner {
   static async runLinting(
     fileBatches: string[][],
     workerType: 'style' | 'component',
-    options: LintOptions = {}
+    options: LintRunnerOptions = {}
   ): Promise<LintResult[]> {
     try {
       const workerScript = path.resolve(

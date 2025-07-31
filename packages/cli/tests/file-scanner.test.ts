@@ -1,6 +1,6 @@
 import path from 'path';
-import { FileScanner, ScanOptions } from '../file-scanner';
-import { StyleFilePatterns } from '../file-patterns';
+import { FileScanner, ScanOptions } from '../src/services/file-scanner';
+import { StyleFilePatterns } from '../src/services/file-patterns';
 import {mkdir, writeFile, rm} from "fs/promises";
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);

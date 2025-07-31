@@ -1,6 +1,6 @@
 import { Declaration, Root } from 'postcss';
 import valueParser from 'postcss-value-parser';
-import stylelint, { PostcssResult, Rule, RuleSeverity } from 'stylelint';
+import stylelint, { PostcssResult, RuleSeverity } from 'stylelint';
 import ruleMetadata from '../../utils/rulesMetadata';
 import replacePlaceholders from '../../utils/util';
 import { isTargetProperty } from '../../utils/prop-utills';
@@ -11,8 +11,6 @@ const sldsPlusStylingHooks = metadata.sldsPlusStylingHooks;
 const { utils, createPlugin }: typeof stylelint = stylelint;
 
 const ruleName: string = 'slds/enforce-sds-to-slds-hooks';
-
-const ruleInfo = ruleMetadata(ruleName);
 
 const { severityLevel = 'error', warningMsg = '', errorMsg = '', ruleDesc = 'No description provided' } = ruleMetadata(ruleName) || {};
 
@@ -63,7 +61,7 @@ function detectRightSide(decl:Declaration, basicReportProps:Partial<stylelint.Pr
     const message = messages.replace(oldValue, suggestedMatch);
 
     utils.report(<stylelint.Problem>{
-      message: JSON.stringify({message, suggestions:[suggestedMatch]}),
+      message,
       index,
       endIndex,
       ...basicReportProps,
@@ -96,7 +94,7 @@ function detectLeftSide(decl:Declaration, basicReportProps:Partial<stylelint.Pro
   const message = messages.replace(prop, suggestedMatch);
 
     utils.report(<stylelint.Problem>{
-      message: JSON.stringify({message, suggestions:[suggestedMatch]}),
+      message,
       index: startIndex,
       endIndex,
       ...basicReportProps,
@@ -128,7 +126,7 @@ const ruleFunction:Partial<stylelint.Rule> = (primaryOptions: boolean, {severity
 
 ruleFunction.ruleName = ruleName;
 ruleFunction.meta = {
-  url: '',
+  url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-sds-to-slds-hooks',
   fixable: true
 };
 

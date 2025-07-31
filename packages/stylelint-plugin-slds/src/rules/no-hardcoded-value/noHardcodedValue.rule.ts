@@ -12,8 +12,11 @@ import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { handleFontProps } from './handlers/fontHandler';
 import { forEachDensifyValue } from '../../utils/density-utils';
 import { isFontProperty } from '../../utils/fontValueParser';
+import { isRuleEnabled } from '../../utils/rule-utils';
 
 const { createPlugin } = stylelint;
+
+
 
 export const createNoHardcodedValueRule = (
   ruleName: string,
@@ -33,6 +36,11 @@ export const createNoHardcodedValueRule = (
     { severity = severityLevel as RuleSeverity, propertyTargets = [] } = {}
   ) => {
     return (root: Root, result: PostcssResult) => {
+      // do not recommend slds1 hooks as replacement for hardcoded values if slds2 is enabled
+      if (ruleName === 'slds/no-hardcoded-values-slds1' && isRuleEnabled(result, 'slds/no-hardcoded-values-slds2')) {
+        return;
+      }
+
       root.walkDecls((decl) => {
         if (!isTargetProperty(decl.prop, propertyTargets)) {
           return;
@@ -94,7 +102,7 @@ export const createNoHardcodedValueRule = (
   ruleFunction.ruleName = ruleName;
   ruleFunction.messages = <any>messages;
   ruleFunction.meta = {
-    url: '',
+    url: 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-hardcoded-value',
     fixable: true,
   };
 

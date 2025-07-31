@@ -28,7 +28,7 @@ Install these items if they aren't installed already.
 - [VS Code](https://code.visualstudio.com/)
 - [SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=MS-SarifVSCode.sarif-viewer) VS Code extension. This extension enables you to view SLDS Linter violation reports.
 - [Node.js](https://nodejs.org/)
-  - The minimum supported version is **v18.4.0**
+  - The minimum supported version is **v18.18.0** 
   - We recommend using the latest [Active LTS](https://nodejs.org/en/about/previous-releases) version of Node.js.  
 
 ## Install SLDS Linter
@@ -102,7 +102,7 @@ These options are available on SLDS Linter commands.
 | `--fix`                  | Automatically fix problems                                                   | `lint`         |
 | `--config-stylelint <path>`  | Path to stylelint config file             | `lint`, `report`|
 | `--config-eslint <path>` | Path to eslint config file                    | `lint`, `report`|
-| `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode | `lint` |
+| `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Auto-detects if not specified | `lint` |
 | `--format <type>`        | Output format (sarif, csv). Defaults to sarif | `report` |
 
 To view help for these options, add `--help` to each command. For example, run `npx @salesforce-ux/slds-linter lint --help` to see which options you can use with `lint`.

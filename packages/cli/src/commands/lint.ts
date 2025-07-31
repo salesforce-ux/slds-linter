@@ -22,7 +22,7 @@ export function registerLintCommand(program: Command): void {
     .option('--fix', 'Automatically fix problems')
     .option('--config-stylelint <path>', 'Path to stylelint config file')
     .option('--config-eslint <path>', 'Path to eslint config file')
-    .option('--editor <editor>', 'Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode', 'vscode')
+    .option('--editor <editor>', 'Editor to open files with (e.g., vscode, atom, sublime). Auto-detects if not specified')
     .action(async (directory:string, options: CliOptions) => {
       const startTime = Date.now();
       try {
@@ -44,12 +44,7 @@ export function registerLintCommand(program: Command): void {
         }
 
         // Use Node API to perform the linting
-        const lintResults = await lint({
-          directory: normalizedOptions.directory,
-          fix: normalizedOptions.fix,
-          configStylelint: normalizedOptions.configStylelint,
-          configEslint: normalizedOptions.configEslint
-        });
+        const lintResults = await lint(normalizedOptions);
 
         // Print detailed lint results only for files with issues
         printLintResults(lintResults, normalizedOptions.editor);
