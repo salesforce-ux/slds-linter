@@ -13,6 +13,14 @@ function cleanDirs(){
     return rimraf(['build']);
 }
 
+/**
+ * Copy non-TypeScript assets (YAML files, etc.) to build directory
+ */
+function copyAssets() {
+  return src(['src/**/*.yml', 'src/**/*.yaml'])
+    .pipe(dest('build/'));
+}
+
  /**
   * Compile typescript files with version injection
   * */
@@ -56,6 +64,6 @@ const compileTs = async () => {
  */
 const generateDefinitions = task('tsc --project tsconfig.json');
 
-export const build = series(cleanDirs, compileTs, generateDefinitions);
+export const build = series(cleanDirs, compileTs, copyAssets, generateDefinitions);
 
 export default task('gulp --tasks');
