@@ -55,7 +55,6 @@ Object.assign(plugin.configs, {
         "@salesforce-ux/slds": plugin
       },
       rules: {
-        ...cssPlugin.configs.recommended.rules,
         "@salesforce-ux/slds/no-important-tag": "error",
         "@salesforce-ux/slds/no-slds-class-overrides": "warn"
       }

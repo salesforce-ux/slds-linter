@@ -45,97 +45,97 @@ ruleTester.run('no-important-tag', rule, {
     {
       code: `.example { color: red !important; }`,
       filename: 'test.css',
+      output: `.example { color: red; }`,
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
         suggestions: [
           {
             messageId: 'removeImportant',
-            output: `.example { color: red ; }`
+            output: `.example { color: red; }`
           },
           {
             messageId: 'addSpecificityComment',
             output: `.example { color: red /* TODO: Increase specificity instead */; }`
           }
         ]
-      }],
-      output: `.example { color: red ; }`
+      }]
     },
     {
       code: `.example { background-color: var(--slds-g-color-brand) !important; }`,
       filename: 'test.css',
+      output: `.example { background-color: var(--slds-g-color-brand); }`,
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
         suggestions: [
           {
             messageId: 'removeImportant',
-            output: `.example { background-color: var(--slds-g-color-brand) ; }`
+            output: `.example { background-color: var(--slds-g-color-brand); }`
           },
           {
             messageId: 'addSpecificityComment',
             output: `.example { background-color: var(--slds-g-color-brand) /* TODO: Increase specificity instead */; }`
           }
         ]
-      }],
-      output: `.example { background-color: var(--slds-g-color-brand) ; }`
+      }]
     },
     {
       code: `.example { --slds-custom-prop: blue !important; }`,
       filename: 'test.css',
+      output: `.example { --slds-custom-prop: blue; }`,
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
         suggestions: [
           {
             messageId: 'removeImportant',
-            output: `.example { --slds-custom-prop: blue ; }`
+            output: `.example { --slds-custom-prop: blue; }`
           },
           {
             messageId: 'addSpecificityComment',
             output: `.example { --slds-custom-prop: blue /* TODO: Increase specificity instead */; }`
           }
         ]
-      }],
-      output: `.example { --slds-custom-prop: blue ; }`
+      }]
     },
     {
       code: `.example { color: red ! /* comment */ important; }`,
       filename: 'test.css',
+      output: `.example { color: red; }`,
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
         suggestions: [
           {
             messageId: 'removeImportant',
-            output: `.example { color: red ; }`
+            output: `.example { color: red; }`
           },
           {
             messageId: 'addSpecificityComment',
             output: `.example { color: red /* TODO: Increase specificity instead */; }`
           }
         ]
-      }],
-      output: `.example { color: red ; }`
+      }]
     },
     {
       code: `.example { margin: 16px !  important; }`,
       filename: 'test.css',
+      output: `.example { margin: 16px; }`,
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
         suggestions: [
           {
             messageId: 'removeImportant',
-            output: `.example { margin: 16px ; }`
+            output: `.example { margin: 16px; }`
           },
           {
             messageId: 'addSpecificityComment',
             output: `.example { margin: 16px /* TODO: Increase specificity instead */; }`
           }
         ]
-      }],
-      output: `.example { margin: 16px ; }`
+      }]
     },
     {
       code: `.example { 
@@ -143,6 +143,10 @@ ruleTester.run('no-important-tag', rule, {
         background: blue !important; 
       }`,
       filename: 'test.css',
+      output: `.example { 
+        color: red; 
+        background: blue; 
+      }`,
       errors: [
         {
           messageId: 'unexpectedImportant',
@@ -151,7 +155,7 @@ ruleTester.run('no-important-tag', rule, {
             {
               messageId: 'removeImportant',
               output: `.example { 
-        color: red ; 
+        color: red; 
         background: blue !important; 
       }`
             },
@@ -172,7 +176,7 @@ ruleTester.run('no-important-tag', rule, {
               messageId: 'removeImportant',
               output: `.example { 
         color: red !important; 
-        background: blue ; 
+        background: blue; 
       }`
             },
             {
@@ -184,11 +188,7 @@ ruleTester.run('no-important-tag', rule, {
             }
           ]
         }
-      ],
-      output: `.example { 
-        color: red ; 
-        background: blue ; 
-      }`
-    }
+      ]
+    },
   ]
 }); 
