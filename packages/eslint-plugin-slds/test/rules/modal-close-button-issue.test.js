@@ -1,5 +1,4 @@
 const rule = require("./../../src/rules/modal-close-button-issue");
-const {messages} = require("./../../src/rules/utils/rule")
 const { RuleTester } = require("eslint");
 
 function normalizeHTML(html) {
@@ -54,14 +53,14 @@ ruleTester.run("slds-modal-button-issue", rule, {
     // ❌ Scenario 1: Remove slds-button_icon-inverse from a modal close button
     {
       code: `<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"></button>`,
-      errors: [{ message: messages["removeClass"], type: "Tag" }],
+      errors: [{ message: "Remove the slds-button_icon-inverse class from the modal close button in components that use the SLDS modal blueprint.", type: "Tag" }],
       output: `<button class="slds-button slds-button_icon slds-modal__close"></button>`,
     },
 
     // ❌ Scenario 2: Fix variant="bare-inverse" and ensure size="large" in lightning-button-icon
     {
       code: `<lightning-button-icon variant="bare-inverse" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>`,
-      errors: [{ message: messages["changeVariant"]}],
+      errors: [{ message: "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>."}],
       output: `<lightning-button-icon variant="bare" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>`,
     },
 
@@ -70,14 +69,14 @@ ruleTester.run("slds-modal-button-issue", rule, {
       code: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare-inverse" size="medium"></lightning-icon></button>`,
       errors: [
         //{ messageId: "ensureSizeAttribute", type: "Tag" },
-        { message: messages["changeVariant"]}
+        { message: "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>."}
       ],
       output: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare" size="medium"></lightning-icon></button>`,
     },
     {
       code: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare-inverse"></lightning-icon></button>`,
       errors: [
-        { message: messages["changeVariant"]}
+        { message: "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>."}
       ],
       output: `<button class="slds-button slds-modal__close"><lightning-icon variant="bare"></lightning-icon></button>`,
     },
@@ -95,8 +94,8 @@ ruleTester.run("slds-modal-button-issue", rule, {
                 <span class="slds-assistive-text">{cancelButtonLabel}</span>
             </button>`,
       errors: [
-        { message: messages["removeClass"]},
-        { message: messages["changeVariant"] }
+        { message: "Remove the slds-button_icon-inverse class from the modal close button in components that use the SLDS modal blueprint."},
+        { message: "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>." }
       ],
       output: `<button class="slds-button slds-button_icon slds-modal__close">
                 <lightning-icon
@@ -117,8 +116,8 @@ ruleTester.run("slds-modal-button-issue", rule, {
                 class="slds-button slds-button_icon slds-modal__close slds-button--icon-inverse" variant="bare-inverse" size="large">
             </lightning-button-icon>`,
       errors: [
-        { message: messages["removeClass"]},
-        { message: messages["changeVariant"]}
+        { message: "Remove the slds-button_icon-inverse class from the modal close button in components that use the SLDS modal blueprint."},
+        { message: "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>."}
       ],
       output: `<lightning-button-icon
                 title={labels.closeButton} icon-name="utility:close"
@@ -136,9 +135,9 @@ ruleTester.run("slds-modal-button-issue", rule, {
                 variant="bare-inverse" size="large">
             </lightning-button-icon>`,
       errors: [
-        { message: messages["removeClass"]},
-        { message: messages["changeVariant"]},
-        { message: messages["changeVariant"]},
+        { message: "Remove the slds-button_icon-inverse class from the modal close button in components that use the SLDS modal blueprint."},
+        { message: "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>."},
+        { message: "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>."},
       ],
       output: `<lightning-button-icon
                 title={labels.closeButton} icon-name="utility:close"
@@ -160,7 +159,7 @@ ruleTester.run("slds-modal-button-issue", rule, {
                 <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{heading}</h2>
             </header>`,
       errors: [
-        { message: messages["removeClass"]}
+        { message: "Remove the slds-button_icon-inverse class from the modal close button in components that use the SLDS modal blueprint."}
       ],
       output: `<header class="slds-modal__header">
                 <button class="slds-button slds-button_icon slds-modal__close" title={labels.Close} onclick={close}>

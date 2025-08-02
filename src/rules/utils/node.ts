@@ -25,4 +25,4 @@ function isAttributesEmpty(node) {
 export {
   findAttr,
   isAttributesEmpty,
-};
+}; 

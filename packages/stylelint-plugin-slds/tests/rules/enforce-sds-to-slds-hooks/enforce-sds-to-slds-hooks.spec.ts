@@ -1,5 +1,3 @@
-import { messages } from './../../../../eslint-plugin-slds/src/rules/utils/rule';
-
 import stylelint, { LinterResult, LinterOptions } from 'stylelint';
 
 const { lint }: typeof stylelint = stylelint;
