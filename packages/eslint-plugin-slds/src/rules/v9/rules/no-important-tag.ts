@@ -1,14 +1,7 @@
 /**
  * @fileoverview Rule to disallow `!important` flags in CSS properties
- * Uses YAML-based messages and ESLint v9 native messageId system
- * 
- * NOTE: We use a custom implementation instead of the official @eslint/css no-important rule because:
- * 1. SLDS-specific property targeting with isTargetProperty()
- * 2. CX writer message customization via YAML configuration
- * 3. Configurable propertyTargets for SLDS workflows
- * 4. Direct auto-fix instead of suggestions-only
- * 
- * Official rule: https://github.com/eslint/css/blob/main/docs/rules/no-important.md
+ * Compatible with @eslint/css parser for ESLint v9
+ * Enhanced with ESLint suggest API for multiple fix options
  */
 
 import { Rule } from 'eslint';
@@ -28,7 +21,7 @@ export default {
       url: ruleConfig.meta.docs.url || 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-important-tag',
     },
     fixable: ruleConfig.meta.fixable,
-    hasSuggestions: ruleConfig.meta.hasSuggestions,
+    hasSuggestions: true, // Enable suggestions API
     schema: [
       {
         type: 'object',
@@ -36,49 +29,72 @@ export default {
           propertyTargets: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Specific CSS properties to target (empty means target all SLDS properties)',
-          },
+            description: 'Array of CSS properties to target for !important checking'
+          }
         },
         additionalProperties: false,
       },
     ],
-    // Use messages directly from YAML - ESLint v9 handles {{placeholder}} interpolation
     messages: ruleConfig.messages,
   },
-
-  create(context: Rule.RuleContext): Rule.RuleListener {
-    // Skip non-CSS files
-    if (!context.filename?.match(/\.(css|scss)$/)) {
-      return {};
-    }
-
+  
+  create(context) {
+    const sourceCode = context.sourceCode;
     const options = context.options[0] || {};
     const propertyTargets = options.propertyTargets || [];
+    
+    // Simple regex to detect !important
     const importantPattern = /!(\s|\/\*.*?\*\/)*important/iu;
+
+    /**
+     * Generate suggestion options for replacing !important
+     */
+    function generateSuggestions(node: any, propertyName: string, currentValue: string) {
+      const suggestions = [];
+      const declarationText = sourceCode.getText(node);
+
+      // Suggestion 1: Simply remove !important
+      suggestions.push({
+        messageId: 'removeImportant',
+        fix(fixer) {
+          const newText = declarationText.replace(importantPattern, '');
+          const cleanedText = newText.replace(/\s*;/, ' ;');
+          return fixer.replaceText(node, cleanedText);
+        },
+      });
+
+      // Suggestion 2: Add specificity comment (following stylelint pattern)
+      suggestions.push({
+        messageId: 'addSpecificityComment',
+        fix(fixer) {
+          const newText = declarationText.replace(importantPattern, '/* TODO: Increase specificity instead */');
+          return fixer.replaceText(node, newText);
+        },
+      });
+
+      return suggestions;
+    }
 
     return {
       Declaration(node: any) {
-        // Check if this is a target property for SLDS linting
-        if (!isTargetProperty(node.property, propertyTargets)) {
-          return;
-        }
-
-        if (node.important) {
-          const sourceCode = context.sourceCode;
+        // Check if declaration has !important flag AND matches property targeting (stylelint parity)
+        if (node.important && isTargetProperty(node.property, propertyTargets)) {
           const declarationText = sourceCode.getText(node);
           const importantMatch = importantPattern.exec(declarationText);
-
+          
           if (importantMatch) {
-            // Report and auto-fix the !important flag
+            const currentValue = node.value;
+            
             context.report({
               node,
               messageId: 'unexpectedImportant',
+              // Auto-fix: Simple !important removal (parity with stylelint version)
               fix(fixer) {
-                // Primary fix: remove !important
-                const fullText = sourceCode.getText(node);
-                const newText = fullText.replace(importantPattern, '');
-                return fixer.replaceText(node, newText);
+                const newText = declarationText.replace(importantPattern, '');
+                const cleanedText = newText.replace(/\s*;/, ' ;');
+                return fixer.replaceText(node, cleanedText);
               },
+              suggest: generateSuggestions(node, node.property, currentValue),
             });
           }
         }

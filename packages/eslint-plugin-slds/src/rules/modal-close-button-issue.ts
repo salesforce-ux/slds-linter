@@ -1,4 +1,4 @@
-import { findAttr, isAttributesEmpty } from "./utils/node";
+import { findAttr, isAttributesEmpty } from "../utils/node";
 import { getRuleMessages } from '../utils/yaml-message-loader';
 
 const ruleMessages = getRuleMessages('modal-close-button-issue');

@@ -1,6 +1,7 @@
 /**
  * @fileoverview Rule to disallow overriding SLDS CSS classes
- * Uses YAML-based messages and ESLint v9 native messageId system
+ * Compatible with @eslint/css parser for ESLint v9
+ * Maintains parity with stylelint version (no auto-fix, basic suggestions)
  */
 
 import { Rule } from 'eslint';
@@ -9,6 +10,8 @@ import { getRuleConfig } from '../../../utils/yaml-message-loader';
 
 const ruleName = 'no-slds-class-overrides';
 const ruleConfig = getRuleConfig(ruleName);
+
+// Get SLDS classes from metadata (same as stylelint version)
 const sldsClasses = metadata.sldsPlusClasses;
 const sldsClassesSet = new Set(sldsClasses);
 
@@ -21,26 +24,40 @@ export default {
       recommended: ruleConfig.meta.docs.recommended,
       url: ruleConfig.meta.docs.url || 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides',
     },
-    fixable: ruleConfig.meta.fixable,
-    hasSuggestions: ruleConfig.meta.hasSuggestions,
+    fixable: null, // No auto-fix (parity with stylelint version)
+    hasSuggestions: true, // Basic suggest API
     schema: [],
-    // Use messages directly from YAML - ESLint v9 handles {{placeholder}} interpolation
     messages: ruleConfig.messages,
   },
+  
+  create(context) {
+    const sourceCode = context.sourceCode;
 
-  create(context: Rule.RuleContext): Rule.RuleListener {
-    // Skip non-CSS files
-    if (!context.filename?.match(/\.(css|scss)$/)) {
-      return {};
+    /**
+     * Generate basic suggestion options (simple, no complexity)
+     */
+    function generateSuggestions(node: any, className: string) {
+      const suggestions = [];
+      const selectorText = sourceCode.getText(node.parent || node);
+
+      // Basic suggestion: Add ESLint disable comment
+      suggestions.push({
+        messageId: 'addDisableComment',
+        data: { className },
+        fix(fixer) {
+          const ruleWithComment = `/* eslint-disable-next-line slds/no-slds-class-overrides */\n${selectorText}`;
+          return fixer.replaceText(node.parent || node, ruleWithComment);
+        },
+      });
+
+      return suggestions;
     }
 
     return {
-      // Use ClassSelector visitor to directly target CSS class selectors
       ClassSelector(node: any) {
-        // Extract the class name from the ClassSelector node
         const className = node.name;
         
-        // Check if this is an SLDS class that shouldn't be overridden
+        // Core detection logic (same as stylelint version)
         if (className && className.startsWith('slds-') && sldsClassesSet.has(className)) {
           context.report({
             node,
@@ -48,6 +65,8 @@ export default {
             data: {
               className: className,
             },
+            // Basic suggestions (no complexity)
+            suggest: generateSuggestions(node, className),
           });
         }
       },

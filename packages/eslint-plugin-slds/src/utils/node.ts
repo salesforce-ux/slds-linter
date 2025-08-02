@@ -2,7 +2,6 @@
 // Compatible with both ESLint v8 and v9
 
 /**
- * Find an attribute by key in a HTML node
  * @param {TagNode | ScriptTagNode | StyleTagNode} node
  * @param {string} key
  * @returns {AttributeNode | undefined}
@@ -14,7 +13,7 @@ function findAttr(node, key) {
 }
 
 /**
- * Checks whether a node's attributes is empty or not
+ * Checks whether a node's attributes is empty or not.
  * @param {TagNode | ScriptTagNode | StyleTagNode} node
  * @returns {boolean}
  */

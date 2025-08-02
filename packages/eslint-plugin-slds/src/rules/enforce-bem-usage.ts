@@ -1,4 +1,4 @@
-import { findAttr, isAttributesEmpty } from "./utils/node";
+import { findAttr, isAttributesEmpty } from "../utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
 import { getRuleMessages } from '../utils/yaml-message-loader';
 

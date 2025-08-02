@@ -11,13 +11,14 @@ no-important-tag:
   messages:
     unexpectedImportant: "Avoid using '!important' unless absolutely necessary."
     removeImportant: "Remove !important flag"
+    addSpecificityComment: "Replace !important with specificity comment"
 
 no-slds-class-overrides:
   description: "Create new custom CSS classes instead of overriding SLDS selectors"
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides"
   messages:
     sldsClassOverride: "Overriding SLDS class '{{className}}' isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button"
-    createCustomClass: "Create a custom class in your namespace"
+    addDisableComment: "Add eslint-disable comment for intentional override of {{className}}"
 
 # =============================================================================
 # HTML/Component Rules (ESLint v8 & v9)

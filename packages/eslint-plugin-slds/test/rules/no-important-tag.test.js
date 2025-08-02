@@ -48,6 +48,16 @@ ruleTester.run('no-important-tag', rule, {
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
+        suggestions: [
+          {
+            messageId: 'removeImportant',
+            output: `.example { color: red ; }`
+          },
+          {
+            messageId: 'addSpecificityComment',
+            output: `.example { color: red /* TODO: Increase specificity instead */; }`
+          }
+        ]
       }],
       output: `.example { color: red ; }`
     },
@@ -57,6 +67,16 @@ ruleTester.run('no-important-tag', rule, {
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
+        suggestions: [
+          {
+            messageId: 'removeImportant',
+            output: `.example { background-color: var(--slds-g-color-brand) ; }`
+          },
+          {
+            messageId: 'addSpecificityComment',
+            output: `.example { background-color: var(--slds-g-color-brand) /* TODO: Increase specificity instead */; }`
+          }
+        ]
       }],
       output: `.example { background-color: var(--slds-g-color-brand) ; }`
     },
@@ -66,6 +86,16 @@ ruleTester.run('no-important-tag', rule, {
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
+        suggestions: [
+          {
+            messageId: 'removeImportant',
+            output: `.example { --slds-custom-prop: blue ; }`
+          },
+          {
+            messageId: 'addSpecificityComment',
+            output: `.example { --slds-custom-prop: blue /* TODO: Increase specificity instead */; }`
+          }
+        ]
       }],
       output: `.example { --slds-custom-prop: blue ; }`
     },
@@ -75,6 +105,16 @@ ruleTester.run('no-important-tag', rule, {
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
+        suggestions: [
+          {
+            messageId: 'removeImportant',
+            output: `.example { color: red ; }`
+          },
+          {
+            messageId: 'addSpecificityComment',
+            output: `.example { color: red /* TODO: Increase specificity instead */; }`
+          }
+        ]
       }],
       output: `.example { color: red ; }`
     },
@@ -84,6 +124,16 @@ ruleTester.run('no-important-tag', rule, {
       errors: [{
         messageId: 'unexpectedImportant',
         type: 'Declaration',
+        suggestions: [
+          {
+            messageId: 'removeImportant',
+            output: `.example { margin: 16px ; }`
+          },
+          {
+            messageId: 'addSpecificityComment',
+            output: `.example { margin: 16px /* TODO: Increase specificity instead */; }`
+          }
+        ]
       }],
       output: `.example { margin: 16px ; }`
     },
@@ -97,10 +147,42 @@ ruleTester.run('no-important-tag', rule, {
         {
           messageId: 'unexpectedImportant',
           type: 'Declaration',
+          suggestions: [
+            {
+              messageId: 'removeImportant',
+              output: `.example { 
+        color: red ; 
+        background: blue !important; 
+      }`
+            },
+            {
+              messageId: 'addSpecificityComment',
+              output: `.example { 
+        color: red /* TODO: Increase specificity instead */; 
+        background: blue !important; 
+      }`
+            }
+          ]
         },
         {
           messageId: 'unexpectedImportant',
           type: 'Declaration',
+          suggestions: [
+            {
+              messageId: 'removeImportant',
+              output: `.example { 
+        color: red !important; 
+        background: blue ; 
+      }`
+            },
+            {
+              messageId: 'addSpecificityComment',
+              output: `.example { 
+        color: red !important; 
+        background: blue /* TODO: Increase specificity instead */; 
+      }`
+            }
+          ]
         }
       ],
       output: `.example { 
