@@ -36,14 +36,41 @@ export default {
     /**
      * Generate suggestion for disabling the rule
      */
-    function generateSuggestion(classNode: any, className: string) {
+    function generateSuggestion(classNode: any, className: string, selectorNode: any) {
       return {
         messageId: 'addDisableComment',
         data: { className },
         fix(fixer: any) {
-          const nodeText = sourceCode.getText(classNode);
-          const commentedText = `/* eslint-disable-next-line slds/no-slds-class-overrides */\n${nodeText}`;
-          return fixer.replaceText(classNode, commentedText);
+          // VSCode extension workaround: Avoid [0,0] ranges which it handles incorrectly
+          // Instead use replaceTextRange to replace a minimal range with comment + original text
+          const allText = sourceCode.getText();
+          const classRange = sourceCode.getRange(classNode);
+          const classStart = classRange[0];
+          
+          // Find the beginning of the line containing the class selector
+          let lineStart = classStart;
+          while (lineStart > 0 && allText[lineStart - 1] !== '\n') {
+            lineStart--;
+          }
+          
+          // Find the first non-whitespace character on this line (start of CSS selector)
+          let selectorStart = lineStart;
+          while (selectorStart < allText.length && /\s/.test(allText[selectorStart])) {
+            selectorStart++;
+          }
+          
+          // Find the end of the CSS selector (until the opening brace)
+          let selectorEnd = selectorStart;
+          while (selectorEnd < allText.length && allText[selectorEnd] !== '{') {
+            selectorEnd++;
+          }
+          
+          // Get the entire selector text and replace it with comment + selector
+          const selectorText = allText.substring(selectorStart, selectorEnd);
+          const comment = '/* eslint-disable-line @salesforce-ux/slds/no-slds-class-overrides */ ';
+          
+          // Replace entire selector with comment + selector to avoid [0,0] range issue
+          return fixer.replaceTextRange([selectorStart, selectorEnd], comment + selectorText);
         },
       };
     }
@@ -65,7 +92,7 @@ export default {
               node: classSelectorNode,
               messageId: 'sldsClassOverride',
               data: { className },
-              suggest: [generateSuggestion(classSelectorNode, className)],
+              suggest: [generateSuggestion(classSelectorNode, className, node)],
             });
           }
         }

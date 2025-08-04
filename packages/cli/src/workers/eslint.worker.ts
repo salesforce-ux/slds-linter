@@ -31,7 +31,8 @@ class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
             column: warning.column,
             endColumn: warning.endColumn,
             message: warning.message,
-            ruleId: warning.ruleId || 'unknown'
+            ruleId: warning.ruleId || 'unknown',
+            suggestions: warning.suggestions
           })),
         errors: fileResult.messages
           .filter(msg => msg.severity === 2)
@@ -40,7 +41,8 @@ class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
             column: error.column,
             endColumn: error.endColumn,
             message: error.message,
-            ruleId: error.ruleId || 'unknown'
+            ruleId: error.ruleId || 'unknown',
+            suggestions: error.suggestions
           }))
       };
     } catch (error: any) {

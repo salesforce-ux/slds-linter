@@ -168,15 +168,21 @@ export class ReportGenerator {
     runBuilder: SarifRunBuilder,
     lintResult: LintResult
   ): void {
-    lintResult.errors.forEach(error => {
-      const resultBuilder = new SarifResultBuilder().initSimple(transformedResults(lintResult, error, 'error'));
+    // Helper function to add results with fixes
+    const addResultWithFixes = (entry: LintResultEntry, level: 'error' | 'warning') => {
+      const transformedResult = transformedResults(lintResult, entry, level);
+      const resultBuilder = new SarifResultBuilder().initSimple(transformedResult);
+      
+      // Add fixes if they exist (already filtered in transformedResults)
+      if (transformedResult.fixes?.length) {
+        resultBuilder.result.fixes = transformedResult.fixes;
+      }
+      
       runBuilder.addResult(resultBuilder);
-    });
+    };
 
-    lintResult.warnings.forEach(warning => {
-      const resultBuilder = new SarifResultBuilder().initSimple(transformedResults(lintResult, warning, 'warning'));
-      runBuilder.addResult(resultBuilder);
-    });
+    lintResult.errors.forEach(error => addResultWithFixes(error, 'error'));
+    lintResult.warnings.forEach(warning => addResultWithFixes(warning, 'warning'));
   }
 }
 

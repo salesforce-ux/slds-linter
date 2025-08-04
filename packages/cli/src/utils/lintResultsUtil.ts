@@ -80,8 +80,45 @@ export function printLintResults(results: LintResult[], editor?: string): void {
   });
 }
 
+/**
+ * Create SARIF fixes from ESLint suggestions
+ * @param suggestions - ESLint suggestions array
+ * @param filePath - File path for the suggestions
+ * @param entry - Lint result entry for location context
+ * @returns SARIF-compliant fixes array
+ */
+function createSarifFixes(
+  suggestions: Array<{ desc: string; messageId?: string; fix?: { range: [number, number]; text: string } }>, 
+  filePath: string, 
+  entry: LintResultEntry
+) {
+  return suggestions
+    .filter(suggestion => suggestion.fix) // Only include suggestions with actual fixes
+    .map(suggestion => ({
+      description: {
+        text: suggestion.desc
+      },
+      artifactChanges: [{
+        artifactLocation: {
+          uri: path.relative(process.cwd(), filePath)
+        },
+        replacements: [{
+          deletedRegion: {
+            startLine: entry.line,
+            startColumn: entry.column,
+            endLine: entry.line,
+            endColumn: entry.endColumn
+          },
+          insertedContent: {
+            text: suggestion.fix!.text
+          }
+        }]
+      }]
+    }));
+}
+
 export function transformedResults(lintResult: LintResult, entry: LintResultEntry, level: 'error' | 'warning'): SarifResultEntry {
-  return {
+  const result: SarifResultEntry = {
     ruleId: replaceNamespaceinRules(entry.ruleId),
     level,
     messageText: parseText(entry.message),
@@ -90,5 +127,12 @@ export function transformedResults(lintResult: LintResult, entry: LintResultEntr
     startColumn: entry.column,
     endLine: entry.line,
     endColumn: entry.endColumn
+  };
+
+  // Convert ESLint suggestions to SARIF fixes
+  if (entry.suggestions?.length) {
+    result.fixes = createSarifFixes(entry.suggestions, lintResult.filePath, entry);
   }
+
+  return result;
 }

@@ -45,6 +45,14 @@ export interface LintResultEntry {
   message: string;
   ruleId: string;
   severity: number;
+  suggestions?: Array<{
+    desc: string;
+    messageId?: string;
+    fix?: {
+      range: [number, number];
+      text: string;
+    };
+  }>;
 }
 
 export interface LintResult {
@@ -69,6 +77,14 @@ export interface WorkerResult {
     endColumn: number;
     message: string;
     ruleId: string;
+    suggestions?: Array<{
+      desc: string;
+      messageId?: string;
+      fix?: {
+        range: [number, number];
+        text: string;
+      };
+    }>;
   }>;
   errors?: Array<{
     line: number;
@@ -76,6 +92,14 @@ export interface WorkerResult {
     endColumn: number;
     message: string;
     ruleId: string;
+    suggestions?: Array<{
+      desc: string;
+      messageId?: string;
+      fix?: {
+        range: [number, number];
+        text: string;
+      };
+    }>;
   }>;
 } 
 
@@ -88,4 +112,25 @@ export interface SarifResultEntry {
   startColumn?: number;
   endLine?: number;
   endColumn?: number;
+  fixes?: Array<{
+    description: {
+      text: string;
+    };
+    artifactChanges: Array<{
+      artifactLocation: {
+        uri: string;
+      };
+      replacements: Array<{
+        deletedRegion: {
+          startLine: number;
+          startColumn: number;
+          endLine: number;
+          endColumn: number;
+        };
+        insertedContent: {
+          text: string;
+        };
+      }>;
+    }>;
+  }>;
 }

@@ -70,7 +70,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
         suggestions: [
           {
             messageId: 'addDisableComment',
-            output: `/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button { background: red; }`
+            output: `/* eslint-disable-line @salesforce-ux/slds/no-slds-class-overrides */ .slds-button { background: red; }`
           }
         ]
       }]
@@ -84,7 +84,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
         suggestions: [
           {
             messageId: 'addDisableComment',
-            output: `/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-input { border-color: blue; }`
+            output: `/* eslint-disable-line @salesforce-ux/slds/no-slds-class-overrides */ .slds-input { border-color: blue; }`
           }
         ]
       }]
@@ -98,7 +98,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
         suggestions: [
           {
             messageId: 'addDisableComment',
-            output: `/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-card { padding: 20px; }`
+            output: `/* eslint-disable-line @salesforce-ux/slds/no-slds-class-overrides */ .slds-card { padding: 20px; }`
           }
         ]
       }]
@@ -112,7 +112,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
         suggestions: [
           {
             messageId: 'addDisableComment',
-            output: `.my-app /* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button { background: red; }`
+            output: `/* eslint-disable-line @salesforce-ux/slds/no-slds-class-overrides */ .my-app .slds-button { background: red; }`
           }
         ]
       }]
@@ -126,7 +126,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
         suggestions: [
           {
             messageId: 'addDisableComment',
-            output: `/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button:hover { background: blue; }`
+            output: `/* eslint-disable-line @salesforce-ux/slds/no-slds-class-overrides */ .slds-button:hover { background: blue; }`
           }
         ]
       }]
@@ -141,7 +141,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
           suggestions: [
             {
               messageId: 'addDisableComment',
-              output: `.slds-button/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button_brand { background: red; }`
+              output: `/* eslint-disable-line @salesforce-ux/slds/no-slds-class-overrides */ .slds-button.slds-button_brand { background: red; }`
             }
           ]
         }
@@ -161,7 +161,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
             {
               messageId: 'addDisableComment',
               output: `
-        /* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button { background: red; }
+        /* eslint-disable-line @salesforce-ux/slds/no-slds-class-overrides */ .slds-button { background: red; }
         .slds-input { border: blue; }
       `
             }
@@ -175,7 +175,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
               messageId: 'addDisableComment',
               output: `
         .slds-button { background: red; }
-        /* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-input { border: blue; }
+        /* eslint-disable-line @salesforce-ux/slds/no-slds-class-overrides */ .slds-input { border: blue; }
       `
             }
           ]
