@@ -17,10 +17,11 @@ const yamlPlugin = {
     build.onResolve({ filter: /\.ya?ml$/ }, args => ({
       path: resolve(dirname(args.importer), args.path),
       namespace: 'yaml-file',
+      external: false  // Mark as internal to bundle into output
     }));
     build.onLoad({ filter: /.*/, namespace: 'yaml-file' }, args => ({
-      contents: JSON.stringify(load(readFileSync(args.path, 'utf8'))),
-      loader: 'json',
+      contents: `module.exports = ${JSON.stringify(load(readFileSync(args.path, 'utf8')), null, 2)};`,
+      loader: 'js',
     }));
   },
 };
@@ -31,14 +32,6 @@ const yamlPlugin = {
  */
 function cleanDirs(){
     return rimraf(['build']);
-}
-
-/**
- * Copy non-TypeScript assets (YAML files, etc.) to build directory
- */
-function copyAssets() {
-  return src(['src/**/*.yml', 'src/**/*.yaml'])
-    .pipe(dest('build/'));
 }
 
  /**
@@ -84,6 +77,6 @@ const compileTs = async () => {
  */
 const generateDefinitions = task('tsc --project tsconfig.json');
 
-export const build = series(cleanDirs, compileTs, copyAssets, generateDefinitions);
+export const build = series(cleanDirs, compileTs, generateDefinitions);
 
 export default task('gulp --tasks');
