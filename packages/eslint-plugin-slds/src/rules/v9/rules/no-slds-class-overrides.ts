@@ -1,7 +1,7 @@
 /**
  * @fileoverview Rule to disallow overriding SLDS CSS classes
  * Compatible with @eslint/css parser for ESLint v9
- * Maintains parity with stylelint version (no auto-fix, basic suggestions)
+ * Maintains full parity with stylelint version behavior
  */
 
 import { Rule } from 'eslint';
@@ -24,8 +24,8 @@ export default {
       recommended: ruleConfig.meta.docs.recommended,
       url: ruleConfig.meta.docs.url || 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides',
     },
-    fixable: null, // No auto-fix (parity with stylelint version)
-    hasSuggestions: true, // Basic suggest API
+    fixable: null, // No auto-fix (matches stylelint's fixable: false)
+    hasSuggestions: true,
     schema: [],
     messages: ruleConfig.messages,
   },
@@ -34,39 +34,31 @@ export default {
     const sourceCode = context.sourceCode;
 
     /**
-     * Generate basic suggestion options (simple, no complexity)
+     * Generate suggestion for disabling the rule
      */
-    function generateSuggestions(node: any, className: string) {
-      const suggestions = [];
-      const selectorText = sourceCode.getText(node.parent || node);
-
-      // Basic suggestion: Add ESLint disable comment
-      suggestions.push({
+    function generateSuggestion(classNode: any, className: string) {
+      return {
         messageId: 'addDisableComment',
         data: { className },
-        fix(fixer) {
-          const ruleWithComment = `/* eslint-disable-next-line slds/no-slds-class-overrides */\n${selectorText}`;
-          return fixer.replaceText(node.parent || node, ruleWithComment);
+        fix(fixer: any) {
+          const nodeText = sourceCode.getText(classNode);
+          const commentedText = `/* eslint-disable-next-line slds/no-slds-class-overrides */\n${nodeText}`;
+          return fixer.replaceText(classNode, commentedText);
         },
-      });
-
-      return suggestions;
+      };
     }
 
     return {
-      ClassSelector(node: any) {
-        const className = node.name;
+      ClassSelector(classNode: any) {
+        const className = classNode.name;
         
         // Core detection logic (same as stylelint version)
         if (className && className.startsWith('slds-') && sldsClassesSet.has(className)) {
           context.report({
-            node,
+            node: classNode,
             messageId: 'sldsClassOverride',
-            data: {
-              className: className,
-            },
-            // Basic suggestions (no complexity)
-            suggest: generateSuggestions(node, className),
+            data: { className },
+            suggest: [generateSuggestion(classNode, className)],
           });
         }
       },
