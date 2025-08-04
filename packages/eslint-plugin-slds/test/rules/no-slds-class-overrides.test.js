@@ -53,6 +53,11 @@ ruleTester.run('no-slds-class-overrides', rule, {
       code: `.app-wrapper .custom-button:hover { background: red; }`,
       filename: 'test.css',
     },
+    // This case is valid since only the last class (.modified) is checked, and it's not an SLDS class
+    {
+      code: `.container .slds-input.modified { border: 2px solid red; }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Valid SLDS classes that should trigger warnings
@@ -126,34 +131,10 @@ ruleTester.run('no-slds-class-overrides', rule, {
         ]
       }]
     },
-    {
-      code: `.container .slds-input.modified { border: 2px solid red; }`,
-      filename: 'test.css',
-      errors: [{
-        messageId: 'sldsClassOverride',
-        type: 'ClassSelector',
-        suggestions: [
           {
-            messageId: 'addDisableComment',
-            output: `.container /* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-input.modified { border: 2px solid red; }`
-          }
-        ]
-      }]
-    },
-    {
       code: `.slds-button.slds-button_brand { background: red; }`,
       filename: 'test.css',
       errors: [
-        {
-          messageId: 'sldsClassOverride',
-          type: 'ClassSelector',
-          suggestions: [
-            {
-              messageId: 'addDisableComment',
-              output: `/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button.slds-button_brand { background: red; }`
-            }
-          ]
-        },
         {
           messageId: 'sldsClassOverride',
           type: 'ClassSelector',

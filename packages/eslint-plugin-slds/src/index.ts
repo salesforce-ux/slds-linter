@@ -3,7 +3,6 @@
 import enforceBemUsage from './rules/enforce-bem-usage';
 import noDeprecatedClassesSlds2 from './rules/no-deprecated-classes-slds2';
 import modalCloseButtonIssue from './rules/modal-close-button-issue';
-import noImportantTag from './rules/v9/rules/no-important-tag';
 import noSldsClassOverrides from './rules/v9/rules/no-slds-class-overrides';
 import htmlParser from "@html-eslint/parser";
 import cssPlugin from "@eslint/css";
@@ -12,7 +11,6 @@ const rules = {
   "enforce-bem-usage": enforceBemUsage,
   "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
   "modal-close-button-issue": modalCloseButtonIssue,
-  "no-important-tag": noImportantTag,
   "no-slds-class-overrides": noSldsClassOverrides,
 };
 
@@ -55,7 +53,6 @@ Object.assign(plugin.configs, {
         "@salesforce-ux/slds": plugin
       },
       rules: {
-        "@salesforce-ux/slds/no-important-tag": "error",
         "@salesforce-ux/slds/no-slds-class-overrides": "warn"
       }
     },

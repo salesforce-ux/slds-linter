@@ -49,17 +49,25 @@ export default {
     }
 
     return {
-      ClassSelector(classNode: any) {
-        const className = classNode.name;
+      // For no-slds-class-overrides: Only flags classes at selector end
+      "SelectorList Selector"(node: any) {
+        // Get the last ClassSelector in this selector (the one at the end)
+        const classSelectorNode = node.children.filter((child: any) => child.type === "ClassSelector").at(-1);
         
-        // Core detection logic (same as stylelint version)
-        if (className && className.startsWith('slds-') && sldsClassesSet.has(className)) {
-          context.report({
-            node: classNode,
-            messageId: 'sldsClassOverride',
-            data: { className },
-            suggest: [generateSuggestion(classNode, className)],
-          });
+        if (classSelectorNode) {
+          const className = classSelectorNode.name;
+          
+          // Check if it's an SLDS class that exists in metadata
+          if (className && 
+              className.startsWith('slds-') && 
+              sldsClassesSet.has(className)) {
+            context.report({
+              node: classSelectorNode,
+              messageId: 'sldsClassOverride',
+              data: { className },
+              suggest: [generateSuggestion(classSelectorNode, className)],
+            });
+          }
         }
       },
     };
