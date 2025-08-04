@@ -66,13 +66,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector',
-        suggestions: [
-          {
-            messageId: 'addDisableComment',
-            output: `/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button { background: red; }`
-          }
-        ]
+        type: 'ClassSelector'
       }]
     },
     {
@@ -80,13 +74,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector',
-        suggestions: [
-          {
-            messageId: 'addDisableComment',
-            output: `/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-input { border-color: blue; }`
-          }
-        ]
+        type: 'ClassSelector'
       }]
     },
     {
@@ -94,13 +82,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector',
-        suggestions: [
-          {
-            messageId: 'addDisableComment',
-            output: `/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-card { padding: 20px; }`
-          }
-        ]
+        type: 'ClassSelector'
       }]
     },
     {
@@ -108,13 +90,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector',
-        suggestions: [
-          {
-            messageId: 'addDisableComment',
-            output: `.my-app /* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button { background: red; }`
-          }
-        ]
+        type: 'ClassSelector'
       }]
     },
     {
@@ -122,13 +98,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector',
-        suggestions: [
-          {
-            messageId: 'addDisableComment',
-            output: `/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button:hover { background: blue; }`
-          }
-        ]
+        type: 'ClassSelector'
       }]
     },
           {
@@ -137,13 +107,7 @@ ruleTester.run('no-slds-class-overrides', rule, {
       errors: [
         {
           messageId: 'sldsClassOverride',
-          type: 'ClassSelector',
-          suggestions: [
-            {
-              messageId: 'addDisableComment',
-              output: `.slds-button/* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button_brand { background: red; }`
-            }
-          ]
+          type: 'ClassSelector'
         }
       ]
     },
@@ -156,29 +120,11 @@ ruleTester.run('no-slds-class-overrides', rule, {
       errors: [
         {
           messageId: 'sldsClassOverride',
-          type: 'ClassSelector',
-          suggestions: [
-            {
-              messageId: 'addDisableComment',
-              output: `
-        /* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-button { background: red; }
-        .slds-input { border: blue; }
-      `
-            }
-          ]
+          type: 'ClassSelector'
         },
         {
           messageId: 'sldsClassOverride',
-          type: 'ClassSelector',
-          suggestions: [
-            {
-              messageId: 'addDisableComment',
-              output: `
-        .slds-button { background: red; }
-        /* eslint-disable-next-line slds/no-slds-class-overrides */\n.slds-input { border: blue; }
-      `
-            }
-          ]
+          type: 'ClassSelector'
         }
       ]
     },

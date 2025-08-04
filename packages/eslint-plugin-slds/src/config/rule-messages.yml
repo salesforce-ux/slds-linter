@@ -18,7 +18,6 @@ no-slds-class-overrides:
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides"
   messages:
     sldsClassOverride: "Overriding .{{className}} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button."
-    addDisableComment: "Add eslint-disable comment for intentional override of {{className}}"
 
 # =============================================================================
 # HTML/Component Rules (ESLint v8 & v9)

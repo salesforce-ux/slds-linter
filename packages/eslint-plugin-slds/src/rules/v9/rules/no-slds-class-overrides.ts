@@ -25,29 +25,11 @@ export default {
       url: ruleConfig.meta.docs.url || 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides',
     },
     fixable: null, // No auto-fix (matches stylelint's fixable: false)
-    hasSuggestions: true,
     schema: [],
     messages: ruleConfig.messages,
   },
   
   create(context) {
-    const sourceCode = context.sourceCode;
-
-    /**
-     * Generate suggestion for disabling the rule
-     */
-    function generateSuggestion(classNode: any, className: string) {
-      return {
-        messageId: 'addDisableComment',
-        data: { className },
-        fix(fixer: any) {
-          const nodeText = sourceCode.getText(classNode);
-          const commentedText = `/* eslint-disable-next-line slds/no-slds-class-overrides */\n${nodeText}`;
-          return fixer.replaceText(classNode, commentedText);
-        },
-      };
-    }
-
     return {
       // For no-slds-class-overrides: Only flags classes at selector end
       "SelectorList Selector"(node: any) {
@@ -65,7 +47,6 @@ export default {
               node: classSelectorNode,
               messageId: 'sldsClassOverride',
               data: { className },
-              suggest: [generateSuggestion(classSelectorNode, className)],
             });
           }
         }
