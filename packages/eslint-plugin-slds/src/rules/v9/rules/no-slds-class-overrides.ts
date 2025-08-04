@@ -6,7 +6,7 @@
 
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
-import { getRuleConfig } from '../../../utils/yaml-message-loader';
+import { getRuleConfig } from '../../../utils/rule-config';
 
 const ruleName = 'no-slds-class-overrides';
 const ruleConfig = getRuleConfig(ruleName);

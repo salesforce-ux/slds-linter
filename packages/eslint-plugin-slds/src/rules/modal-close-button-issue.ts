@@ -1,5 +1,6 @@
+import { Rule } from 'eslint';
 import { findAttr, isAttributesEmpty } from "../utils/node";
-import { getRuleMessages } from '../utils/yaml-message-loader';
+import { getRuleMessages } from '../utils/rule-config';
 
 const ruleMessages = getRuleMessages('modal-close-button-issue');
 

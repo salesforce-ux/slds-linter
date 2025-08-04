@@ -1330,6 +1330,7 @@ __metadata:
     "@types/eslint": "npm:^8.56.0"
     "@types/jest": "npm:^29.5.14"
     "@types/js-yaml": "npm:^4.0.9"
+    "@types/node": "npm:^18.0.0"
     jest: "npm:^29.7.0"
     js-yaml: "npm:^4.1.0"
     ts-jest: "npm:^29.2.5"
@@ -1603,6 +1604,15 @@ __metadata:
   dependencies:
     undici-types: "npm:~7.8.0"
   checksum: 10c0/6c4686bc144f6ce7bffd4cadc3e1196e2217c1da4c639c637213719c8a3ee58b6c596b994befcbffeacd9d9eb0c3bff6529d2bc27da5d1cb9d58b1da0056f9f4
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^18.0.0":
+  version: 18.19.121
+  resolution: "@types/node@npm:18.19.121"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10c0/12ec33287214d617c7a5f8868f4ba11bd8c4dd895aa3e847bd15410eaf1ec58a0ce55dcb65a4eaffdccbb5e360476de88510248a681726bbc858fc90b8769e5d
   languageName: node
   linkType: hard
 
@@ -7571,6 +7581,13 @@ __metadata:
     last-run: "npm:^2.0.0"
     undertaker-registry: "npm:^2.0.0"
   checksum: 10c0/a3f4707de03affef7b93af7e1eb840a7af07ee2c9c25ce3a65930d8d0be08cf456e9f0c2998adc93b6c841e48c8df6c19f9f3ec99a31fd7245b0292059627c78
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~5.26.4":
+  version: 5.26.5
+  resolution: "undici-types@npm:5.26.5"
+  checksum: 10c0/bb673d7876c2d411b6eb6c560e0c571eef4a01c1c19925175d16e3a30c4c428181fb8d7ae802a261f283e4166a0ac435e2f505743aa9e45d893f9a3df017b501
   languageName: node
   linkType: hard
 

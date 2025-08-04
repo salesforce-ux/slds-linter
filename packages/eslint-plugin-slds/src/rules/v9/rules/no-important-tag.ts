@@ -5,7 +5,7 @@
  */
 
 import { Rule } from 'eslint';
-import { getRuleConfig } from '../../../utils/yaml-message-loader';
+import { getRuleConfig } from '../../../utils/rule-config';
 import { isTargetProperty } from '../../../utils/css-utils';
 
 const ruleName = 'no-important-tag';

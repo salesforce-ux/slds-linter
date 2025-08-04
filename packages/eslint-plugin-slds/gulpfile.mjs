@@ -4,6 +4,26 @@ import { rimraf} from 'rimraf'
 import {task} from "gulp-execa";
 import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
+import { load } from 'js-yaml';
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+
+/**
+ * esbuild plugin to handle YAML imports
+ */
+const yamlPlugin = {
+  name: 'yaml',
+  setup(build) {
+    build.onResolve({ filter: /\.ya?ml$/ }, args => ({
+      path: resolve(dirname(args.importer), args.path),
+      namespace: 'yaml-file',
+    }));
+    build.onLoad({ filter: /.*/, namespace: 'yaml-file' }, args => ({
+      contents: JSON.stringify(load(readFileSync(args.path, 'utf8'))),
+      loader: 'json',
+    }));
+  },
+};
 
 /**
  * Clean all generated folder
@@ -27,7 +47,7 @@ function copyAssets() {
 const compileTs = async () => {
   const isInternal = process.env.TARGET_PERSONA === 'internal';
   
-  const plugins = [];
+  const plugins = [yamlPlugin];
   
   if (isInternal) {
     plugins.push(
