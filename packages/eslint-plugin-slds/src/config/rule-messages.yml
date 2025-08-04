@@ -5,14 +5,6 @@
 # CSS Rules (ESLint v9 with @eslint/css)
 # =============================================================================
 
-no-important-tag:
-  description: "Avoid using '!important' unless absolutely necessary"
-  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-important-tag"
-  messages:
-    unexpectedImportant: "Avoid using '!important' unless absolutely necessary."
-    removeImportant: "Remove !important flag"
-    addSpecificityComment: "Replace !important with specificity comment"
-
 no-slds-class-overrides:
   description: "Create new custom CSS classes instead of overriding SLDS selectors"
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides"
