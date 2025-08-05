@@ -3,13 +3,13 @@
  * Converts YAML imports to JSON for testing
  */
 
-const yaml = require('js-yaml');
+const { parse } = require('yaml');
 const fs = require('fs');
 
 module.exports = {
   process(src, filename) {
     try {
-      const data = yaml.load(src);
+      const data = parse(src);
       return {
         code: `module.exports = ${JSON.stringify(data, null, 2)};`,
       };

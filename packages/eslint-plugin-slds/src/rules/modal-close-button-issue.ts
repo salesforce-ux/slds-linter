@@ -1,22 +1,22 @@
 import { Rule } from 'eslint';
 import { findAttr, isAttributesEmpty } from "../utils/node";
-import { getRuleMessages } from '../utils/rule-config';
+import ruleMessages from '../config/rule-messages.yml';
 
-const ruleMessages = getRuleMessages('modal-close-button-issue');
+const ruleConfig = ruleMessages['modal-close-button-issue'];
 
 // This rule specific to CVS, find more details here https://issues.salesforce.com/issue/a028c00000zh1iqAAA/modal-close-button-is-not-visible-with-the-new-white-background-after-winter-25-release
 export = {
   meta: {
-    type: "problem",
+    type: ruleConfig.type,
     docs: {
       category: "Best Practices",
       recommended: true,
-      description: ruleMessages.description,
-      url: ruleMessages.url
+      description: ruleConfig.description,
+      url: ruleConfig.url
     },
     fixable: "code",
     schema: [],
-    messages: ruleMessages.messages,
+    messages: ruleConfig.messages,
   },
 
   create(context) {

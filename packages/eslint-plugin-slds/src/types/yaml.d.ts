@@ -7,6 +7,7 @@ declare module '*.yml' {
   interface RuleMessages {
     description: string;
     url?: string;
+    type: 'problem' | 'suggestion' | 'layout';
     messages: Record<string, string>;
   }
   

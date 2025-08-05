@@ -6,10 +6,9 @@
 
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
-import { getRuleConfig } from '../../../utils/rule-config';
+import ruleMessages from '../../../config/rule-messages.yml';
 
-const ruleName = 'no-slds-class-overrides';
-const ruleConfig = getRuleConfig(ruleName);
+const ruleConfig = ruleMessages['no-slds-class-overrides'];
 
 // Get SLDS classes from metadata (same as stylelint version)
 const sldsClasses = metadata.sldsPlusClasses;
@@ -17,14 +16,15 @@ const sldsClassesSet = new Set(sldsClasses);
 
 export default {
   meta: {
-    type: ruleConfig.meta.type,
+    type: ruleConfig.type,
     docs: {
-      description: ruleConfig.meta.docs.description,
-      category: ruleConfig.meta.docs.category,
-      recommended: ruleConfig.meta.docs.recommended,
-      url: ruleConfig.meta.docs.url || 'https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides',
+      description: ruleConfig.description,
+      category: "Best Practices",
+      recommended: true,
+      url: ruleConfig.url,
     },
-    fixable: null, // No auto-fix (matches stylelint's fixable: false)
+    fixable: null,
+    hasSuggestions: false,
     schema: [],
     messages: ruleConfig.messages,
   },

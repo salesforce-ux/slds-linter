@@ -1,11 +1,11 @@
 import { Rule } from 'eslint';
 import { findAttr, isAttributesEmpty } from "../utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
-import { getRuleMessages } from '../utils/rule-config';
+import ruleMessages from '../config/rule-messages.yml';
 
 const bemMapping = metadata.bemNaming;
 const deprecatedClasses = metadata.deprecatedClasses;
-const ruleMessages = getRuleMessages('enforce-bem-usage');
+const ruleConfig = ruleMessages['enforce-bem-usage'];
 
 /**
  * Checks if a given className or its BEM mapped equivalent is deprecated.
@@ -22,14 +22,14 @@ const isDeprecatedClass = (className : string) => {
 
 export = {
   meta: {
-    type: "problem", // The rule type
+    type: ruleConfig.type,
     docs: {
       category: "Stylistic Issues",
       recommended: true,
-      description: ruleMessages.description,
-      url: ruleMessages.url
+      description: ruleConfig.description,
+      url: ruleConfig.url
     },
-    fixable: "code", // This rule can be fixed automatically
+    fixable: "code",
     schema: [
       {
         type: "object",
@@ -40,7 +40,7 @@ export = {
         additionalProperties: false,
       },
     ],
-    messages: ruleMessages.messages,
+    messages: ruleConfig.messages,
   },
 
   create(context) {  

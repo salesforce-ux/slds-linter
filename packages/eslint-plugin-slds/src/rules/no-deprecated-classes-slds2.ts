@@ -1,22 +1,22 @@
 import { Rule } from 'eslint';
 import { findAttr, isAttributesEmpty } from "../utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
-import { getRuleMessages } from '../utils/rule-config';
+import ruleMessages from '../config/rule-messages.yml';
 
 const deprecatedClasses = metadata.deprecatedClasses;
-const ruleMessages = getRuleMessages('no-deprecated-classes-slds2');
+const ruleConfig = ruleMessages['no-deprecated-classes-slds2'];
 
 export = {
   meta: {
-    type: "problem", // The rule type
+    type: ruleConfig.type,
     docs: {
       category: "Best Practices",
       recommended: true,
-      description: ruleMessages.description,
-      url: ruleMessages.url
+      description: ruleConfig.description,
+      url: ruleConfig.url
     },
-    schema: [], // No additional options needed
-    messages: ruleMessages.messages,
+    schema: [],
+    messages: ruleConfig.messages,
   },
 
   create(context) {

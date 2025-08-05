@@ -1,5 +1,5 @@
-# ESLint Rule Messages - Centralized Configuration
-# This file contains rule descriptions, documentation URLs, and user-facing messages for all rules
+# ESLint Rule Messages - Complete Configuration
+# This file contains all rule metadata: descriptions, documentation URLs, user-facing messages etc.
 
 # =============================================================================
 # CSS Rules (ESLint v9 with @eslint/css)
@@ -8,9 +8,10 @@
 no-slds-class-overrides:
   description: "Create new custom CSS classes instead of overriding SLDS selectors"
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides"
+  type: "problem"
   messages:
     sldsClassOverride: "Overriding .{{className}} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button."
-
+  
 # =============================================================================
 # HTML/Component Rules (ESLint v8 & v9)
 # =============================================================================
@@ -18,6 +19,7 @@ no-slds-class-overrides:
 enforce-bem-usage:
   description: "Replace BEM double-dash syntax in class names with single underscore syntax"
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-bem-usage"
+  type: "suggestion"
   messages:
     bemDoubleDash: "{{actual}} has been retired. Update it to the new name {{newValue}}."
     fixBemNaming: "Update to correct BEM naming convention"
@@ -25,6 +27,7 @@ enforce-bem-usage:
 modal-close-button-issue:
   description: "Update component attributes or CSS classes for the modal close button to comply with the modal component blueprint"
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#modal-close-button-issue"
+  type: "problem"
   messages:
     modalCloseButtonIssue: "Update component attributes or CSS classes for the modal close button to comply with the modal component blueprint."
     removeClass: "Remove the slds-button_icon-inverse class from the modal close button in components that use the SLDS modal blueprint."
@@ -36,6 +39,7 @@ modal-close-button-issue:
 no-deprecated-classes-slds2:
   description: "Replace classes that aren't available with SLDS 2 classes"
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-classes-slds2"
+  type: "problem"
   messages:
     deprecatedClass: "The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information."
     updateToModernClass: "Replace deprecated class with modern equivalent"
