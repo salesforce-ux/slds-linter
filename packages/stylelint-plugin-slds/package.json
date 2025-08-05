@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/stylelint-plugin-slds",
-  "version": "0.3.1-internal-beta.3",
+  "version": "0.5.0",
   "type": "module",
   "main": "build/index.js",
   "files": [
