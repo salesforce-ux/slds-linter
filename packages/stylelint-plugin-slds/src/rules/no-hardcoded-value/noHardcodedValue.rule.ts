@@ -5,12 +5,11 @@ import ruleMetadata from '../../utils/rulesMetadata';
 import { isTargetProperty } from '../../utils/prop-utills';
 import { handleBoxShadow } from './handlers/boxShadowHandler';
 import { handleColorProps } from './handlers/colorHandler';
-import { handleDensityPropForNode } from './handlers/densityHandler';
+import { handleDensityProps } from './handlers/densityHandler';
 import { toRuleMessages } from '../../utils/rule-message-utils';
 import { colorProperties, densificationProperties, matchesCssProperty } from '../../utils/property-matcher';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { handleFontProps } from './handlers/fontHandler';
-import { forEachDensifyValue } from '../../utils/density-utils';
 import { isFontProperty } from '../../utils/fontValueParser';
 import { isRuleEnabled } from '../../utils/rule-utils';
 
@@ -80,20 +79,30 @@ export const createNoHardcodedValueRule = (
             reportProps,
             messages
           );
-        } else if (isColorProp) {
-          handleColorProps(
-            decl,
-            parsedValue,
-            cssValueStartIndex,
-            supportedStylinghooks,
-            cssProperty,
-            reportProps,
-            messages
-          );
-        } else if (isDensiProp) {
-          forEachDensifyValue(parsedValue, (node) => {
-            handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, cssProperty, reportProps, messages);
-          });
+        } else {
+          if (isColorProp) {
+            handleColorProps(
+              decl,
+              parsedValue,
+              cssValueStartIndex,
+              supportedStylinghooks,
+              cssProperty,
+              reportProps,
+              messages
+            );
+          }
+          
+          if (isDensiProp) {
+            handleDensityProps(
+              decl,
+              parsedValue,
+              cssValueStartIndex,
+              supportedStylinghooks,
+              cssProperty,
+              reportProps,
+              messages
+            );
+          }
         }
       });
     };

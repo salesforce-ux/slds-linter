@@ -1,48 +1,30 @@
-import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
-import { matchesCssProperty } from './property-matcher';
-import { addOnlyUnique } from './util';
-import { toAlternateUnitValue } from './value-utils';
+import type { ValueToStylingHookEntry, ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
+import { ParsedUnitValue, parseUnitValue, toAlternateUnitValue } from './value-utils';
 
-// Define the structure of a hook
-export interface Hook {
-  name: string;
-  properties: string[];
-}
 
-export const findExactMatchStylingHook = (
-  cssValue: string,
-  supportedStylinghooks: ValueToStylingHooksMapping,
-  cssProperty: string
-): string[] => {
-  let matchedHooks: string[] = [];
-  if (cssValue in supportedStylinghooks) {
-    const hooks = supportedStylinghooks[cssValue] || [];
-    matchedHooks = hooks
-      .filter((hook: Hook) => {
-        return matchesCssProperty(hook.properties, cssProperty);
-      })
-      .map((hook) => hook.name);
+function isValueMatch(valueToMatch: ParsedUnitValue, sldsValue: ParsedUnitValue): boolean {
+  if (!valueToMatch || !sldsValue) {
+    return false;
   }
-  return matchedHooks;
-}; 
+  return valueToMatch.unit === sldsValue.unit && valueToMatch.number === sldsValue.number;
+}
 
 export function getStylingHooksForDensityValue(
   value: string,
   supportedStylinghooks: ValueToStylingHooksMapping,
   cssProperty: string
-): string[] {  
-    const alternateValue = toAlternateUnitValue(value);
-    let closestHooks = findExactMatchStylingHook(
-      value,
-      supportedStylinghooks,
-      cssProperty
-    );
+): string[] {
+  const valueToMatch = parseUnitValue(value);
+  const alternateValue = toAlternateUnitValue(valueToMatch.number, valueToMatch.unit);
+  const matchedHooks = [];
 
-    const alternateHooks = alternateValue ? findExactMatchStylingHook(
-      alternateValue,
-      supportedStylinghooks,
-      cssProperty
-    ) : [];
-
-    return addOnlyUnique(closestHooks, alternateHooks);
+  for (const [sldsValue, hooks] of Object.entries(supportedStylinghooks)) {
+    const parsedValue = parseUnitValue(sldsValue);
+    if (isValueMatch(valueToMatch, parsedValue) || isValueMatch(alternateValue, parsedValue)) {
+      hooks
+        .filter((hook: ValueToStylingHookEntry) => hook.properties.includes(cssProperty))
+        .forEach((hook) => matchedHooks.push(hook.name));
+    }
+  }
+  return matchedHooks;
 }
