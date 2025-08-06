@@ -19,7 +19,7 @@ no-slds-class-overrides:
 enforce-bem-usage:
   description: "Replace BEM double-dash syntax in class names with single underscore syntax"
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-bem-usage"
-  type: "suggestion"
+  type: "problem"
   messages:
     bemDoubleDash: "{{actual}} has been retired. Update it to the new name {{newValue}}."
     fixBemNaming: "Update to correct BEM naming convention"
