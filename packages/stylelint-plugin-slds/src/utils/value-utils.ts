@@ -38,23 +38,39 @@ export function isGlobalValue(value: string): boolean {
     return value === 'initial' || value === 'inherit' || value === 'unset' || value === 'revert' || value === 'revert-layer';
   }
 
+export type ParsedUnitValue = {
+  unit: 'px' | 'rem';
+  number: number;
+} | null;
 
+export function parseUnitValue(value: string): ParsedUnitValue {
+  const parsedValue = valueParser.unit(value);
+  if(!parsedValue){
+    return null;
+  }
+  return {
+    unit: parsedValue.unit as 'px' | 'rem',
+    number: parseFloat(parsedValue.number)
+  };
+}
 
-export function toAlternateUnitValue(value: string): string {
-    const parsedValue = valueParser.unit(value);
-    const unitType = parsedValue && parsedValue.unit;
-    const numberVal = parsedValue ? Number(parsedValue.number) : 0;
-    let alternateValue = null;
+export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem'): ParsedUnitValue {
     if (unitType === 'px') {
       let floatValue = parseFloat(`${numberVal / 16}`);
       if (!isNaN(floatValue)) {
-        alternateValue = `${parseFloat(floatValue.toFixed(4))}rem`;
+        return {
+          unit: 'rem',
+          number: parseFloat(floatValue.toFixed(4))
+        }
       }
     } else if (unitType === 'rem') {
       const intValue = parseInt(`${numberVal * 16}`);
       if (!isNaN(intValue)) {
-        alternateValue = `${intValue}px`;
+        return {
+          unit: 'px',
+          number: intValue
+        }
       }
     }
-    return alternateValue;
+    return null;
 }

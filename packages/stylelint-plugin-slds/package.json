@@ -16,7 +16,7 @@
     "dev": "gulp dev"
   },
   "dependencies": {
-    "@salesforce-ux/sds-metadata": "^0.3.2",
+    "@salesforce-ux/sds-metadata": "^0.3.3",
     "chroma-js": "^3.1.2"
   },
   "devDependencies": {

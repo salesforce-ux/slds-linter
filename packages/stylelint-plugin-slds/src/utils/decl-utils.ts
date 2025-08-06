@@ -79,3 +79,7 @@ export function isCommaDivision(node: valueParser.Node): boolean {
 export function isInsetKeyword(node: valueParser.Node): boolean {
   return node.type === 'word' && node.value === 'inset';
 }
+
+export function isSameNode(node1: valueParser.Node, node2: valueParser.Node): boolean {
+  return node1.type === node2.type && node1.value === node2.value && node1.sourceIndex === node2.sourceIndex && node1.sourceEndIndex === node2.sourceEndIndex;
+}
