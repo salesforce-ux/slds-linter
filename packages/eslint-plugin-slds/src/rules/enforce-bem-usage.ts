@@ -1,7 +1,11 @@
-import { findAttr, isAttributesEmpty } from "./utils/node";
+import { Rule } from 'eslint';
+import { findAttr, isAttributesEmpty } from "../utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
+import ruleMessages from '../config/rule-messages.yml';
+
 const bemMapping = metadata.bemNaming;
 const deprecatedClasses = metadata.deprecatedClasses;
+const ruleConfig = ruleMessages['enforce-bem-usage'];
 
 /**
  * Checks if a given className or its BEM mapped equivalent is deprecated.
@@ -18,14 +22,14 @@ const isDeprecatedClass = (className : string) => {
 
 export = {
   meta: {
-    type: "problem", // The rule type
+    type: ruleConfig.type,
     docs: {
       category: "Stylistic Issues",
       recommended: true,
-      description: "Replace BEM double-dash syntax in class names with single underscore syntax.",
-      url : "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-bem-usage"
+      description: ruleConfig.description,
+      url: ruleConfig.url
     },
-    fixable: "code", // This rule can be fixed automatically
+    fixable: "code",
     schema: [
       {
         type: "object",
@@ -36,6 +40,7 @@ export = {
         additionalProperties: false,
       },
     ],
+    messages: ruleConfig.messages,
   },
 
   create(context) {  
@@ -68,11 +73,11 @@ export = {
             context.report({
               node,
               loc: { start: startLoc, end: endLoc },
+              messageId: 'bemDoubleDash',
               data: {
                 actual: className,
                 newValue
               },
-              message: "{{actual}} has been retired. Update it to the new name {{newValue}}.",
               fix(fixer) {
                 if (newValue) {
                   const newClassValue = classAttr.value.value.replace(

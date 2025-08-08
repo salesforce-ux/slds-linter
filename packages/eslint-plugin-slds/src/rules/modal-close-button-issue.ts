@@ -1,18 +1,22 @@
-import { findAttr, isAttributesEmpty } from "./utils/node";
-import { messages } from "./utils/rule";
+import { Rule } from 'eslint';
+import { findAttr, isAttributesEmpty } from "../utils/node";
+import ruleMessages from '../config/rule-messages.yml';
+
+const ruleConfig = ruleMessages['modal-close-button-issue'];
 
 // This rule specific to CVS, find more details here https://issues.salesforce.com/issue/a028c00000zh1iqAAA/modal-close-button-is-not-visible-with-the-new-white-background-after-winter-25-release
 export = {
   meta: {
-    type: "problem",
+    type: ruleConfig.type,
     docs: {
       category: "Best Practices",
       recommended: true,
-      description: "Update component attributes or CSS classes for the modal close button to comply with the modal component blueprint.",
-      url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#modal-close-button-issue"
+      description: ruleConfig.description,
+      url: ruleConfig.url
     },
     fixable: "code",
     schema: [],
+    messages: ruleConfig.messages,
   },
 
   create(context) {
@@ -43,7 +47,7 @@ export = {
                         context.report({
                             node,
                             loc: classAttr.loc,
-                            message: messages["removeClass"],
+                            messageId: "removeClass",
                             fix(fixer) {                         
                                 return fixer.replaceText(classAttr, // Replace the full attribute
                                 `class="${newClassList}"` // Updated class list
@@ -85,7 +89,7 @@ export = {
                             context.report({
                                 node,
                                 loc: attribute.loc,
-                                message: messages["removeClass"],
+                                messageId: "removeClass",
                                 fix(fixer) {
                                     return fixer.replaceText(attribute, // Replace the full attribute
                                     `${attrName}="${newClassList}"` // Correctly modifies the respective attribute
@@ -111,7 +115,7 @@ export = {
               context.report({
                 node: attribute,
                 loc: attribute.value.loc,
-                message: messages["ensureButtonClasses"],
+                messageId: "ensureButtonClasses",
                 fix(fixer) {
                   return fixer.replaceText(attribute.value, `${newClassList}`);
                 },
@@ -121,7 +125,7 @@ export = {
             if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
               context.report({
                 node: variantAttr,
-                message: messages["changeVariant"],
+                messageId: "changeVariant",
                 loc: variantAttr.value.loc,
                 fix(fixer) {
                     return fixer.replaceText(variantAttr.value, `bare`);
@@ -166,7 +170,7 @@ export = {
           if (variantAttr && variantAttr.value && variantAttr.value.value === "bare-inverse") {
             context.report({
               node: variantAttr,
-              message: messages["changeVariant"],
+              messageId: "changeVariant",
               loc: variantAttr.value.loc,
               fix(fixer) {
                   return fixer.replaceText(variantAttr.value, `bare`);

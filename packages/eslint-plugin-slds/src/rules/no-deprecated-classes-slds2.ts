@@ -1,17 +1,22 @@
-import { findAttr, isAttributesEmpty } from "./utils/node";
+import { Rule } from 'eslint';
+import { findAttr, isAttributesEmpty } from "../utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
+import ruleMessages from '../config/rule-messages.yml';
+
 const deprecatedClasses = metadata.deprecatedClasses;
+const ruleConfig = ruleMessages['no-deprecated-classes-slds2'];
 
 export = {
   meta: {
-    type: "problem", // The rule type
+    type: ruleConfig.type,
     docs: {
       category: "Best Practices",
       recommended: true,
-      description: "Replace classes that aren’t available with SLDS 2 classes. See lightningdesignsystem.com for more info.",
-      url : "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-classes-slds2"
+      description: ruleConfig.description,
+      url: ruleConfig.url
     },
-    schema: [], // No additional options needed
+    schema: [],
+    messages: ruleConfig.messages,
   },
 
   create(context) {
@@ -44,10 +49,10 @@ export = {
             context.report({
               node,
               loc: { start: startLoc, end: endLoc },
+              messageId: 'deprecatedClass',
               data: {
                 className,
               },
-              message: "The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information.",
             });
           }
         });

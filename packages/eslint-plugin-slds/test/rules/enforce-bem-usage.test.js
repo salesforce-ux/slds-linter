@@ -44,7 +44,7 @@ ruleTester.run("enforce-bem-usage", rule, {
       code: `<div class="slds-container--medium"></div>`, // Invalid: underscore instead of double underscore
       errors: [
         {
-          message: "slds-container--medium has been retired. Update it to the new name slds-container_medium.",
+          messageId: "bemDoubleDash",
           line: 1,
           column: 13,
         },
@@ -55,7 +55,7 @@ ruleTester.run("enforce-bem-usage", rule, {
       code: `<div class="block block_element slds-border--left"></div>`, // Invalid: `block_element` not in BEM
       errors: [
         {
-          message: "slds-border--left has been retired. Update it to the new name slds-border_left.",
+          messageId: "bemDoubleDash",
           line: 1,
           column: 33,
         }
@@ -66,7 +66,7 @@ ruleTester.run("enforce-bem-usage", rule, {
       code: `<div class="slds-p-right--xxx-small"></div>`, // Invalid: Missing block name
       errors: [
         {
-          message: "slds-p-right--xxx-small has been retired. Update it to the new name slds-p-right_xxx-small.",
+          messageId: "bemDoubleDash",
           line: 1,
           column: 13,
         },

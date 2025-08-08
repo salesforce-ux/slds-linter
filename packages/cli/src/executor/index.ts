@@ -45,14 +45,16 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
       configPath: configStylelint,
     });
     
-    // Run linting on component files
-    const componentResults = await LintRunner.runLinting(componentFiles, 'component', {
+    // Combine all files into a single array for unified processing
+    const allFiles = [...styleFiles, ...componentFiles];
+    // Run linting on all files
+    const allResults = await LintRunner.runLinting(allFiles, 'component', {
       fix,
       configPath: configEslint,
     });
     
     // Combine results from both linters
-    const combinedResults = [...styleResults, ...componentResults];
+    const combinedResults = [...styleResults, ...allResults];
     return standardizeLintMessages(combinedResults);
   } catch (error: any) {
     // Enhance error with context for better debugging
