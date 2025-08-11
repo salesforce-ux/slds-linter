@@ -3,7 +3,7 @@
  * Allows importing .yml files as JSON objects via esbuild
  */
 
-declare module '*.yml' {
+declare module '*rule-messages.yml' {
   interface RuleMessages {
     description: string;
     url?: string;
