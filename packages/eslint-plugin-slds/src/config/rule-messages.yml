@@ -13,7 +13,7 @@ no-slds-class-overrides:
     sldsClassOverride: "Overriding .{{className}} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button."
 
 no-deprecated-slds-classes:
-  description: "Replace classes that aren't available with SLDS 2 classes"
+  description: "Please replace the deprecated classes with a modern equivalent"
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-slds-classes"
   type: "problem"
   messages:
