@@ -4,6 +4,27 @@ import { rimraf} from 'rimraf'
 import {task} from "gulp-execa";
 import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
+import { parse } from 'yaml';
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+
+/**
+ * esbuild plugin to handle YAML imports
+ */
+const yamlPlugin = {
+  name: 'yaml',
+  setup(build) {
+    build.onResolve({ filter: /\.ya?ml$/ }, args => ({
+      path: resolve(dirname(args.importer), args.path),
+      namespace: 'yaml-file',
+      external: false  // Mark as internal to bundle into output
+    }));
+    build.onLoad({ filter: /.*/, namespace: 'yaml-file' }, args => ({
+      contents: `module.exports = ${JSON.stringify(parse(readFileSync(args.path, 'utf8')), null, 2)};`,
+      loader: 'js',
+    }));
+  },
+};
 
 /**
  * Clean all generated folder
@@ -19,7 +40,7 @@ function cleanDirs(){
 const compileTs = async () => {
   const isInternal = process.env.TARGET_PERSONA === 'internal';
   
-  const plugins = [];
+  const plugins = [yamlPlugin];
   
   if (isInternal) {
     plugins.push(

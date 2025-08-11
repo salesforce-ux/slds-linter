@@ -48,12 +48,6 @@
             "severity": "warning"
         }
     ],
-    "slds/no-slds-class-overrides": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/no-slds-namespace-for-custom-hooks": [
         true,
         {

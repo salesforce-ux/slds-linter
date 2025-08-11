@@ -5,9 +5,11 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "declaration": true,
+    "emitDeclarationOnly": true,
     "noEmitOnError": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["./src/types", "./node_modules/@types", "../../node_modules/@types"]
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["build", "node_modules"]

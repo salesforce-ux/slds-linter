@@ -3,39 +3,58 @@
 import enforceBemUsage from './rules/enforce-bem-usage';
 import noDeprecatedClassesSlds2 from './rules/no-deprecated-classes-slds2';
 import modalCloseButtonIssue from './rules/modal-close-button-issue';
+import noSldsClassOverrides from './rules/v9/no-slds-class-overrides';
 import htmlParser from "@html-eslint/parser";
+import cssPlugin from "@eslint/css";
+
+const rules = {
+  "enforce-bem-usage": enforceBemUsage,
+  "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
+  "modal-close-button-issue": modalCloseButtonIssue,
+  "no-slds-class-overrides": noSldsClassOverrides,
+};
 
 const plugin = {
   meta: {
     name: "@salesforce-ux/eslint-plugin-slds",
     version: process.env.PLUGIN_VERSION
   },
-  configs: {},
-  rules: {
-    "enforce-bem-usage": enforceBemUsage,
-    "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
-    "modal-close-button-issue": modalCloseButtonIssue
-  }
+  rules,
+  configs: {}
 };
 
 Object.assign(plugin.configs, {
-  // flat config format for ESLint v9+
+  // Flat config for ESLint v9+
   "flat/recommended": [
+    // HTML/Component config
     {
-      plugins: {
-        "@salesforce-ux/slds": plugin,
-      },
-      rules: {
-        "@salesforce-ux/slds/enforce-bem-usage": "error",
-        "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
-        "@salesforce-ux/slds/modal-close-button-issue": "error"
-      },
+      files: ["**/*.html", "**/*.cmp"],
       languageOptions: {
         parser: htmlParser,
         ecmaVersion: 2021,
         sourceType: "module"
       },
-      files: ["**/*.html", "**/*.cmp"]
+      plugins: {
+        "@salesforce-ux/slds": plugin
+      },
+      rules: {
+        "@salesforce-ux/slds/enforce-bem-usage": "error",
+        "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
+        "@salesforce-ux/slds/modal-close-button-issue": "error"
+      }
+    },
+    // CSS/SCSS config
+    {
+      files: ["**/*.{css,scss}"],
+      language: "css/scss",
+      ...cssPlugin.configs.recommended,
+      plugins: {
+        css: cssPlugin,
+        "@salesforce-ux/slds": plugin
+      },
+      rules: {
+        "@salesforce-ux/slds/no-slds-class-overrides": "warn"
+      }
     }
   ],
   // legacy config for ESLint v8-
