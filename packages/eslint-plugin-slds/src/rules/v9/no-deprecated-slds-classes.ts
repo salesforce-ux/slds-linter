@@ -1,9 +1,3 @@
-/**
- * @fileoverview Rule to disallow deprecated SLDS CSS classes
- * Compatible with @eslint/css parser for ESLint v9
- * Maintains full parity with stylelint version behavior
- */
-
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages.yml';
