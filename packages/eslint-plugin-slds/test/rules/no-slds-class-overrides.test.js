@@ -1,4 +1,4 @@
-const rule = require('../../src/rules/v9/rules/no-slds-class-overrides').default;
+const rule = require('../../src/rules/v9/no-slds-class-overrides').default;
 const { RuleTester } = require('eslint');
 
 let cssPlugin;

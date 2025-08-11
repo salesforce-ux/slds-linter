@@ -6,7 +6,7 @@
 
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
-import ruleMessages from '../../../config/rule-messages.yml';
+import ruleMessages from '../../config/rule-messages.yml';
 
 const ruleConfig = ruleMessages['no-slds-class-overrides'];
 
@@ -19,8 +19,7 @@ export default {
     type: ruleConfig.type,
     docs: {
       description: ruleConfig.description,
-      category: "Best Practices",
-      recommended: true,
+      recommended: true, //useful for plugin recommended configs
       url: ruleConfig.url,
     },
     fixable: null,
@@ -32,9 +31,9 @@ export default {
   create(context) {
     return {
       // For no-slds-class-overrides: Only flags classes at selector end
-      "SelectorList Selector"(node: any) {
+      "SelectorList Selector"(node) {
         // Get the last ClassSelector in this selector (the one at the end)
-        const classSelectorNode = node.children.filter((child: any) => child.type === "ClassSelector").at(-1);
+        const classSelectorNode = node.children.filter((child) => child.type === "ClassSelector").at(-1);
         
         if (classSelectorNode) {
           const className = classSelectorNode.name;

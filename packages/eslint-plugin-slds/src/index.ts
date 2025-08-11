@@ -3,7 +3,7 @@
 import enforceBemUsage from './rules/enforce-bem-usage';
 import noDeprecatedClassesSlds2 from './rules/no-deprecated-classes-slds2';
 import modalCloseButtonIssue from './rules/modal-close-button-issue';
-import noSldsClassOverrides from './rules/v9/rules/no-slds-class-overrides';
+import noSldsClassOverrides from './rules/v9/no-slds-class-overrides';
 import htmlParser from "@html-eslint/parser";
 import cssPlugin from "@eslint/css";
 
@@ -55,9 +55,6 @@ Object.assign(plugin.configs, {
       rules: {
         "@salesforce-ux/slds/no-slds-class-overrides": "warn"
       }
-    },
-    {
-      ignores: ["node_modules/"]
     }
   ],
   // legacy config for ESLint v8-
