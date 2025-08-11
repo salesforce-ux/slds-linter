@@ -46,7 +46,7 @@ Object.assign(plugin.configs, {
     // CSS/SCSS config
     {
       files: ["**/*.{css,scss}"],
-      language: "css/css",
+      language: "css/scss",
       ...cssPlugin.configs.recommended,
       plugins: {
         css: cssPlugin,
