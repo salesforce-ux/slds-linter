@@ -2,23 +2,20 @@ import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages.yml';
 
-const ruleConfig = ruleMessages['no-deprecated-slds-classes'];
+const {type, description, url, messages} = ruleMessages['no-deprecated-slds-classes'];
 
 const deprecatedClasses = metadata.deprecatedClasses;
 const deprecatedClassesSet = new Set(deprecatedClasses);
 
 export default {
   meta: {
-    type: ruleConfig.type,
+    type,
     docs: {
-      description: ruleConfig.description,
+      description,
       recommended: true,
-      url: ruleConfig.url,
+      url,
     },
-    fixable: null,
-    hasSuggestions: false,
-    schema: [],
-    messages: ruleConfig.messages,
+    messages,
   },
   
   create(context) {
