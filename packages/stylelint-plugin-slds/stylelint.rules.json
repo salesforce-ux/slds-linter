@@ -11,12 +11,6 @@
             "severity": "warning"
         }
     ],
-    "slds/no-deprecated-slds-classes": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/no-hardcoded-values-slds2": [
         true,
         {

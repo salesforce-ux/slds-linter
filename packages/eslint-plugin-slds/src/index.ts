@@ -4,6 +4,7 @@ import enforceBemUsage from './rules/enforce-bem-usage';
 import noDeprecatedClassesSlds2 from './rules/no-deprecated-classes-slds2';
 import modalCloseButtonIssue from './rules/modal-close-button-issue';
 import noSldsClassOverrides from './rules/v9/no-slds-class-overrides';
+import noDeprecatedSldsClasses from './rules/v9/no-deprecated-slds-classes';
 import htmlParser from "@html-eslint/parser";
 import cssPlugin from "@eslint/css";
 
@@ -12,6 +13,7 @@ const rules = {
   "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
   "modal-close-button-issue": modalCloseButtonIssue,
   "no-slds-class-overrides": noSldsClassOverrides,
+  "no-deprecated-slds-classes": noDeprecatedSldsClasses,
 };
 
 const plugin = {
@@ -43,17 +45,21 @@ Object.assign(plugin.configs, {
         "@salesforce-ux/slds/modal-close-button-issue": "error"
       }
     },
-    // CSS/SCSS config
+    // CSS config - Standard CSS files
     {
       files: ["**/*.{css,scss}"],
-      language: "css/scss",
+      language: "css/css",
       ...cssPlugin.configs.recommended,
+      languageOptions: {
+        tolerant: true  // Allow recoverable parsing errors for SCSS syntax
+      },
       plugins: {
         css: cssPlugin,
         "@salesforce-ux/slds": plugin
       },
       rules: {
-        "@salesforce-ux/slds/no-slds-class-overrides": "warn"
+        "@salesforce-ux/slds/no-slds-class-overrides": "warn",
+        "@salesforce-ux/slds/no-deprecated-slds-classes": "warn"
       }
     }
   ],
