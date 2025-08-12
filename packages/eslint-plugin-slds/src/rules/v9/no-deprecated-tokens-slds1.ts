@@ -3,22 +3,21 @@ import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages.yml';
 
 const ruleConfig = ruleMessages['no-deprecated-tokens-slds1'];
+const { type, description, url, messages } = ruleConfig;
 
 // Get token mapping from metadata (Aura tokens to LWC tokens)
 const tokenMapping = metadata.auraToLwcTokensMapping;
 
 export default {
   meta: {
-    type: ruleConfig.type,
+    type: type,
     docs: {
-      description: ruleConfig.description,
+      description: description,
       recommended: true,
-      url: ruleConfig.url,
+      url: url,
     },
     fixable: 'code',
-    hasSuggestions: true,
-    schema: [],
-    messages: ruleConfig.messages,
+    messages: messages,
   },
   
   create(context) {
@@ -81,19 +80,7 @@ export default {
                 return fixer.replaceText(actualFunctionNode, newReplacement);
               }
               return null;
-            },
-            suggest: [
-              {
-                desc: `Replace ${originalFunctionCall} with ${replacement}`,
-                fix(fixer) {
-                  if (actualFunctionNode && actualFunctionNode.type === 'Function') {
-                    const newReplacement = `var(${tokenMapping[tokenName]}, ${originalFunctionCall})`;
-                    return fixer.replaceText(actualFunctionNode, newReplacement);
-                  }
-                  return null;
-                }
-              }
-            ]
+            }
           });
         } else {
           // Report without specific replacement
