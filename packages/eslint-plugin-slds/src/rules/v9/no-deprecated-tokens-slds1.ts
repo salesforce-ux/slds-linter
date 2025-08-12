@@ -10,14 +10,14 @@ const tokenMapping = metadata.auraToLwcTokensMapping;
 
 export default {
   meta: {
-    type: type,
+    type,
     docs: {
       description: description,
       recommended: true,
-      url: url,
+      url,
     },
     fixable: 'code',
-    messages: messages,
+    messages,
   },
   
   create(context) {
@@ -31,12 +31,12 @@ export default {
     /**
      * Generate replacement suggestion for deprecated token
      */
-    function generateReplacement(tokenName: string): string | null {
+    function generateReplacement(tokenName: string, originalFunctionCall: string): string | null {
       if (shouldIgnoreDetection(tokenName)) {
         return null;
       }
       const recommendation = tokenMapping[tokenName];
-      return `var(${recommendation}, token(${tokenName}))`;
+      return `var(${recommendation}, ${originalFunctionCall})`;
     }
 
     return {
@@ -62,7 +62,7 @@ export default {
           context.sourceCode.getText(actualFunctionNode) : 
           `token(${tokenName})`; // fallback
 
-        const replacement = generateReplacement(tokenName);
+        const replacement = generateReplacement(tokenName, originalFunctionCall);
         
         if (replacement) {
           // Report with replacement suggestion
