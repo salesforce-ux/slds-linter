@@ -39,57 +39,65 @@ export default {
       return `var(${recommendation}, ${originalFunctionCall})`;
     }
 
-    return {
-      "Function[name='token'] Identifier, Function[name='t'] Identifier"(node) {
-        // Get the token name from the identifier
-        const tokenName = context.sourceCode.getText(node);
-        
-        // Skip if token should be ignored
-        if (shouldIgnoreDetection(tokenName)) {
-          return;
-        }
+    function handleTokenFunction(node, functionName) {
+      // Get the token name from the identifier
+      const tokenName = context.sourceCode.getText(node);
+      
+      // Skip if token should be ignored
+      if (shouldIgnoreDetection(tokenName)) {
+        return;
+      }
 
-        // Generate replacement preserving the original function name
-        const functionNode = node.parent; // Should be the Function node
-        
-        // Find the actual Function node in the AST hierarchy
-        let actualFunctionNode = functionNode;
-        while (actualFunctionNode && actualFunctionNode.type !== 'Function') {
-          actualFunctionNode = actualFunctionNode.parent;
-        }
-        
-        const originalFunctionCall = actualFunctionNode ? 
-          context.sourceCode.getText(actualFunctionNode) : 
-          `token(${tokenName})`; // fallback
-
-        const replacement = generateReplacement(tokenName, originalFunctionCall);
-        
-        if (replacement) {
-          // Report with replacement suggestion
-          context.report({
-            node,
-            messageId: 'deprecatedToken',
-            data: { 
-              oldValue: originalFunctionCall,
-              newValue: replacement
-            },
-            fix(fixer) {
-              if (actualFunctionNode && actualFunctionNode.type === 'Function') {
-                // Generate replacement preserving original function call format
-                const newReplacement = `var(${tokenMapping[tokenName]}, ${originalFunctionCall})`;
-                return fixer.replaceText(actualFunctionNode, newReplacement);
-              }
-              return null;
+      // Create original function call - mirroring stylelint's approach
+      const originalFunctionCall = `${functionName}(${tokenName})`;
+      const replacement = generateReplacement(tokenName, originalFunctionCall);
+      
+      if (replacement) {
+        // Report with replacement suggestion
+        context.report({
+          node,
+          messageId: 'deprecatedToken',
+          data: { 
+            oldValue: originalFunctionCall,
+            newValue: replacement
+          },
+          fix(fixer) {
+            // Use node position to avoid multiple replacements of same token
+            const sourceCode = context.sourceCode.getText();
+            const simpleCall = `${functionName}(${tokenName})`;
+            const nodeOffset = node.loc.start.offset;
+            
+            // Search backwards from the node position to find the function start
+            const searchStart = Math.max(0, nodeOffset - functionName.length - 1);
+            const searchEnd = nodeOffset + tokenName.length + 1;
+            const searchArea = sourceCode.substring(searchStart, searchEnd);
+            
+            const callIndex = searchArea.indexOf(simpleCall);
+            if (callIndex !== -1) {
+              const actualStart = searchStart + callIndex;
+              const actualEnd = actualStart + simpleCall.length;
+              return fixer.replaceTextRange([actualStart, actualEnd], replacement);
             }
-          });
-        } else {
-          // Report without specific replacement
-          context.report({
-            node,
-            messageId: 'noReplacement',
-          });
-        }
+            return null;
+          }
+        });
+      } else {
+        // Report without specific replacement
+        context.report({
+          node,
+          messageId: 'noReplacement',
+        });
+      }
+    }
+
+    return {
+      "Function[name='token'] Identifier"(node) {
+        handleTokenFunction(node, 'token');
+      },
+      "Function[name='t'] Identifier"(node) {
+        handleTokenFunction(node, 't');
       },
     };
+
   },
 } as Rule.RuleModule;

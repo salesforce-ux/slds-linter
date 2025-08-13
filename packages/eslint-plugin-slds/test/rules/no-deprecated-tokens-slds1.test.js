@@ -45,6 +45,7 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
     // Basic deprecated token usage
     {
       code: `.example { color: token(account); }`,
+      output: `.example { color: var(--lwc-account, token(account)); }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
@@ -55,6 +56,7 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
     // Shorthand 't' function
     {
       code: `.example { color: t(accountInfo); }`,
+      output: `.example { color: var(--lwc-accountInfo, t(accountInfo)); }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
@@ -67,6 +69,10 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       code: `.example { 
         color: token(account); 
         background: token(accountInfo);
+      }`,
+      output: `.example { 
+        color: var(--lwc-account, token(account)); 
+        background: var(--lwc-accountInfo, token(accountInfo));
       }`,
       filename: 'test.css',
       errors: [
@@ -87,6 +93,10 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
         border: 1px solid token(account); 
         margin: 10px;
       }`,
+      output: `.container .example:hover { 
+        border: 1px solid var(--lwc-account, token(account)); 
+        margin: 10px;
+      }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
@@ -99,6 +109,9 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       code: `.example { 
         width: calc(100% - token(account)); 
       }`,
+      output: `.example { 
+        width: calc(100% - var(--lwc-account, token(account))); 
+      }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
@@ -106,10 +119,13 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       }]
     },
 
-    // Token with fallback should still be flagged
+    // Simple token call (no parameters)
     {
       code: `.example { 
-        color: token(account, #123456); 
+        color: token(brandPrimary); 
+      }`,
+      output: `.example { 
+        color: var(--lwc-brandPrimary, token(brandPrimary)); 
       }`,
       filename: 'test.css',
       errors: [{
