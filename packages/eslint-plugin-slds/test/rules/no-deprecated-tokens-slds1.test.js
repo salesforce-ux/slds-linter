@@ -34,6 +34,11 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       code: `.example { color: var(--slds-c-button-brand-color-background); }`,
       filename: 'test.css',
     },
+    // token function used as fallback to slds token
+    {
+      code: `.example { color: var(--slds-c-button-brand-color-background, token(brandPrimary)); }`,
+      filename: 'test.css',
+    },
     // Unknown/non-LWC tokens should not be flagged (following StyleLint behavior)
     {
       code: `.example { color: token(unknownToken); }`,
