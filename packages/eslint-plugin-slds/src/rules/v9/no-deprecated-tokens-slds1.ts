@@ -64,7 +64,7 @@ export default {
           fix(fixer) {
             // Use node position to avoid multiple replacements of same token
             const sourceCode = context.sourceCode.getText();
-            const simpleCall = `${functionName}(${tokenName})`;
+            const tokenFunctionCall = `${functionName}(${tokenName})`;
             const nodeOffset = node.loc.start.offset;
             
             // Search backwards from the node position to find the function start
@@ -72,10 +72,10 @@ export default {
             const searchEnd = nodeOffset + tokenName.length + 1;
             const searchArea = sourceCode.substring(searchStart, searchEnd);
             
-            const callIndex = searchArea.indexOf(simpleCall);
-            if (callIndex !== -1) {
-              const actualStart = searchStart + callIndex;
-              const actualEnd = actualStart + simpleCall.length;
+            const functionCallIndex = searchArea.indexOf(tokenFunctionCall);
+            if (functionCallIndex !== -1) {
+              const actualStart = searchStart + functionCallIndex;
+              const actualEnd = actualStart + tokenFunctionCall.length;
               return fixer.replaceTextRange([actualStart, actualEnd], replacement);
             }
             return null;

@@ -1,15 +1,15 @@
 .THIS{
-    color: token(brandPrimary);
-    border: t(borderWidthThin) solid transparent;
-    border-radius: t(borderRadiusMedium);
-    font-size: t(fontSize3); /* future sldsPlus work */  
-    border-width: t(borderWidthThin);
+    color: var(--lwc-brandPrimary, token(brandPrimary));
+    border: var(--lwc-borderWidthThin, t(borderWidthThin)) solid transparent;
+    border-radius: var(--lwc-borderRadiusMedium, t(borderRadiusMedium));
+    font-size: var(--lwc-fontSize3, t(fontSize3)); /* future sldsPlus work */  
+    border-width: var(--lwc-borderWidthThin, t(borderWidthThin));
 }
 
 .THIS .shortHand{
-    padding: t(spacingXSmall) t(spacingXSmall);
+    padding: var(--lwc-spacingXSmall, t(spacingXSmall)) var(--lwc-spacingXSmall, t(spacingXSmall));
 }
 
 .THIS .zeroSpace{
-    padding: t(spacingNone)
+    padding: var(--lwc-spacingNone, t(spacingNone))
 }
