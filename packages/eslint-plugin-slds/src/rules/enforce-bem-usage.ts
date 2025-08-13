@@ -21,7 +21,7 @@ const isDeprecatedClass = (className : string) => {
   return (deprecatedClasses.includes(className) || deprecatedClasses.includes(bemMapping[className]))
 }
 
-const htmlRule = {
+const enforceBemUsageHtml = {
   create(context) {  
 
     function check(node) {
@@ -85,7 +85,7 @@ const htmlRule = {
 
 
 // Create a hybrid rule that works for both HTML and CSS
-const hybridRule = {
+const enforceBemUsage = {
   meta: {
     type,
     docs: {
@@ -114,9 +114,9 @@ const hybridRule = {
       }
     } else {
       // Use HTML implementation (compatible with both ESLint v8 and v9)
-      return htmlRule.create(context);
+      return enforceBemUsageHtml.create(context);
     }
   },
 };
 
-export = hybridRule;
+export = enforceBemUsage;
