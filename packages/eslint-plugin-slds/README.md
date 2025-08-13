@@ -44,7 +44,7 @@ module.exports = defineConfig([
 
 ## Migrate to the Latest Version
 
-> By default, the latest version of the plugin supports legacy and flat config systems.
+By default, the latest version of the plugin supports legacy and flat config systems.
 
 ## Supported Rules
 
