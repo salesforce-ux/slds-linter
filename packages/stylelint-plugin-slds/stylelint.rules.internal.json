@@ -11,13 +11,6 @@
             "severity": "error"
         }
     ],
-    "slds/enforce-sds-to-slds-hooks": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
-    
     "slds/lwc-token-to-slds-hook": [
         true,
         {
