@@ -25,17 +25,16 @@ ruleTester.run('enforce-bem-usage-css', rule, {
       code: `.app-button { background: blue; }`,
       filename: 'test.css',
     },
-    // Classes that already use modern BEM naming
     {
-      code: `.slds-text-heading--large { font-size: 24px; }`,
+      code: `.slds-action-overflow_touch { font-size: 24px; }`,
       filename: 'test.css',
     },
     {
-      code: `.slds-dl--horizontal__label { display: block; }`,
+      code: `.slds-alert_error { display: block; }`,
       filename: 'test.css',
     },
     {
-      code: `.slds-dl--horizontal__detail { color: gray; }`,
+      code: `.slds-alert_warning { color: gray; }`,
       filename: 'test.css',
     },
     // Element selectors
@@ -63,21 +62,19 @@ ruleTester.run('enforce-bem-usage-css', rule, {
     },
   ],
   invalid: [
-    // Old BEM naming that should be updated
     {
-      code: `.slds-text-heading_large { font-size: 24px; }`,
+      code: `.slds-action-overflow--touch { font-size: 24px; }`,
       filename: 'test.css',
-      output: `.slds-text-heading--large { font-size: 24px; }`,
+      output: `.slds-action-overflow_touch { font-size: 24px; }`,
       errors: [{
         messageId: 'bemDoubleDash',
         type: 'ClassSelector'
       }]
     },
-    // Multiple selectors with old BEM naming
     {
-      code: `.slds-dl_horizontal__label, .slds-dl_horizontal__detail { display: none; }`,
+      code: `.slds-alert--error, .slds-alert--warning { display: none; }`,
       filename: 'test.css',
-      output: `.slds-dl--horizontal__label, .slds-dl--horizontal__detail { display: none; }`,
+      output: `.slds-alert_error, .slds-alert_warning { display: none; }`,
       errors: [
         {
           messageId: 'bemDoubleDash',
@@ -89,58 +86,53 @@ ruleTester.run('enforce-bem-usage-css', rule, {
         }
       ]
     },
-    // Old BEM naming in pseudo-selector
     {
-      code: `.slds-dl_horizontal__label:last-of-type { border-bottom: none; }`,
+      code: `.slds-action-overflow--touch:last-of-type { border-bottom: none; }`,
       filename: 'test.css',
-      output: `.slds-dl--horizontal__label:last-of-type { border-bottom: none; }`,
+      output: `.slds-action-overflow_touch:last-of-type { border-bottom: none; }`,
       errors: [{
         messageId: 'bemDoubleDash',
         type: 'ClassSelector'
       }]
     },
-    // Old BEM naming in complex selector
     {
-      code: `div.slds-dl_horizontal__label { border-bottom: none; }`,
+      code: `div.slds-alert--error { border-bottom: none; }`,
       filename: 'test.css',
-      output: `div.slds-dl--horizontal__label { border-bottom: none; }`,
+      output: `div.slds-alert_error { border-bottom: none; }`,
       errors: [{
         messageId: 'bemDoubleDash',
         type: 'ClassSelector'
       }]
     },
-    // Old BEM naming in chained selector
     {
-      code: `.slds-dl_horizontal__label div { border-bottom: none; }`,
+      code: `.slds-alert--warning div { border-bottom: none; }`,
       filename: 'test.css',
-      output: `.slds-dl--horizontal__label div { border-bottom: none; }`,
+      output: `.slds-alert_warning div { border-bottom: none; }`,
       errors: [{
         messageId: 'bemDoubleDash',
         type: 'ClassSelector'
       }]
     },
-    // Old BEM naming in chained direct selector
     {
-      code: `.slds-dl_horizontal__label > div { border-bottom: none; }`,
+      code: `.slds-action-overflow--touch > div { border-bottom: none; }`,
       filename: 'test.css',
-      output: `.slds-dl--horizontal__label > div { border-bottom: none; }`,
+      output: `.slds-action-overflow_touch > div { border-bottom: none; }`,
       errors: [{
         messageId: 'bemDoubleDash',
         type: 'ClassSelector'
       }]
     },
-    // Multiple rules with old BEM naming
     {
       code: `
-.slds-dl_horizontal__label, .slds-dl_horizontal__detail {}
+.slds-alert--error, .slds-alert--warning {}
 
-.slds-dl_horizontal__label {}
+.slds-action-overflow--touch {}
       `,
       filename: 'test.css',
       output: `
-.slds-dl--horizontal__label, .slds-dl--horizontal__detail {}
+.slds-alert_error, .slds-alert_warning {}
 
-.slds-dl--horizontal__label {}
+.slds-action-overflow_touch {}
       `,
       errors: [
         {
