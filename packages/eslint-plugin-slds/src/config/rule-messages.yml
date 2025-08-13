@@ -18,6 +18,14 @@ no-deprecated-slds-classes:
   type: "problem"
   messages:
     deprecatedClass: "The class {{className}} is deprecated and not available in SLDS2. Please update to a supported class."
+
+no-deprecated-tokens-slds1:
+  description: "Update outdated design tokens to SLDS 2 styling hooks with similar values. For more information, see Styling Hooks on lightningdesignsystem.com."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-tokens-slds1"
+  type: "problem"
+  messages:
+    deprecatedToken: "Consider removing {{oldValue}} or replacing it with {{newValue}}. Set the fallback to {{oldValue}}. For more info, see Styling Hooks on lightningdesignsystem.com."
+    noReplacement: "Update outdated design tokens to SLDS 2 styling hooks with similar values. For more information, see Styling Hooks on lightningdesignsystem.com."
   
 # =============================================================================
 # HTML/Component Rules (ESLint v8 & v9)

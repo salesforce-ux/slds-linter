@@ -24,12 +24,6 @@
             "severity": "warning"
         }
     ],
-    "slds/no-deprecated-tokens-slds1": [
-        true,
-        {
-            "severity": "error"
-        }
-    ],
     "slds/no-hardcoded-values-slds1": [
         true,
         {
