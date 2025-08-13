@@ -2,18 +2,18 @@
 
 ESLint plugin provides custom linting rules specifically built for Salesforce Lightning Design System 2 (SLDS 2 beta).
 
-## Installation
-
-```bash
-npm install @salesforce-ux/eslint-plugin-slds --save-dev
-```
-
 ## Requirements
 
 - **Node.js**: 18.18.0 or higher
 - **ESLint**: 8.0.0 or 9.0.0+
 
-## Configuration
+## Install
+
+```bash
+npm install @salesforce-ux/eslint-plugin-slds --save-dev
+```
+
+## Configure
 
 ### ESLint v8 (Legacy Config)
 
@@ -42,16 +42,15 @@ module.exports = defineConfig([
 ]);
 ```
 
-## Migration Note
+## Migrate to the Latest Version
 
-> Always import the plugin from the root (`@salesforce-ux/eslint-plugin-slds`).
-> The plugin automatically supports both legacy and flat config systems.
+By default, the latest version of the plugin supports legacy and flat config systems.
 
-## Rules
+## Supported Rules
 
-- `enforce-bem-usage`: Enforces proper BEM methodology usage
-- `no-deprecated-classes-slds2`: Prevents usage of deprecated SLDS classes
-- `modal-close-button-issue`: Ensures proper modal close button implementation
+- `enforce-bem-usage`: Identifies instances that use the double-dash (--) syntax for block-element-modifier (BEM) in classes.
+- `no-deprecated-classes-slds2`: Identifies classes that aren’t available in SLDS 2.
+- `modal-close-button-issue`: Identifies instances where the CSS classes or component attributes for the modal close button must be changed to follow the modal component blueprint.
 
 ## License
 
