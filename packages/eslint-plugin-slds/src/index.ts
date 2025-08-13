@@ -7,6 +7,7 @@ import noSldsClassOverrides from './rules/v9/no-slds-class-overrides';
 import noDeprecatedSldsClasses from './rules/v9/no-deprecated-slds-classes';
 import noDeprecatedTokensSlds1 from './rules/v9/no-deprecated-tokens-slds1';
 
+
 import htmlParser from "@html-eslint/parser";
 import cssPlugin from "@eslint/css";
 
@@ -63,7 +64,8 @@ Object.assign(plugin.configs, {
       rules: {
         "@salesforce-ux/slds/no-slds-class-overrides": "warn",
         "@salesforce-ux/slds/no-deprecated-slds-classes": "warn",
-        "@salesforce-ux/slds/no-deprecated-tokens-slds1": "error"
+        "@salesforce-ux/slds/no-deprecated-tokens-slds1": "error",
+        "@salesforce-ux/slds/enforce-bem-usage": "warn"
       }
     }
   ],
