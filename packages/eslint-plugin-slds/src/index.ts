@@ -6,6 +6,7 @@ import modalCloseButtonIssue from './rules/modal-close-button-issue';
 import noSldsClassOverrides from './rules/v9/no-slds-class-overrides';
 import noDeprecatedSldsClasses from './rules/v9/no-deprecated-slds-classes';
 import noDeprecatedTokensSlds1 from './rules/v9/no-deprecated-tokens-slds1';
+
 import htmlParser from "@html-eslint/parser";
 import cssPlugin from "@eslint/css";
 
