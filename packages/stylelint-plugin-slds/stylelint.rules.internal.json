@@ -6,7 +6,7 @@
             "severity": "error"
         }
     ],
-    "slds/lwc-token-to-slds-hook": [
+    "slds/enforce-sds-to-slds-hooks": [
         true,
         {
             "severity": "warning"
