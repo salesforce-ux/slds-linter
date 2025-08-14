@@ -15,6 +15,9 @@ export function getStylingHooksForDensityValue(
   cssProperty: string
 ): string[] {
   const valueToMatch = parseUnitValue(value);
+  if (!valueToMatch) {
+    return [];
+  }
   const alternateValue = toAlternateUnitValue(valueToMatch.number, valueToMatch.unit);
   const matchedHooks = [];
 
