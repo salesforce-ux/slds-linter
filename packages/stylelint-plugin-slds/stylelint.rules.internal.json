@@ -1,10 +1,5 @@
 {
-    "slds/enforce-bem-usage": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
+
     "slds/enforce-component-hook-naming-convention": [
         true,
         {
