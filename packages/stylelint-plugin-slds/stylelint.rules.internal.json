@@ -17,13 +17,6 @@
             "severity": "warning"
         }
     ],
-    
-    "slds/lwc-token-to-slds-hook": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/no-hardcoded-values-slds1": [
         true,
         {
