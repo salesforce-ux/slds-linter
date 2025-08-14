@@ -34,70 +34,58 @@ export default {
   },
   
   create(context) {
-    return {
-      // Combined selector to handle both CSS custom properties and var() function calls
-      "Declaration[property=/^--sds-/], Function[name='var'] Identifier[name=/^--sds-/]"(node) {
-        if (node.type === "Declaration") {
-          // Left side: CSS custom property declaration
-          // Example: --sds-c-border-radius: 50%;
-          const property = node.property;
-          
-          if (shouldIgnoreDetection(property)) {
-            return;
-          }
-
-          const suggestedMatch = toSldsToken(property);
-          
-          context.report({
-            node,
-            messageId: 'replaceSdsWithSlds',
-            data: { 
-              oldValue: property,
-              suggestedMatch 
-            },
-            fix(fixer) {
-              // For CSS Declaration nodes, we need to replace the property name
-              const sourceCode = context.sourceCode;
-              const fullText = sourceCode.getText();
-              const nodeOffset = node.loc.start.offset;
-              
-              // Search for the property name around the node position
-              const searchStart = Math.max(0, nodeOffset - 10);
-              const searchEnd = nodeOffset + property.length + 10;
-              const searchArea = fullText.substring(searchStart, searchEnd);
-              
-              const propertyIndex = searchArea.indexOf(property);
-              if (propertyIndex !== -1) {
-                const actualStart = searchStart + propertyIndex;
-                const actualEnd = actualStart + property.length;
-                return fixer.replaceTextRange([actualStart, actualEnd], suggestedMatch);
-              }
-              return null;
+    function reportAndFix(node, oldValue, suggestedMatch) {
+      context.report({
+        node,
+        messageId: 'replaceSdsWithSlds',
+        data: { oldValue, suggestedMatch },
+        fix(fixer) {
+          // For Declaration nodes, use the offset from loc info
+          if (node.type === "Declaration") {
+            const sourceCode = context.sourceCode;
+            const fullText = sourceCode.getText();
+            const nodeOffset = node.loc.start.offset;
+            
+            // The property name appears at the start of the Declaration
+            const propertyStart = nodeOffset;
+            const propertyEnd = propertyStart + oldValue.length;
+            
+            // Verify we're replacing the right text
+            const textAtPosition = fullText.substring(propertyStart, propertyEnd);
+            if (textAtPosition === oldValue) {
+              return fixer.replaceTextRange([propertyStart, propertyEnd], suggestedMatch);
             }
-          });
-        } else if (node.type === "Identifier") {
-          // Right side: SDS token in var() function calls
-          // Example: var(--sds-g-color-surface-1)
-          const tokenName = node.name;
-          
-          if (shouldIgnoreDetection(tokenName)) {
-            return;
           }
-
-          const suggestedMatch = toSldsToken(tokenName);
           
-          context.report({
-            node,
-            messageId: 'replaceSdsWithSlds',
-            data: { 
-              oldValue: tokenName,
-              suggestedMatch 
-            },
-            fix(fixer) {
-              return fixer.replaceText(node, suggestedMatch);
-            }
-          });
+          // For Identifier nodes (inside var() functions), simple replacement works
+          return fixer.replaceText(node, suggestedMatch);
         }
+      });
+    }
+
+    return {
+      // CSS custom property declarations: --sds-* properties
+      "Declaration[property=/^--sds-/]"(node) {
+        const property = node.property;
+        
+        if (shouldIgnoreDetection(property)) {
+          return;
+        }
+
+        const suggestedMatch = toSldsToken(property);
+        reportAndFix(node, property, suggestedMatch);
+      },
+
+      // SDS tokens inside var() functions: var(--sds-*)
+      "Function[name='var'] Identifier[name=/^--sds-/]"(node) {
+        const tokenName = node.name;
+        
+        if (shouldIgnoreDetection(tokenName)) {
+          return;
+        }
+
+        const suggestedMatch = toSldsToken(tokenName);
+        reportAndFix(node, tokenName, suggestedMatch);
       }
     };
   },
