@@ -83,6 +83,60 @@ export default {
   },
   
   create(context) {
+    function reportAndFix(node, oldValue, suggestedMatch, messageId, data) {
+      let fixFunction = null;
+      
+      // Only provide fix if we have a concrete suggestion
+      if (suggestedMatch) {
+        fixFunction = (fixer) => {
+          // For Declaration nodes, use the offset from loc info
+          if (node.type === "Declaration") {
+            const sourceCode = context.sourceCode;
+            const fullText = sourceCode.getText();
+            const nodeOffset = node.loc.start.offset;
+            
+            // The property name appears at the start of the Declaration
+            const propertyStart = nodeOffset;
+            const propertyEnd = propertyStart + oldValue.length;
+            
+            // Verify we're replacing the right text
+            const textAtPosition = fullText.substring(propertyStart, propertyEnd);
+            if (textAtPosition === oldValue) {
+              return fixer.replaceTextRange([propertyStart, propertyEnd], suggestedMatch);
+            }
+          } else {
+            // For var() function replacements, we need to replace the entire function call
+            const sourceCode = context.sourceCode;
+            const fullText = sourceCode.getText();
+            
+            // Find the var() function call that contains this identifier
+            const varFunctionCall = `var(${oldValue})`;
+            const nodeOffset = node.loc.start.offset;
+            
+            // Search backwards to find the 'var(' part
+            const searchStart = Math.max(0, nodeOffset - 4); // 'var('.length = 4
+            const searchEnd = nodeOffset + oldValue.length + 1; // +1 for closing ')'
+            const searchArea = fullText.substring(searchStart, searchEnd);
+            
+            const functionCallIndex = searchArea.indexOf(varFunctionCall);
+            if (functionCallIndex !== -1) {
+              const actualStart = searchStart + functionCallIndex;
+              const actualEnd = actualStart + varFunctionCall.length;
+              return fixer.replaceTextRange([actualStart, actualEnd], suggestedMatch);
+            }
+          }
+          return null;
+        };
+      }
+
+      context.report({
+        node,
+        messageId,
+        data,
+        fix: fixFunction
+      });
+    }
+
     return {
       // CSS custom property declarations: --lwc-* properties
       "Declaration[property=/^--lwc-/]"(node) {
@@ -95,30 +149,12 @@ export default {
         const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(property);
         const { messageId, data } = getReportMessage(property, replacementCategory, recommendation);
         
-        // for any raw values, color-mix, calc just recommend as deprecated, suggest only if recommendation is string or array of strings
-        const canSuggest = (hasRecommendation && (replacementCategory === ReplacementCategory.SLDS_TOKEN || replacementCategory === ReplacementCategory.ARRAY));
+        // Only provide auto-fix for SLDS token replacements
+        const suggestedMatch = (hasRecommendation && replacementCategory === ReplacementCategory.SLDS_TOKEN) 
+          ? recommendation as string 
+          : null;
         
-        context.report({
-          node,
-          messageId,
-          data,
-          fix: (replacementCategory === ReplacementCategory.SLDS_TOKEN && canSuggest) ? (fixer) => {
-            const sourceCode = context.sourceCode;
-            const fullText = sourceCode.getText();
-            const nodeOffset = node.loc.start.offset;
-            
-            // The property name appears at the start of the Declaration
-            const propertyStart = nodeOffset;
-            const propertyEnd = propertyStart + property.length;
-            
-            // Verify we're replacing the right text
-            const textAtPosition = fullText.substring(propertyStart, propertyEnd);
-            if (textAtPosition === property) {
-              return fixer.replaceTextRange([propertyStart, propertyEnd], recommendation as string);
-            }
-            return null;
-          } : undefined
-        });
+        reportAndFix(node, property, suggestedMatch, messageId, data);
       },
 
       // LWC tokens inside var() functions: var(--lwc-*)
@@ -132,46 +168,20 @@ export default {
         const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(tokenName);
         const { messageId, data } = getReportMessage(tokenName, replacementCategory, recommendation);
         
-        let replacement: string | null = null;
+        let suggestedMatch: string | null = null;
         
         if (hasRecommendation) {
           if (replacementCategory === ReplacementCategory.SLDS_TOKEN) {
             // Create the replacement in the format: var(--slds-token, var(--lwc-token))
             // This matches the Stylelint rule's behavior for SLDS tokens
             const originalVarCall = `var(${tokenName})`;
-            replacement = `var(${recommendation}, ${originalVarCall})`;
+            suggestedMatch = `var(${recommendation}, ${originalVarCall})`;
           } else if (replacementCategory === ReplacementCategory.RAW_VALUE) {
-            replacement = recommendation as string;
+            suggestedMatch = recommendation as string;
           }
         }
 
-        context.report({
-          node,
-          messageId,
-          data,
-          fix: replacement ? (fixer) => {
-            // For var() function replacements, we need to replace the entire function call
-            const sourceCode = context.sourceCode;
-            const fullText = sourceCode.getText();
-            
-            // Find the var() function call that contains this identifier
-            const varFunctionCall = `var(${tokenName})`;
-            const nodeOffset = node.loc.start.offset;
-            
-            // Search backwards to find the 'var(' part
-            const searchStart = Math.max(0, nodeOffset - 4); // 'var('.length = 4
-            const searchEnd = nodeOffset + tokenName.length + 1; // +1 for closing ')'
-            const searchArea = fullText.substring(searchStart, searchEnd);
-            
-            const functionCallIndex = searchArea.indexOf(varFunctionCall);
-            if (functionCallIndex !== -1) {
-              const actualStart = searchStart + functionCallIndex;
-              const actualEnd = actualStart + varFunctionCall.length;
-              return fixer.replaceTextRange([actualStart, actualEnd], replacement!);
-            }
-            return null;
-          } : undefined
-        });
+        reportAndFix(node, tokenName, suggestedMatch, messageId, data);
       },
     };
   },
