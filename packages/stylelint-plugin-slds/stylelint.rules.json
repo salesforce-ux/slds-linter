@@ -5,12 +5,6 @@
             "severity": "error"
         }
     ],
-    "slds/enforce-sds-to-slds-hooks": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/no-hardcoded-values-slds2": [
         true,
         {
