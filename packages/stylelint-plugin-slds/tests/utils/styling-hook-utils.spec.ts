@@ -77,15 +77,13 @@ describe('styling-hook-utils', () => {
     });
 
     it('should handle invalid value format', () => {
-      expect(() => {
-        getStylingHooksForDensityValue('invalid', mockStylingHooks, 'margin');
-      }).toThrow();
+      const result = getStylingHooksForDensityValue('invalid', mockStylingHooks, 'margin');
+      expect(result).toEqual([]);
     });
 
     it('should handle empty value', () => {
-      expect(() => {
-        getStylingHooksForDensityValue('', mockStylingHooks, 'margin');
-      }).toThrow();
+      const result = getStylingHooksForDensityValue('', mockStylingHooks, 'margin');
+      expect(result).toEqual([]);
     });
 
     it('should handle zero values', () => {

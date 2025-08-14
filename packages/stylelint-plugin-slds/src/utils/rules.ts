@@ -5,6 +5,7 @@ const rulesMetadata = {
     severityLevel: "error",
     ruleDesc:
       "Replace BEM double-dash syntax in class names with single underscore syntax.",
+    errorMsg: "${oldValue} has been retired. Update it to the new name ${newValue}",  
   },
 
   "slds/modal-close-button-issue": {
