@@ -55,8 +55,8 @@ export default {
         
         const fallbackPart = commaMatch[1].trim();
         
-        // Extract SLDS token from fallback (either direct or nested var())
-        const sldsMatch = fallbackPart.match(/var\(([^,)]+)/) || fallbackPart.match(/^(--[^,\s)]+)/);
+        // Extract SLDS token from nested var() function in fallback
+        const sldsMatch = fallbackPart.match(/var\(([^,)]+)/);
         if (!sldsMatch) return;
         
         const sldsToken = sldsMatch[1];
