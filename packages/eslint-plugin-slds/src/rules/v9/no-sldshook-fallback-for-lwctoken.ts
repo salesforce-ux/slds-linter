@@ -44,40 +44,25 @@ function hasUnsupportedFallback(lwcToken: string, sldsToken: string): boolean {
 }
 
 /**
- * Parse a var() function string to extract tokens and check for nested fallbacks
+ * Extract SLDS token from the fallback part of a var() function
+ * Handles both direct tokens and nested var() functions
  */
-function parseVarFunction(rawValue: string): { lwcToken?: string; sldsToken?: string } | null {
-  // Remove the 'var(' prefix and ')' suffix, then trim
-  const content = rawValue.replace(/^var\s*\(\s*/, '').replace(/\s*\)$/, '').trim();
+function extractSldsTokenFromFallback(fallbackValue: string): string | null {
+  const trimmed = fallbackValue.trim();
   
-  // Split by comma to get main token and fallback
-  const parts = content.split(',').map(part => part.trim());
-  
-  if (parts.length < 2) {
-    return null; // No fallback present
+  // Check if the fallback is a nested var() function
+  if (trimmed.startsWith('var(')) {
+    // Extract the token from nested var() function: var(--slds-token, ...)
+    const match = trimmed.match(/^var\s*\(\s*(--[^,\s)]+)/);
+    return match ? match[1] : null;
   }
   
-  const mainToken = parts[0];
-  const fallbackPart = parts[1];
-  
-  // Check if the main token is an LWC token
-  if (!isLwcToken(mainToken)) {
-    return null;
+  // For direct token references (though less common in fallbacks)
+  if (trimmed.startsWith('--')) {
+    return trimmed.split(/[,\s)]/)[0];
   }
   
-  // Handle nested var() functions in fallback
-  let fallbackToken = fallbackPart;
-  if (fallbackPart.startsWith('var(')) {
-    // Extract the token from nested var() function
-    const nestedContent = fallbackPart.replace(/^var\s*\(\s*/, '').replace(/\s*\).*$/, '').trim();
-    const nestedParts = nestedContent.split(',').map(part => part.trim());
-    fallbackToken = nestedParts[0];
-  }
-  
-  return {
-    lwcToken: mainToken,
-    sldsToken: fallbackToken
-  };
+  return null;
 }
 
 export default {
@@ -108,19 +93,21 @@ export default {
           return;
         }
         
-        // Get the raw value of the var() function using getText
-        const rawValue = context.sourceCode.getText(varFunctionNode).trim();
+        // Get the raw text of the entire var() function
+        const rawValue = context.sourceCode.getText(varFunctionNode);
         
-        // Parse the var() function to extract tokens
-        const parsed = parseVarFunction(rawValue);
-        
-        if (!parsed) {
+        // Check if there's a comma (indicating a fallback value exists)
+        if (!rawValue.includes(',')) {
           return;
         }
         
-        const { sldsToken } = parsed;
+        // Extract the fallback part after the first comma
+        const commaIndex = rawValue.indexOf(',');
+        const fallbackPart = rawValue.substring(commaIndex + 1, rawValue.lastIndexOf(')')).trim();
         
-        if (!hasUnsupportedFallback(lwcToken, sldsToken)) {
+        const sldsToken = extractSldsTokenFromFallback(fallbackPart);
+        
+        if (!sldsToken || !hasUnsupportedFallback(lwcToken, sldsToken)) {
           return;
         }
         
