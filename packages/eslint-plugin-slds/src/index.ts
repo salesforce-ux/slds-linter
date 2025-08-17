@@ -74,7 +74,7 @@ Object.assign(plugin.configs, {
         "@salesforce-ux/slds/lwc-token-to-slds-hook": "error",
         "@salesforce-ux/slds/enforce-bem-usage": "warn",
         "@salesforce-ux/slds/enforce-sds-to-slds-hooks": "warn",
-        "@salesforce-ux/slds/no-unsupported-hooks-slds2": "error"
+        "@salesforce-ux/slds/no-unsupported-hooks-slds2": "warn"
       }
     }
   ],
