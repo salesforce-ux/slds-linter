@@ -42,12 +42,6 @@
             "severity": "warning"
         }
     ],
-    "slds/no-sldshook-fallback-for-lwctoken": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/no-unsupported-hooks-slds2": [
         true,
         {

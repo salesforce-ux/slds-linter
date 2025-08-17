@@ -75,3 +75,10 @@ lwc-token-to-slds-hook:
     errorWithReplacement: "The '{{oldValue}}' design token is deprecated. Replace it with '{{newValue}}'. For more info, see Global Styling Hooks on lightningdesignsystem.com."
     errorWithStyleHooks: "The '{{oldValue}}' design token is deprecated. Replace it with the SLDS 2 '{{newValue}}' styling hook and set the fallback to '{{oldValue}}'. For more info, see Global Styling Hooks on lightningdesignsystem.com."
     errorWithNoRecommendation: "The '{{oldValue}}' design token is deprecated. For more info, see the New Global Styling Hook Guidance on lightningdesignsystem.com."
+
+no-sldshook-fallback-for-lwctoken:
+  description: "Avoid using --slds styling hooks as fallback values for --lwc tokens."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-sldshook-fallback-for-lwctoken"
+  type: "problem"
+  messages:
+    unsupportedFallback: "Remove the {{sldsToken}} styling hook that is used as a fallback value for {{lwcToken}}."
