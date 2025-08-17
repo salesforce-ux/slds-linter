@@ -35,12 +35,6 @@
             "severity": "warning"
         }
     ],
-    "slds/no-unsupported-hooks-slds2": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/reduce-annotations": [
         true,
         {

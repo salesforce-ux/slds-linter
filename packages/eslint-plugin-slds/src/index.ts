@@ -8,6 +8,7 @@ import noDeprecatedSldsClasses from './rules/v9/no-deprecated-slds-classes';
 import noDeprecatedTokensSlds1 from './rules/v9/no-deprecated-tokens-slds1';
 import lwcTokenToSldsHook from './rules/v9/lwc-token-to-slds-hook';
 import enforceSdsToSldsHooks from './rules/v9/enforce-sds-to-slds-hooks';
+import noUnsupportedHooksSlds2 from './rules/v9/no-unsupported-hooks-slds2';
 
 
 import htmlParser from "@html-eslint/parser";
@@ -21,7 +22,8 @@ const rules = {
   "no-deprecated-slds-classes": noDeprecatedSldsClasses,
   "no-deprecated-tokens-slds1": noDeprecatedTokensSlds1,
   "lwc-token-to-slds-hook": lwcTokenToSldsHook,
-  "enforce-sds-to-slds-hooks": enforceSdsToSldsHooks
+  "enforce-sds-to-slds-hooks": enforceSdsToSldsHooks,
+  "no-unsupported-hooks-slds2": noUnsupportedHooksSlds2
 };
 
 const plugin = {
@@ -69,9 +71,10 @@ Object.assign(plugin.configs, {
         "@salesforce-ux/slds/no-slds-class-overrides": "warn",
         "@salesforce-ux/slds/no-deprecated-slds-classes": "warn",
         "@salesforce-ux/slds/no-deprecated-tokens-slds1": "error",
-        "@salesforce-ux/slds/lwc-token-to-slds-hook": "error"
-        "@salesforce-ux/slds/enforce-bem-usage": "warn"
-        "@salesforce-ux/slds/enforce-sds-to-slds-hooks": "warn"
+        "@salesforce-ux/slds/lwc-token-to-slds-hook": "error",
+        "@salesforce-ux/slds/enforce-bem-usage": "warn",
+        "@salesforce-ux/slds/enforce-sds-to-slds-hooks": "warn",
+        "@salesforce-ux/slds/no-unsupported-hooks-slds2": "error"
       }
     }
   ],
