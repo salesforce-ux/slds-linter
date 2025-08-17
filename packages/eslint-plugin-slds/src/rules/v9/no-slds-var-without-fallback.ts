@@ -16,42 +16,15 @@ function isSldsCssVariable(cssVar: string): boolean {
 }
 
 /**
- * Checks if a var() function has a fallback value by checking if there's a comma
- * indicating a second parameter
+ * Checks if a var() function has a fallback value by looking for an Operator node with value ","
  */
-function isVarFunction(node: any): boolean {
-  return node && node.type === 'Function' && node.name === 'var';
-}
-
-/**
- * Checks if a var() function has a fallback value by examining the function call text
- */
-function hasFallbackValue(varFunctionNode: any, sourceCode: any): boolean {
-  if (!varFunctionNode) return false;
+function hasFallbackValue(varFunctionNode: any): boolean {
+  if (!varFunctionNode || !varFunctionNode.children) return false;
   
-  // Get the text of the var() function
-  const functionText = sourceCode.getText(varFunctionNode);
-  
-  // Check if there's a comma in the function call, indicating a fallback value
-  // We need to be careful not to count commas inside nested function calls
-  let parenLevel = 0;
-  let foundComma = false;
-  
-  for (let i = 0; i < functionText.length; i++) {
-    const char = functionText[i];
-    
-    if (char === '(') {
-      parenLevel++;
-    } else if (char === ')') {
-      parenLevel--;
-    } else if (char === ',' && parenLevel === 1) {
-      // Found a comma at the top level of the var() function
-      foundComma = true;
-      break;
-    }
-  }
-  
-  return foundComma;
+  // Look for an Operator node with value "," which indicates a fallback parameter
+  return varFunctionNode.children.some((child: any) => 
+    child.type === 'Operator' && child.value === ','
+  );
 }
 
 export default {
@@ -73,19 +46,12 @@ export default {
         messageId: 'varWithoutFallback',
         data: { cssVar, recommendation: fallbackValue },
         fix(fixer) {
-          // Find the var() function call that contains this identifier
-          const sourceCode = context.sourceCode;
+          // Get the var() function node that contains this identifier
           const varFunctionNode = context.sourceCode.getAncestors(node).at(-1);
           
-          if (isVarFunction(varFunctionNode)) {
-            // Replace the entire var() function with one that includes the fallback
-            const varFunctionCall = `var(${cssVar})`;
-            const varWithFallback = `var(${cssVar}, ${fallbackValue})`;
-            
-            return fixer.replaceText(varFunctionNode, varWithFallback);
-          }
-          
-          return null;
+          // Replace the entire var() function with one that includes the fallback
+          const varWithFallback = `var(${cssVar}, ${fallbackValue})`;
+          return fixer.replaceText(varFunctionNode, varWithFallback);
         }
       });
     }
@@ -102,7 +68,7 @@ export default {
         // Get the var() function node that contains this identifier
         const varFunctionNode = context.sourceCode.getAncestors(node).at(-1);
         
-        if (!isVarFunction(varFunctionNode) || hasFallbackValue(varFunctionNode, context.sourceCode)) {
+        if (hasFallbackValue(varFunctionNode)) {
           return;
         }
 
