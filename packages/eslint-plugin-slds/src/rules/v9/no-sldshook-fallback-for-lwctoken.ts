@@ -14,55 +14,15 @@ const allSldsHooks = [...sldsPlusStylingHooks.global, ...sldsPlusStylingHooks.co
 const allSldsHooksSet = new Set(allSldsHooks);
 
 /**
- * Convert --sds- token to --slds- equivalent
- */
-const toSldsToken = (sdsToken: string = '') => (sdsToken || '').replace('--sds-', '--slds-');
-
-/**
- * Check if a CSS variable name starts with --lwc-
- */
-function isLwcToken(token: string): boolean {
-  return token.startsWith('--lwc-');
-}
-
-/**
- * Check if a CSS variable name starts with --slds-
- */
-function isSldsToken(token: string): boolean {
-  return token.startsWith('--slds-');
-}
-
-/**
  * Check if using an SLDS hook as fallback for LWC token is unsupported
  */
 function hasUnsupportedFallback(lwcToken: string, sldsToken: string): boolean {
-  const safeSldsToken = toSldsToken(sldsToken);
-  return lwcToken && safeSldsToken 
-    && isLwcToken(lwcToken) 
-    && isSldsToken(safeSldsToken) 
-    && allSldsHooksSet.has(safeSldsToken);
-}
-
-/**
- * Extract SLDS token from the fallback part of a var() function
- * Handles both direct tokens and nested var() functions
- */
-function extractSldsTokenFromFallback(fallbackValue: string): string | null {
-  const trimmed = fallbackValue.trim();
+  // Convert --sds- to --slds- if needed
+  const normalizedSldsToken = sldsToken.replace('--sds-', '--slds-');
   
-  // Check if the fallback is a nested var() function
-  if (trimmed.startsWith('var(')) {
-    // Extract the token from nested var() function: var(--slds-token, ...)
-    const match = trimmed.match(/^var\s*\(\s*(--[^,\s)]+)/);
-    return match ? match[1] : null;
-  }
-  
-  // For direct token references (though less common in fallbacks)
-  if (trimmed.startsWith('--')) {
-    return trimmed.split(/[,\s)]/)[0];
-  }
-  
-  return null;
+  return lwcToken.startsWith('--lwc-') 
+    && normalizedSldsToken.startsWith('--slds-') 
+    && allSldsHooksSet.has(normalizedSldsToken);
 }
 
 export default {
@@ -80,45 +40,34 @@ export default {
     return {
       // Handle LWC tokens inside var() functions: var(--lwc-*, ...)
       "Function[name='var'] Identifier[name=/^--lwc-/]"(node) {
-        if (node.type !== "Identifier") {
-          return;
-        }
-        
         const lwcToken = node.name;
         
         // Get the var() function node that contains this identifier
         const varFunctionNode = context.sourceCode.getAncestors(node).at(-1);
+        if (!varFunctionNode) return;
         
-        if (!varFunctionNode) {
-          return;
-        }
-        
-        // Get the raw text of the entire var() function
+        // Get the raw value of the var() function
         const rawValue = context.sourceCode.getText(varFunctionNode);
         
-        // Check if there's a comma (indicating a fallback value exists)
-        if (!rawValue.includes(',')) {
-          return;
+        // Parse fallback: extract text after first comma, handle nested var()
+        const commaMatch = rawValue.match(/,\s*(.+)\)$/);
+        if (!commaMatch) return;
+        
+        const fallbackPart = commaMatch[1].trim();
+        
+        // Extract SLDS token from fallback (either direct or nested var())
+        const sldsMatch = fallbackPart.match(/var\(([^,)]+)/) || fallbackPart.match(/^(--[^,\s)]+)/);
+        if (!sldsMatch) return;
+        
+        const sldsToken = sldsMatch[1];
+        
+        if (hasUnsupportedFallback(lwcToken, sldsToken)) {
+          context.report({
+            node,
+            messageId: 'unsupportedFallback',
+            data: { lwcToken, sldsToken }
+          });
         }
-        
-        // Extract the fallback part after the first comma
-        const commaIndex = rawValue.indexOf(',');
-        const fallbackPart = rawValue.substring(commaIndex + 1, rawValue.lastIndexOf(')')).trim();
-        
-        const sldsToken = extractSldsTokenFromFallback(fallbackPart);
-        
-        if (!sldsToken || !hasUnsupportedFallback(lwcToken, sldsToken)) {
-          return;
-        }
-        
-        context.report({
-          node,
-          messageId: 'unsupportedFallback',
-          data: { 
-            lwcToken,
-            sldsToken 
-          }
-        });
       }
     };
   },
