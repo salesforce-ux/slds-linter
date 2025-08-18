@@ -11,19 +11,7 @@
             "severity": "warning"
         }
     ],
-    "slds/no-slds-namespace-for-custom-hooks": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/no-slds-private-var": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
-    "slds/no-slds-var-without-fallback": [
         true,
         {
             "severity": "warning"
