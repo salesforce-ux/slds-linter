@@ -46,20 +46,33 @@ export default {
         const varFunctionNode = context.sourceCode.getAncestors(node).at(-1);
         if (!varFunctionNode) return;
         
-        // Get the raw value of the var() function
-        const rawValue = context.sourceCode.getText(varFunctionNode);
+        //access children to find fallback
+        const varFunctionChildren = (varFunctionNode as any).children;
+        if (!varFunctionChildren) return;
         
-        // Parse fallback: extract text after first comma, handle nested var()
-        const commaMatch = rawValue.match(/,\s*(.+)\)$/);
-        if (!commaMatch) return;
+        // Find comma operator and the Raw node after it
+        let foundComma = false;
+        let fallbackRawNode = null;
         
-        const fallbackPart = commaMatch[1].trim();
+        for (const child of varFunctionChildren) {
+          if (child.type === 'Operator' && child.value === ',') {
+            foundComma = true;
+            continue;
+          }
+          if (foundComma && child.type === 'Raw') {
+            fallbackRawNode = child;
+            break;
+          }
+        }
         
-        // Extract SLDS token from nested var() function in fallback
-        const sldsMatch = fallbackPart.match(/var\(([^,)]+)/);
-        if (!sldsMatch) return;
+        if (!fallbackRawNode) return;
         
-        const sldsToken = sldsMatch[1];
+        // Extract SLDS token from the Raw node value
+        const fallbackValue = fallbackRawNode.value.trim();
+        const varMatch = fallbackValue.match(/var\(([^,)]+)/);
+        if (!varMatch) return;
+        
+        const sldsToken = varMatch[1];
         
         if (hasUnsupportedFallback(lwcToken, sldsToken)) {
           context.report({
