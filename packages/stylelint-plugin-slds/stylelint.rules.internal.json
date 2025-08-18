@@ -24,12 +24,6 @@
             "severity": "warning"
         }
     ],
-    "slds/no-slds-var-without-fallback": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/no-sldshook-fallback-for-lwctoken": [
         true,
         {
