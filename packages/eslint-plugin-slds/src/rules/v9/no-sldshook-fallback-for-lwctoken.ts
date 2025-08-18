@@ -1,6 +1,8 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages.yml';
+import { getFallbackValue, extractSldsTokenFromVarString } from '../../utils/css-var-utils';
+import { reportWithoutFix } from '../../utils/eslint-report-utils';
 
 const ruleConfig = ruleMessages['no-sldshook-fallback-for-lwctoken'];
 const { type, description, url, messages } = ruleConfig;
@@ -46,40 +48,16 @@ export default {
         const varFunctionNode = context.sourceCode.getAncestors(node).at(-1);
         if (!varFunctionNode) return;
         
-        //access children to find fallback
-        const varFunctionChildren = (varFunctionNode as any).children;
-        if (!varFunctionChildren) return;
+        // Get fallback value using utility function
+        const fallbackValue = getFallbackValue(varFunctionNode);
+        if (!fallbackValue) return;
         
-        // Find comma operator and the Raw node after it
-        let foundComma = false;
-        let fallbackRawNode = null;
-        
-        for (const child of varFunctionChildren) {
-          if (child.type === 'Operator' && child.value === ',') {
-            foundComma = true;
-            continue;
-          }
-          if (foundComma && child.type === 'Raw') {
-            fallbackRawNode = child;
-            break;
-          }
-        }
-        
-        if (!fallbackRawNode) return;
-        
-        // Extract SLDS token from the Raw node value
-        const fallbackValue = fallbackRawNode.value.trim();
-        const varMatch = fallbackValue.match(/var\(([^,)]+)/);
-        if (!varMatch) return;
-        
-        const sldsToken = varMatch[1];
+        // Extract SLDS token from the fallback value
+        const sldsToken = extractSldsTokenFromVarString(fallbackValue);
+        if (!sldsToken) return;
         
         if (hasUnsupportedFallback(lwcToken, sldsToken)) {
-          context.report({
-            node,
-            messageId: 'unsupportedFallback',
-            data: { lwcToken, sldsToken }
-          });
+          reportWithoutFix(context, node, 'unsupportedFallback', { lwcToken, sldsToken });
         }
       }
     };
