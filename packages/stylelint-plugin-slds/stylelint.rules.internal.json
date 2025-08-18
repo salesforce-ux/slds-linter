@@ -6,12 +6,6 @@
             "severity": "error"
         }
     ],
-    "slds/enforce-sds-to-slds-hooks": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/no-hardcoded-values-slds1": [
         true,
         {
@@ -19,12 +13,6 @@
         }
     ],
     "slds/no-hardcoded-values-slds2": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
-    "slds/no-slds-namespace-for-custom-hooks": [
         true,
         {
             "severity": "warning"

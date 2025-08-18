@@ -9,6 +9,7 @@ import noDeprecatedTokensSlds1 from './rules/v9/no-deprecated-tokens-slds1';
 import lwcTokenToSldsHook from './rules/v9/lwc-token-to-slds-hook';
 import enforceSdsToSldsHooks from './rules/v9/enforce-sds-to-slds-hooks';
 import noSldsVarWithoutFallback from './rules/v9/no-slds-var-without-fallback';
+import noSldsNamespaceForCustomHooks from './rules/v9/no-slds-namespace-for-custom-hooks';
 
 
 import htmlParser from "@html-eslint/parser";
@@ -23,7 +24,8 @@ const rules = {
   "no-deprecated-tokens-slds1": noDeprecatedTokensSlds1,
   "lwc-token-to-slds-hook": lwcTokenToSldsHook,
   "enforce-sds-to-slds-hooks": enforceSdsToSldsHooks,
-  "no-slds-var-without-fallback": noSldsVarWithoutFallback
+  "no-slds-var-without-fallback": noSldsVarWithoutFallback,
+  "no-slds-namespace-for-custom-hooks": noSldsNamespaceForCustomHooks
 };
 
 const plugin = {
@@ -74,7 +76,8 @@ Object.assign(plugin.configs, {
         "@salesforce-ux/slds/lwc-token-to-slds-hook": "error",
         "@salesforce-ux/slds/enforce-bem-usage": "warn",
         "@salesforce-ux/slds/enforce-sds-to-slds-hooks": "warn",
-        "@salesforce-ux/slds/no-slds-var-without-fallback": "warn"
+        "@salesforce-ux/slds/no-slds-var-without-fallback": "warn",
+        "@salesforce-ux/slds/no-slds-namespace-for-custom-hooks": "warn"
       }
     }
   ],
