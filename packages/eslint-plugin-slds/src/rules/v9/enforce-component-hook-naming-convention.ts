@@ -33,12 +33,6 @@ export default {
     return {
       /*
        * Handle component hooks in CSS declarations
-       * Limitation: For example:
-       * .testClass{
-       *    --slds-c-accordion-section-color-background: var(--slds-c-accordion-section-color-border);
-       *  }
-       * var in value is not detected, because eslint treats above statement as custom property assignment 
-       * and value treated as raw string, not parsed into function nodes
        */
       "Declaration[property=/^--slds-c-/], Function[name='var'] Identifier[name=/^--slds-c-/]"(node) {
         let hookName: string;
