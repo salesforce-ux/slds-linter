@@ -1,10 +1,4 @@
 {
-    "slds/enforce-component-hook-naming-convention": [
-        true,
-        {
-            "severity": "error"
-        }
-    ],
     "slds/no-hardcoded-values-slds2": [
         true,
         {

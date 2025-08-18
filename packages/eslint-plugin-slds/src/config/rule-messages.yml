@@ -104,3 +104,10 @@ no-slds-namespace-for-custom-hooks:
   messages:
     customHookNamespace: "Using the --slds namespace for {{token}} isn't supported. Create the custom styling hook in your namespace. Example: --myapp-{{tokenWithoutNamespace}}"
 
+enforce-component-hook-naming-convention:
+  description: "Replace component styling hooks that use a deprecated naming convention."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-component-hook-naming-convention"
+  type: "problem"
+  messages:
+    replace: "Replace the deprecated {{oldValue}} component styling hook with {{suggestedMatch}}."
+
