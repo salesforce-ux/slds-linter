@@ -104,6 +104,13 @@ no-slds-namespace-for-custom-hooks:
   messages:
     customHookNamespace: "Using the --slds namespace for {{token}} isn't supported. Create the custom styling hook in your namespace. Example: --myapp-{{tokenWithoutNamespace}}"
 
+no-slds-private-var:
+  description: "Some SLDS styling hooks are private and reserved only for internal Salesforce use. Private SLDS styling hooks have prefixes --_slds- and --slds-s-. For more information, look up private CSS in lightningdesignsystem.com."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-private-var"
+  type: "problem"
+  messages:
+    privateVar: "This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector {{prop}}. For more information, look up private CSS in lightningdesignsystem.com."
+
 enforce-component-hook-naming-convention:
   description: "Replace component styling hooks that use a deprecated naming convention."
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-component-hook-naming-convention"
