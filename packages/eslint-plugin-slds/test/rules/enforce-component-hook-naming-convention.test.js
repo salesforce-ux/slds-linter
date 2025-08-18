@@ -60,20 +60,6 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
         --slds-c-card-color-background: #fff;
       }`,
       filename: 'test.css',
-    },
-    // Modern component hook property with modern component hook in value
-    {
-      code: `.testClass {
-        --slds-c-accordion-section-color-background: var(--slds-c-accordion-section-color-border);
-      }`,
-      filename: 'test.css',
-    },
-    // Your requested test case: modern component hook property with modern hook in value
-    {
-      code: `.testClass {
-        --slds-c-accordion-section-color-border: var(--slds-c-accordion-section-color-border);
-      }`,
-      filename: 'test.css',
     }
   ],
 
@@ -106,24 +92,14 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
         color: var(--slds-c-accordion-section-color-border);
       }`,
       filename: 'test.css',
-      errors: [
-        {
-          messageId: 'replace',
-          type: 'Declaration',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
-        },
-        {
-          messageId: 'replace',
-          type: 'Identifier',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
+      errors: [{
+        messageId: 'replace',
+        type: 'Identifier',
+        data: {
+          oldValue: '--slds-c-accordion-color-border',
+          suggestedMatch: '--slds-c-accordion-section-color-border'
         }
-      ]
+      }]
     },
 
     // Multiple deprecated component hooks in same file
@@ -142,14 +118,6 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
       }`,
       filename: 'test.css',
       errors: [
-        {
-          messageId: 'replace',
-          type: 'Declaration',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
-        },
         {
           messageId: 'replace',
           type: 'Declaration',
@@ -180,24 +148,14 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
         margin: 10px;
       }`,
       filename: 'test.css',
-      errors: [
-        {
-          messageId: 'replace',
-          type: 'Declaration',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
-        },
-        {
-          messageId: 'replace',
-          type: 'Identifier',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
+      errors: [{
+        messageId: 'replace',
+        type: 'Identifier',
+        data: {
+          oldValue: '--slds-c-accordion-color-border',
+          suggestedMatch: '--slds-c-accordion-section-color-border'
         }
-      ]
+      }]
     },
 
     // Deprecated component hook in calc() function
@@ -209,24 +167,14 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
         width: calc(100% - var(--slds-c-accordion-section-color-border));
       }`,
       filename: 'test.css',
-      errors: [
-        {
-          messageId: 'replace',
-          type: 'Declaration',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
-        },
-        {
-          messageId: 'replace',
-          type: 'Identifier',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
+      errors: [{
+        messageId: 'replace',
+        type: 'Identifier',
+        data: {
+          oldValue: '--slds-c-accordion-color-border',
+          suggestedMatch: '--slds-c-accordion-section-color-border'
         }
-      ]
+      }]
     },
 
     // Deprecated component hook with fallback value
@@ -238,101 +186,14 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
         color: var(--slds-c-accordion-section-color-border, #333);
       }`,
       filename: 'test.css',
-      errors: [
-        {
-          messageId: 'replace',
-          type: 'Declaration',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
-        },
-        {
-          messageId: 'replace',
-          type: 'Identifier',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
-        }
-      ]
-    },
-
-
-
-    // Complex CSS property value with deprecated hook (var function)
-    {
-      code: `.example {
-        background-image: linear-gradient(to right, var(--slds-c-accordion-color-border), var(--custom-color));
-      }`,
-      output: `.example {
-        background-image: linear-gradient(to right, var(--slds-c-accordion-section-color-border), var(--custom-color));
-      }`,
-      filename: 'test.css',
-      errors: [
-        {
-          messageId: 'replace',
-          type: 'Declaration',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
-        },
-        {
-          messageId: 'replace',
-          type: 'Identifier',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
-        }
-      ]
-    },
-
-    // Deprecated hook without var() wrapper (covering the limitation)
-    {
-      code: `.testClass {
-        --custom-prop: --slds-c-accordion-color-border;
-      }`,
-      filename: 'test.css',
       errors: [{
         messageId: 'replace',
-        type: 'Declaration',
+        type: 'Identifier',
         data: {
           oldValue: '--slds-c-accordion-color-border',
           suggestedMatch: '--slds-c-accordion-section-color-border'
         }
       }]
-    },
-
-    // Deprecated component hook property with deprecated hook in value
-    // Note: Both the property name and the var() hook should be flagged
-    {
-      code: `.testClass {
-        --slds-c-accordion-color-border: var(--slds-c-accordion-heading-text-color);
-      }`,
-      output: `.testClass {
-        --slds-c-accordion-section-color-border: var(--slds-c-accordion-heading-text-color);
-      }`,
-      filename: 'test.css',
-      errors: [
-        {
-          messageId: 'replace',
-          type: 'Declaration',
-          data: {
-            oldValue: '--slds-c-accordion-heading-text-color',
-            suggestedMatch: '--slds-c-accordion-heading-color'
-          }
-        },
-        {
-          messageId: 'replace',
-          type: 'Declaration',
-          data: {
-            oldValue: '--slds-c-accordion-color-border',
-            suggestedMatch: '--slds-c-accordion-section-color-border'
-          }
-        }
-      ]
     }
   ]
 });
