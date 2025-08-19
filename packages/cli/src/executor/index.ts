@@ -7,6 +7,9 @@ import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_V
 import { LintResult, LintConfig, ReportConfig } from '../types';
 import { normalizeCliOptions } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { isDynamicPattern } from 'globby';
 
 /**
  * Run linting on specified files or directory
@@ -25,17 +28,34 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
       configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
     });
     
-    // Scan directory for style files (CSS, SCSS, etc.)
-    const styleFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
-      patterns: StyleFilePatterns,
-      batchSize: 100,
-    });
-    
-    // Scan directory for component files (HTML, etc.)
-    const componentFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
-      patterns: ComponentFilePatterns,
-      batchSize: 100,
-    });
+    let styleFiles: string[][] = [];
+    let componentFiles: string[][] = [];
+
+    // Check if it's a single file path and not a glob pattern
+    if (normalizedConfig.directory && !isDynamicPattern(normalizedConfig.directory)) {
+      const stats = await fs.stat(normalizedConfig.directory).catch(() => null);
+      if (stats?.isFile()) {
+        // Fast path for single file
+        const ext = path.extname(normalizedConfig.directory).toLowerCase();
+        Logger.debug(`Detected single file with extension: ${ext}`);
+        
+        if (['.css'].includes(ext)) {
+          styleFiles = [[normalizedConfig.directory]];
+        } else if (['.html', '.htm'].includes(ext)) {
+          componentFiles = [[normalizedConfig.directory]];
+        } else {
+          Logger.warning(`Unsupported file type: ${ext}`);
+        }
+      } else {
+        // Regular directory scanning
+        Logger.debug('Scanning directory for files...');
+        [styleFiles, componentFiles] = await scanDirectory(normalizedConfig.directory);
+      }
+    } else {
+      // Handle glob patterns or directory scanning
+      Logger.debug('Processing glob pattern or directory...');
+      [styleFiles, componentFiles] = await scanDirectory(normalizedConfig.directory);
+    }
     
     const { fix, configStylelint, configEslint } = normalizedConfig;
     
@@ -146,6 +166,24 @@ function standardizeLintMessages(results: LintResult[]): LintResult[] {
       return { ...entry, message: entry.message };
     })
   }));
+}
+
+/**
+ * Helper function to scan directory for style and component files
+ * @param directory Directory to scan
+ * @returns Promise resolving to [styleFiles, componentFiles]
+ */
+async function scanDirectory(directory: string): Promise<[string[][], string[][]]> {
+  return Promise.all([
+    FileScanner.scanFiles(directory, {
+      patterns: StyleFilePatterns,
+      batchSize: 100,
+    }),
+    FileScanner.scanFiles(directory, {
+      patterns: ComponentFilePatterns,
+      batchSize: 100,
+    })
+  ]);
 }
 
 export type { LintResult, LintResultEntry, LintConfig, ReportConfig, ExitCode, WorkerResult, SarifResultEntry } from '../types'; 
