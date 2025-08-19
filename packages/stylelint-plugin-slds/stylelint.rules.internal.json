@@ -17,12 +17,6 @@
         {
             "severity": "warning"
         }
-    ],
-    "slds/reduce-annotations": [
-        true,
-        {
-            "severity": "warning"
-        }
     ]
 
 }

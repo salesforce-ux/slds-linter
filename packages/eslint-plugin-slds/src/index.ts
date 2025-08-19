@@ -13,6 +13,7 @@ import noUnsupportedHooksSlds2 from './rules/v9/no-unsupported-hooks-slds2';
 import noSldsVarWithoutFallback from './rules/v9/no-slds-var-without-fallback';
 import noSldsNamespaceForCustomHooks from './rules/v9/no-slds-namespace-for-custom-hooks';
 import enforceComponentHookNamingConvention from './rules/v9/enforce-component-hook-naming-convention';
+import reduceAnnotations from './rules/v9/reduce-annotations';
 
 
 import htmlParser from "@html-eslint/parser";
@@ -31,7 +32,8 @@ const rules = {
   "no-unsupported-hooks-slds2": noUnsupportedHooksSlds2,
   "no-slds-var-without-fallback": noSldsVarWithoutFallback,
   "no-slds-namespace-for-custom-hooks": noSldsNamespaceForCustomHooks,
-  "enforce-component-hook-naming-convention": enforceComponentHookNamingConvention
+  "enforce-component-hook-naming-convention": enforceComponentHookNamingConvention,
+  "reduce-annotations": reduceAnnotations
 };
 
 const plugin = {
@@ -86,7 +88,8 @@ Object.assign(plugin.configs, {
         "@salesforce-ux/slds/no-unsupported-hooks-slds2": "warn",
         "@salesforce-ux/slds/no-slds-var-without-fallback": "warn",
         "@salesforce-ux/slds/no-slds-namespace-for-custom-hooks": "warn",
-        "@salesforce-ux/slds/enforce-component-hook-naming-convention": "error"
+        "@salesforce-ux/slds/enforce-component-hook-naming-convention": "error",
+        "@salesforce-ux/slds/reduce-annotations": "warn"
       }
     }
   ],

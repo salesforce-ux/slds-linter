@@ -111,3 +111,10 @@ enforce-component-hook-naming-convention:
   messages:
     replace: "Replace the deprecated {{oldValue}} component styling hook with {{suggestedMatch}}."
 
+reduce-annotations:
+  description: "Remove your annotations and update your code."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#reduce-annotations"
+  type: "problem"
+  messages:
+    removeAnnotation: "Remove this annotation and update the code to SLDS best practices. For help, file an issue at https://github.com/salesforce-ux/slds-linter/"
+
