@@ -118,3 +118,19 @@ enforce-component-hook-naming-convention:
   messages:
     replace: "Replace the deprecated {{oldValue}} component styling hook with {{suggestedMatch}}."
 
+no-hardcoded-values-slds1:
+  description: "Hardcoded CSS values shouldn't be used. Instead, use an SLDS 1 styling hook to scale your solutions and align with Salesforce design standards."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-hardcoded-value"
+  type: "suggestion"
+  messages:
+    hardcodedValue: "Replace the {{oldValue}} static value with an SLDS 1 styling hook: {{newValue}}."
+    noReplacement: "There's no replacement styling hook for the {{oldValue}} static value. Remove the static value."
+
+no-hardcoded-values-slds2:
+  description: "Hardcoded CSS values shouldn't be used. Instead, use an SLDS 2 styling hook to scale your solutions and align with Salesforce design standards."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-hardcoded-value"
+  type: "suggestion"
+  messages:
+    hardcodedValue: "Consider replacing the {{oldValue}} static value with an SLDS 2 styling hook that has a similar value: {{newValue}}."
+    noReplacement: "There's no replacement styling hook for the {{oldValue}} static value. Remove the static value."
+

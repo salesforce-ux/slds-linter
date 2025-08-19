@@ -1,17 +1,4 @@
 {
-
-    "slds/no-hardcoded-values-slds1": [
-        true,
-        {
-            "severity": "error"
-        }
-    ],
-    "slds/no-hardcoded-values-slds2": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/reduce-annotations": [
         true,
         {

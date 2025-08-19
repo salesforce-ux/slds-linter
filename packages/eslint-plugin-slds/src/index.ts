@@ -14,6 +14,8 @@ import noSldsVarWithoutFallback from './rules/v9/no-slds-var-without-fallback';
 import noSldsNamespaceForCustomHooks from './rules/v9/no-slds-namespace-for-custom-hooks';
 import enforceComponentHookNamingConvention from './rules/v9/enforce-component-hook-naming-convention';
 import noSldsPrivateVar from './rules/v9/no-slds-private-var';
+import noHardcodedValuesSlds1 from './rules/v9/no-hardcoded-values-slds1';
+import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values-slds2';
 
 
 import htmlParser from "@html-eslint/parser";
@@ -33,7 +35,9 @@ const rules = {
   "no-slds-var-without-fallback": noSldsVarWithoutFallback,
   "no-slds-namespace-for-custom-hooks": noSldsNamespaceForCustomHooks,
   "enforce-component-hook-naming-convention": enforceComponentHookNamingConvention,
-  "no-slds-private-var": noSldsPrivateVar
+  "no-slds-private-var": noSldsPrivateVar,
+  "no-hardcoded-values-slds1": noHardcodedValuesSlds1,
+  "no-hardcoded-values-slds2": noHardcodedValuesSlds2
 };
 
 const plugin = {
@@ -89,7 +93,9 @@ Object.assign(plugin.configs, {
         "@salesforce-ux/slds/no-slds-var-without-fallback": "warn",
         "@salesforce-ux/slds/no-slds-namespace-for-custom-hooks": "warn",
         "@salesforce-ux/slds/enforce-component-hook-naming-convention": "error",
-        "@salesforce-ux/slds/no-slds-private-var": "warn"
+        "@salesforce-ux/slds/no-slds-private-var": "warn",
+        "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
+        "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn"
       }
     }
   ],
