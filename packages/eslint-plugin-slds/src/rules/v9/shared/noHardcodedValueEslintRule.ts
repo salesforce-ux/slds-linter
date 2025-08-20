@@ -57,8 +57,8 @@ export function createNoHardcodedValueEslintRule({
       }
 
       return {
-        // Hybrid approach: Use CSS AST selectors where they work well,
-        // fall back to general Declaration visitor for compatibility
+        // Simplified CSS AST approach: Use specific selectors for complex properties,
+        // fall back to general Declaration visitor for reliable functionality
         
         // Box shadow properties - complex shorthand, use original handler
         "Declaration[property='box-shadow']"(node: any) {
@@ -70,7 +70,7 @@ export function createNoHardcodedValueEslintRule({
           handleComplexDeclaration(node, 'font');
         },
 
-        // General fallback for all other declarations - maintains compatibility
+        // General fallback for all other declarations - maintains full compatibility
         "Declaration"(node: any) {
           const cssProperty = node.property.toLowerCase();
           
@@ -83,16 +83,7 @@ export function createNoHardcodedValueEslintRule({
         }
       };
 
-      /**
-       * Get property name from a value node by traversing up to the declaration
-       */
-      function getPropertyFromDeclaration(valueNode: any): string {
-        let parent = valueNode.parent;
-        while (parent && parent.type !== 'Declaration') {
-          parent = parent.parent;
-        }
-        return parent ? parent.property.toLowerCase() : '';
-      }
+
 
       /**
        * Handle general declarations using the original approach but with CSS AST targeting

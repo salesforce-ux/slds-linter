@@ -47,6 +47,46 @@ export function handleDensityPropForNode(
 }
 
 /**
+ * Simplified Density Handler for CSS AST - handles direct dimension values from CSS AST nodes
+ * More efficient for simple dimension values detected by CSS AST selectors
+ */
+export function handleDensityValueFromCSS(
+  dimensionValue: string,
+  cssProperty: string,
+  supportedStylinghooks: ValueToStylingHooksMapping,
+  eslintNode: any,
+  messages: any,
+  reportFn: Function
+) {
+  const propToMatch = resolvePropertyToMatch(cssProperty);
+  const closestHooks = getStylingHooksForDensityValue(dimensionValue, supportedStylinghooks, propToMatch);
+
+  if (closestHooks.length > 0) {
+    // Create ESLint fix for single suggestions only
+    const fix = closestHooks.length === 1 ? (fixer: any) => {
+      return fixer.replaceText(eslintNode, `var(${closestHooks[0]}, ${dimensionValue})`);
+    } : null;
+
+    const message = messages.hardcodedValue
+      .replace('{{oldValue}}', dimensionValue)
+      .replace('{{newValue}}', closestHooks.join(', '));
+
+    reportFn({
+      node: eslintNode,
+      message,
+      fix
+    });
+  } else {
+    // No suggestions available
+    const message = messages.noReplacement.replace('{{oldValue}}', dimensionValue);
+    reportFn({
+      node: eslintNode,
+      message
+    });
+  }
+}
+
+/**
  * Replace a specific density value within a CSS declaration with a hook
  */
 function replaceDensityValueInDeclaration(fixer: any, decl: any, valueNode: valueParser.Node, hookName: string) {

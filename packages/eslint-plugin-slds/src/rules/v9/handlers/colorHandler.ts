@@ -61,6 +61,57 @@ export function handleColorProps(
 }
 
 /**
+ * Simplified Color Handler for CSS AST - handles direct color values from CSS AST nodes
+ * More efficient for simple color values detected by CSS AST selectors
+ */
+export function handleColorValueFromCSS(
+  colorValue: string,
+  cssProperty: string,
+  supportedStylinghooks: ValueToStylingHooksMapping,
+  eslintNode: any,
+  messages: any,
+  reportFn: Function
+) {
+  const hexValue = convertToHex(colorValue);
+  
+  // Skip transparent and invalid colors
+  if (colorValue === 'transparent' || !hexValue) {
+    return;
+  }
+
+  const propToMatch = resolvePropertyToMatch(cssProperty);
+  const closestHooks = findClosestColorHook(
+    hexValue,
+    supportedStylinghooks,
+    propToMatch
+  );
+
+  if (closestHooks.length > 0) {
+    // Create ESLint fix for single suggestions only
+    const fix = closestHooks.length === 1 ? (fixer: any) => {
+      return fixer.replaceText(eslintNode, `var(${closestHooks[0]}, ${colorValue})`);
+    } : null;
+
+    const message = messages.hardcodedValue
+      .replace('{{oldValue}}', colorValue)
+      .replace('{{newValue}}', closestHooks.join(', '));
+
+    reportFn({
+      node: eslintNode,
+      message,
+      fix
+    });
+  } else {
+    // No suggestions available
+    const message = messages.noReplacement.replace('{{oldValue}}', colorValue);
+    reportFn({
+      node: eslintNode,
+      message
+    });
+  }
+}
+
+/**
  * Replace a specific color value within a CSS declaration with a hook
  */
 function replaceColorValueInDeclaration(fixer: any, decl: any, colorNode: valueParser.Node, hookName: string) {
