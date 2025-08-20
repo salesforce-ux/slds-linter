@@ -11,9 +11,6 @@ const SLDS_ANNOTATIONS = [
   "@sldsValidatorIgnore"
 ];
 
-// CSS comment pattern for detecting annotations
-const COMMENT_REGEX = /\/\*[\s\S]*?\*\//g;
-
 export default {
   meta: {
     type,
@@ -29,34 +26,23 @@ export default {
     return {
       StyleSheet(node) {
         const sourceCode = context.sourceCode;
-        const text = sourceCode.getText();
-        let match;
         
-        // Find all CSS comments and check for SLDS validator annotations
-        while ((match = COMMENT_REGEX.exec(text)) !== null) {
-          const commentContent = match[0].slice(2, -2).trim(); // Remove /* and */
+        let comments = (sourceCode as any)?.comments || [];
+
+        comments.forEach(comment => {
+          const commentContent = comment.value.trim();
           
-          // Check if comment contains any SLDS validator annotation
-          const hasAnnotation = SLDS_ANNOTATIONS.some(annotation => 
+          const matchingAnnotation = SLDS_ANNOTATIONS.find(annotation => 
             commentContent.startsWith(annotation)
           );
           
-          if (hasAnnotation) {
-            // Calculate line and column position
-            const beforeComment = text.substring(0, match.index);
-            const lines = beforeComment.split('\n');
-            const line = lines.length;
-            const column = lines[lines.length - 1].length + 1;
-            
+          if (matchingAnnotation) {
             context.report({
-              loc: {
-                start: { line, column },
-                end: { line, column: column + match[0].length }
-              },
-              messageId: 'removeAnnotation',
+              node: comment,
+              messageId: 'removeAnnotation'
             });
           }
-        }
+        });
       },
     };
   },
