@@ -4,6 +4,7 @@ import type { ValueToStylingHookEntry, ValueToStylingHooksMapping } from '@sales
 describe('styling-hook-utils', () => {
   describe('getStylingHooksForDensityValue', () => {
     const mockStylingHooks: ValueToStylingHooksMapping = {
+      // Original spacing hooks
       '16px': [
         {
           name: 'slds-spacing-small',
@@ -31,6 +32,35 @@ describe('styling-hook-utils', () => {
           name: 'slds-spacing-large-rem',
           properties: ['margin', 'padding']
         }
+      ],
+      // Line height hooks
+      '1.25': [
+        {
+          name: '--slds-g-font-lineheight-2',
+          properties: ['line-height']
+        }
+      ],
+      '1.5': [
+        {
+          name: '--slds-g-font-lineheight-base',
+          properties: ['line-height']
+        },
+        {
+          name: '--slds-g-font-lineheight-4',
+          properties: ['line-height']
+        }
+      ],
+      '1.375': [
+        {
+          name: '--slds-g-font-lineheight-3',
+          properties: ['line-height']
+        }
+      ],
+      '1.75': [
+        {
+          name: '--slds-g-font-lineheight-5',
+          properties: ['line-height']
+        }
       ]
     };
 
@@ -50,6 +80,11 @@ describe('styling-hook-utils', () => {
     });
 
     it('should return matching hooks for rem to px conversion', () => {
+      const result = getStylingHooksForDensityValue('2rem', mockStylingHooks, 'margin');
+      expect(result).toEqual(['slds-spacing-large', 'slds-spacing-large-rem']);
+    });
+
+    it('should return matching hooks for rem to px conversion', () => {
       const result = getStylingHooksForDensityValue('1rem', mockStylingHooks, 'height');
       expect(result).toEqual(['slds-spacing-small', 'slds-spacing-small-rem']);
     });
@@ -58,6 +93,9 @@ describe('styling-hook-utils', () => {
       const result = getStylingHooksForDensityValue('16px', mockStylingHooks, 'width');
       expect(result).toEqual(['slds-spacing-small', 'slds-spacing-small-rem']);
       // Should not include slds-spacing-medium since it doesn't include 'width'
+      const result1 = getStylingHooksForDensityValue('1.25', mockStylingHooks, 'font-size');
+      expect(result1).toEqual([]);
+      // Should not include any hooks since they are for line-height only
     });
 
     it('should return empty array when no matching value found', () => {
@@ -256,6 +294,32 @@ describe('styling-hook-utils', () => {
       };
       const result = getStylingHooksForDensityValue('16px', mixedMapping, 'margin');
       expect(result).toEqual(['slds-spacing-small-px', 'slds-spacing-small-rem']);
+    });
+
+    // Line height specific tests
+    it('should return matching hooks for line-height with single hook', () => {
+      const result = getStylingHooksForDensityValue('1.25', mockStylingHooks, 'line-height');
+      expect(result).toEqual(['--slds-g-font-lineheight-2']);
+    });
+
+    it('should return matching hooks for line-height with multiple hooks', () => {
+      const result = getStylingHooksForDensityValue('1.5', mockStylingHooks, 'line-height');
+      expect(result).toEqual(['--slds-g-font-lineheight-base', '--slds-g-font-lineheight-4']);
+    });
+
+    it('should return matching hooks for line-height with decimal value', () => {
+      const result = getStylingHooksForDensityValue('1.375', mockStylingHooks, 'line-height');
+      expect(result).toEqual(['--slds-g-font-lineheight-3']);
+    });
+
+    it('should return matching hooks for line-height with larger value', () => {
+      const result = getStylingHooksForDensityValue('1.75', mockStylingHooks, 'line-height');
+      expect(result).toEqual(['--slds-g-font-lineheight-5']);
+    });
+
+    it('should handle unitless line-height values', () => {
+      const result = getStylingHooksForDensityValue('1.25', mockStylingHooks, 'line-height');
+      expect(result).toEqual(['--slds-g-font-lineheight-2']);
     });
   });
 }); 

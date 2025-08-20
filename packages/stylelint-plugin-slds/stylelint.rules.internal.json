@@ -12,12 +12,6 @@
             "severity": "warning"
         }
     ],
-    "slds/no-slds-private-var": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ],
     "slds/reduce-annotations": [
         true,
         {
