@@ -54,6 +54,11 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { background-color: var(--color-brand); }`,
       filename: 'test.css',
     },
+    // Transparent color should be ignored
+    {
+      code: `.example { color: transparent; }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
