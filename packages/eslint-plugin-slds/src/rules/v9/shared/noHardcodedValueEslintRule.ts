@@ -8,7 +8,7 @@ import {
   handleFontProps
 } from '../handlers';
 import { isTargetProperty } from '../../../utils/css-utils';
-import { createESLintReportFunction } from '../utils/reporting';
+import { createESLintReportFunction } from '../../../utils/reporting';
 
 /**
  * Creates the shared no-hardcoded-value rule implementation for ESLint v9
