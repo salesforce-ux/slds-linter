@@ -134,3 +134,10 @@ no-hardcoded-values-slds2:
     hardcodedValue: "Consider replacing the {{oldValue}} static value with an SLDS 2 styling hook that has a similar value: {{newValue}}."
     noReplacement: "There's no replacement styling hook for the {{oldValue}} static value. Remove the static value."
 
+reduce-annotations:
+  description: "Remove your annotations and update your code."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#reduce-annotations"
+  type: "problem"
+  messages:
+    removeAnnotation: "Remove this annotation and update the code to SLDS best practices. For help, file an issue at https://github.com/salesforce-ux/slds-linter/"
+

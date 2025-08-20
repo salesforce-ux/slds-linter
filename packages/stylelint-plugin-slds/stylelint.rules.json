@@ -1,8 +1,1 @@
-{
-    "slds/reduce-annotations": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ]
-}
+{}
