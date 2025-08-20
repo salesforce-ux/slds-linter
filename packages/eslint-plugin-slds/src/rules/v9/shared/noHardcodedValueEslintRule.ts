@@ -1,10 +1,8 @@
 import { Rule } from 'eslint';
-import valueParser from 'postcss-value-parser';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { isTargetProperty } from '../../../utils/css-utils';
 import { createESLintReportFunction } from '../../../utils/reporting';
 import { findClosestColorHook, convertToHex } from '../../../utils/color-lib-utils';
-import { forEachColorValue } from '../../../utils/color-utils';
 import { getStylingHooksForDensityValue } from '../../../utils/styling-hook-utils';
 import { resolvePropertyToMatch } from '../../../utils/property-matcher';
 import { parseBoxShadowValue, isBoxShadowMatch } from '../../../utils/boxShadowValueParser';
@@ -94,7 +92,7 @@ export function createNoHardcodedValueEslintRule({
       }
 
       /**
-       * Handle color declarations - simplified using postcss but optimized with CSS AST targeting
+       * Handle color declarations using pure CSS AST traversal
        */
       function handleColorDeclaration(node: any) {
         const cssProperty = node.property.toLowerCase();
@@ -112,49 +110,60 @@ export function createNoHardcodedValueEslintRule({
           return;
         }
 
-        // Parse the CSS value using postcss-value-parser
-        const parsedValue = valueParser(cssValue);
-        
-        // Use existing color detection logic
-        forEachColorValue(parsedValue, (valueNode) => {
-          const hexValue = convertToHex(valueNode.value);
-          
-          // Skip transparent and invalid colors
-          if (valueNode.value === 'transparent' || !hexValue) {
-            return;
-          }
-
-          const propToMatch = resolvePropertyToMatch(cssProperty);
-          const closestHooks = findClosestColorHook(hexValue, valueToStylinghook, propToMatch);
-
-          if (closestHooks.length > 0) {
-            // Create ESLint fix for single suggestions only
-            const fix = closestHooks.length === 1 ? (fixer: any) => {
-              return replaceColorValueInDeclaration(fixer, node, valueNode, closestHooks[0]);
-            } : null;
-
-            const message = messages.hardcodedValue
-              .replace('{{oldValue}}', valueNode.value)
-              .replace('{{newValue}}', closestHooks.join(', '));
-
-            reportFn({
-              node: node.value,
-              message,
-              fix
-            });
-          } else {
-            // No suggestions available
-            const message = messages.noReplacement.replace('{{oldValue}}', valueNode.value);
-            reportFn({
-              node: node.value,
-              message
-            });
+        // Traverse CSS AST value nodes directly
+        traverseValueNodes(node.value, (valueNode) => {
+          if (isColorValueNode(valueNode)) {
+            handleSingleColorValue(valueNode, cssProperty, node);
           }
         });
       }
 
       /**
-       * Handle density/sizing declarations - simplified using postcss but optimized with CSS AST targeting
+       * Handle a single color value using CSS AST
+       */
+      function handleSingleColorValue(valueNode: any, cssProperty: string, declarationNode: any) {
+        const colorValue = getColorValueFromNode(valueNode);
+        
+        // Skip transparent and invalid colors
+        if (!colorValue || colorValue === 'transparent') {
+          return;
+        }
+
+        const hexValue = convertToHex(colorValue);
+        if (!hexValue) {
+          return;
+        }
+
+        const propToMatch = resolvePropertyToMatch(cssProperty);
+        const closestHooks = findClosestColorHook(hexValue, valueToStylinghook, propToMatch);
+
+        if (closestHooks.length > 0) {
+          // Create ESLint fix for single suggestions only
+          const fix = closestHooks.length === 1 ? (fixer: any) => {
+            return fixer.replaceText(valueNode, `var(${closestHooks[0]}, ${colorValue})`);
+          } : null;
+
+          const message = messages.hardcodedValue
+            .replace('{{oldValue}}', colorValue)
+            .replace('{{newValue}}', closestHooks.join(', '));
+
+          reportFn({
+            node: valueNode,
+            message,
+            fix
+          });
+        } else {
+          // No suggestions available
+          const message = messages.noReplacement.replace('{{oldValue}}', colorValue);
+          reportFn({
+            node: valueNode,
+            message
+          });
+        }
+      }
+
+      /**
+       * Handle density/sizing declarations using pure CSS AST traversal
        */
       function handleDensityDeclaration(node: any) {
         const cssProperty = node.property.toLowerCase();
@@ -172,41 +181,50 @@ export function createNoHardcodedValueEslintRule({
           return;
         }
 
-        // Parse the CSS value using postcss-value-parser
-        const parsedValue = valueParser(cssValue);
-        
-        // Process density values
-        parsedValue.walk((valueNode) => {
-          if (valueNode.type === 'word' && isDimensionValue(valueNode.value)) {
-            const propToMatch = resolvePropertyToMatch(cssProperty);
-            const closestHooks = getStylingHooksForDensityValue(valueNode.value, valueToStylinghook, propToMatch);
-
-            if (closestHooks.length > 0) {
-              // Create ESLint fix for single suggestions only
-              const fix = closestHooks.length === 1 ? (fixer: any) => {
-                return replaceDensityValueInDeclaration(fixer, node, valueNode, closestHooks[0]);
-              } : null;
-
-              const message = messages.hardcodedValue
-                .replace('{{oldValue}}', valueNode.value)
-                .replace('{{newValue}}', closestHooks.join(', '));
-
-              reportFn({
-                node: node.value,
-                message,
-                fix
-              });
-            } else {
-              // No suggestions available
-              const message = messages.noReplacement.replace('{{oldValue}}', valueNode.value);
-              reportFn({
-                node: node.value,
-                message
-              });
-            }
+        // Traverse CSS AST value nodes directly
+        traverseValueNodes(node.value, (valueNode) => {
+          if (isDimensionValueNode(valueNode)) {
+            handleSingleDimensionValue(valueNode, cssProperty, node);
           }
-          return false;
         });
+      }
+
+      /**
+       * Handle a single dimension value using CSS AST
+       */
+      function handleSingleDimensionValue(valueNode: any, cssProperty: string, declarationNode: any) {
+        const dimensionValue = getDimensionValueFromNode(valueNode);
+        
+        if (!dimensionValue || !isDimensionValue(dimensionValue)) {
+          return;
+        }
+
+        const propToMatch = resolvePropertyToMatch(cssProperty);
+        const closestHooks = getStylingHooksForDensityValue(dimensionValue, valueToStylinghook, propToMatch);
+
+        if (closestHooks.length > 0) {
+          // Create ESLint fix for single suggestions only
+          const fix = closestHooks.length === 1 ? (fixer: any) => {
+            return fixer.replaceText(valueNode, `var(${closestHooks[0]}, ${dimensionValue})`);
+          } : null;
+
+          const message = messages.hardcodedValue
+            .replace('{{oldValue}}', dimensionValue)
+            .replace('{{newValue}}', closestHooks.join(', '));
+
+          reportFn({
+            node: valueNode,
+            message,
+            fix
+          });
+        } else {
+          // No suggestions available
+          const message = messages.noReplacement.replace('{{oldValue}}', dimensionValue);
+          reportFn({
+            node: valueNode,
+            message
+          });
+        }
       }
 
       /**
@@ -285,8 +303,102 @@ export function createNoHardcodedValueEslintRule({
 
 
             /**
-       * Helper functions
+       * Pure CSS AST helper functions
        */
+      
+      /**
+       * Traverse CSS AST value nodes recursively
+       */
+      function traverseValueNodes(valueNode: any, callback: (node: any) => void) {
+        if (!valueNode) return;
+        
+        // Call callback for current node
+        callback(valueNode);
+        
+        // Recursively traverse children if they exist
+        if (valueNode.children && Array.isArray(valueNode.children)) {
+          for (const child of valueNode.children) {
+            traverseValueNodes(child, callback);
+          }
+        }
+      }
+
+      /**
+       * Check if a CSS AST node represents a color value
+       */
+      function isColorValueNode(node: any): boolean {
+        if (!node) return false;
+        
+        // Check for hex colors (Hash type in CSS AST)
+        if (node.type === 'Hash') {
+          return true;
+        }
+        
+        // Check for named colors (identifiers that are valid colors)
+        if (node.type === 'Identifier') {
+          const colorName = node.name;
+          // Basic named color check - could be expanded
+          const namedColors = ['red', 'green', 'blue', 'black', 'white', 'gray', 'orange', 'yellow', 'purple', 'pink', 'brown'];
+          return namedColors.includes(colorName?.toLowerCase());
+        }
+        
+        return false;
+      }
+
+      /**
+       * Check if a CSS AST node represents a dimension value
+       */
+      function isDimensionValueNode(node: any): boolean {
+        if (!node) return false;
+        
+        // Check for dimension nodes (e.g., 16px, 1rem, 100%)
+        if (node.type === 'Dimension') {
+          return true;
+        }
+        
+        // Check for identifier nodes that might be font-weight values
+        if (node.type === 'Identifier') {
+          const fontWeights = ['normal', 'bold', 'bolder', 'lighter', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
+          return fontWeights.includes(node.name);
+        }
+        
+        return false;
+      }
+
+      /**
+       * Extract color value from a CSS AST node
+       */
+      function getColorValueFromNode(node: any): string | null {
+        if (!node) return null;
+        
+        if (node.type === 'Hash') {
+          return '#' + node.value; // e.g., "#ff0000" (add # prefix)
+        }
+        
+        if (node.type === 'Identifier') {
+          return node.name; // e.g., "red"
+        }
+        
+        return null;
+      }
+
+      /**
+       * Extract dimension value from a CSS AST node
+       */
+      function getDimensionValueFromNode(node: any): string | null {
+        if (!node) return null;
+        
+        if (node.type === 'Dimension') {
+          return node.value + (node.unit || ''); // e.g., "16px", "1rem"
+        }
+        
+        if (node.type === 'Identifier') {
+          return node.name; // e.g., "bold", "normal"
+        }
+        
+        return null;
+      }
+
       function isDimensionValue(value: string): boolean {
         // Check if it's a dimension value (number + unit or just number)
         const dimensionRegex = /^-?(\d+(\.\d+)?|\.\d+)(px|em|rem|%|ch|ex|vw|vh|vmin|vmax|cm|mm|in|pt|pc)?$/;
@@ -298,53 +410,7 @@ export function createNoHardcodedValueEslintRule({
         return /^0(\.0+)?(px|em|rem|%|ch|ex|vw|vh|vmin|vmax|cm|mm|in|pt|pc)?$/.test(value);
       }
 
-      /**
-       * ESLint fix functions with proper range calculation
-       */
-      function replaceColorValueInDeclaration(fixer: any, declNode: any, valueNode: any, hookName: string) {
-        // Calculate the proper range for the color value within the declaration
-        return replaceValueInDeclaration(fixer, declNode, valueNode, hookName);
-      }
 
-      function replaceDensityValueInDeclaration(fixer: any, declNode: any, valueNode: any, hookName: string) {
-        // Calculate the proper range for the dimension value within the declaration
-        return replaceValueInDeclaration(fixer, declNode, valueNode, hookName);
-      }
-
-      /**
-       * Generic function to replace a value within a CSS declaration using postcss-value-parser positioning
-       */
-      function replaceValueInDeclaration(fixer: any, declNode: any, valueNode: any, hookName: string) {
-        // Get the full CSS declaration value text
-        const fullValueText = context.sourceCode.getText(declNode.value);
-        const declValueRange = declNode.value.range;
-        
-        if (!declValueRange) {
-          // If no range available, fall back to replacing the entire value
-          return fixer.replaceText(declNode.value, `var(${hookName}, ${fullValueText})`);
-        }
-
-        // Use postcss-value-parser source indices to find the exact position
-        const startOffset = valueNode.sourceIndex || 0;
-        const endOffset = (valueNode.sourceEndIndex !== undefined) 
-          ? valueNode.sourceEndIndex 
-          : startOffset + valueNode.value.length;
-
-        // Calculate absolute positions within the source code
-        const absoluteStart = declValueRange[0] + startOffset;
-        const absoluteEnd = declValueRange[0] + endOffset;
-
-        // Validate the range is within bounds
-        if (absoluteStart >= declValueRange[0] && absoluteEnd <= declValueRange[1]) {
-          return fixer.replaceTextRange(
-            [absoluteStart, absoluteEnd],
-            `var(${hookName}, ${valueNode.value})`
-          );
-        } else {
-          // Fallback: replace the entire declaration value if range calculation fails
-          return fixer.replaceText(declNode.value, `var(${hookName}, ${fullValueText})`);
-        }
-      }
 
       /**
        * Extract shadow values and their corresponding hooks from the styling hooks mapping
