@@ -7,9 +7,7 @@ import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_V
 import { LintResult, LintConfig, ReportConfig } from '../types';
 import { normalizeCliOptions } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { isDynamicPattern } from 'globby';
+
 
 /**
  * Run linting on specified files or directory
@@ -31,31 +29,9 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     let styleFiles: string[][] = [];
     let componentFiles: string[][] = [];
 
-    // Check if it's a single file path and not a glob pattern
-    if (normalizedConfig.directory && !isDynamicPattern(normalizedConfig.directory)) {
-      const stats = await fs.stat(normalizedConfig.directory).catch(() => null);
-      if (stats?.isFile()) {
-        // Fast path for single file
-        const ext = path.extname(normalizedConfig.directory).toLowerCase();
-        Logger.debug(`Detected single file with extension: ${ext}`);
-        
-        if (['.css'].includes(ext)) {
-          styleFiles = [[normalizedConfig.directory]];
-        } else if (['.html', '.htm'].includes(ext)) {
-          componentFiles = [[normalizedConfig.directory]];
-        } else {
-          Logger.warning(`Unsupported file type: ${ext}`);
-        }
-      } else {
-        // Regular directory scanning
-        Logger.debug('Scanning directory for files...');
-        [styleFiles, componentFiles] = await scanDirectory(normalizedConfig.directory);
-      }
-    } else {
-      // Handle glob patterns or directory scanning
-      Logger.debug('Processing glob pattern or directory...');
-      [styleFiles, componentFiles] = await scanDirectory(normalizedConfig.directory);
-    }
+    // Let FileScanner handle all cases (single file, directory, glob patterns)
+    Logger.debug('Scanning for files...');
+    [styleFiles, componentFiles] = scanDirectory(normalizedConfig.directory);
     
     const { fix, configStylelint, configEslint } = normalizedConfig;
     
@@ -173,8 +149,8 @@ function standardizeLintMessages(results: LintResult[]): LintResult[] {
  * @param directory Directory to scan
  * @returns Promise resolving to [styleFiles, componentFiles]
  */
-async function scanDirectory(directory: string): Promise<[string[][], string[][]]> {
-  return Promise.all([
+function scanDirectory(directory: string): [string[][], string[][]] {
+  return [
     FileScanner.scanFiles(directory, {
       patterns: StyleFilePatterns,
       batchSize: 100,
@@ -183,7 +159,7 @@ async function scanDirectory(directory: string): Promise<[string[][], string[][]
       patterns: ComponentFilePatterns,
       batchSize: 100,
     })
-  ]);
+  ];
 }
 
 export type { LintResult, LintResultEntry, LintConfig, ReportConfig, ExitCode, WorkerResult, SarifResultEntry } from '../types'; 
