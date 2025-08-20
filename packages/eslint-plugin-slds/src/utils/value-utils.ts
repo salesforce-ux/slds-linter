@@ -1,4 +1,4 @@
-import valueParser from 'postcss-value-parser';
+// Simplified value parsing without postcss-value-parser dependency
 
 
 /**
@@ -44,14 +44,18 @@ export type ParsedUnitValue = {
 } | null;
 
 export function parseUnitValue(value: string): ParsedUnitValue {
-  const parsedValue = valueParser.unit(value);
-  if(!parsedValue){
-    return null;
-  }
-  return {
-    unit: parsedValue.unit as 'px' | 'rem',
-    number: parseFloat(parsedValue.number)
-  };
+  if (!value) return null;
+  
+  // Simple regex to parse number and unit
+  const match = value.match(/^(-?\d*\.?\d+)(px|rem)?$/);
+  if (!match) return null;
+  
+  const number = parseFloat(match[1]);
+  const unit = (match[2] || 'px') as 'px' | 'rem';
+  
+  if (isNaN(number)) return null;
+  
+  return { number, unit };
 }
 
 export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem'): ParsedUnitValue {

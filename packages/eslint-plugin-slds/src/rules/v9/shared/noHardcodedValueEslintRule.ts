@@ -80,16 +80,7 @@ export function createNoHardcodedValueEslintRule({
 
 
 
-      /**
-       * Get declaration property from a value node by traversing up to the declaration
-       */
-      function getDeclarationProperty(valueNode: any): string {
-        let parent = valueNode.parent;
-        while (parent && parent.type !== 'Declaration') {
-          parent = parent.parent;
-        }
-        return parent ? parent.property.toLowerCase() : '';
-      }
+
 
       /**
        * Handle color declarations using pure CSS AST traversal
@@ -110,20 +101,17 @@ export function createNoHardcodedValueEslintRule({
           return;
         }
 
-        // Traverse CSS AST value nodes directly
-        traverseValueNodes(node.value, (valueNode) => {
-          if (isColorValueNode(valueNode)) {
-            handleSingleColorValue(valueNode, cssProperty, node);
-          }
-        });
+        // Simple color value extraction from CSS AST
+        const colorValue = getSimpleColorValue(cssValue);
+        if (colorValue) {
+          handleSingleColorValue(colorValue, cssProperty, node);
+        }
       }
 
       /**
        * Handle a single color value using CSS AST
        */
-      function handleSingleColorValue(valueNode: any, cssProperty: string, declarationNode: any) {
-        const colorValue = getColorValueFromNode(valueNode);
-        
+      function handleSingleColorValue(colorValue: string, cssProperty: string, declarationNode: any) {
         // Skip transparent and invalid colors
         if (!colorValue || colorValue === 'transparent') {
           return;
@@ -140,7 +128,7 @@ export function createNoHardcodedValueEslintRule({
         if (closestHooks.length > 0) {
           // Create ESLint fix for single suggestions only
           const fix = closestHooks.length === 1 ? (fixer: any) => {
-            return fixer.replaceText(valueNode, `var(${closestHooks[0]}, ${colorValue})`);
+            return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${colorValue})`);
           } : null;
 
           const message = messages.hardcodedValue
@@ -148,7 +136,7 @@ export function createNoHardcodedValueEslintRule({
             .replace('{{newValue}}', closestHooks.join(', '));
 
           reportFn({
-            node: valueNode,
+            node: declarationNode.value,
             message,
             fix
           });
@@ -156,7 +144,7 @@ export function createNoHardcodedValueEslintRule({
           // No suggestions available
           const message = messages.noReplacement.replace('{{oldValue}}', colorValue);
           reportFn({
-            node: valueNode,
+            node: declarationNode.value,
             message
           });
         }
@@ -181,20 +169,17 @@ export function createNoHardcodedValueEslintRule({
           return;
         }
 
-        // Traverse CSS AST value nodes directly
-        traverseValueNodes(node.value, (valueNode) => {
-          if (isDimensionValueNode(valueNode)) {
-            handleSingleDimensionValue(valueNode, cssProperty, node);
-          }
-        });
+        // Simple dimension value extraction from CSS AST
+        const dimensionValue = getSimpleDimensionValue(cssValue);
+        if (dimensionValue) {
+          handleSingleDimensionValue(dimensionValue, cssProperty, node);
+        }
       }
 
       /**
        * Handle a single dimension value using CSS AST
        */
-      function handleSingleDimensionValue(valueNode: any, cssProperty: string, declarationNode: any) {
-        const dimensionValue = getDimensionValueFromNode(valueNode);
-        
+      function handleSingleDimensionValue(dimensionValue: string, cssProperty: string, declarationNode: any) {
         if (!dimensionValue || !isDimensionValue(dimensionValue)) {
           return;
         }
@@ -205,7 +190,7 @@ export function createNoHardcodedValueEslintRule({
         if (closestHooks.length > 0) {
           // Create ESLint fix for single suggestions only
           const fix = closestHooks.length === 1 ? (fixer: any) => {
-            return fixer.replaceText(valueNode, `var(${closestHooks[0]}, ${dimensionValue})`);
+            return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${dimensionValue})`);
           } : null;
 
           const message = messages.hardcodedValue
@@ -213,7 +198,7 @@ export function createNoHardcodedValueEslintRule({
             .replace('{{newValue}}', closestHooks.join(', '));
 
           reportFn({
-            node: valueNode,
+            node: declarationNode.value,
             message,
             fix
           });
@@ -221,7 +206,7 @@ export function createNoHardcodedValueEslintRule({
           // No suggestions available
           const message = messages.noReplacement.replace('{{oldValue}}', dimensionValue);
           reportFn({
-            node: valueNode,
+            node: declarationNode.value,
             message
           });
         }
@@ -302,98 +287,53 @@ export function createNoHardcodedValueEslintRule({
 
 
 
-            /**
-       * Pure CSS AST helper functions
+      /**
+       * Simple value extraction helpers
        */
       
       /**
-       * Traverse CSS AST value nodes recursively
+       * Extract color value from CSS value string using simple regex
        */
-      function traverseValueNodes(valueNode: any, callback: (node: any) => void) {
-        if (!valueNode) return;
+      function getSimpleColorValue(cssValue: string): string | null {
+        if (!cssValue) return null;
         
-        // Call callback for current node
-        callback(valueNode);
+        // Match hex colors
+        const hexMatch = cssValue.match(/#([a-fA-F0-9]{3,6})\b/);
+        if (hexMatch) {
+          return hexMatch[0];
+        }
         
-        // Recursively traverse children if they exist
-        if (valueNode.children && Array.isArray(valueNode.children)) {
-          for (const child of valueNode.children) {
-            traverseValueNodes(child, callback);
+        // Match named colors
+        const namedColors = ['red', 'green', 'blue', 'black', 'white', 'gray', 'grey', 'orange', 'yellow', 'purple', 'pink', 'brown'];
+        for (const color of namedColors) {
+          if (cssValue.toLowerCase().includes(color)) {
+            return color;
           }
-        }
-      }
-
-      /**
-       * Check if a CSS AST node represents a color value
-       */
-      function isColorValueNode(node: any): boolean {
-        if (!node) return false;
-        
-        // Check for hex colors (Hash type in CSS AST)
-        if (node.type === 'Hash') {
-          return true;
-        }
-        
-        // Check for named colors (identifiers that are valid colors)
-        if (node.type === 'Identifier') {
-          const colorName = node.name;
-          // Basic named color check - could be expanded
-          const namedColors = ['red', 'green', 'blue', 'black', 'white', 'gray', 'orange', 'yellow', 'purple', 'pink', 'brown'];
-          return namedColors.includes(colorName?.toLowerCase());
-        }
-        
-        return false;
-      }
-
-      /**
-       * Check if a CSS AST node represents a dimension value
-       */
-      function isDimensionValueNode(node: any): boolean {
-        if (!node) return false;
-        
-        // Check for dimension nodes (e.g., 16px, 1rem, 100%)
-        if (node.type === 'Dimension') {
-          return true;
-        }
-        
-        // Check for identifier nodes that might be font-weight values
-        if (node.type === 'Identifier') {
-          const fontWeights = ['normal', 'bold', 'bolder', 'lighter', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
-          return fontWeights.includes(node.name);
-        }
-        
-        return false;
-      }
-
-      /**
-       * Extract color value from a CSS AST node
-       */
-      function getColorValueFromNode(node: any): string | null {
-        if (!node) return null;
-        
-        if (node.type === 'Hash') {
-          return '#' + node.value; // e.g., "#ff0000" (add # prefix)
-        }
-        
-        if (node.type === 'Identifier') {
-          return node.name; // e.g., "red"
         }
         
         return null;
       }
 
       /**
-       * Extract dimension value from a CSS AST node
+       * Extract dimension value from CSS value string using simple regex
        */
-      function getDimensionValueFromNode(node: any): string | null {
-        if (!node) return null;
+      function getSimpleDimensionValue(cssValue: string): string | null {
+        if (!cssValue) return null;
         
-        if (node.type === 'Dimension') {
-          return node.value + (node.unit || ''); // e.g., "16px", "1rem"
+        // Match dimension values like 16px, 1rem, 0.5em, etc.
+        const dimensionMatch = cssValue.match(/(-?\d*\.?\d+)(px|rem|em|%)?/);
+        if (dimensionMatch) {
+          const number = dimensionMatch[1];
+          const unit = dimensionMatch[2] || '';
+          return number + unit;
         }
         
-        if (node.type === 'Identifier') {
-          return node.name; // e.g., "bold", "normal"
+        // Match font-weight values
+        const fontWeights = ['normal', 'bold', 'bolder', 'lighter', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
+        for (const weight of fontWeights) {
+          if (cssValue.toLowerCase().includes(weight)) {
+            return weight;
+          }
         }
         
         return null;
