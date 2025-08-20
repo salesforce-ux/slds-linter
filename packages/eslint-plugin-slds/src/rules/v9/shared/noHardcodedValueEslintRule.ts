@@ -57,58 +57,99 @@ export function createNoHardcodedValueEslintRule({
       }
 
       return {
-        Declaration(node: any) {
+        // Hybrid approach: Use CSS AST selectors where they work well,
+        // fall back to general Declaration visitor for compatibility
+        
+        // Box shadow properties - complex shorthand, use original handler
+        "Declaration[property='box-shadow']"(node: any) {
+          handleComplexDeclaration(node, 'box-shadow');
+        },
+
+        // Font shorthand properties - complex, use original handler  
+        "Declaration[property='font']"(node: any) {
+          handleComplexDeclaration(node, 'font');
+        },
+
+        // General fallback for all other declarations - maintains compatibility
+        "Declaration"(node: any) {
           const cssProperty = node.property.toLowerCase();
-          const cssValue = context.sourceCode.getText(node.value);
           
-          // Apply property targeting logic
-          if (!isTargetProperty(cssProperty)) {
+          // Skip if already handled by specific selectors above
+          if (cssProperty === 'box-shadow' || cssProperty === 'font') {
             return;
           }
+          
+          handleGeneralDeclaration(node);
+        }
+      };
 
-          // Skip CSS variables and function calls
-          if (cssValue?.trim().startsWith('var(') || 
-              cssValue?.trim() === 'var' ||
-              cssValue?.includes('color-mix(')) {
-            return;
-          }
+      /**
+       * Get property name from a value node by traversing up to the declaration
+       */
+      function getPropertyFromDeclaration(valueNode: any): string {
+        let parent = valueNode.parent;
+        while (parent && parent.type !== 'Declaration') {
+          parent = parent.parent;
+        }
+        return parent ? parent.property.toLowerCase() : '';
+      }
 
-          // Parse the CSS value for processing
-          const parsedValue = valueParser(cssValue);
-          const cssValueStartIndex = 0; // ESLint provides node-relative positions
+      /**
+       * Handle general declarations using the original approach but with CSS AST targeting
+       */
+      function handleGeneralDeclaration(node: any) {
+        const cssProperty = node.property.toLowerCase();
+        const cssValue = context.sourceCode.getText(node.value);
+        
+        // Apply property targeting logic
+        if (!isTargetProperty(cssProperty)) {
+          return;
+        }
 
-          // Create declaration adapter for handlers
-          const declAdapter = {
-            prop: cssProperty,
-            value: { 
-              value: cssValue,
-              range: node.value.range || [0, cssValue.length]
-            },
-            // Pass the actual ESLint node and context for range information
-            __eslintNode: node,
-            __context: context
-          };
+        // Skip CSS variables and function calls
+        if (cssValue?.trim().startsWith('var(') || 
+            cssValue?.trim() === 'var' ||
+            cssValue?.includes('color-mix(')) {
+          return;
+        }
 
+        // Parse the CSS value for processing
+        const parsedValue = valueParser(cssValue);
+        const cssValueStartIndex = 0; // ESLint provides node-relative positions
 
+        // Create declaration adapter for handlers
+        const declAdapter = {
+          prop: cssProperty,
+          value: { 
+            value: cssValue,
+            range: node.value.range || [0, cssValue.length]
+          },
+          // Pass the actual ESLint node and context for range information
+          __eslintNode: node,
+          __context: context
+        };
 
-          const reportProps = {
-            node: node.value, // Report on value node for precise location
-          };
+        const reportProps = {
+          node: node.value, // Report on value node for precise location
+        };
 
-          // Determine property type and handle accordingly (order matters!)
-          if (cssProperty === 'box-shadow') {
-            handleBoxShadow(
-              declAdapter,
-              cssValue,
-              cssValueStartIndex,
-              valueToStylinghook,
-              reportProps,
-              messages,
-              reportFn
-            );
-          } else if (isFontProperty(cssProperty, cssValue)) {
-            // Font properties should be handled first (includes font-size, font-weight, font)
-            handleFontProps(
+        // Determine property type and handle accordingly (order matters!)
+        if (isFontProperty(cssProperty, cssValue)) {
+          // Font properties should be handled first (includes font-size, font-weight)
+          handleFontProps(
+            declAdapter,
+            parsedValue,
+            cssValueStartIndex,
+            valueToStylinghook,
+            cssProperty,
+            reportProps,
+            messages,
+            reportFn
+          );
+        } else {
+          // Handle color and density properties separately
+          if (isColorProperty(cssProperty)) {
+            handleColorProps(
               declAdapter,
               parsedValue,
               cssValueStartIndex,
@@ -118,10 +159,83 @@ export function createNoHardcodedValueEslintRule({
               messages,
               reportFn
             );
-          } else {
-            // Handle color and density properties separately
-            if (isColorProperty(cssProperty)) {
-              handleColorProps(
+          }
+          
+          if (isDensityProperty(cssProperty)) {
+            forEachDensifyValue(parsedValue, (valueNode: any) => {
+              handleDensityPropForNode(
+                declAdapter,
+                valueNode,
+                valueNode.value,
+                cssValueStartIndex,
+                valueToStylinghook,
+                cssProperty,
+                reportProps,
+                messages,
+                reportFn
+              );
+            });
+          }
+        }
+      }
+
+      /**
+       * Handle complex declarations that need full postcss-value-parser (shorthand properties)
+       */
+      function handleComplexDeclaration(node: any, propertyType: 'box-shadow' | 'font') {
+        const cssProperty = node.property.toLowerCase();
+        const cssValue = context.sourceCode.getText(node.value);
+        
+        // Apply property targeting logic
+        if (!isTargetProperty(cssProperty)) {
+          return;
+        }
+
+        // Skip CSS variables and function calls
+        if (cssValue?.trim().startsWith('var(') || 
+            cssValue?.trim() === 'var' ||
+            cssValue?.includes('color-mix(')) {
+          return;
+        }
+
+        // Parse the CSS value for processing (keeping existing postcss-value-parser for complex properties)
+        const parsedValue = valueParser(cssValue);
+        const cssValueStartIndex = 0; // ESLint provides node-relative positions
+
+        // Create declaration adapter for handlers
+        const declAdapter = {
+          prop: cssProperty,
+          value: { 
+            value: cssValue,
+            range: node.value.range || [0, cssValue.length]
+          },
+          // Pass the actual ESLint node and context for range information
+          __eslintNode: node,
+          __context: context
+        };
+
+        const reportProps = {
+          node: node.value, // Report on value node for precise location
+        };
+
+        // Route to appropriate handler based on property type (complex properties only)
+        switch (propertyType) {
+          case 'box-shadow':
+            handleBoxShadow(
+              declAdapter,
+              cssValue,
+              cssValueStartIndex,
+              valueToStylinghook,
+              reportProps,
+              messages,
+              reportFn
+            );
+            break;
+
+          case 'font':
+            // Only handle complex font shorthand here
+            if (cssProperty === 'font' && isFontProperty(cssProperty, cssValue)) {
+              handleFontProps(
                 declAdapter,
                 parsedValue,
                 cssValueStartIndex,
@@ -132,25 +246,11 @@ export function createNoHardcodedValueEslintRule({
                 reportFn
               );
             }
-            
-            if (isDensityProperty(cssProperty)) {
-              forEachDensifyValue(parsedValue, (valueNode: any) => {
-                handleDensityPropForNode(
-                  declAdapter,
-                  valueNode,
-                  valueNode.value,
-                  cssValueStartIndex,
-                  valueToStylinghook,
-                  cssProperty,
-                  reportProps,
-                  messages,
-                  reportFn
-                );
-              });
-            }
-          }
+            break;
         }
-      };
+      }
+
+
     }
   };
 }
