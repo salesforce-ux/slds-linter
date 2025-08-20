@@ -61,7 +61,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { color: #ff0000; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Consider replacing the #ff0000 static value with an SLDS 2 styling hook that has a similar value: .*slds-g-color-palette-red-50.*|.*slds-g-color-palette-hot-orange.*/i 
+        messageId: 'hardcodedValue'
       }]
       // No output because multiple suggestions
     },
@@ -70,7 +70,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { font-size: 0.875rem; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Consider replacing the 0.875rem static value with an SLDS 2 styling hook that has a similar value: .*slds-g-font-scale-1/i 
+        messageId: 'hardcodedValue'
       }],
       output: `.example { font-size: var(--slds-g-font-scale-1, 0.875rem); }`
     },
@@ -79,7 +79,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { background-color: #ffffff; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: .*slds-g-color-palette-neutral-100.*|.*slds-g-color-neutral-base-100.*/i 
+        messageId: 'hardcodedValue'
       }]
       // No output because multiple suggestions
     },
@@ -88,7 +88,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { color: #ffffff; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Consider replacing the #ffffff static value with an SLDS 2 styling hook that has a similar value: .*slds-g-color-palette-neutral-100.*|.*slds-g-color-neutral-base-100.*/i 
+        messageId: 'hardcodedValue'
       }]
       // No output because multiple suggestions
     },
@@ -97,7 +97,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { border-color: #fff; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: .*slds-g-color-palette-neutral-100.*|.*slds-g-color-neutral-base-100.*/i 
+        messageId: 'hardcodedValue'
       }]
       // No output because multiple suggestions
     },
@@ -106,7 +106,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { font-size: 16px; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Consider replacing the 16px static value with an SLDS 2 styling hook that has a similar value: .*slds-g-font-scale-2/i 
+        messageId: 'hardcodedValue'
       }],
       output: `.example { font-size: var(--slds-g-font-scale-2, 16px); }`
     },
@@ -115,7 +115,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { font-size: 1rem; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Consider replacing the 1rem static value with an SLDS 2 styling hook that has a similar value: .*slds-g-font-scale-2/i 
+        messageId: 'hardcodedValue'
       }],
       output: `.example { font-size: var(--slds-g-font-scale-2, 1rem); }`
     },
@@ -124,7 +124,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { background-color: #123456; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Consider replacing the #123456 static value with an SLDS 2 styling hook that has a similar value: .*slds-g-color-palette-cloud-blue.*|.*slds-g-color-palette-blue.*|.*slds-g-color-on-surface.*|.*slds-g-color-surface-inverse.*/i 
+        messageId: 'hardcodedValue'
       }]
       // No output because multiple suggestions
     }

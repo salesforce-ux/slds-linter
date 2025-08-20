@@ -131,21 +131,23 @@ export function createNoHardcodedValueEslintRule({
             return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${colorValue})`);
           } : null;
 
-          const message = messages.hardcodedValue
-            .replace('{{oldValue}}', colorValue)
-            .replace('{{newValue}}', closestHooks.join(', '));
-
           reportFn({
             node: declarationNode.value,
-            message,
+            messageId: 'hardcodedValue',
+            data: {
+              oldValue: colorValue,
+              newValue: closestHooks.join(', ')
+            },
             fix
           });
         } else {
           // No suggestions available
-          const message = messages.noReplacement.replace('{{oldValue}}', colorValue);
           reportFn({
             node: declarationNode.value,
-            message
+            messageId: 'noReplacement',
+            data: {
+              oldValue: colorValue
+            }
           });
         }
       }
@@ -193,21 +195,23 @@ export function createNoHardcodedValueEslintRule({
             return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${dimensionValue})`);
           } : null;
 
-          const message = messages.hardcodedValue
-            .replace('{{oldValue}}', dimensionValue)
-            .replace('{{newValue}}', closestHooks.join(', '));
-
           reportFn({
             node: declarationNode.value,
-            message,
+            messageId: 'hardcodedValue',
+            data: {
+              oldValue: dimensionValue,
+              newValue: closestHooks.join(', ')
+            },
             fix
           });
         } else {
           // No suggestions available
-          const message = messages.noReplacement.replace('{{oldValue}}', dimensionValue);
           reportFn({
             node: declarationNode.value,
-            message
+            messageId: 'noReplacement',
+            data: {
+              oldValue: dimensionValue
+            }
           });
         }
       }
@@ -257,17 +261,25 @@ export function createNoHardcodedValueEslintRule({
                 return fixer.replaceText(node.value, `var(${suggestions[0]}, ${cssValue})`);
               } : null;
 
-              const message = suggestions.length > 0 
-                ? messages.hardcodedValue
-                    .replace('{{oldValue}}', cssValue)
-                    .replace('{{newValue}}', suggestions.join(', '))
-                : messages.noReplacement.replace('{{oldValue}}', cssValue);
-
-              reportFn({
-                node: node.value,
-                message,
-                fix
-              });
+              if (suggestions.length > 0) {
+                reportFn({
+                  node: node.value,
+                  messageId: 'hardcodedValue',
+                  data: {
+                    oldValue: cssValue,
+                    newValue: suggestions.join(', ')
+                  },
+                  fix
+                });
+              } else {
+                reportFn({
+                  node: node.value,
+                  messageId: 'noReplacement',
+                  data: {
+                    oldValue: cssValue
+                  }
+                });
+              }
             }
             return;
           }

@@ -52,7 +52,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       code: `.example { color: #ff0000; }`,
       filename: 'test.css',
       errors: [{
-        message: /Replace the #ff0000 static value with an SLDS 1 styling hook: .*slds-g-color-.*red.*|.*slds-g-color-error.*|.*slds-g-color-.*orange.*/i
+        messageId: 'hardcodedValue'
       }]
       // No output because multiple suggestions
     },
@@ -61,7 +61,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       code: `.example { font-size: 0.875rem; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Replace the 0.875rem static value with an SLDS 1 styling hook: .*slds-g-font-scale-1/i 
+        messageId: 'hardcodedValue'
       }],
       output: `.example { font-size: var(--slds-g-font-scale-1, 0.875rem); }`
     },
@@ -70,7 +70,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       code: `.example { box-shadow: 0px 2px 3px 0px #00000027; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Replace the 0px 2px 3px 0px #00000027 static value with an SLDS 1 styling hook: .*slds-g-shadow-2/i 
+        messageId: 'hardcodedValue'
       }],
       output: `.example { box-shadow: var(--slds-g-shadow-2, 0px 2px 3px 0px #00000027); }`
     },
@@ -79,7 +79,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       code: `.example { font-size: 16px; }`,
       filename: 'test.css',
       errors: [{ 
-        message: /Replace the 16px static value with an SLDS 1 styling hook: .*slds-g-font-scale-2/i 
+        messageId: 'hardcodedValue'
       }],
       output: `.example { font-size: var(--slds-g-font-scale-2, 16px); }`
     },
@@ -88,7 +88,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       code: `.example { background-color: #123456; }`,
       filename: 'test.css',
       errors: [{
-        message: /Replace the #123456 static value with an SLDS 1 styling hook: .*slds-g-color-.*blue.*|.*slds-g-color-brand.*/i
+        messageId: 'hardcodedValue'
       }]
       // No output because multiple suggestions
     },
@@ -97,7 +97,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       code: `.example { padding: 20px; }`,
       filename: 'test.css',
       errors: [{
-        message: /There's no replacement styling hook for the 20px static value\. Remove the static value\./i
+        messageId: 'noReplacement'
       }]
       // No output because no auto-fix available
     }

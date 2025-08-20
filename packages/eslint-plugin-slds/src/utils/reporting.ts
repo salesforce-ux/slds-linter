@@ -7,13 +7,15 @@ import { Rule } from 'eslint';
 export function createESLintReportFunction(context: Rule.RuleContext, messages: any) {
   return function reportFn(config: {
     node?: any;
-    message: string;
+    messageId: string;
+    data?: any;
     fix?: any;
     [key: string]: any;
   }) {
     context.report({
       node: config.node,
-      message: config.message,
+      messageId: config.messageId,
+      data: config.data || {},
       fix: config.fix || null,
     });
   };
