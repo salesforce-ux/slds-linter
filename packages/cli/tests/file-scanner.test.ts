@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 describe('FileScanner', () => {
-  const testDir = path.join(__dirname, 'fixtures');
+  const testDir = path.join(__dirname , 'fixtures');
 
   beforeAll(async () => {
     // Create test directory and files for testing
@@ -31,12 +31,10 @@ describe('FileScanner', () => {
     const options: ScanOptions = {
       patterns: StyleFilePatterns,
       batchSize: 1,
-      gitignore: false // Disable gitignore for tests
+      gitignore: false
     };
 
-    // Use relative path to test directory
-    const relativeTestDir = path.relative(process.cwd(), testDir);
-    const batches = FileScanner.scanFiles(relativeTestDir, options);
+    const batches = await FileScanner.scanFiles(testDir, options);
     
     expect(batches).toHaveLength(2);
     expect(batches[0]).toHaveLength(1);
@@ -51,12 +49,10 @@ describe('FileScanner', () => {
         extensions: ['nonexistent'],
         exclude: []
       },
-      gitignore: false // Disable gitignore for tests
+      gitignore: false
     };
 
-    // Use relative path to test directory
-    const relativeTestDir = path.relative(process.cwd(), testDir);
-    const batches = FileScanner.scanFiles(relativeTestDir, options);
+    const batches = await FileScanner.scanFiles(testDir, options);
     expect(batches).toHaveLength(0);
   });
 }); 

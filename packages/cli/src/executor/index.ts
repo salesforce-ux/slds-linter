@@ -8,7 +8,6 @@ import { LintResult, LintConfig, ReportConfig } from '../types';
 import { normalizeCliOptions } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
 
-
 /**
  * Run linting on specified files or directory
  * 
@@ -26,12 +25,17 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
       configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
     });
     
-    let styleFiles: string[][] = [];
-    let componentFiles: string[][] = [];
-
-    // Let FileScanner handle all cases (single file, directory, glob patterns)
-    Logger.debug('Scanning for files...');
-    [styleFiles, componentFiles] = scanDirectory(normalizedConfig.directory);
+    // Scan directory for style files (CSS, SCSS, etc.)
+    const styleFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
+      patterns: StyleFilePatterns,
+      batchSize: 100,
+    });
+    
+    // Scan directory for component files (HTML, etc.)
+    const componentFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
+      patterns: ComponentFilePatterns,
+      batchSize: 100,
+    });
     
     const { fix, configStylelint, configEslint } = normalizedConfig;
     
@@ -142,24 +146,6 @@ function standardizeLintMessages(results: LintResult[]): LintResult[] {
       return { ...entry, message: entry.message };
     })
   }));
-}
-
-/**
- * Helper function to scan directory for style and component files
- * @param directory Directory to scan
- * @returns Promise resolving to [styleFiles, componentFiles]
- */
-function scanDirectory(directory: string): [string[][], string[][]] {
-  return [
-    FileScanner.scanFiles(directory, {
-      patterns: StyleFilePatterns,
-      batchSize: 100,
-    }),
-    FileScanner.scanFiles(directory, {
-      patterns: ComponentFilePatterns,
-      batchSize: 100,
-    })
-  ];
 }
 
 export type { LintResult, LintResultEntry, LintConfig, ReportConfig, ExitCode, WorkerResult, SarifResultEntry } from '../types'; 

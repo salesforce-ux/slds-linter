@@ -37,24 +37,7 @@ jest.mock('../src/services/file-scanner', () => {
   };
 });
 
-jest.mock('globby', () => ({
-  isDynamicPattern: jest.fn().mockImplementation((path) => {
-    return String(path).includes('*');
-  })
-}));
-
-jest.mock('fs/promises', () => ({
-  stat: jest.fn().mockImplementation((path) => {
-    if (String(path).endsWith('.css') || String(path).endsWith('.html')) {
-      return Promise.resolve({
-        isFile: () => true
-      });
-    }
-    return Promise.resolve({
-      isFile: () => false
-    });
-  })
-}));
+jest.mock('fs/promises');
 
 // Skip tests temporarily until TypeScript issues are resolved
 xdescribe('Executor functions', () => {
@@ -92,51 +75,6 @@ xdescribe('Executor functions', () => {
       expect(FileScanner.scanFiles).not.toHaveBeenCalled();
       
       // LintRunner should still be called
-      expect(LintRunner.runLinting).toHaveBeenCalledTimes(2);
-    });
-
-    it('should optimize for single CSS file and skip directory scanning', async () => {
-      const config: LintConfig = {
-        directory: './styles/main.css',
-        fix: false
-      };
-      
-      await lint(config);
-      
-      // FileScanner should not be called for single file
-      expect(FileScanner.scanFiles).not.toHaveBeenCalled();
-      
-      // LintRunner should be called once for CSS file only
-      expect(LintRunner.runLinting).toHaveBeenCalledTimes(1);
-      expect(LintRunner.runLinting).toHaveBeenCalledWith([[config.directory]], 'style', expect.any(Object));
-    });
-
-    it('should optimize for single HTML file and skip directory scanning', async () => {
-      const config: LintConfig = {
-        directory: './components/button.html',
-        fix: false
-      };
-      
-      await lint(config);
-      
-      // FileScanner should not be called for single file
-      expect(FileScanner.scanFiles).not.toHaveBeenCalled();
-      
-      // LintRunner should be called once for HTML file only
-      expect(LintRunner.runLinting).toHaveBeenCalledTimes(1);
-      expect(LintRunner.runLinting).toHaveBeenCalledWith([[config.directory]], 'component', expect.any(Object));
-    });
-
-    it('should fall back to directory scanning for glob patterns', async () => {
-      const config: LintConfig = {
-        directory: './styles/*.css',
-        fix: false
-      };
-      
-      await lint(config);
-      
-      // FileScanner should be called for glob patterns
-      expect(FileScanner.scanFiles).toHaveBeenCalledTimes(2);
       expect(LintRunner.runLinting).toHaveBeenCalledTimes(2);
     });
   });

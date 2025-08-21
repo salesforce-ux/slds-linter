@@ -1,8 +1,8 @@
 import { promises as fs } from "fs";
 import { Logger } from "../utils/logger";
-import { globbySync } from 'globby';
+import {globby, isDynamicPattern} from 'globby';
+import {extname} from "path";
 import path from 'path';
-import { StyleFilePatterns, ComponentFilePatterns } from './file-patterns';
 
 export interface FilePattern {
   extensions:string[];
@@ -12,7 +12,7 @@ export interface FilePattern {
 export interface ScanOptions {
   patterns: FilePattern;
   batchSize?: number;
-  gitignore?: boolean; // Allow overriding gitignore in tests
+  gitignore?: boolean;
 }
 
 export class FileScanner {
@@ -24,41 +24,62 @@ export class FileScanner {
    * @param options Scanning options including patterns and batch size
    * @returns Array of file paths in batches
    */
-  static scanFiles(
+  static async scanFiles(
     directory: string,
     options: ScanOptions
-  ): string[][] {
+  ): Promise<string[][]> {
     try {
       Logger.debug(`Scanning directory: ${directory}`);
 
       // Normalize path separators for cross-platform compatibility
       const normalizedPath = directory.replace(/\\/g, '/');
-      const currentWorkingDir = process.cwd();
+      
+      let workingDirectory: string;
+      let globPattern: string;
+      
+      if (!isDynamicPattern(normalizedPath)) {
+        // Simple directory path - use it as cwd and search for files
+        workingDirectory = path.isAbsolute(normalizedPath) ? normalizedPath : path.join(process.cwd(), normalizedPath);
+        const extensions = options.patterns.extensions.join(',');
+        globPattern = `**/*.{${extensions}}`;
+      } else {
+        // Complex glob pattern - find the deepest concrete directory
+        const firstGlobIndex = normalizedPath.search(/[*?{}[\]!+@()]/);
+        const lastDirectoryIndex = normalizedPath.substring(0, firstGlobIndex).lastIndexOf('/');
+        
+        if (lastDirectoryIndex === -1) {
+          workingDirectory = process.cwd();
+          globPattern = normalizedPath;
+        } else {
+          const basePath = normalizedPath.substring(0, lastDirectoryIndex);
+          workingDirectory = path.isAbsolute(basePath) ? basePath : path.join(process.cwd(), basePath);
+          globPattern = normalizedPath.substring(lastDirectoryIndex + 1);
+        }
+      }
 
-      // Parse path components for glob optimization
-      const { searchPattern, searchDirectory } = this.parseSearchPath(normalizedPath, currentWorkingDir, options.patterns.extensions);
-
-      // Set working directory and search pattern
-      const workingDirectory = searchDirectory;
-      const globPattern = searchPattern;
-
-      Logger.debug(`Using working directory: ${workingDirectory}, pattern: ${globPattern}`);
-
-      // Use globby with optimized options
-      const allFiles: string[] = globbySync(globPattern, {
+      const allFiles: string[] = await globby(globPattern, {
         cwd: workingDirectory,
+        expandDirectories: false, // Disable for optimum performance - avoid unintended file discovery
+        unique:true,
+        ignore: options.patterns.exclude,
         onlyFiles: true,
+        dot: true, // Include.dot files
         absolute: true,
-        ignore: [...(options.patterns.exclude || []), '**/node_modules/**'], // Exclude node_modules for better performance
-        gitignore: options.gitignore !== false // Enable gitignore by default, allow disabling for tests
-      });
+        gitignore: options.gitignore !== false
+      }).then(matches => matches.filter(match => {
+        const fileExt = extname(match).substring(1);
+        return options.patterns.extensions.includes(fileExt);
+      }));
+
+      // Validate files exist and are readable
+      const validFiles = await this.validateFiles(allFiles);
 
       // Split into batches
       const batchSize = options.batchSize || this.DEFAULT_BATCH_SIZE;
-      const batches = this.createBatches(allFiles, batchSize);
+      const batches = this.createBatches(validFiles, batchSize);
 
       Logger.debug(
-        `Found ${allFiles.length} files, split into ${batches.length} batches`
+        `Found ${validFiles.length} files, split into ${batches.length} batches`
       );
       return batches;
     } catch (error: any) {
@@ -94,101 +115,5 @@ export class FileScanner {
       batches.push(files.slice(i, i + batchSize));
     }
     return batches;
-  }
-
-  /**
-   * Parses a file path into optimized search components
-   * @param filePath Normalized file path to parse
-   * @param rootDirectory Base directory to start search from
-   * @param fileExtensions Allowed file extensions
-   * @returns Object containing search pattern and directory
-   */
-  private static parseSearchPath(
-    filePath: string,
-    rootDirectory: string,
-    fileExtensions: string[]
-  ): { searchPattern: string; searchDirectory: string } {
-    // Handle glob patterns
-    if (filePath.includes('*')) {
-      return this.parseGlobPattern(filePath, rootDirectory);
-    }
-
-    // Handle single files
-    if (this.isSupportedFile(filePath)) {
-      return this.parseSingleFile(filePath, rootDirectory);
-    }
-
-    // Handle directories
-    return this.parseDirectory(filePath, rootDirectory, fileExtensions);
-  }
-
-  /**
-   * Checks if a file has a supported extension
-   */
-  private static isSupportedFile(filePath: string): boolean {
-    const allSupportedExtensions = [
-      ...StyleFilePatterns.extensions,
-      ...ComponentFilePatterns.extensions
-    ];
-    return allSupportedExtensions.some(ext => filePath.endsWith(`.${ext}`));
-  }
-
-  /**
-   * Parses a glob pattern into search components
-   */
-  private static parseGlobPattern(
-    globPath: string,
-    rootDirectory: string
-  ): { searchPattern: string; searchDirectory: string } {
-    const globIndex = globPath.indexOf('*');
-    const directoryPath = globPath.substring(0, globIndex).lastIndexOf('/');
-
-    if (directoryPath === -1) {
-      return {
-        searchPattern: globPath,
-        searchDirectory: rootDirectory
-      };
-    }
-
-    return {
-      searchPattern: globPath.substring(directoryPath + 1),
-      searchDirectory: path.join(rootDirectory, globPath.substring(0, directoryPath))
-    };
-  }
-
-  /**
-   * Parses a single file path into search components
-   */
-  private static parseSingleFile(
-    filePath: string,
-    rootDirectory: string
-  ): { searchPattern: string; searchDirectory: string } {
-    const directoryPath = filePath.lastIndexOf('/');
-
-    if (directoryPath === -1) {
-      return {
-        searchPattern: filePath,
-        searchDirectory: rootDirectory
-      };
-    }
-
-    return {
-      searchPattern: filePath.substring(directoryPath + 1),
-      searchDirectory: path.join(rootDirectory, filePath.substring(0, directoryPath))
-    };
-  }
-
-  /**
-   * Parses a directory path into search components
-   */
-  private static parseDirectory(
-    directoryPath: string,
-    rootDirectory: string,
-    fileExtensions: string[]
-  ): { searchPattern: string; searchDirectory: string } {
-    return {
-      searchPattern: `*.{${fileExtensions.join(',')}}`,
-      searchDirectory: path.join(rootDirectory, directoryPath)
-    };
   }
 }
