@@ -87,9 +87,11 @@ describe('styling-hook-utils', () => {
       const result = getStylingHooksForDensityValue('16px', mockStylingHooks, 'width');
       expect(result).toEqual(['slds-spacing-small', 'slds-spacing-small-rem']);
       // Should not include slds-spacing-medium since it doesn't include 'width'
-      const result1 = getStylingHooksForDensityValue('1.25', mockStylingHooks, 'font-size');
-      expect(result1).toEqual([]);
-      // Should not include any hooks since they are for line-height only
+    });
+
+    it('should return empty array when no matching value found', () => {
+      const result = getStylingHooksForDensityValue('8px', mockStylingHooks, 'margin');
+      expect(result).toEqual([]);
     });
 
     it('should return empty array when no hooks match the CSS property', () => {
