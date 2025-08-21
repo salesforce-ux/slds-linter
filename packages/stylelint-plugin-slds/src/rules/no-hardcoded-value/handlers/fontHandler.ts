@@ -7,19 +7,6 @@ import { handleDensityPropForNode } from "./densityHandler";
 import { FontValue, isKnownFontWeight, parseFont } from "../../../utils/fontValueParser";
 import { isFunctionNode } from "../../../utils/decl-utils";
 
-function handleLineHeight(
-    decl: Declaration,
-    node: valueParser.Node,
-    cssValueStartIndex: number,
-    supportedStylinghooks: ValueToStylingHooksMapping,
-    reportProps: Partial<stylelint.Problem>,
-    messages: MessagesObj
-) {
-    if (node && !isFunctionNode(node)) {
-        handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, 'line-height', reportProps, messages);
-    }
-}
-
 export function handleFontProps(
     decl: Declaration,
     parsedValue: valueParser.ParsedValue,
