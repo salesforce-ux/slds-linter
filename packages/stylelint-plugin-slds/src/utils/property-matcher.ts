@@ -109,8 +109,6 @@ export function resolvePropertyToMatch(cssProperty:string){
     return 'background-color';
   } else if(cssProperty === 'outline' || cssProperty === 'outline-color' || isBorderColorProperty(cssProperty)){
     return 'border-color';
-  } else if(cssProperty === 'line-height'){
-    return 'line-height';
   }
   return propertyToMatch;
 }

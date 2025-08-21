@@ -38,40 +38,24 @@ export function isGlobalValue(value: string): boolean {
     return value === 'initial' || value === 'inherit' || value === 'unset' || value === 'revert' || value === 'revert-layer';
   }
 
-export type UnitType = 'px' | 'rem' | 'unitless';
-
 export type ParsedUnitValue = {
-  unit: UnitType;
+  unit: 'px' | 'rem';
   number: number;
 } | null;
 
 export function parseUnitValue(value: string): ParsedUnitValue {
-  // Handle unitless numbers first (like line-height: 1.25)
-  const number = parseFloat(value);
-  if (!isNaN(number) && value.trim() === number.toString()) {
-    return {
-      unit: 'unitless',
-      number
-    };
-  }
-
   const parsedValue = valueParser.unit(value);
-  if (!parsedValue) {
+  if(!parsedValue){
     return null;
   }
   return {
-    unit: parsedValue.unit as UnitType,
+    unit: parsedValue.unit as 'px' | 'rem',
     number: parseFloat(parsedValue.number)
   };
 }
 
-export function toAlternateUnitValue(numberVal: number, unitType: UnitType): ParsedUnitValue {
-    if (unitType === 'unitless') {
-      return {
-        unit: 'unitless',
-        number: numberVal
-      };
-    } else if (unitType === 'px') {
+export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem'): ParsedUnitValue {
+    if (unitType === 'px') {
       let floatValue = parseFloat(`${numberVal / 16}`);
       if (!isNaN(floatValue)) {
         return {

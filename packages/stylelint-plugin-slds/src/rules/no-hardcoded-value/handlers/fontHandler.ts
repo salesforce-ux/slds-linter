@@ -26,37 +26,12 @@ export function handleFontProps(
         fontValue = {
             'font-size': decl.value
         }
-    } else if (cssProperty === 'line-height') {
-        fontValue = {
-            'line-height': decl.value
-        }
     } else if (cssProperty === 'font') {
         fontValue = parseFont(decl.value);
     }
 
-    // Handle standalone line-height
-    if (cssProperty === 'line-height') {
-        const node = parsedValue.nodes[0];
-        if (node && !isFunctionNode(node)) {
-            handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, cssProperty, reportProps, messages);
-        }
-        return;
-    }
-
-    // Process line-height first for font shorthand
-    if (cssProperty === 'font' && fontValue['line-height']) {
-        const slashIndex = parsedValue.nodes.findIndex(n => n.type === 'div' && n.value === '/');
-        if (slashIndex !== -1 && slashIndex + 1 < parsedValue.nodes.length) {
-            const node = parsedValue.nodes[slashIndex + 1];
-            if (node && !isFunctionNode(node)) {
-                handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, 'line-height', reportProps, messages);
-            }
-        }
-    }
-
-    // Process other font properties
     for (const [key, value] of Object.entries(fontValue)) {
-        if (!value || key === 'line-height') {
+        if (!value) {
             continue;
         }
 

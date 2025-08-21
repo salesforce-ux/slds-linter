@@ -4,18 +4,10 @@ import { isFunctionNode } from './decl-utils';
 export const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
 
 export function isDensifyValue(node: valueParser.Node, nonZeroOnly: boolean = true): boolean {
-  // First try to parse as a unit value
-  const parsedValue = valueParser.unit(node.value);
   
-  // Handle unitless numeric values (like line-height: 1.25)
-  if (node.type === 'word' && !parsedValue) {
-    const number = Number(node.value);
-    if (!isNaN(number) && (!nonZeroOnly || number !== 0)) {
-      return true;
-    }
-  }
-
+  const parsedValue = valueParser.unit(node.value);
   if (node.type !== 'word' || !parsedValue) {
+    // Consider only node of type word and parsable by unit function
     return false;
   } else if (
     parsedValue.unit &&
