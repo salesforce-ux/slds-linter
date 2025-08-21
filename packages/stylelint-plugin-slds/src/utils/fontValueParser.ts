@@ -155,6 +155,6 @@ export function parseFont(value: string): FontValue {
 
 export function isFontProperty(property: string, value: string): boolean {
   return property === 'font' 
-    || (property === 'font-weight' && isKnownFontWeight(value))
-    || property === 'font-size'
+  || (property === 'font-weight' && isKnownFontWeight(value))
+  || (property === 'font-size');
 }

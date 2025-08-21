@@ -30,18 +30,14 @@ export function handleFontProps(
         fontValue = parseFont(decl.value);
     }
 
-    for (const [key, value] of Object.entries(fontValue)) {
-        if (!value) {
+    for (let [key, value] of Object.entries(fontValue)) {
+        const node = !!value && parsedValue.nodes.find(node => node.type === 'word' && node.value === value);
+        const isValidNode = node && !isFunctionNode(node);
+        if (!isValidNode) {
             continue;
         }
-
-        const node = parsedValue.nodes.find(node => node.type === 'word' && node.value === value);
-        if (!node || isFunctionNode(node)) {
-            continue;
-        }
-
         if (key === 'font-weight' && isKnownFontWeight(value)) {
-            const cssValue = node.value === 'normal' ? '400' : node.value;
+            let cssValue = node.value === 'normal' ? '400' : node.value;
             handleDensityPropForNode(decl, node, cssValue, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages);
         } else if (key === 'font-size') {
             handleDensityPropForNode(decl, node, node.value, cssValueStartIndex, supportedStylinghooks, key, reportProps, messages);

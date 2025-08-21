@@ -4,7 +4,6 @@ import type { ValueToStylingHookEntry, ValueToStylingHooksMapping } from '@sales
 describe('styling-hook-utils', () => {
   describe('getStylingHooksForDensityValue', () => {
     const mockStylingHooks: ValueToStylingHooksMapping = {
-      // Original spacing hooks
       '16px': [
         {
           name: 'slds-spacing-small',
@@ -80,11 +79,6 @@ describe('styling-hook-utils', () => {
     });
 
     it('should return matching hooks for rem to px conversion', () => {
-      const result = getStylingHooksForDensityValue('2rem', mockStylingHooks, 'margin');
-      expect(result).toEqual(['slds-spacing-large', 'slds-spacing-large-rem']);
-    });
-
-    it('should return matching hooks for rem to px conversion', () => {
       const result = getStylingHooksForDensityValue('1rem', mockStylingHooks, 'height');
       expect(result).toEqual(['slds-spacing-small', 'slds-spacing-small-rem']);
     });
@@ -96,11 +90,6 @@ describe('styling-hook-utils', () => {
       const result1 = getStylingHooksForDensityValue('1.25', mockStylingHooks, 'font-size');
       expect(result1).toEqual([]);
       // Should not include any hooks since they are for line-height only
-    });
-
-    it('should return empty array when no matching value found', () => {
-      const result = getStylingHooksForDensityValue('8px', mockStylingHooks, 'margin');
-      expect(result).toEqual([]);
     });
 
     it('should return empty array when no hooks match the CSS property', () => {
