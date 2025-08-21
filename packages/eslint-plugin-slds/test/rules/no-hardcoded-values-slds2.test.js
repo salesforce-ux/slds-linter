@@ -1,4 +1,4 @@
-const rule = require('../../src/rules/v9/no-hardcoded-values-slds2').default;
+const rule = require('../../src/rules/v9/no-hardcoded-values/no-hardcoded-values-slds2').default;
 const { RuleTester } = require('eslint');
 
 let cssPlugin;
