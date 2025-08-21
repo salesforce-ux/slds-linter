@@ -38,10 +38,19 @@ export class FileScanner {
       let globPattern: string;
       
       if (!isDynamicPattern(normalizedPath)) {
-        // Simple directory path - use it as cwd and search for files
-        workingDirectory = path.isAbsolute(normalizedPath) ? normalizedPath : path.join(process.cwd(), normalizedPath);
-        const extensions = options.patterns.extensions.join(',');
-        globPattern = `**/*.{${extensions}}`;
+        // Check if it's a file (has extension) or directory
+        const hasExtension = path.extname(normalizedPath) !== '';
+        if (hasExtension) {
+          // Single file - use its directory as cwd and filename as pattern
+          const directory = path.dirname(normalizedPath);
+          workingDirectory = path.isAbsolute(directory) ? directory : path.join(process.cwd(), directory);
+          globPattern = path.basename(normalizedPath);
+        } else {
+          // Simple directory path - use it as cwd and search for files
+          workingDirectory = path.isAbsolute(normalizedPath) ? normalizedPath : path.join(process.cwd(), normalizedPath);
+          const extensions = options.patterns.extensions.join(',');
+          globPattern = `**/*.{${extensions}}`;
+        }
       } else {
         // Complex glob pattern - find the deepest concrete directory
         const firstGlobIndex = normalizedPath.search(/[*?{}[\]!+@()]/);
