@@ -28,19 +28,19 @@
 }
 
 .test-cls2 {
-  padding: 0 var(--slds-g-spacing-4, 1rem);
+  padding: 0 1rem;
 }
 
 .test-cls2 {
-  font-size: var(--slds-g-font-scale-1, 0.875rem);
+  font-size: 0.875rem;
 }
 
 .test-cls2 {
-  box-shadow: var(--slds-g-shadow-1, 0px 0px 1.5px 0px #00000017, 0px 1.4px 1.5px 0px #00000017, 0px -1px 1px 0px #00000009);
+  box-shadow: 0px 0px 1.5px 0px #00000017, 0px 1.4px 1.5px 0px #00000017, 0px -1px 1px 0px #00000009;
 }
 
 .test-cls2 {
-  box-shadow: var(--slds-g-shadow-3, 0px 0px 4.5px 0px #00000014, 0px 4.2px 4.5px 0px #00000017, 0px -1px 1.44px 0px #00000008);
+  box-shadow: 0px 0px 4.5px 0px #00000014, 0px 4.2px 4.5px 0px #00000017, 0px -1px 1.44px 0px #00000008;
 }
 
 /* For text truncation with ellipsis
@@ -59,8 +59,8 @@
    .slds-col_padded
    .slds-gutters .slds-col */
 .test-cls4 {
-  padding-right: var(--slds-g-spacing-4, 1rem);
-  padding-left: var(--slds-g-spacing-4, 1rem);
+  padding-right: 1rem;
+  padding-left: 1rem;
 }
 
 /* For flex container with center alignment
@@ -86,15 +86,15 @@
 /* For media object figure with small spacing
    Possible util class: .slds-media_small .slds-media__figure */
 .test-cls7 {
-  margin-right: var(--slds-g-spacing-2, 0.5rem);
+  margin-right: 0.5rem;
   flex-shrink: 0;
 }
 
 /* For vertical margin with medium spacing
    Possible util class: .slds-m-vertical_medium */
 .test-cls8 {
-  margin-top: var(--slds-g-spacing-4, 1rem);
-  margin-bottom: var(--slds-g-spacing-4, 1rem);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 /* For flex container with center vertical alignment
@@ -124,7 +124,7 @@
    .slds-small-size_medium
    .slds-max-medium-size_medium */
 .test-cls4 {
-  width: var(--slds-g-sizing-15, 20rem);
+  width: 20rem;
 }
 
 /* For setting element order in flexbox
@@ -159,16 +159,16 @@
 	background-color: #fff;
 	border-color: #fff;
 	color: #fff;
-	color: var(--slds-g-color-palette-cloud-blue-40, #05628a);
+	color: #05628a;
 }
 
 .test-line-heights {
   /* Should suggest --slds-g-font-lineheight-2 */
-  line-height: var(--slds-g-font-lineheight-2, 1.25);
+  line-height: 1.25;
 
   /* Should suggest --slds-g-font-lineheight-3 */
-  line-height: var(--slds-g-font-lineheight-3, 1.375);
+  line-height: 1.375;
 
   /* Should suggest --slds-g-font-lineheight-5 */
-  line-height: var(--slds-g-font-lineheight-5, 1.75);
+  line-height: 1.75;
 }
