@@ -1,7 +1,7 @@
 import { isTargetProperty } from '../../../../utils/css-utils';
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
-import { extractDimensionValue, shouldSkipValue, isDimensionValue } from '../../../../utils/valueExtractors';
+import { shouldSkipValue } from '../../../../utils/valueExtractors';
 import type { HandlerContext, DeclarationHandler } from '../../../../utils/types';
 
 /**
@@ -21,12 +21,51 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
     return;
   }
 
-  // Simple dimension value extraction from CSS AST
-  const dimensionValue = extractDimensionValue(cssValue);
+  // Extract dimension value directly from CSS AST
+  const dimensionValue = extractDimensionFromAST(node.value);
   if (dimensionValue) {
     handleSingleDimensionValue(dimensionValue, cssProperty, node, context);
   }
 };
+
+/**
+ * Extract dimension value directly from CSS AST nodes
+ * Uses structured AST access instead of regex parsing
+ */
+function extractDimensionFromAST(valueNode: any): string | null {
+  if (!valueNode) return null;
+  
+  switch (valueNode.type) {
+    case 'Dimension':
+      // Dimensions with units: 16px, 1rem, 0.875rem, etc.
+      if (Number(valueNode.value) === 0) {
+        return null;
+      }
+      return `${valueNode.value}${valueNode.unit}`;
+      
+    case 'Number':
+      // Numbers without units: 400 (font-weight), 1.5 (line-height)
+      if (Number(valueNode.value) === 0) {
+        return null;
+      }
+      return valueNode.value.toString();
+      
+    case 'Identifier':
+      // Named font-weight values: normal, bold, bolder, lighter
+      const namedValue = valueNode.name.toLowerCase();
+      const fontWeightValues = ['normal', 'bold', 'bolder', 'lighter'];
+      return fontWeightValues.includes(namedValue) ? namedValue : null;
+      
+    case 'Value':
+      // Value wrapper - extract from first child (typical structure)
+      if (valueNode.children?.[0]) {
+        return extractDimensionFromAST(valueNode.children[0]);
+      }
+      break;
+  }
+  
+  return null;
+}
 
 /**
  * Handle a single dimension value using CSS AST
@@ -37,7 +76,7 @@ function handleSingleDimensionValue(
   declarationNode: any, 
   context: HandlerContext
 ) {
-  if (!dimensionValue || !isDimensionValue(dimensionValue)) {
+  if (!dimensionValue) {
     return;
   }
 

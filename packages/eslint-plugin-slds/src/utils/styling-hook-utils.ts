@@ -1,3 +1,4 @@
+//stylelint-sds/packages/stylelint-plugin-slds/src/utils/styling-hook-utils.ts
 import type { ValueToStylingHookEntry, ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { ParsedUnitValue, parseUnitValue, toAlternateUnitValue } from './value-utils';
 

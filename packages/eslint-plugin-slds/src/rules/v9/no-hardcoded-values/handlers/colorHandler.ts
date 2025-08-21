@@ -1,32 +1,66 @@
 import { isTargetProperty } from '../../../../utils/css-utils';
 import { findClosestColorHook, convertToHex } from '../../../../utils/color-lib-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
-import { extractColorValue, shouldSkipValue } from '../../../../utils/valueExtractors';
+import { shouldSkipValue } from '../../../../utils/valueExtractors';
 import type { HandlerContext, DeclarationHandler } from '../../../../utils/types';
 
 /**
- * Handle color declarations using pure CSS AST traversal
+ * Handle color declarations using CSS AST traversal
  */
 export const handleColorDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
-  const cssValue = context.sourceCode.getText(node.value);
   
   // Apply property targeting logic
   if (!isTargetProperty(cssProperty)) {
     return;
   }
 
+  // Get the raw CSS value string for skip checks
+  const cssValue = context.sourceCode.getText(node.value);
+  
   // Skip CSS variables and function calls
   if (shouldSkipValue(cssValue)) {
     return;
   }
 
-  // Simple color value extraction from CSS AST
-  const colorValue = extractColorValue(cssValue);
+  // Extract color value directly from CSS AST
+  const colorValue = extractColorFromAST(node.value);
   if (colorValue) {
     handleSingleColorValue(colorValue, cssProperty, node, context);
   }
 };
+
+/**
+ * Extract color value directly from CSS AST nodes
+ * Handles Value wrappers and direct Hash/Identifier nodes
+ */
+function extractColorFromAST(valueNode: any): string | null {
+  if (!valueNode) return null;
+  
+  switch (valueNode.type) {
+    case 'Hash':
+      // Direct hex colors: #ff0000, #05628a
+      return `#${valueNode.value}`;
+      
+    case 'Identifier':
+      // Direct named colors: red, blue, etc. (skip transparent)
+      const colorName = valueNode.name.toLowerCase();
+      if (colorName === 'transparent') {
+        return null;
+      }
+      
+      return colorName;
+      
+    case 'Value':
+      // Value wrapper - extract from first child (typical structure)
+      if (valueNode.children?.[0]) {
+        return extractColorFromAST(valueNode.children[0]);
+      }
+      break;
+  }
+  
+  return null;
+}
 
 /**
  * Handle a single color value using CSS AST
