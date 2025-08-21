@@ -2,15 +2,35 @@ import { Rule } from 'eslint';
 import { createESLintReportFunction } from '../../../utils/reporting';
 import { 
   handleColorDeclaration, 
-  handleDensityDeclaration, 
-  handleBoxShadowDeclaration, 
-  handleFontShorthand 
+  handleDensityDeclaration 
 } from './handlers/index';
+import { colorProperties, densificationProperties } from '../../../utils/property-matcher';
 import type { RuleConfig, HandlerContext } from '../../../utils/types';
 
 /**
+ * Convert property patterns to CSS AST selector patterns
+ * Handles wildcards (*) and creates proper ESLint CSS selector syntax
+ */
+function createCSSASTSelector(properties: string[]): string {
+  const selectorParts = properties.map(prop => {
+    if (prop.includes('*')) {
+      // Convert wildcards to regex patterns for CSS AST selectors
+      const regexPattern = prop.replace(/\*/g, '.*');
+      return `Declaration[property=/${regexPattern}$/]`;
+    } else {
+      // Exact property match
+      return `Declaration[property='${prop}']`;
+    }
+  });
+  
+  return selectorParts.join(', ');
+}
+
+/**
  * Creates the shared no-hardcoded-value rule implementation for ESLint v9
- * Following the pattern from reference PRs #233, #234, #247
+ * Simplified implementation focusing on core color and density properties
+ * Uses property-matcher.ts to ensure comprehensive coverage without missing properties
+ * Complex cases like box-shadow and font shorthand will be handled in future iterations
  */
 export function createNoHardcodedValueEslintRule(config: RuleConfig): Rule.RuleModule {
   const { ruleConfig, ruleId } = config;
@@ -54,28 +74,28 @@ export function createNoHardcodedValueEslintRule(config: RuleConfig): Rule.RuleM
         sourceCode: context.sourceCode
       };
 
-      // Define CSS AST selectors and their handlers
-      return {
-        // Box shadow properties - complex shorthand requiring special parsing
-        "Declaration[property='box-shadow']"(node: any) {
-          handleBoxShadowDeclaration(node, handlerContext);
-        },
+      // Generate CSS AST selectors from property-matcher.ts arrays
+      const colorSelector = createCSSASTSelector(colorProperties);
+      const densitySelector = createCSSASTSelector([
+        ...densificationProperties,
+        'font-size',
+        'font-weight'
+      ]);
 
-        // Color properties - optimized CSS AST targeting
-        "Declaration[property='color'], Declaration[property='background-color'], Declaration[property=/^border.*color$/], Declaration[property='outline-color'], Declaration[property='fill'], Declaration[property='stroke']"(node: any) {
-          handleColorDeclaration(node, handlerContext);
-        },
-
-        // Density/sizing properties - optimized CSS AST targeting  
-        "Declaration[property='font-size'], Declaration[property='font-weight'], Declaration[property=/^(margin|padding)/], Declaration[property='width'], Declaration[property='height'], Declaration[property=/^(min|max)-/], Declaration[property='top'], Declaration[property='right'], Declaration[property='bottom'], Declaration[property='left'], Declaration[property='border-width'], Declaration[property='border-radius'], Declaration[property='line-height'], Declaration[property='letter-spacing'], Declaration[property='word-spacing']"(node: any) {
-          handleDensityDeclaration(node, handlerContext);
-        },
-
-        // Font shorthand - complex property requiring special parsing
-        "Declaration[property='font']"(node: any) {
-          handleFontShorthand(node, handlerContext);
-        }
+      // Define CSS AST selectors and their handlers using property-matcher.ts
+      const visitors: Record<string, (node: any) => void> = {};
+      
+      // Color properties - handle hardcoded color values
+      visitors[colorSelector] = (node: any) => {
+        handleColorDeclaration(node, handlerContext);
       };
+
+      // Density/sizing properties - handle hardcoded dimension values  
+      visitors[densitySelector] = (node: any) => {
+        handleDensityDeclaration(node, handlerContext);
+      };
+
+      return visitors;
     }
   };
 }

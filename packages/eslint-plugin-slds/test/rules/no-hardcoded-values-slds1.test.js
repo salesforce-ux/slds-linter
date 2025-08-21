@@ -65,15 +65,6 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       }],
       output: `.example { font-size: var(--slds-g-font-scale-1, 0.875rem); }`
     },
-    // Box shadow with single suggestion (auto-fixable)
-    {
-      code: `.example { box-shadow: 0px 2px 3px 0px #00000027; }`,
-      filename: 'test.css',
-      errors: [{ 
-        messageId: 'hardcodedValue'
-      }],
-      output: `.example { box-shadow: var(--slds-g-shadow-2, 0px 2px 3px 0px #00000027); }`
-    },
     // Font size with single suggestion
     {
       code: `.example { font-size: 16px; }`,
