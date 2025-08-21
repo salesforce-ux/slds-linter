@@ -1,3 +1,4 @@
+//stylelint-sds/packages/stylelint-plugin-slds/src/utils/color-lib-utils.ts
 import { ValueToStylingHooksMapping, ValueToStylingHookEntry } from '@salesforce-ux/sds-metadata';
 import chroma from 'chroma-js';
 
