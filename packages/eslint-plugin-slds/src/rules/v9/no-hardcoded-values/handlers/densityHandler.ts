@@ -1,26 +1,14 @@
-import { isTargetProperty } from '../../../../utils/css-utils';
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
-import { shouldSkipValue } from '../../../../utils/valueExtractors';
 import type { HandlerContext, DeclarationHandler } from '../../../../utils/types';
 
 /**
- * Handle density/sizing declarations using pure CSS AST traversal
+ * Handle density/sizing declarations using CSS AST traversal
+ * property filtering is handled by main rule's CSS AST selectors
  */
 export const handleDensityDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
-  const cssValue = context.sourceCode.getText(node.value);
   
-  // Apply property targeting logic
-  if (!isTargetProperty(cssProperty)) {
-    return;
-  }
-
-  // Skip CSS variables and function calls
-  if (shouldSkipValue(cssValue)) {
-    return;
-  }
-
   // Extract dimension value directly from CSS AST
   const dimensionValue = extractDimensionFromAST(node.value);
   if (dimensionValue) {
@@ -30,38 +18,29 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
 
 /**
  * Extract dimension value directly from CSS AST nodes
- * Uses structured AST access instead of regex parsing
+ * Leverages structured AST data instead of regex parsing
  */
 function extractDimensionFromAST(valueNode: any): string | null {
   if (!valueNode) return null;
   
   switch (valueNode.type) {
     case 'Dimension':
-      // Dimensions with units: 16px, 1rem, 0.875rem, etc.
-      if (Number(valueNode.value) === 0) {
-        return null;
-      }
-      return `${valueNode.value}${valueNode.unit}`;
+      // Dimensions: 16px, 1rem -> return "16px", "1rem" (skip zero values)
+      return Number(valueNode.value) === 0 ? null : `${valueNode.value}${valueNode.unit}`;
       
     case 'Number':
-      // Numbers without units: 400 (font-weight), 1.5 (line-height)
-      if (Number(valueNode.value) === 0) {
-        return null;
-      }
-      return valueNode.value.toString();
+      // Numbers: 400, 1.5 -> return "400", "1.5" (skip zero values)
+      return Number(valueNode.value) === 0 ? null : valueNode.value.toString();
       
     case 'Identifier':
-      // Named font-weight values: normal, bold, bolder, lighter
+      // Named values: normal, bold -> return if valid font-weight
       const namedValue = valueNode.name.toLowerCase();
       const fontWeightValues = ['normal', 'bold', 'bolder', 'lighter'];
       return fontWeightValues.includes(namedValue) ? namedValue : null;
       
     case 'Value':
-      // Value wrapper - extract from first child (typical structure)
-      if (valueNode.children?.[0]) {
-        return extractDimensionFromAST(valueNode.children[0]);
-      }
-      break;
+      // Value wrapper - extract from first child
+      return valueNode.children?.[0] ? extractDimensionFromAST(valueNode.children[0]) : null;
   }
   
   return null;
