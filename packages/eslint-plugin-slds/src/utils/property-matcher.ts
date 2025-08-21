@@ -1,3 +1,4 @@
+///stylelint-sds/packages/stylelint-plugin-slds/src/utils/property-matcher.ts
 /**
  * Check if any of the hook properties match the provided cssProperty using wildcard matching.
  * @param hookProperties - Array of property patterns (can contain wildcards like `*`)
