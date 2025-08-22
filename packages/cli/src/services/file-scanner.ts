@@ -69,7 +69,7 @@ export class FileScanner {
       const allFiles: string[] = await globby(globPattern, {
         cwd: workingDirectory,
         expandDirectories: false, // Disable for optimum performance - avoid unintended file discovery
-        unique:true,
+        unique: true,
         ignore: options.patterns.exclude,
         onlyFiles: true,
         dot: true, // Include.dot files
