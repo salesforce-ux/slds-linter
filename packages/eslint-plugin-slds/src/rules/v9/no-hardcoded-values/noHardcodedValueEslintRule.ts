@@ -33,7 +33,7 @@ function createCSSASTSelector(properties: string[]): string {
  * Complex cases like box-shadow and font shorthand will be handled in future iterations
  */
 export function createNoHardcodedValueEslintRule(config: RuleConfig): Rule.RuleModule {
-  const { ruleConfig, ruleId } = config;
+  const { ruleConfig } = config;
   const { type, description, url, messages } = ruleConfig;
 
   return {
@@ -52,16 +52,6 @@ export function createNoHardcodedValueEslintRule(config: RuleConfig): Rule.RuleM
       // Skip non-CSS files
       if (!context.filename?.match(/\.(css|scss)$/)) {
         return {};
-      }
-
-      // Prevent SLDS1 from running if SLDS2 is enabled (matches Stylelint behavior)
-      if (ruleId === 'slds/no-hardcoded-values-slds1') {
-        // Check if SLDS2 rule is enabled in the same config
-        const settings = context.settings as any;
-        const rules = settings?.eslintConfig?.rules || {};
-        if (rules['@salesforce-ux/slds/no-hardcoded-values-slds2']) {
-          return {}; // Skip SLDS1 when SLDS2 is enabled
-        }
       }
 
       // Create ESLint-specific reporting function

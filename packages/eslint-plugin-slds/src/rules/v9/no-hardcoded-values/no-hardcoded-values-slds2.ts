@@ -9,7 +9,6 @@ const { type, description, url, messages } = ruleConfig;
 const valueToStylinghook = metadata.valueToStylingHooksCosmos;
 
 export default createNoHardcodedValueEslintRule({
-  ruleId: 'slds/no-hardcoded-values-slds2',
   ruleConfig,
   valueToStylinghook,
 }) as Rule.RuleModule;

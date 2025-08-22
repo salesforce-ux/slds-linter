@@ -24,7 +24,6 @@ export interface ReportOptions {
  * Configuration for creating the rule
  */
 export interface RuleConfig {
-  ruleId: string;
   ruleConfig: {
     type: 'problem' | 'suggestion' | 'layout';
     description: string;
