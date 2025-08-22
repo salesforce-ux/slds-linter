@@ -40,7 +40,8 @@
     "@eslint/css": "^0.9.0",
     "@html-eslint/eslint-plugin": "^0.34.0",
     "@html-eslint/parser": "^0.34.0",
-    "@salesforce-ux/sds-metadata": "^0.3.3"
+    "@salesforce-ux/sds-metadata": "^0.3.3",
+    "chroma-js": "^3.1.2"
   },
   "peerDependencies": {
     "eslint": "^8.0.0 || ^9.0.0"
@@ -51,6 +52,7 @@
     }
   },
   "devDependencies": {
+    "@types/chroma-js": "^2.4.4",
     "@types/eslint": "^8.56.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.11.19",
