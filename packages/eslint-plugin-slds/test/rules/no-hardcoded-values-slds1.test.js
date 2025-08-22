@@ -44,7 +44,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { background-color: color-mix(in oklab, #a71e14 25%, white); }`,
       filename: 'test.css',
-    },
+    }
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
@@ -91,6 +91,51 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
         messageId: 'noReplacement'
       }]
       // No output because no auto-fix available
+    },
+    // RGB color values should be detected
+    {
+      code: `.example { color: rgb(255, 0, 0); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // No output expected due to multiple suggestions for red color
+    },
+    // RGBA color values should be detected
+    {
+      code: `.example { background-color: rgba(18, 52, 86, 0.8); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // No output expected due to potential multiple suggestions
+    },
+    // RGB percentage values should be detected
+    {
+      code: `.example { border-color: rgb(50%, 25%, 75%); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // No output expected due to potential multiple suggestions
+    },
+    // HSL color values should be detected (using red which has known hooks)
+    {
+      code: `.example { color: hsl(0, 100%, 50%); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // No output expected due to multiple suggestions for red color
+    },
+    // HSLA color values should be detected
+    {
+      code: `.example { background-color: hsla(240, 75%, 60%, 0.9); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // No output expected due to potential multiple suggestions
     }
   ]
 });

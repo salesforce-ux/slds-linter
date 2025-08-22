@@ -1,60 +1,93 @@
-import { findClosestColorHook, convertToHex } from '../../../../utils/color-lib-utils';
+import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
 import type { HandlerContext, DeclarationHandler } from '../../../../utils/types';
 
 /**
  * Handle color declarations using CSS AST traversal
- * property filtering is handled by main rule's CSS AST selectors
+ * Simplified approach leveraging chroma-js validation and CSS AST raw text
  */
 export const handleColorDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
   
-  // Extract color value directly from CSS AST
-  const colorValue = extractColorFromAST(node.value);
-  if (colorValue) {
-    handleSingleColorValue(colorValue, cssProperty, node, context);
+  // Get the raw color value from CSS AST
+  const colorValue = getColorValueFromAST(node.value);
+  
+  if (colorValue && isValidColor(colorValue) && colorValue !== 'transparent') {
+    processColorValue(colorValue, cssProperty, node, context);
   }
 };
 
 /**
- * Extract color value directly from CSS AST nodes
- * Leverages structured AST data instead of string parsing
+ * Extract color value from CSS AST node using simple text reconstruction
+ * Handles hex, named colors, rgb(), rgba(), hsl(), hsla()
  */
-function extractColorFromAST(valueNode: any): string | null {
+function getColorValueFromAST(valueNode: any): string | null {
   if (!valueNode) return null;
   
   switch (valueNode.type) {
     case 'Hash':
-      // Hex colors: #05628a -> return "#05628a"
       return `#${valueNode.value}`;
       
     case 'Identifier':
-      // Named colors: red -> return "red" (skip transparent)
-      const colorName = valueNode.name.toLowerCase();
-      return colorName === 'transparent' ? null : colorName;
+      return valueNode.name;
+      
+    case 'Function':
+      // Reconstruct function call from AST
+      if (['rgb', 'rgba', 'hsl', 'hsla'].includes(valueNode.name)) {
+        return reconstructFunctionFromAST(valueNode);
+      }
+      break;
       
     case 'Value':
       // Value wrapper - extract from first child
-      return valueNode.children?.[0] ? extractColorFromAST(valueNode.children[0]) : null;
+      return valueNode.children?.[0] ? getColorValueFromAST(valueNode.children[0]) : null;
   }
   
   return null;
 }
 
 /**
- * Handle a single color value using CSS AST
+ * Reconstruct color function from CSS AST 
+ * Simple approach: rebuild the string from AST structure
  */
-function handleSingleColorValue(
+function reconstructFunctionFromAST(functionNode: any): string {
+  const args: string[] = [];
+  
+  if (!functionNode.children) {
+    return `${functionNode.name}()`;
+  }
+  
+  for (const child of functionNode.children) {
+    if (child.type === 'Operator' && child.value === ',') {
+      continue; // Skip commas, we'll add them back
+    }
+    
+    if (child.type === 'Number') {
+      args.push(child.value);
+    } else if (child.type === 'Percentage') {
+      args.push(`${child.value}%`);
+    } else if (child.type === 'Value' && child.children?.[0]) {
+      // Handle nested values
+      if (child.children[0].type === 'Number') {
+        args.push(child.children[0].value);
+      } else if (child.children[0].type === 'Percentage') {
+        args.push(`${child.children[0].value}%`);
+      }
+    }
+  }
+  
+  return `${functionNode.name}(${args.join(', ')})`;
+}
+
+/**
+ * Process validated color value and report issues
+ */
+function processColorValue(
   colorValue: string, 
   cssProperty: string, 
   declarationNode: any, 
   context: HandlerContext
 ) {
-  // Skip transparent and invalid colors
-  if (!colorValue || colorValue === 'transparent') {
-    return;
-  }
-
   const hexValue = convertToHex(colorValue);
   if (!hexValue) {
     return;
