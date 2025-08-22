@@ -30,7 +30,8 @@ describe('FileScanner', () => {
   it('should scan and batch files correctly', async () => {
     const options: ScanOptions = {
       patterns: StyleFilePatterns,
-      batchSize: 1
+      batchSize: 1,
+      gitignore: false
     };
 
     const batches = await FileScanner.scanFiles(testDir, options);
@@ -47,7 +48,8 @@ describe('FileScanner', () => {
       patterns: {
         extensions: ['nonexistent'],
         exclude: []
-      }
+      },
+      gitignore: false
     };
 
     const batches = await FileScanner.scanFiles(testDir, options);
