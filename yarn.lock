@@ -1327,9 +1327,11 @@ __metadata:
     "@html-eslint/eslint-plugin": "npm:^0.34.0"
     "@html-eslint/parser": "npm:^0.34.0"
     "@salesforce-ux/sds-metadata": "npm:^0.3.3"
+    "@types/chroma-js": "npm:^2.4.4"
     "@types/eslint": "npm:^8.56.0"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^20.11.19"
+    chroma-js: "npm:^3.1.2"
     jest: "npm:^29.7.0"
     ts-jest: "npm:^29.2.5"
     yaml: "npm:^2.8.1"
@@ -1505,6 +1507,13 @@ __metadata:
   dependencies:
     "@babel/types": "npm:^7.28.2"
   checksum: 10c0/b52d7d4e8fc6a9018fe7361c4062c1c190f5778cf2466817cb9ed19d69fbbb54f9a85ffedeb748ed8062d2cf7d4cc088ee739848f47c57740de1c48cbf0d0994
+  languageName: node
+  linkType: hard
+
+"@types/chroma-js@npm:^2.4.4":
+  version: 2.4.5
+  resolution: "@types/chroma-js@npm:2.4.5"
+  checksum: 10c0/2860bb40e29bc034464324c53291164d5a665edb6a3f7adff80ef968fe468f3484435a9b7a3735874e979bfd189d026989d9aa6743cb8a7ca0d99b64555904b3
   languageName: node
   linkType: hard
 
