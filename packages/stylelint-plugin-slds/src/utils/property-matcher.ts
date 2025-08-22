@@ -85,7 +85,8 @@ export const densificationProperties = [
   'left',
   'bottom',
   'outline',
-  'outline-width'
+  'outline-width',
+  'line-height'
 ]; 
 
 export function resolvePropertyToMatch(cssProperty:string){
