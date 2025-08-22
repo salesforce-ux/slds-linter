@@ -1,5 +1,6 @@
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
+import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../utils/types';
 
 /**
@@ -10,33 +11,60 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
   const cssProperty = node.property.toLowerCase();
   
   // Extract dimension value directly from CSS AST
-  const dimensionValue = extractDimensionFromAST(node.value);
-  if (dimensionValue) {
-    handleSingleDimensionValue(dimensionValue, cssProperty, node, context);
+  const parsedDimension = extractDimensionFromAST(node.value);
+  if (parsedDimension) {
+    handleSingleDimensionValue(parsedDimension, cssProperty, node, context);
   }
 };
 
 /**
- * Extract dimension value directly from CSS AST nodes
- * Leverages structured AST data instead of regex parsing
+ * Extract parsed dimension value directly from CSS AST nodes
+ * Returns structured data with number and unit to eliminate regex parsing
  */
-function extractDimensionFromAST(valueNode: any): string | null {
+function extractDimensionFromAST(valueNode: any): ParsedUnitValue | null {
   if (!valueNode) return null;
   
   switch (valueNode.type) {
     case 'Dimension':
-      // Dimensions: 16px, 1rem -> return "16px", "1rem" (skip zero values)
-      return Number(valueNode.value) === 0 ? null : `${valueNode.value}${valueNode.unit}`;
+      // Dimensions: 16px, 1rem -> extract value and unit directly from AST
+      const numValue = Number(valueNode.value);
+      if (numValue === 0) return null; // Skip zero values
+      
+      const unit = valueNode.unit.toLowerCase();
+      if (unit !== 'px' && unit !== 'rem') return null; // Only support px and rem
+      
+      return {
+        number: numValue,
+        unit: unit as 'px' | 'rem'
+      };
       
     case 'Number':
-      // Numbers: 400, 1.5 -> return "400", "1.5" (skip zero values)
-      return Number(valueNode.value) === 0 ? null : valueNode.value.toString();
+      // Numbers: 400, 1.5 -> treat as unitless (font-weight, line-height, etc.)
+      const numberValue = Number(valueNode.value);
+      if (numberValue === 0) return null; // Skip zero values
+      
+      return {
+        number: numberValue,
+        unit: null
+      };
       
     case 'Identifier':
-      // Named values: normal, bold -> return if valid font-weight
+      // Named values: normal, bold -> handle font-weight keywords
       const namedValue = valueNode.name.toLowerCase();
-      const fontWeightValues = ['normal', 'bold', 'bolder', 'lighter'];
-      return fontWeightValues.includes(namedValue) ? namedValue : null;
+      const fontWeightMap: Record<string, number> = {
+        'normal': 400,
+        'bold': 700,
+        'bolder': 900,
+        'lighter': 300
+      };
+      
+      if (fontWeightMap[namedValue]) {
+        return {
+          number: fontWeightMap[namedValue],
+          unit: null, // Font weights are unitless but we need a unit for consistency
+        };
+      }
+      return null;
       
     case 'Value':
       // Value wrapper - extract from first child
@@ -47,32 +75,37 @@ function extractDimensionFromAST(valueNode: any): string | null {
 }
 
 /**
- * Handle a single dimension value using CSS AST
+ * Handle a single dimension value using parsed CSS AST data
  */
 function handleSingleDimensionValue(
-  dimensionValue: string, 
+  parsedDimension: ParsedUnitValue, 
   cssProperty: string, 
   declarationNode: any, 
   context: HandlerContext
 ) {
-  if (!dimensionValue) {
+  if (!parsedDimension) {
     return;
   }
 
+  // Reconstruct raw value from parsed data for reporting
+  const rawValue = parsedDimension.unit 
+    ? `${parsedDimension.number}${parsedDimension.unit}`
+    : parsedDimension.number.toString();
+
   const propToMatch = resolvePropertyToMatch(cssProperty);
-  const closestHooks = getStylingHooksForDensityValue(dimensionValue, context.valueToStylinghook, propToMatch);
+  const closestHooks = getStylingHooksForDensityValue(parsedDimension, context.valueToStylinghook, propToMatch);
 
   if (closestHooks.length > 0) {
     // Create ESLint fix for single suggestions only
     const fix = closestHooks.length === 1 ? (fixer: any) => {
-      return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${dimensionValue})`);
+      return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${rawValue})`);
     } : undefined;
 
     context.reportFn({
       node: declarationNode.value,
       messageId: 'hardcodedValue',
       data: {
-        oldValue: dimensionValue,
+        oldValue: rawValue,
         newValue: closestHooks.join(', ')
       },
       fix
@@ -83,7 +116,7 @@ function handleSingleDimensionValue(
       node: declarationNode.value,
       messageId: 'noReplacement',
       data: {
-        oldValue: dimensionValue
+        oldValue: rawValue
       }
     });
   }

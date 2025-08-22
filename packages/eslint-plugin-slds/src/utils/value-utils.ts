@@ -1,5 +1,4 @@
-// Simplified value parsing without postcss-value-parser dependency
-
+// Simplified value parsing
 
 /**
  * Checks if a value is a CSS global value.
@@ -39,7 +38,7 @@ export function isGlobalValue(value: string): boolean {
   }
 
 export type ParsedUnitValue = {
-  unit: 'px' | 'rem';
+  unit: 'px' | 'rem' | null;
   number: number;
 } | null;
 
@@ -58,7 +57,7 @@ export function parseUnitValue(value: string): ParsedUnitValue {
   return { number, unit };
 }
 
-export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem'): ParsedUnitValue {
+export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem' | null): ParsedUnitValue {
     if (unitType === 'px') {
       let floatValue = parseFloat(`${numberVal / 16}`);
       if (!isNaN(floatValue)) {
@@ -76,5 +75,6 @@ export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem'):
         }
       }
     }
+    // For unitless values (font-weight, etc.), no alternate unit conversion
     return null;
 }
