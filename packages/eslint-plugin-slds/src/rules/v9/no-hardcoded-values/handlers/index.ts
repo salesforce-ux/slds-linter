@@ -1,7 +1,8 @@
 /**
  * Centralized export for core handlers
- * Simplified implementation focusing on essential color and density cases
+ * Supports color, density, and font shorthand cases
  */
 
 export { handleColorDeclaration } from './colorHandler';
 export { handleDensityDeclaration } from './densityHandler';
+export { handleFontShorthand } from './fontHandler';

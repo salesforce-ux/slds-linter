@@ -2,7 +2,8 @@ import { Rule } from 'eslint';
 import { createESLintReportFunction } from '../../../utils/reporting';
 import { 
   handleColorDeclaration, 
-  handleDensityDeclaration 
+  handleDensityDeclaration,
+  handleFontShorthand 
 } from './handlers/index';
 import { colorProperties, densificationProperties } from '../../../utils/property-matcher';
 import type { RuleConfig, HandlerContext } from '../../../utils/types';
@@ -28,9 +29,9 @@ function createCSSASTSelector(properties: string[]): string {
 
 /**
  * Creates the shared no-hardcoded-value rule implementation for ESLint v9
- * Simplified implementation focusing on core color and density properties
+ * Supports color, density, and font shorthand properties
  * Uses property-matcher.ts to ensure comprehensive coverage without missing properties
- * Complex cases like box-shadow and font shorthand will be handled in future iterations
+ * Complex cases like box-shadow can be added in future iterations
  */
 export function createNoHardcodedValueEslintRule(config: RuleConfig): Rule.RuleModule {
   const { ruleConfig } = config;
@@ -67,9 +68,7 @@ export function createNoHardcodedValueEslintRule(config: RuleConfig): Rule.RuleM
       // Generate CSS AST selectors from property-matcher.ts arrays
       const colorSelector = createCSSASTSelector(colorProperties);
       const densitySelector = createCSSASTSelector([
-        ...densificationProperties,
-        'font-size',
-        'font-weight'
+        ...densificationProperties
       ]);
 
       // Define CSS AST selectors and their handlers using property-matcher.ts
@@ -83,6 +82,16 @@ export function createNoHardcodedValueEslintRule(config: RuleConfig): Rule.RuleM
       // Density/sizing properties - handle hardcoded dimension values  
       visitors[densitySelector] = (node: any) => {
         handleDensityDeclaration(node, handlerContext);
+      };
+
+      // Individual font properties - handle hardcoded font values
+      visitors["Declaration[property='font-size'], Declaration[property='font-weight']"] = (node: any) => {
+        handleDensityDeclaration(node, handlerContext);
+      };
+
+      // Font shorthand - complex property requiring special parsing
+      visitors["Declaration[property='font']"] = (node: any) => {
+        handleFontShorthand(node, handlerContext);
       };
 
       return visitors;

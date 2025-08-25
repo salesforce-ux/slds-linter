@@ -44,6 +44,15 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { background-color: color-mix(in oklab, #a71e14 25%, white); }`,
       filename: 'test.css',
+    },
+    // Font shorthand with CSS variables should be ignored
+    {
+      code: `.example { font: var(--font-family); }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.example { font: normal var(--slds-g-font-weight-bold) var(--slds-g-font-scale-2)/1.5 sans-serif; }`,
+      filename: 'test.css',
     }
   ],
   invalid: [
@@ -136,6 +145,80 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
         messageId: 'hardcodedValue'
       }]
       // No output expected due to potential multiple suggestions
+    },
+    // Font shorthand with hardcoded font-size
+    {
+      code: `.example { font: 16px Arial; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // No auto-fix for font shorthand due to complexity
+    },
+    // Font shorthand with hardcoded font-size in rem
+    {
+      code: `.example { font: 1rem Arial; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // No auto-fix for font shorthand due to complexity
+    },
+    // Font shorthand with hardcoded font-weight and font-size
+    {
+      code: `.example { font: 700 16px Arial; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Both font-size and font-weight should be flagged
+    },
+    // Font shorthand with small font-size
+    {
+      code: `.example { font: 0.875rem Arial; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // No auto-fix for font shorthand due to complexity
+    },
+    // Individual line-height properties with design tokens
+    {
+      code: `.example { line-height: 1.25; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { line-height: var(--slds-g-font-lineheight-2, 1.25); }`
+    },
+    {
+      code: `.example { line-height: 1.375; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { line-height: var(--slds-g-font-lineheight-3, 1.375); }`
+    },
+    {
+      code: `.example { line-height: 1.75; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { line-height: var(--slds-g-font-lineheight-5, 1.75); }`
+    },
+    // Font shorthand with line-height
+    {
+      code: `.example { font: 16px/1.25 Arial; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Both font-size and line-height should be flagged, no auto-fix for font shorthand
     }
   ]
 });
