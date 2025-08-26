@@ -161,3 +161,14 @@
 	color: #fff;
 	color: #05628a;
 }
+
+.test-line-heights {
+  /* Should suggest --slds-g-font-lineheight-2 */
+  line-height: 1.25;
+
+  /* Should suggest --slds-g-font-lineheight-3 */
+  line-height: 1.375;
+
+  /* Should suggest --slds-g-font-lineheight-5 */
+  line-height: 1.75;
+}
