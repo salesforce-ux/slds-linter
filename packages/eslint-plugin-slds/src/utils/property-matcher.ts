@@ -59,12 +59,19 @@ export function isInsetProperty(cssProperty: string): boolean {
   return INSET_REGEX.test(cssProperty);
 }
 
+export const fontProperties = [
+  'font-size', 
+  'font-weight'
+];
+
 export const colorProperties = [
   'color',
   'fill',
   'background',
   'background-color',
   'stroke',
+  'border',
+  'border*',
   'border*-color',
   'outline',
   'outline-color',
@@ -88,6 +95,25 @@ export const densificationProperties = [
   'outline',
   'outline-width'
 ]; 
+
+/**
+ * Convert property patterns to CSS AST selector patterns
+ * Handles wildcards (*) and creates proper ESLint CSS selector syntax
+ */
+export function toSelector(properties: string[]): string {
+  const selectorParts = properties.map(prop => {
+    if (prop.includes('*')) {
+      // Convert wildcards to regex patterns for CSS AST selectors
+      const regexPattern = prop.replace(/\*/g, '.*');
+      return `Declaration[property=/${regexPattern}$/]`;
+    } else {
+      // Exact property match
+      return `Declaration[property='${prop}']`;
+    }
+  });
+  
+  return selectorParts.join(', ');
+}
 
 export function resolvePropertyToMatch(cssProperty:string){
   const propertyToMatch = cssProperty.toLowerCase();

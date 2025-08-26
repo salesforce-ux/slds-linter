@@ -1,7 +1,7 @@
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
-import type { HandlerContext, DeclarationHandler } from '../../../../utils/types';
+import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
 /**
  * Handle density/sizing declarations using CSS AST traversal
@@ -101,7 +101,7 @@ function handleSingleDimensionValue(
       return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${rawValue})`);
     } : undefined;
 
-    context.reportFn({
+    context.context.report({
       node: declarationNode.value,
       messageId: 'hardcodedValue',
       data: {
@@ -112,7 +112,7 @@ function handleSingleDimensionValue(
     });
   } else {
     // No suggestions available
-    context.reportFn({
+    context.context.report({
       node: declarationNode.value,
       messageId: 'noReplacement',
       data: {

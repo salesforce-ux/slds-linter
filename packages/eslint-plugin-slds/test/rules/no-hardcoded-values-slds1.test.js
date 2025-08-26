@@ -136,6 +136,36 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
         messageId: 'hardcodedValue'
       }]
       // No output expected due to potential multiple suggestions
+    },
+    // Background shorthand with color - validates css-tree parsing fix
+    {
+      code: `.example { background: url(image.png) #ff0000 no-repeat center; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+    },
+    // Border shorthand with both dimension and color - validates combined handler
+    {
+      code: `.example { border: 2px solid #0000ff; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'noReplacement'
+      }, {
+        messageId: 'noReplacement'
+      }]
+      // Both 2px dimension and #0000ff color should be flagged
+    },
+    // Complex gradient with multiple colors in shorthand
+    {
+      code: `.example { background: linear-gradient(#ff0000, rgba(0, 255, 0, 0.8)); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'noReplacement'
+      }]
+      // Both colors should be detected via css-tree parsing
     }
   ]
 });

@@ -1,82 +1,86 @@
 import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
-import type { HandlerContext, DeclarationHandler } from '../../../../utils/types';
+import type { HandlerContext, DeclarationHandler } from '../../../../types';
+
+// Import css-tree for proper CSS value parsing
+import { parse, walk, generate } from 'css-tree';
 
 /**
- * Handle color declarations using CSS AST traversal
- * Simplified approach leveraging chroma-js validation and CSS AST raw text
+ * Handle color declarations using CSS tree parsing
+ * Supports shorthand properties like background, border, etc.  
+ * Uses css-tree for reliable AST-based parsing + chroma-js validation
  */
 export const handleColorDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
   
-  // Get the raw color value from CSS AST
-  const colorValue = getColorValueFromAST(node.value);
+  // Get the raw CSS value as string and parse with css-tree
+  const valueText = context.sourceCode.getText(node.value);
+  const colorValues = extractColorsFromCSSValue(valueText);
   
-  if (colorValue && isValidColor(colorValue) && colorValue !== 'transparent') {
-    processColorValue(colorValue, cssProperty, node, context);
-  }
+  // Process each color found
+  colorValues.forEach(colorValue => {
+    if (colorValue && isValidColor(colorValue) && colorValue !== 'transparent') {
+      processColorValue(colorValue, cssProperty, node, context);
+    }
+  });
 };
 
 /**
- * Extract color value from CSS AST node using simple text reconstruction
- * Handles hex, named colors, rgb(), rgba(), hsl(), hsla()
+ * Extract all color values from a CSS value using css-tree parsing
+ * Uses css-tree for reliable AST-based color detection in shorthand properties
+ * More accurate than regex patterns for complex CSS values
  */
-function getColorValueFromAST(valueNode: any): string | null {
-  if (!valueNode) return null;
+function extractColorsFromCSSValue(valueText: string): string[] {
+  if (!valueText || typeof valueText !== 'string') {
+    return [];
+  }
+
+  // Quick check for values that should be skipped entirely
+  if (valueText.includes('var(') || valueText.includes('calc(') || valueText.includes('color-mix(')) {
+    return [];
+  }
+
+  const colors: string[] = [];
+
+  // Parse the CSS value using css-tree with value context
+  const ast = parse(valueText, { context: 'value' });
   
-  switch (valueNode.type) {
+  // Walk the AST to find color values using css-tree's built-in walk
+  walk(ast, (node: any) => {
+    const colorValue = extractColorFromCSSNode(node);
+    if (colorValue && isValidColor(colorValue)) {
+      colors.push(colorValue);
+    }
+  });
+
+  return colors;
+}
+
+
+
+/**
+ * Extract color value from a CSS AST node
+ */
+function extractColorFromCSSNode(node: any): string | null {
+  if (!node || !node.type) return null;
+
+  switch (node.type) {
     case 'Hash':
-      return `#${valueNode.value}`;
+      return `#${node.value}`;
       
     case 'Identifier':
-      return valueNode.name;
+      // Check if it's a named color (validated later with chroma-js)
+      return node.name;
       
     case 'Function':
-      // Reconstruct function call from AST
-      if (['rgb', 'rgba', 'hsl', 'hsla'].includes(valueNode.name)) {
-        return reconstructFunctionFromAST(valueNode);
+      // Handle color functions: rgb(), rgba(), hsl(), hsla()
+      if (['rgb', 'rgba', 'hsl', 'hsla'].includes(node.name)) {
+        return generate(node);
       }
       break;
-      
-    case 'Value':
-      // Value wrapper - extract from first child
-      return valueNode.children?.[0] ? getColorValueFromAST(valueNode.children[0]) : null;
   }
   
   return null;
-}
-
-/**
- * Reconstruct color function from CSS AST 
- * Simple approach: rebuild the string from AST structure
- */
-function reconstructFunctionFromAST(functionNode: any): string {
-  const args: string[] = [];
-  
-  if (!functionNode.children) {
-    return `${functionNode.name}()`;
-  }
-  
-  for (const child of functionNode.children) {
-    if (child.type === 'Operator' && child.value === ',') {
-      continue; // Skip commas, we'll add them back
-    }
-    
-    if (child.type === 'Number') {
-      args.push(child.value);
-    } else if (child.type === 'Percentage') {
-      args.push(`${child.value}%`);
-    } else if (child.type === 'Value' && child.children?.[0]) {
-      // Handle nested values
-      if (child.children[0].type === 'Number') {
-        args.push(child.children[0].value);
-      } else if (child.children[0].type === 'Percentage') {
-        args.push(`${child.children[0].value}%`);
-      }
-    }
-  }
-  
-  return `${functionNode.name}(${args.join(', ')})`;
 }
 
 /**
@@ -102,7 +106,7 @@ function processColorValue(
       return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${colorValue})`);
     } : undefined;
 
-    context.reportFn({
+    context.context.report({
       node: declarationNode.value,
       messageId: 'hardcodedValue',
       data: {
@@ -113,7 +117,7 @@ function processColorValue(
     });
   } else {
     // No suggestions available
-    context.reportFn({
+    context.context.report({
       node: declarationNode.value,
       messageId: 'noReplacement',
       data: {

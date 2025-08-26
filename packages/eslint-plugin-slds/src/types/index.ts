@@ -6,19 +6,11 @@ import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
  */
 export interface HandlerContext {
   valueToStylinghook: ValueToStylingHooksMapping;
-  reportFn: (options: ReportOptions) => void;
+  context: Rule.RuleContext;
   sourceCode: any;
 }
 
-/**
- * Options for reporting issues
- */
-export interface ReportOptions {
-  node: any;
-  messageId: string;
-  data?: Record<string, any>;
-  fix?: (fixer: any) => any;
-}
+
 
 /**
  * Configuration for creating the rule
