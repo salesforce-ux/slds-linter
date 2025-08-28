@@ -29,7 +29,8 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
 };
 
 /**
- * Extract color values from CSS using simplified AST traversal
+ * Extract color values from CSS using optimized css-tree traversal
+ * Uses this.skip to efficiently prevent traversing skip function children
  */
 function extractColorsFromCSSValue(valueText: string): string[] {
   if (!valueText || typeof valueText !== 'string') {
@@ -40,20 +41,15 @@ function extractColorsFromCSSValue(valueText: string): string[] {
 
   try {
     const ast = parse(valueText, { context: 'value' });
-    const skippedNodes = new Set();
     
-    // First pass: mark nodes inside CSS functions using utility
-    walk(ast, (node: any) => {
-      if (node.type === 'Function' && isCssFunction(node.name)) {
-        walk(node, (childNode: any) => {
-          skippedNodes.add(childNode);
-        });
-      }
-    });
-    
-    // Second pass: extract colors from non-skipped nodes
-    walk(ast, (node: any) => {
-      if (!skippedNodes.has(node)) {
+    // Most efficient traversal using css-tree's skip mechanism
+    walk(ast, {
+      enter(node: any) {
+        // Skip CSS functions and their children efficiently using this.skip
+        if (node.type === 'Function' && isCssFunction(node.name)) {
+          return this.skip; // Prevents traversing children - most efficient
+        }
+        
         let colorValue: string | null = null;
         
         switch (node.type) {
