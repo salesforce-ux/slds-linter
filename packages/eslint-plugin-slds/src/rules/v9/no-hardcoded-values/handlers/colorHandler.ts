@@ -26,81 +26,67 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
 };
 
 /**
- * Remove ignored CSS functions (var, calc, color-mix) from value text
- * This allows us to extract colors from mixed values like "#fff var(--token)"
- */
-function removeIgnoredFunctions(valueText: string): string {
-  // Remove complete function calls for var(), calc(), color-mix()
-  let filtered = valueText;
-  
-  // Handles cases like: var(--token, var(--nested, value))
-  const functionPattern = /\b(var|calc|color-mix)\s*\((?:[^()]*\([^)]*\))*[^)]*\)/gi;
-  filtered = filtered.replace(functionPattern, '').trim();
-  
-  // Clean up extra whitespace
-  filtered = filtered.replace(/\s+/g, ' ').trim();
-  
-  return filtered;
-}
-
-/**
- * Extract all color values from a CSS value using css-tree parsing
- * Uses css-tree for reliable AST-based color detection in shorthand properties
- * More accurate than regex patterns for complex CSS values
+ * Extract all color values from a CSS value using css-tree's AST parsing
+ * Optimized to use existing @eslint/css-tree package from dependencies
+ * Efficiently skips ignored function nodes during traversal
  */
 function extractColorsFromCSSValue(valueText: string): string[] {
   if (!valueText || typeof valueText !== 'string') {
     return [];
   }
 
-  // Pre-filter to remove CSS functions we want to ignore completely
-  const filteredValue = removeIgnoredFunctions(valueText);
-  if (!filteredValue) {
-    return []; // Nothing left after filtering
-  }
-
   const colors: string[] = [];
+  const skippedNodes = new Set();
 
-  // Parse the filtered CSS value using css-tree with value context
-  const ast = parse(filteredValue, { context: 'value' });
-  
-  // Walk the AST to find color values
-  walk(ast, (node: any) => {
-    const colorValue = extractColorFromCSSNode(node);
-    if (colorValue && isValidColor(colorValue)) {
-      colors.push(colorValue);
-    }
-  });
+  try {
+    // Parse the CSS value using css-tree with value context
+    const ast = parse(valueText, { context: 'value' });
+    
+    // First pass: identify nodes inside ignored functions
+    walk(ast, (node: any, item: any, list: any) => {
+      if (node.type === 'Function' && ['var', 'calc', 'color-mix'].includes(node.name)) {
+        // Mark this function and all its children for skipping
+        walk(node, (childNode: any) => {
+          skippedNodes.add(childNode);
+        });
+      }
+    });
+    
+    // Second pass: extract colors from non-skipped nodes
+    walk(ast, (node: any) => {
+      if (!skippedNodes.has(node)) {
+        let colorValue: string | null = null;
+        
+        // Inline color extraction logic using css-tree node types
+        switch (node.type) {
+          case 'Hash':
+            colorValue = `#${node.value}`;
+            break;
+          case 'Identifier':
+            colorValue = node.name;
+            break;
+          case 'Function':
+            // Handle color functions: rgb(), rgba(), hsl(), hsla()
+            if (['rgb', 'rgba', 'hsl', 'hsla'].includes(node.name)) {
+              colorValue = generate(node);
+            }
+            break;
+        }
+        
+        if (colorValue && isValidColor(colorValue)) {
+          colors.push(colorValue);
+        }
+      }
+    });
+  } catch (error) {
+    // If parsing fails, return empty array (malformed CSS)
+    return [];
+  }
 
   return colors;
 }
 
 
-
-/**
- * Extract color value from a CSS AST node
- */
-function extractColorFromCSSNode(node: any): string | null {
-  if (!node || !node.type) return null;
-
-  switch (node.type) {
-    case 'Hash':
-      return `#${node.value}`;
-      
-    case 'Identifier':
-      // Check if it's a named color (validated later with chroma-js)
-      return node.name;
-      
-    case 'Function':
-      // Handle color functions: rgb(), rgba(), hsl(), hsla()
-      if (['rgb', 'rgba', 'hsl', 'hsla'].includes(node.name)) {
-        return generate(node);
-      }
-      break;
-  }
-  
-  return null;
-}
 
 /**
  * Process validated color value and report issues

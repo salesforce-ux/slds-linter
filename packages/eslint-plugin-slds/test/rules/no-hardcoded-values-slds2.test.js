@@ -168,6 +168,15 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         messageId: 'hardcodedValue'
       }]
       // No output expected due to potential multiple suggestions
+    },
+    // Mixed value with color and CSS variable - review comment case
+    {
+      code: `.example { border: #0000ff var(--fallback-width, 2px) solid; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'noReplacement'
+      }]
+      // Should detect #0000ff but ignore var() content
     }
   ]
 });

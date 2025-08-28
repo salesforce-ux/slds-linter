@@ -166,6 +166,15 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
         messageId: 'noReplacement'
       }]
       // Both colors should be detected via css-tree parsing
+    },
+    // Mixed value with color and CSS variable - review comment case
+    {
+      code: `.example { background: #fff var(--custom-token); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Should detect #fff but ignore var() content
     }
   ]
 });
