@@ -5,6 +5,9 @@ import type { HandlerContext, DeclarationHandler } from '../../../../types';
 // Import @eslint/css-tree for ESLint-compatible CSS value parsing
 import { parse, walk, generate } from '@eslint/css-tree';
 
+// Import CSS function utilities for consistent function detection
+import { isCssFunction, isCssColorFunction } from '../../../../utils/css-functions';
+
 /**
  * Handle color declarations using CSS tree parsing
  * Supports shorthand properties like background, border, etc.  
@@ -26,9 +29,7 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
 };
 
 /**
- * Extract all color values from a CSS value using css-tree's AST parsing
- * Optimized to use existing @eslint/css-tree package from dependencies
- * Efficiently skips ignored function nodes during traversal
+ * Extract color values from CSS using simplified AST traversal
  */
 function extractColorsFromCSSValue(valueText: string): string[] {
   if (!valueText || typeof valueText !== 'string') {
@@ -36,16 +37,14 @@ function extractColorsFromCSSValue(valueText: string): string[] {
   }
 
   const colors: string[] = [];
-  const skippedNodes = new Set();
 
   try {
-    // Parse the CSS value using css-tree with value context
     const ast = parse(valueText, { context: 'value' });
+    const skippedNodes = new Set();
     
-    // First pass: identify nodes inside ignored functions
-    walk(ast, (node: any, item: any, list: any) => {
-      if (node.type === 'Function' && ['var', 'calc', 'color-mix'].includes(node.name)) {
-        // Mark this function and all its children for skipping
+    // First pass: mark nodes inside CSS functions using utility
+    walk(ast, (node: any) => {
+      if (node.type === 'Function' && isCssFunction(node.name)) {
         walk(node, (childNode: any) => {
           skippedNodes.add(childNode);
         });
@@ -57,7 +56,6 @@ function extractColorsFromCSSValue(valueText: string): string[] {
       if (!skippedNodes.has(node)) {
         let colorValue: string | null = null;
         
-        // Inline color extraction logic using css-tree node types
         switch (node.type) {
           case 'Hash':
             colorValue = `#${node.value}`;
@@ -66,8 +64,8 @@ function extractColorsFromCSSValue(valueText: string): string[] {
             colorValue = node.name;
             break;
           case 'Function':
-            // Handle color functions: rgb(), rgba(), hsl(), hsla()
-            if (['rgb', 'rgba', 'hsl', 'hsla'].includes(node.name)) {
+            // Only process color functions using utility
+            if (isCssColorFunction(node.name)) {
               colorValue = generate(node);
             }
             break;
@@ -79,7 +77,6 @@ function extractColorsFromCSSValue(valueText: string): string[] {
       }
     });
   } catch (error) {
-    // If parsing fails, return empty array (malformed CSS)
     return [];
   }
 

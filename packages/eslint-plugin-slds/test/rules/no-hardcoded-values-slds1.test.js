@@ -44,6 +44,11 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { background-color: color-mix(in oklab, #a71e14 25%, white); }`,
       filename: 'test.css',
+    },
+    // Gradient functions should be skipped - colors inside gradients are not flagged
+    {
+      code: `.example { background: linear-gradient(#ff0000, rgba(0, 255, 0, 0.8)); }`,
+      filename: 'test.css',
     }
   ],
   invalid: [
@@ -155,17 +160,6 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
         messageId: 'noReplacement'
       }]
       // Both 2px dimension and #0000ff color should be flagged
-    },
-    // Complex gradient with multiple colors in shorthand
-    {
-      code: `.example { background: linear-gradient(#ff0000, rgba(0, 255, 0, 0.8)); }`,
-      filename: 'test.css',
-      errors: [{
-        messageId: 'hardcodedValue'
-      }, {
-        messageId: 'noReplacement'
-      }]
-      // Both colors should be detected via css-tree parsing
     },
     // Mixed value with color and CSS variable - review comment case
     {
