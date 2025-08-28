@@ -22,7 +22,7 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
   
   // Process each color found
   colorValues.forEach(colorValue => {
-    if (colorValue && isValidColor(colorValue) && colorValue !== 'transparent') {
+    if (colorValue !== 'transparent') {
       processColorValue(colorValue, cssProperty, node, context);
     }
   });
