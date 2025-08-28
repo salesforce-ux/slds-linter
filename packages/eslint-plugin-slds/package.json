@@ -38,6 +38,7 @@
   "description": "ESLint plugin provides custom linting rules specifically built for Salesforce Lightning Design System 2 (SLDS 2 beta)",
   "dependencies": {
     "@eslint/css": "^0.9.0",
+    "@eslint/css-tree": "^3.6.5",
     "@html-eslint/eslint-plugin": "^0.34.0",
     "@html-eslint/parser": "^0.34.0",
     "@salesforce-ux/sds-metadata": "^0.3.3",

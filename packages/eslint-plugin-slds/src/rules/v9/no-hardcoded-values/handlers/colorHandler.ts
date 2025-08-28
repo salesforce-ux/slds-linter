@@ -2,8 +2,8 @@ import { findClosestColorHook, convertToHex, isValidColor } from '../../../../ut
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
-// Import css-tree for proper CSS value parsing
-import { parse, walk, generate } from 'css-tree';
+// Import @eslint/css-tree for ESLint-compatible CSS value parsing
+import { parse, walk, generate } from '@eslint/css-tree';
 
 /**
  * Handle color declarations using CSS tree parsing
