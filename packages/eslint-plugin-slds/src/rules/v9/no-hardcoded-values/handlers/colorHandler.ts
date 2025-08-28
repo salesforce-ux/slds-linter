@@ -18,26 +18,24 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
   
   // Get the raw CSS value as string and parse with css-tree
   const valueText = context.sourceCode.getText(node.value);
-  const colorValues = extractColorsFromCSSValue(valueText);
   
-  // Process each color found
-  colorValues.forEach(colorValue => {
+  // Use callback pattern to handle each color value as it's encountered
+  forEachColorValue(valueText, (colorValue) => {
     if (colorValue !== 'transparent') {
-      processColorValue(colorValue, cssProperty, node, context);
+      handleColorValue(colorValue, cssProperty, node, context);
     }
   });
 };
 
 /**
- * Extract color values from CSS using optimized css-tree traversal
+ * Iterate over color values in CSS using optimized css-tree traversal
+ * Uses callback pattern to handle each color value as it's encountered
  * Uses this.skip to efficiently prevent traversing skip function children
  */
-function extractColorsFromCSSValue(valueText: string): string[] {
+function forEachColorValue(valueText: string, callback: (colorValue: string) => void): void {
   if (!valueText || typeof valueText !== 'string') {
-    return [];
+    return;
   }
-
-  const colors: string[] = [];
 
   try {
     const ast = parse(valueText, { context: 'value' });
@@ -67,23 +65,21 @@ function extractColorsFromCSSValue(valueText: string): string[] {
         }
         
         if (colorValue && isValidColor(colorValue)) {
-          colors.push(colorValue);
+          callback(colorValue);
         }
       }
     });
   } catch (error) {
-    return [];
+    return;
   }
-
-  return colors;
 }
 
 
 
 /**
- * Process validated color value and report issues
+ * Handle validated color value and report issues
  */
-function processColorValue(
+function handleColorValue(
   colorValue: string, 
   cssProperty: string, 
   declarationNode: any, 
