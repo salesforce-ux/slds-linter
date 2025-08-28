@@ -13,7 +13,7 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
   // Extract dimension value directly from CSS AST
   const parsedDimension = extractDimensionFromAST(node.value);
   if (parsedDimension) {
-    handleSingleDimensionValue(parsedDimension, cssProperty, node, context);
+    processDimensionValue(parsedDimension, cssProperty, node, context);
   }
 };
 
@@ -75,9 +75,9 @@ function extractDimensionFromAST(valueNode: any): ParsedUnitValue | null {
 }
 
 /**
- * Handle a single dimension value using parsed CSS AST data
+ * Process dimension value using parsed CSS AST data and report issues
  */
-function handleSingleDimensionValue(
+function processDimensionValue(
   parsedDimension: ParsedUnitValue, 
   cssProperty: string, 
   declarationNode: any, 
