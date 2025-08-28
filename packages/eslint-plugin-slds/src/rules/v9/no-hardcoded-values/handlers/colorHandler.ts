@@ -26,6 +26,24 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
 };
 
 /**
+ * Remove ignored CSS functions (var, calc, color-mix) from value text
+ * This allows us to extract colors from mixed values like "#fff var(--token)"
+ */
+function removeIgnoredFunctions(valueText: string): string {
+  // Remove complete function calls for var(), calc(), color-mix()
+  let filtered = valueText;
+  
+  // Handles cases like: var(--token, var(--nested, value))
+  const functionPattern = /\b(var|calc|color-mix)\s*\((?:[^()]*\([^)]*\))*[^)]*\)/gi;
+  filtered = filtered.replace(functionPattern, '').trim();
+  
+  // Clean up extra whitespace
+  filtered = filtered.replace(/\s+/g, ' ').trim();
+  
+  return filtered;
+}
+
+/**
  * Extract all color values from a CSS value using css-tree parsing
  * Uses css-tree for reliable AST-based color detection in shorthand properties
  * More accurate than regex patterns for complex CSS values
@@ -35,17 +53,18 @@ function extractColorsFromCSSValue(valueText: string): string[] {
     return [];
   }
 
-  // Quick check for values that should be skipped entirely
-  if (valueText.includes('var(') || valueText.includes('calc(') || valueText.includes('color-mix(')) {
-    return [];
+  // Pre-filter to remove CSS functions we want to ignore completely
+  const filteredValue = removeIgnoredFunctions(valueText);
+  if (!filteredValue) {
+    return []; // Nothing left after filtering
   }
 
   const colors: string[] = [];
 
-  // Parse the CSS value using css-tree with value context
-  const ast = parse(valueText, { context: 'value' });
+  // Parse the filtered CSS value using css-tree with value context
+  const ast = parse(filteredValue, { context: 'value' });
   
-  // Walk the AST to find color values using css-tree's built-in walk
+  // Walk the AST to find color values
   walk(ast, (node: any) => {
     const colorValue = extractColorFromCSSNode(node);
     if (colorValue && isValidColor(colorValue)) {
