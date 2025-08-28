@@ -42,12 +42,11 @@ function extractColorsFromCSSValue(valueText: string): string[] {
   try {
     const ast = parse(valueText, { context: 'value' });
     
-    // Most efficient traversal using css-tree's skip mechanism
     walk(ast, {
       enter(node: any) {
         // Skip CSS functions and their children efficiently using this.skip
         if (node.type === 'Function' && isCssFunction(node.name)) {
-          return this.skip; // Prevents traversing children - most efficient
+          return this.skip;
         }
         
         let colorValue: string | null = null;
