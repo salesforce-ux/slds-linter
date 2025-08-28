@@ -11,7 +11,7 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
   const cssProperty = node.property.toLowerCase();
   
   // Extract dimension value directly from CSS AST
-  const parsedDimension = extractDimensionFromAST(node.value);
+  const parsedDimension = extractDimensionFromAST(node.value, cssProperty);
   if (parsedDimension) {
     processDimensionValue(parsedDimension, cssProperty, node, context);
   }
@@ -21,7 +21,7 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
  * Extract parsed dimension value directly from CSS AST nodes
  * Returns structured data with number and unit to eliminate regex parsing
  */
-function extractDimensionFromAST(valueNode: any): ParsedUnitValue | null {
+function extractDimensionFromAST(valueNode: any, cssProperty?: string): ParsedUnitValue | null {
   if (!valueNode) return null;
   
   switch (valueNode.type) {
@@ -49,26 +49,23 @@ function extractDimensionFromAST(valueNode: any): ParsedUnitValue | null {
       };
       
     case 'Identifier':
-      // Named values: normal, bold -> handle font-weight keywords
+      // Handle named values only for specific properties where we know the mapping
       const namedValue = valueNode.name.toLowerCase();
-      const fontWeightMap: Record<string, number> = {
-        'normal': 400,
-        'bold': 700,
-        'bolder': 900,
-        'lighter': 300
-      };
       
-      if (fontWeightMap[namedValue]) {
+      // Only handle font-weight: normal → 400 conversion
+      if (cssProperty === 'font-weight' && namedValue === 'normal') {
         return {
-          number: fontWeightMap[namedValue],
-          unit: null, // Font weights are unitless but we need a unit for consistency
+          number: 400,
+          unit: null
         };
       }
+      
+      // For all other properties and unknown keywords, skip processing
       return null;
       
     case 'Value':
       // Value wrapper - extract from first child
-      return valueNode.children?.[0] ? extractDimensionFromAST(valueNode.children[0]) : null;
+      return valueNode.children?.[0] ? extractDimensionFromAST(valueNode.children[0], cssProperty) : null;
   }
   
   return null;
