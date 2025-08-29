@@ -64,6 +64,10 @@ export const fontProperties = [
   'font-weight'
 ];
 
+export const fontShorthandProperties = [
+  'font'
+];
+
 export const colorProperties = [
   'color',
   'fill',
