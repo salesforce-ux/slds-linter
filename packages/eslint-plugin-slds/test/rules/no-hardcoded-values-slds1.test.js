@@ -49,6 +49,15 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { background: linear-gradient(#ff0000, rgba(0, 255, 0, 0.8)); }`,
       filename: 'test.css',
+    },
+    // Shorthand properties with all zero values should be ignored
+    {
+      code: `.example { padding: 0; }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.example { margin: 0 0 0 0; }`,
+      filename: 'test.css',
     }
   ],
   invalid: [
@@ -169,6 +178,146 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
         messageId: 'hardcodedValue'
       }]
       // Should detect #fff but ignore var() content
+    },
+    // Shorthand property support - padding with multiple values
+    {
+      code: `.example { padding: 0px 12px; }`,
+      filename: 'test.css',
+      output: `.example { padding: 0px var(--slds-g-spacing-3, 12px); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Should detect 12px but skip 0px, now WITH auto-fix for shorthand properties
+    },
+    // Shorthand property support - margin with 4 values
+    {
+      code: `.example { margin: 8px 12px 16px 20px; }`,
+      filename: 'test.css',
+      output: `.example { margin: var(--slds-g-spacing-2, 8px) var(--slds-g-spacing-3, 12px) var(--slds-g-spacing-4, 16px) 20px; }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'noReplacement'
+      }]
+      // Should detect all 4 values and now WITH auto-fix for available hooks
+    },
+    // Shorthand property support - border-width with multiple values  
+    {
+      code: `.example { border-width: 2px 4px; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'noReplacement'
+      }, {
+        messageId: 'noReplacement'
+      }]
+      // Should detect both 2px and 4px values, but no hooks available in SLDS1
+    },
+    // Shorthand property support - mixed zeros and values
+    {
+      code: `.example { padding: 0 16px 0 8px; }`,
+      filename: 'test.css',
+      output: `.example { padding: 0 var(--slds-g-spacing-4, 16px) 0 var(--slds-g-spacing-2, 8px); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Should detect 16px and 8px but skip zeros, now WITH auto-fix for shorthand properties
+    },
+
+    // ADVANCED EXAMPLES - Shorthand auto-fix functionality
+    // Simple density shorthand with multiple values
+    {
+      code: `.example { padding: 4px 8px; }`,
+      filename: 'test.css',
+      output: `.example { padding: var(--slds-g-spacing-1, 4px) var(--slds-g-spacing-2, 8px); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Both density values auto-fixed in shorthand
+    },
+    // Mixed density availability - partial auto-fix
+    {
+      code: `.example { padding: 4px 20px; }`,
+      filename: 'test.css',
+      output: `.example { padding: var(--slds-g-spacing-1, 4px) 20px; }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'noReplacement'
+      }]
+      // First value auto-fixed, second has no hook
+    },
+    // Complex 4-value shorthand with border-width properties (corrected based on actual behavior)
+    {
+      code: `.example { border-width: 1px 2px 3px 4px; }`,
+      filename: 'test.css',
+      output: `.example { border-width: var(--slds-g-sizing-border-1, 1px) 2px var(--slds-g-sizing-border-3, 3px) 4px; }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'noReplacement'
+      }, {
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'noReplacement'
+      }]
+      // 1px and 3px auto-fix, 2px and 4px have no hooks available
+    },
+    // Complex density shorthand - all values with hooks
+    {
+      code: `.example { margin: 4px 8px 12px 16px; }`,
+      filename: 'test.css',
+      output: `.example { margin: var(--slds-g-spacing-1, 4px) var(--slds-g-spacing-2, 8px) var(--slds-g-spacing-3, 12px) var(--slds-g-spacing-4, 16px); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // All 4 density values should be auto-fixed
+    },
+    // Color shorthand functionality - future-proofing test
+    {
+      code: `.example { background: #ff0000; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Single color in shorthand property
+    },
+    // Edge case: zeros and valid dimensions mixed
+    {
+      code: `.example { margin: 0 8px 0 4px; }`,
+      filename: 'test.css',
+      output: `.example { margin: 0 var(--slds-g-spacing-2, 8px) 0 var(--slds-g-spacing-1, 4px); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Only non-zero dimensions processed and auto-fixed
+    },
+    // Edge case: zero dimensions should be skipped
+    {
+      code: `.example { padding: 8px 0 4px 0; }`,
+      filename: 'test.css',
+      output: `.example { padding: var(--slds-g-spacing-2, 8px) 0 var(--slds-g-spacing-1, 4px) 0; }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Only non-zero dimensions should be processed
     }
   ]
 });

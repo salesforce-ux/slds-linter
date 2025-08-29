@@ -59,6 +59,15 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { color: transparent; }`,
       filename: 'test.css',
     },
+    // Shorthand properties with all zero values should be ignored
+    {
+      code: `.example { padding: 0; }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.example { margin: 0 0 0 0; }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
@@ -177,7 +186,95 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         messageId: 'noReplacement'
       }]
       // Should detect #0000ff but ignore var() content
-    }
+    },
+    // Shorthand property support - padding with rem units
+    {
+      code: `.example { padding: 0 1rem 0.5rem 0; }`,
+      filename: 'test.css',
+      output: `.example { padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-2, 0.5rem) 0; }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Should detect 1rem and 0.5rem but skip zeros, now WITH auto-fix for shorthand properties
+    },
+    // Shorthand property support - margin with mixed units
+    {
+      code: `.example { margin: 0.25rem 0.5rem 0.75rem 1rem; }`,
+      filename: 'test.css',
+      output: `.example { margin: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Should detect all 4 rem values, now WITH auto-fix for shorthand properties
+    },
+    // Shorthand property support - background with multiple colors
+    {
+      code: `.example { background: url(bg.png) #ffffff no-repeat, linear-gradient(#000000, #cccccc); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Should detect #ffffff but skip colors inside linear-gradient
+    },
+    // Shorthand property support - border with dimension and color
+    {
+      code: `.example { border: 1px solid #ffffff; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'noReplacement'
+      }]
+      // Should detect both #ffffff color (has hook) and 1px (no hook in SLDS2)
+    },
+
+    // ADVANCED EXAMPLES - SLDS2 specific shorthand auto-fix
+    // SLDS2 rem-based density shorthand with different values to avoid duplicates
+    {
+      code: `.example { padding: 0.25rem 0.75rem; }`,
+      filename: 'test.css',
+      output: `.example { padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-3, 0.75rem); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Both rem values have single hooks and auto-fix in SLDS2
+    },
+    // Mixed density units in SLDS2 (corrected to use actual sizing hooks)
+    {
+      code: `.example { border-width: 1rem 0.5rem; }`,
+      filename: 'test.css',
+      output: `.example { border-width: var(--slds-g-sizing-5, 1rem) var(--slds-g-sizing-3, 0.5rem); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Different rem values with sizing hooks in SLDS2
+    },
+    // Edge case: Mixed rem and invalid values
+    {
+      code: `.example { padding: 0.25rem 0.125rem; }`,
+      filename: 'test.css',
+      output: `.example { padding: var(--slds-g-spacing-1, 0.25rem) 0.125rem; }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'noReplacement'
+      }]
+      // First has hook, second doesn't in SLDS2
+    },
+    // Note: Font shorthand parsing not yet implemented, 
+    // individual font properties (font-size, line-height, etc.) are supported separately
   ]
 });
 
