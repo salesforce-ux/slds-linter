@@ -688,6 +688,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint/css-tree@npm:^3.6.5":
+  version: 3.6.5
+  resolution: "@eslint/css-tree@npm:3.6.5"
+  dependencies:
+    mdn-data: "npm:2.23.0"
+    source-map-js: "npm:^1.0.1"
+  checksum: 10c0/dd6baf8c88d6014e0afa8ddf13067b87a728484a2805093c4c9e0ec57427bc3462016a5b1ac0d9e590218a5d99440f8d43bfdcea8025b834e0adb8e4005e7b0e
+  languageName: node
+  linkType: hard
+
 "@eslint/css@npm:^0.9.0":
   version: 0.9.0
   resolution: "@eslint/css@npm:0.9.0"
@@ -1324,12 +1334,15 @@ __metadata:
   resolution: "@salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds"
   dependencies:
     "@eslint/css": "npm:^0.9.0"
+    "@eslint/css-tree": "npm:^3.6.5"
     "@html-eslint/eslint-plugin": "npm:^0.34.0"
     "@html-eslint/parser": "npm:^0.34.0"
     "@salesforce-ux/sds-metadata": "npm:^0.3.3"
+    "@types/chroma-js": "npm:^2.4.4"
     "@types/eslint": "npm:^8.56.0"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^20.11.19"
+    chroma-js: "npm:^3.1.2"
     jest: "npm:^29.7.0"
     ts-jest: "npm:^29.2.5"
     yaml: "npm:^2.8.1"
@@ -1505,6 +1518,13 @@ __metadata:
   dependencies:
     "@babel/types": "npm:^7.28.2"
   checksum: 10c0/b52d7d4e8fc6a9018fe7361c4062c1c190f5778cf2466817cb9ed19d69fbbb54f9a85ffedeb748ed8062d2cf7d4cc088ee739848f47c57740de1c48cbf0d0994
+  languageName: node
+  linkType: hard
+
+"@types/chroma-js@npm:^2.4.4":
+  version: 2.4.5
+  resolution: "@types/chroma-js@npm:2.4.5"
+  checksum: 10c0/2860bb40e29bc034464324c53291164d5a665edb6a3f7adff80ef968fe468f3484435a9b7a3735874e979bfd189d026989d9aa6743cb8a7ca0d99b64555904b3
   languageName: node
   linkType: hard
 
@@ -5445,6 +5465,13 @@ __metadata:
   version: 2.21.0
   resolution: "mdn-data@npm:2.21.0"
   checksum: 10c0/cd26902551af2cc29f06f130893cb04bca9ee278939fce3ffbcb759497cc80d53a6f4abdef2ae2f3ed3c95ac8d651f53fc141defd580ebf4ae2f93aea325957b
+  languageName: node
+  linkType: hard
+
+"mdn-data@npm:2.23.0":
+  version: 2.23.0
+  resolution: "mdn-data@npm:2.23.0"
+  checksum: 10c0/7da2e4dda68da8f26077a328172afd8c1b167d8e9ac0518b8297d752b30a093debe5c6260fd7330e6d2d704a04b9ad0f7499a95a0526d50d7b32aae29d9db4e6
   languageName: node
   linkType: hard
 

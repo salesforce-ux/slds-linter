@@ -1,8 +1,1 @@
-{
-    "slds/no-hardcoded-values-slds2": [
-        true,
-        {
-            "severity": "warning"
-        }
-    ]
-}
+{}
