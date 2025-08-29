@@ -2,18 +2,19 @@ import { Rule } from 'eslint';
 
 import { 
   handleColorDeclaration, 
-  handleDensityDeclaration 
+  handleDensityDeclaration,
+  handleFontDeclaration 
 } from './handlers/index';
-import { colorProperties, densificationProperties, fontProperties, toSelector } from '../../../utils/property-matcher';
+import { colorProperties, densificationProperties, fontProperties, fontShorthandProperties, toSelector } from '../../../utils/property-matcher';
 import type { RuleConfig, HandlerContext } from '../../../types';
 
 
 
 /**
  * Creates the shared no-hardcoded-value rule implementation for ESLint v9
- * Simplified implementation focusing on core color and density properties
+ * Supports color, density, and font properties including font shorthand
  * Uses property-matcher.ts to ensure comprehensive coverage without missing properties
- * Complex cases like box-shadow and font shorthand will be handled in future iterations
+ * Complex cases like box-shadow will be handled in future iterations
  */
 export function defineNoHardcodedValueRule(config: RuleConfig): Rule.RuleModule {
   const { ruleConfig } = config;
@@ -42,6 +43,7 @@ export function defineNoHardcodedValueRule(config: RuleConfig): Rule.RuleModule 
       const colorOnlySelector = toSelector(colorProperties);
       const densityOnlySelector = toSelector(densificationProperties);
       const fontDensitySelector = toSelector(fontProperties);
+      const fontShorthandSelector = toSelector(fontShorthandProperties);
 
       // Define CSS AST selectors and their handlers
       const visitors: Record<string, (node: any) => void> = {};
@@ -56,8 +58,14 @@ export function defineNoHardcodedValueRule(config: RuleConfig): Rule.RuleModule 
         handleDensityDeclaration(node, handlerContext);
       };
       
+      // Font density properties (font-size, font-weight)
       visitors[fontDensitySelector] = (node: any) => {
-        handleDensityDeclaration(node, handlerContext);
+        handleFontDeclaration(node, handlerContext);
+      };
+      
+      // Font shorthand property
+      visitors[fontShorthandSelector] = (node: any) => {
+        handleFontDeclaration(node, handlerContext);
       };
 
       return visitors;

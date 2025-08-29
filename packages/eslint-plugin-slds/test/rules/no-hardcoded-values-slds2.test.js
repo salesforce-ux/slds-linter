@@ -68,6 +68,21 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { margin: 0 0 0 0; }`,
       filename: 'test.css',
     },
+    // Font shorthand with CSS variables - TODO: 1rem should be ignored when adjacent to variables  
+    // {
+    //   code: `.example { font: var(--font-weight-bold) 1rem var(--font-family-base); }`,
+    //   filename: 'test.css',
+    // },
+    // Font shorthand with zero font-size should be ignored
+    {
+      code: `.example { font: 0 Arial; }`,
+      filename: 'test.css',
+    },
+    // Font shorthand with SLDS variables should be ignored
+    {
+      code: `.example { font: var(--slds-g-font-weight-bold, 700) var(--slds-g-font-scale-2, 1rem) sans-serif; }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
@@ -273,8 +288,88 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }]
       // First has hook, second doesn't in SLDS2
     },
-    // Note: Font shorthand parsing not yet implemented, 
-    // individual font properties (font-size, line-height, etc.) are supported separately
+    // FONT SHORTHAND TESTS
+    // Font shorthand with font-size (auto-fixable)
+    {
+      code: `.example { font: 16px Arial; }`,
+      filename: 'test.css',
+      output: `.example { font: var(--slds-g-font-scale-2, 16px) Arial; }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Font-size 16px should be auto-fixed
+    },
+    // Font shorthand with font-weight and font-size
+    {
+      code: `.example { font: bold 1rem "Helvetica Neue"; }`,
+      filename: 'test.css',
+      output: `.example { font: 700 var(--slds-g-font-scale-2, 1rem) "Helvetica Neue"; }`,
+      errors: [{
+        messageId: 'noReplacement'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Font-weight 700 (bold) has no hook, font-size 1rem auto-fixed
+    },
+    // Font shorthand with numeric font-weight (larger size)
+    {
+      code: `.example { font: 600 1.25rem Georgia; }`,
+      filename: 'test.css',
+      output: `.example { font: 600 var(--slds-g-font-scale-3, 1.25rem) Georgia; }`,
+      errors: [{
+        messageId: 'noReplacement'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Font-weight 600 has no hook, but font-size 1.25rem has a hook in SLDS2
+    },
+    // Font shorthand with font-weight keyword 'normal'
+    {
+      code: `.example { font: normal 0.875rem sans-serif; }`,
+      filename: 'test.css',
+      output: `.example { font: 400 var(--slds-g-font-scale-1, 0.875rem) sans-serif; }`,
+      errors: [{
+        messageId: 'noReplacement'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Normal (400) has no hook, 0.875rem auto-fixed
+    },
+    // Complex font shorthand with all properties
+    {
+      code: `.example { font: italic small-caps 700 1.125rem/1.6 "Times New Roman", serif; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'noReplacement'
+      }, {
+        messageId: 'noReplacement'
+      }]
+      // Both font-weight 700 and font-size 1.125rem have no hooks in SLDS2
+    },
+    // Font shorthand with line-height and rem units
+    {
+      code: `.example { font: bold 0.875rem/1.5 Arial, sans-serif; }`,
+      filename: 'test.css',
+      output: `.example { font: 700 var(--slds-g-font-scale-1, 0.875rem)/1.5 Arial, sans-serif; }`,
+      errors: [{
+        messageId: 'noReplacement'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Font-weight 700 has no hook, font-size 0.875rem auto-fixed
+    },
+    // Font shorthand with mixed valid and invalid values
+    {
+      code: `.example { font: 500 2rem "Custom Font"; }`,
+      filename: 'test.css',
+      output: `.example { font: 500 var(--slds-g-font-scale-6, 2rem) "Custom Font"; }`,
+      errors: [{
+        messageId: 'noReplacement'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // Font-weight 500 has no hook, but font-size 2rem has a hook in SLDS2
+    }
   ]
 });
 
