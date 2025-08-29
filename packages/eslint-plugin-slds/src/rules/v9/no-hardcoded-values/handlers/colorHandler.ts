@@ -16,7 +16,7 @@ import {
   countValues,
   type ReplacementInfo,
   type PositionInfo
-} from './shared-utils';
+} from '../../../../utils/hardcoded-shared-utils';
 
 /**
  * Handle color declarations using CSS tree parsing

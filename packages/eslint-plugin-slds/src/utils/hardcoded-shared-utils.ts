@@ -1,5 +1,5 @@
 import { parse, walk } from '@eslint/css-tree';
-import type { HandlerContext } from '../../../../types';
+import type { HandlerContext } from '../types';
 
 /**
  * Common replacement data structure used by both color and density handlers
