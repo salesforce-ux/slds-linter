@@ -11,7 +11,6 @@ import { isCssFunction, isCssColorFunction } from '../../../../utils/css-functio
 // Import shared utilities for common logic
 import { 
   handleShorthandAutoFix, 
-  forEachValueWithPosition, 
   forEachValue, 
   countValues,
   type ReplacementInfo,
@@ -32,30 +31,18 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
   // Detect shorthand by counting color values
   const isShorthand = countColorValues(valueText) > 1;
   
-  // For shorthand properties, collect all replacements first
-  if (isShorthand) {
-    const replacements: ReplacementInfo[] = [];
-    
-    // Collect all potential replacements
-    forEachColorValueWithPosition(valueText, (colorValue, positionInfo) => {
-      if (colorValue !== 'transparent') {
-        const result = getColorReplacement(colorValue, cssProperty, context, positionInfo);
-        if (result) {
-          replacements.push(result);
-        }
-      }
-    });
-    
-    // Apply shorthand auto-fix if any colors have hooks
-    handleShorthandAutoFix(node, context, valueText, replacements);
-  } else {
-    // Use original pattern for single values
-    forEachColorValue(valueText, (colorValue) => {
-      if (colorValue !== 'transparent') {
+  // Unified approach: single function handles both shorthand and single values
+  forEachColorValue(valueText, (colorValue, positionInfo) => {
+    if (colorValue !== 'transparent') {
+      if (!isShorthand) {
+        // For single values, handle immediately
         handleColorValue(colorValue, cssProperty, node, context);
       }
-    });
-  }
+      // For shorthand, the function handles auto-fix internally
+    }
+  }, isShorthand ? { 
+    shorthand: { cssProperty, context, node } 
+  } : undefined);
 };
 
 /**
@@ -98,20 +85,42 @@ function countColorValues(valueText: string): number {
 }
 
 /**
- * Iterate over color values in CSS using optimized css-tree traversal
- * Uses callback pattern to handle each color value as it's encountered
- * Uses this.skip to efficiently prevent traversing skip function children
+ * Unified function to iterate over color values in CSS
+ * Supports both simple iteration and shorthand auto-fix through options
  */
-function forEachColorValue(valueText: string, callback: (colorValue: string) => void): void {
-  forEachValue(valueText, extractColorValue, shouldSkipColorNode, callback);
-}
-
-/**
- * Iterate over color values in CSS with position tracking for shorthand auto-fix
- * Uses callback pattern to handle each color value with position info
- */
-function forEachColorValueWithPosition(valueText: string, callback: (colorValue: string, positionInfo?: PositionInfo) => void): void {
-  forEachValueWithPosition(valueText, extractColorValue, shouldSkipColorNode, callback);
+function forEachColorValue(
+  valueText: string, 
+  callback: (colorValue: string, positionInfo?: PositionInfo) => void | ReplacementInfo,
+  options?: { 
+    withPositions?: boolean;
+    shorthand?: {
+      cssProperty: string;
+      context: HandlerContext;
+      node: any;
+    };
+  }
+): void {
+  if (options?.shorthand) {
+    // Shorthand mode: collect replacements and apply auto-fix
+    const replacements: ReplacementInfo[] = [];
+    
+    forEachValue(valueText, extractColorValue, shouldSkipColorNode, (colorValue, positionInfo) => {
+      if (colorValue !== 'transparent') {
+        const result = getColorReplacement(colorValue, options.shorthand!.cssProperty, options.shorthand!.context, positionInfo!);
+        if (result) {
+          replacements.push(result);
+        }
+      }
+      // Call original callback for any additional processing
+      callback(colorValue, positionInfo);
+    }, { withPositions: true });
+    
+    // Apply shorthand auto-fix once all values are processed
+    handleShorthandAutoFix(options.shorthand.node, options.shorthand.context, valueText, replacements);
+  } else {
+    // Normal mode: process each value immediately
+    forEachValue(valueText, extractColorValue, shouldSkipColorNode, callback, { withPositions: options?.withPositions });
+  }
 }
 
 

@@ -6,7 +6,7 @@ import type { HandlerContext, DeclarationHandler } from '../../../../types';
 // Import shared utilities for common logic
 import { 
   handleShorthandAutoFix, 
-  forEachValueWithPosition, 
+  forEachValue, 
   countValues,
   type ReplacementInfo,
   type PositionInfo
@@ -26,26 +26,18 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
   // Detect shorthand by counting dimension tokens
   const isShorthand = countDimensionTokens(valueText) > 1;
   
-  // For shorthand properties, collect all replacements first
-  if (isShorthand) {
-    const replacements: ReplacementInfo[] = [];
-    
-    // Collect all potential replacements
-    forEachDimensionValue(valueText, cssProperty, (parsedDimension, positionInfo) => {
-      const result = getDimensionReplacement(parsedDimension, cssProperty, context, positionInfo);
-      if (result) {
-        replacements.push(result);
+  // Unified approach: single function handles both shorthand and single values
+  forEachDimensionValue(valueText, cssProperty, (parsedDimension, positionInfo) => {
+    if (parsedDimension) {
+      if (!isShorthand) {
+        // For single values, handle immediately
+        handleDimensionValue(parsedDimension, cssProperty, node, positionInfo, false, context);
       }
-    });
-    
-    // Apply shorthand auto-fix if all dimensions have hooks
-    handleShorthandAutoFix(node, context, valueText, replacements);
-  } else {
-    // Use original pattern for single values
-    forEachDimensionValue(valueText, cssProperty, (parsedDimension, positionInfo) => {
-      handleDimensionValue(parsedDimension, cssProperty, node, positionInfo, false, context);
-    });
-  }
+      // For shorthand, the function handles auto-fix internally
+    }
+  }, isShorthand ? { 
+    shorthand: { context, node } 
+  } : undefined);
 };
 
 /**
@@ -82,12 +74,42 @@ function extractDimensionValue(cssProperty: string) {
 }
 
 /**
- * Iterate over dimension values in CSS using optimized css-tree traversal
- * Uses callback pattern to handle each dimension value as it's encountered
- * Supports shorthand properties like padding, margin, etc.
+ * Unified function to iterate over dimension values in CSS
+ * Supports both simple iteration and shorthand auto-fix through options
  */
-function forEachDimensionValue(valueText: string, cssProperty: string, callback: (parsedDimension: ParsedUnitValue, positionInfo?: PositionInfo) => void): void {
-  forEachValueWithPosition(valueText, extractDimensionValue(cssProperty), shouldSkipDimensionNode, callback);
+function forEachDimensionValue(
+  valueText: string, 
+  cssProperty: string, 
+  callback: (parsedDimension: ParsedUnitValue, positionInfo?: PositionInfo) => void,
+  options?: { 
+    withPositions?: boolean;
+    shorthand?: {
+      context: HandlerContext;
+      node: any;
+    };
+  }
+): void {
+  if (options?.shorthand) {
+    // Shorthand mode: collect replacements and apply auto-fix
+    const replacements: ReplacementInfo[] = [];
+    
+    forEachValue(valueText, extractDimensionValue(cssProperty), shouldSkipDimensionNode, (parsedDimension, positionInfo) => {
+      if (parsedDimension) {
+        const result = getDimensionReplacement(parsedDimension, cssProperty, options.shorthand!.context, positionInfo!);
+        if (result) {
+          replacements.push(result);
+        }
+      }
+      // Call original callback for any additional processing
+      callback(parsedDimension, positionInfo);
+    }, { withPositions: true });
+    
+    // Apply shorthand auto-fix once all values are processed
+    handleShorthandAutoFix(options.shorthand.node, options.shorthand.context, valueText, replacements);
+  } else {
+    // Normal mode: process each value immediately
+    forEachValue(valueText, extractDimensionValue(cssProperty), shouldSkipDimensionNode, callback, { withPositions: options?.withPositions });
+  }
 }
 
 /**
