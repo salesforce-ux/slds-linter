@@ -7,7 +7,8 @@ import type { HandlerContext } from '../types';
 export interface ReplacementInfo {
   start: number;
   end: number;
-  replacement: string;
+  replacement: string;        // Full CSS var: var(--hook, fallback)
+  displayValue: string;       // Just the hook: --hook
   hasHook: boolean;
 }
 
@@ -32,8 +33,7 @@ export function handleShorthandAutoFix(
   declarationNode: any,
   context: HandlerContext,
   valueText: string,
-  replacements: ReplacementInfo[],
-  extractValueFromReplacement: (replacement: string) => string = (r) => r.match(/var\(([^,]+)/)?.[1] || r
+  replacements: ReplacementInfo[]
 ) {
   // Sort replacements by position for proper reconstruction
   const sortedReplacements = replacements.sort((a, b) => a.start - b.start);
@@ -43,7 +43,7 @@ export function handleShorthandAutoFix(
   const canAutoFix = hasAnyHooks;
 
   // Report each individual value
-  sortedReplacements.forEach(({ start, end, replacement, hasHook }) => {
+  sortedReplacements.forEach(({ start, end, replacement, displayValue, hasHook }) => {
     const originalValue = valueText.substring(start, end);
     const valueStartColumn = declarationNode.value.loc.start.column;
     const valueColumn = valueStartColumn + start;
@@ -84,7 +84,7 @@ export function handleShorthandAutoFix(
         messageId: 'hardcodedValue',
         data: {
           oldValue: originalValue,
-          newValue: extractValueFromReplacement(replacement)
+          newValue: displayValue
         },
         fix
       });

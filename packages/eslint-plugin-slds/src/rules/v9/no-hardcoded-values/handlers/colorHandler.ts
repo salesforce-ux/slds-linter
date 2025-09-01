@@ -148,6 +148,7 @@ function getColorReplacement(
       start,
       end,
       replacement: `var(${closestHooks[0]}, ${colorValue})`,
+      displayValue: closestHooks[0],
       hasHook: true
     };
   } else {
@@ -156,6 +157,7 @@ function getColorReplacement(
       start,
       end,
       replacement: colorValue,
+      displayValue: colorValue,
       hasHook: false
     };
   }

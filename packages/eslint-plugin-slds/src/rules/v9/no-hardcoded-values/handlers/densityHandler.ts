@@ -175,6 +175,7 @@ function getDimensionReplacement(
       start,
       end,
       replacement: `var(${closestHooks[0]}, ${rawValue})`,
+      displayValue: closestHooks[0],
       hasHook: true
     };
   } else {
@@ -183,6 +184,7 @@ function getDimensionReplacement(
       start,
       end,
       replacement: rawValue,
+      displayValue: rawValue,
       hasHook: false
     };
   }
