@@ -3,6 +3,9 @@ import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
+// Import CSS function utilities for consistent function detection
+import { isCssFunction, isCssColorFunction } from '../../../../utils/css-functions';
+
 // Import shared utilities for common logic
 import { 
   handleShorthandAutoFix, 
@@ -50,10 +53,11 @@ function extractDimensionToken(node: any): boolean | null {
 
 /**
  * Check if node should be skipped during dimension traversal
+ * Skip CSS functions like calc(), var(), and also color functions 
+ * since percentages in color functions should be handled by the color handler
  */
-function shouldSkipDimensionNode(): boolean {
-  // For dimension counting, we don't skip any nodes
-  return false;
+function shouldSkipDimensionNode(node: any): boolean {
+  return node.type === 'Function' && (isCssFunction(node.name) || isCssColorFunction(node.name));
 }
 
 /**
@@ -119,6 +123,7 @@ function forEachDimensionValue(
 function extractDimensionFromAST(valueNode: any, cssProperty?: string): ParsedUnitValue | null {
   if (!valueNode) return null;
   
+  
   switch (valueNode.type) {
     case 'Dimension':
       // Dimensions: 16px, 1rem -> extract value and unit directly from AST
@@ -126,11 +131,11 @@ function extractDimensionFromAST(valueNode: any, cssProperty?: string): ParsedUn
       if (numValue === 0) return null; // Skip zero values
       
       const unit = valueNode.unit.toLowerCase();
-      if (unit !== 'px' && unit !== 'rem') return null; // Only support px and rem
+      if (unit !== 'px' && unit !== 'rem' && unit !== '%') return null; // Support px, rem, and % units
       
       return {
         number: numValue,
-        unit: unit as 'px' | 'rem'
+        unit: unit as 'px' | 'rem' | '%'
       };
       
     case 'Number':
@@ -141,6 +146,16 @@ function extractDimensionFromAST(valueNode: any, cssProperty?: string): ParsedUn
       return {
         number: numberValue,
         unit: null
+      };
+      
+    case 'Percentage':
+      // Percentage values: 100%, 50% -> extract value and add % unit
+      const percentValue = Number(valueNode.value);
+      if (percentValue === 0) return null; // Skip zero values
+      
+      return {
+        number: percentValue,
+        unit: '%'
       };
       
     case 'Identifier':
