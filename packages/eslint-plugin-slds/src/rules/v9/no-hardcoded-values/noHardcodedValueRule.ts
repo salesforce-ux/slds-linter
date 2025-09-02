@@ -3,7 +3,8 @@ import { Rule } from 'eslint';
 import { 
   handleColorDeclaration, 
   handleDensityDeclaration,
-  handleFontDeclaration 
+  handleFontDeclaration,
+  handleBoxShadowDeclaration
 } from './handlers/index';
 import { colorProperties, densificationProperties, fontProperties, toSelector } from '../../../utils/property-matcher';
 import type { RuleConfig, HandlerContext } from '../../../types';
@@ -87,6 +88,11 @@ export function defineNoHardcodedValueRule(config: RuleConfig): Rule.RuleModule 
       // Font shorthand property, Font density properties (font-size, font-weight)
       visitors[fontDensitySelector] = (node: any) => {
         handleFontDeclaration(node, handlerContext);
+      };
+      
+      // Box-shadow property - special case requiring complete value matching
+      visitors['Declaration[property="box-shadow"]'] = (node: any) => {
+        handleBoxShadowDeclaration(node, handlerContext);
       };
 
       // For overlapping properties, run both handlers
