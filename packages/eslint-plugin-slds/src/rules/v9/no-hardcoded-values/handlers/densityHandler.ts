@@ -1,5 +1,5 @@
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
-import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
+import { resolvePropertyToMatch, isShorthandProperty } from '../../../../utils/property-matcher';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
@@ -26,46 +26,35 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
   // Get the raw CSS value as string and parse with css-tree
   const valueText = context.sourceCode.getText(node.value);
   
-  // Detect shorthand by counting dimension tokens
-  const isShorthand = countDimensionTokens(valueText) > 1;
+  // Simplified shorthand detection
+  const isShorthand = isShorthandProperty(cssProperty);
   
-  // Unified approach: single function handles both shorthand and single values
-  forEachDimensionValue(valueText, cssProperty, (parsedDimension, positionInfo) => {
-    if (parsedDimension) {
-      if (!isShorthand) {
-        // For single values, handle immediately
+  if (isShorthand) {
+    // For shorthand properties, always handle with auto-fix
+    forEachDimensionValue(valueText, cssProperty, (parsedDimension, positionInfo) => {
+      if (parsedDimension) {
+        // Shorthand auto-fix handled in forEachDimensionValue
+      }
+    }, { shorthand: { context, node } });
+  } else {
+    // Single value properties: handle immediately
+    forEachDimensionValue(valueText, cssProperty, (parsedDimension, positionInfo) => {
+      if (parsedDimension) {
         handleDimensionValue(parsedDimension, cssProperty, node, positionInfo, false, context);
       }
-      // For shorthand, the function handles auto-fix internally
-    }
-  }, isShorthand ? { 
-    shorthand: { context, node } 
-  } : undefined);
+    });
+  }
 };
-
-/**
- * Extract dimension token from CSS AST node (for counting purposes)
- */
-function extractDimensionToken(node: any): boolean | null {
-  // Return true for dimensions and numbers (including zeros) to count them
-  return node.type === 'Dimension' || node.type === 'Number' ? true : null;
-}
 
 /**
  * Check if node should be skipped during dimension traversal
  * Skip CSS functions like calc(), var(), and also color functions 
- * since percentages in color functions should be handled by the color handler
  */
 function shouldSkipDimensionNode(node: any): boolean {
-  return node.type === 'Function' && (isCssFunction(node.name) || isCssColorFunction(node.name));
-}
-
-/**
- * Count all dimension tokens in CSS value (including zeros and invalid values)
- * Used to detect shorthand properties for auto-fix logic
- */
-function countDimensionTokens(valueText: string): number {
-  return countValues(valueText, extractDimensionToken, shouldSkipDimensionNode);
+  if (node.type === 'Function') {
+    return isCssFunction(node.name) || isCssColorFunction(node.name);
+  }
+  return false;
 }
 
 /**
@@ -304,3 +293,5 @@ function handleDimensionValue(
     });
   }
 }
+
+

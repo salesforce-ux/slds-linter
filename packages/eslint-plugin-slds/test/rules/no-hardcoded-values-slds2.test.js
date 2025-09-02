@@ -226,12 +226,13 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     },
     // Shorthand property support - border with dimension and color
     {
-      code: `.example { border: 1px solid #ffffff; }`,
+      code: `.example { outline: 1px solid red; }`,
       filename: 'test.css',
+      output: `.example { outline: var(--slds-g-sizing-border-1, 1px) solid red; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }]
       // Should detect both #ffffff color (has hook) and 1px (no hook in SLDS2)
     },
@@ -272,6 +273,22 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         messageId: 'noReplacement'
       }]
       // First has hook, second doesn't in SLDS2
+    },
+    // Color shorthand with identical values that have single hooks - should autofix
+    {
+      code: `.example { border-color: #001639 #001639 #001639 #001639; }`,
+      filename: 'test.css',
+      output: `.example { border-color: var(--slds-g-color-palette-blue-10, #001639) var(--slds-g-color-palette-blue-10, #001639) var(--slds-g-color-palette-blue-10, #001639) var(--slds-g-color-palette-blue-10, #001639); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }, {
+        messageId: 'hardcodedValue'
+      }]
+      // All 4 values have single hooks, should provide autofix
     },
     // Note: Font shorthand parsing not yet implemented, 
     // individual font properties (font-size, line-height, etc.) are supported separately

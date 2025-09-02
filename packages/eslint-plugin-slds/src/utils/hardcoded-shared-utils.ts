@@ -16,8 +16,8 @@ export interface ReplacementInfo {
  * Position information from CSS tree parsing
  */
 export interface PositionInfo {
-  start?: { column: number };
-  end?: { column: number };
+  start?: { offset: number; line: number; column: number };
+  end?: { offset: number; line: number; column: number };
 }
 
 /**
