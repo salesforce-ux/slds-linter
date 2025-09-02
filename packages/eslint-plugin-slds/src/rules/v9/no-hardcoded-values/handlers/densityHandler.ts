@@ -24,7 +24,7 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
   const valueText = context.sourceCode.getText(node.value);
   
   // Process all dimension values and apply shorthand auto-fix
-  processDimensionValues(valueText, cssProperty, context, node);
+  handleDensityProps(valueText, cssProperty, context, node);
 };
 
 /**
@@ -39,43 +39,43 @@ function shouldSkipDimensionNode(node: any): boolean {
 }
 
 /**
- * Extract dimension value from CSS AST node for processing
+ * Replace dimension value with hook in CSS variable format
  */
-function extractDimensionValue(cssProperty: string) {
-  return (node: any): ParsedUnitValue | null => {
-    return extractDimensionFromAST(node, cssProperty);
-  };
+function replaceWithHook(dimensionValue: string, hook: string): string {
+  return `var(${hook}, ${dimensionValue})`;
 }
 
+
+
 /**
- * Process all dimension values in CSS and apply shorthand auto-fix
+ * Handle density properties by finding and replacing hardcoded values with hooks
  */
-function processDimensionValues(
+function handleDensityProps(
   valueText: string,
   cssProperty: string,
   context: HandlerContext,
-  node: any
+  declarationNode: any
 ): void {
   const replacements: ReplacementInfo[] = [];
   
-  forEachValue(valueText, extractDimensionValue(cssProperty), shouldSkipDimensionNode, (parsedDimension, positionInfo) => {
+  forEachValue(valueText, (node) => extractDimensionValue(node, cssProperty), shouldSkipDimensionNode, (parsedDimension, positionInfo) => {
     if (parsedDimension) {
-      const result = getDimensionReplacement(parsedDimension, cssProperty, context, positionInfo);
-      if (result) {
-        replacements.push(result);
+      const replacement = createDimensionReplacement(parsedDimension, cssProperty, context, positionInfo);
+      if (replacement) {
+        replacements.push(replacement);
       }
     }
   });
   
   // Apply shorthand auto-fix once all values are processed
-  handleShorthandAutoFix(node, context, valueText, replacements);
+  handleShorthandAutoFix(declarationNode, context, valueText, replacements);
 }
 
 /**
- * Extract parsed dimension value directly from CSS AST nodes
+ * Extract dimension value from CSS AST node
  * Returns structured data with number and unit to eliminate regex parsing
  */
-function extractDimensionFromAST(valueNode: any, cssProperty?: string): ParsedUnitValue | null {
+function extractDimensionValue(valueNode: any, cssProperty?: string): ParsedUnitValue | null {
   if (!valueNode) return null;
   
   
@@ -130,17 +130,17 @@ function extractDimensionFromAST(valueNode: any, cssProperty?: string): ParsedUn
       
     case 'Value':
       // Value wrapper - extract from first child
-      return valueNode.children?.[0] ? extractDimensionFromAST(valueNode.children[0], cssProperty) : null;
+      return valueNode.children?.[0] ? extractDimensionValue(valueNode.children[0], cssProperty) : null;
   }
   
   return null;
 }
 
 /**
- * Get dimension replacement info for shorthand auto-fix
+ * Create dimension replacement info for shorthand auto-fix
  * Returns replacement data or null if no valid replacement
  */
-function getDimensionReplacement(
+function createDimensionReplacement(
   parsedDimension: ParsedUnitValue,
   cssProperty: string,
   context: HandlerContext,
@@ -166,7 +166,7 @@ function getDimensionReplacement(
     return {
       start,
       end,
-      replacement: `var(${closestHooks[0]}, ${rawValue})`,
+      replacement: replaceWithHook(rawValue, closestHooks[0]),
       displayValue: closestHooks[0],
       hasHook: true
     };

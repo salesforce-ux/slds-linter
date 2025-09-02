@@ -26,7 +26,7 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
   const valueText = context.sourceCode.getText(node.value);
   
   // Process all color values and apply shorthand auto-fix
-  processColorValues(valueText, cssProperty, context, node);
+  handleColorProps(valueText, cssProperty, context, node);
 };
 
 /**
@@ -61,36 +61,43 @@ function shouldSkipColorNode(node: any): boolean {
 }
 
 /**
- * Process all color values in CSS and apply shorthand auto-fix
+ * Replace color value with hook in CSS variable format
  */
-function processColorValues(
+function replaceColorWithHook(colorValue: string, hook: string): string {
+  return `var(${hook}, ${colorValue})`;
+}
+
+/**
+ * Handle color properties by finding and replacing hardcoded values with hooks
+ */
+function handleColorProps(
   valueText: string,
   cssProperty: string,
   context: HandlerContext,
-  node: any
+  declarationNode: any
 ): void {
   const replacements: ReplacementInfo[] = [];
   
   forEachValue(valueText, extractColorValue, shouldSkipColorNode, (colorValue, positionInfo) => {
     if (colorValue !== 'transparent' && isValidColor(colorValue)) {
-      const result = getColorReplacement(colorValue, cssProperty, context, positionInfo, valueText);
-      if (result) {
-        replacements.push(result);
+      const replacement = createColorReplacement(colorValue, cssProperty, context, positionInfo, valueText);
+      if (replacement) {
+        replacements.push(replacement);
       }
     }
   });
   
   // Apply shorthand auto-fix once all values are processed
-  handleShorthandAutoFix(node, context, valueText, replacements);
+  handleShorthandAutoFix(declarationNode, context, valueText, replacements);
 }
 
 
 
 /**
- * Get color replacement info for shorthand auto-fix
+ * Create color replacement info for shorthand auto-fix
  * Returns replacement data or null if no valid replacement
  */
-function getColorReplacement(
+function createColorReplacement(
   colorValue: string,
   cssProperty: string,
   context: HandlerContext,
@@ -121,7 +128,7 @@ function getColorReplacement(
     return {
       start,
       end,
-      replacement: `var(${closestHooks[0]}, ${colorValue})`,
+      replacement: replaceColorWithHook(colorValue, closestHooks[0]),
       displayValue: closestHooks[0],
       hasHook: true
     };
