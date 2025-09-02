@@ -6,9 +6,7 @@ import type { HandlerContext, DeclarationHandler } from '../../../../types';
 // Import shared utilities for common logic
 import { 
   handleShorthandAutoFix, 
-  forEachValueWithPosition, 
   forEachValue,
-  countValues,
   type ReplacementInfo,
   type PositionInfo
 } from '../../../../utils/hardcoded-shared-utils';
@@ -21,28 +19,8 @@ export const handleFontDeclaration: DeclarationHandler = (node: any, context: Ha
   const cssProperty = node.property.toLowerCase();
   const valueText = context.sourceCode.getText(node.value);
   
-  // Detect shorthand by property name (font shorthand always needs special handling)
-  const isShorthand = cssProperty === 'font';
-  
-  if (isShorthand) {
-    // Handle font shorthand - collect all replacements first
-    const replacements: ReplacementInfo[] = [];
-    
-    forEachFontValueWithPosition(valueText, (fontValue, positionInfo) => {
-      const result = getFontReplacement(fontValue, cssProperty, context, positionInfo);
-      if (result) {
-        replacements.push(result);
-      }
-    });
-    
-    // Apply shorthand auto-fix if any font values have hooks
-    handleShorthandAutoFix(node, context, valueText, replacements);
-  } else {
-    // Handle individual properties - use simpler approach like color handler
-    forEachFontValue(valueText, cssProperty, (fontValue) => {
-      handleIndividualFontValue(fontValue, cssProperty, node, context);
-    });
-  }
+  // Process all font values and apply shorthand auto-fix
+  handleFontProps(valueText, cssProperty, context, node);
 };
 
 /**
@@ -140,41 +118,44 @@ function shouldSkipFontNode(node: any): boolean {
 }
 
 /**
- * Count font-related values in CSS value (reuse shared-utils pattern)
+ * Replace font value with hook in CSS variable format
  */
-function countFontValues(valueText: string): number {
-  return countValues(valueText, extractFontValue, shouldSkipFontNode);
+function replaceWithHook(fontValue: string, hook: string): string {
+  return `var(${hook}, ${fontValue})`;
 }
 
 /**
- * Iterate over font values with position tracking (for shorthand)
+ * Handle font properties by finding and replacing hardcoded values with hooks
  */
-function forEachFontValueWithPosition(
-  valueText: string, 
-  callback: (fontValue: ParsedUnitValue, positionInfo?: PositionInfo) => void
-): void {
-  forEachValueWithPosition(valueText, extractFontValue, shouldSkipFontNode, callback);
-}
-
-/**
- * Iterate over font values for specific property (for individual properties)
- */
-function forEachFontValue(
-  valueText: string, 
+function handleFontProps(
+  valueText: string,
   cssProperty: string,
-  callback: (fontValue: ParsedUnitValue) => void
+  context: HandlerContext,
+  declarationNode: any
 ): void {
-  forEachValue(valueText, extractFontValueForProperty(cssProperty), shouldSkipFontNode, callback);
+  const replacements: ReplacementInfo[] = [];
+  
+  forEachValue(valueText, (node) => extractFontValueForProperty(cssProperty)(node), shouldSkipFontNode, (fontValue, positionInfo) => {
+    if (fontValue) {
+      const replacement = createFontReplacement(fontValue, cssProperty, context, positionInfo);
+      if (replacement) {
+        replacements.push(replacement);
+      }
+    }
+  });
+  
+  // Apply shorthand auto-fix once all values are processed
+  handleShorthandAutoFix(declarationNode, context, valueText, replacements);
 }
 
 /**
- * Get font replacement info for shorthand auto-fix (follows density pattern)
+ * Create font replacement info for shorthand auto-fix
  */
-function getFontReplacement(
+function createFontReplacement(
   fontValue: ParsedUnitValue,
   cssProperty: string,
   context: HandlerContext,
-  positionInfo?: PositionInfo
+  positionInfo: PositionInfo
 ): ReplacementInfo | null {
   if (!fontValue || !positionInfo?.start) {
     return null;
@@ -199,74 +180,37 @@ function getFontReplacement(
 
   const closestHooks = getStylingHooksForDensityValue(fontValue, context.valueToStylinghook, propToMatch);
 
-  // Calculate position within the CSS value (handle keyword length correctly)
-  const originalValueLength = positionInfo.end ? (positionInfo.end.column - positionInfo.start.column) : rawValue.length;
-  const start = positionInfo.start.column - 1; // css-tree uses 1-based columns
-  const end = start + originalValueLength;
+  // Use position information directly from CSS tree (already 0-based offsets)
+  const start = positionInfo.start.offset;
+  const end = positionInfo.end.offset;
 
   if (closestHooks.length === 1) {
     // Has a single hook replacement
     return {
       start,
       end,
-      replacement: `var(${closestHooks[0]}, ${rawValue})`,
+      replacement: replaceWithHook(rawValue, closestHooks[0]),
+      displayValue: closestHooks[0],
       hasHook: true
     };
-  } else {
-    // No hook or multiple hooks - keep original value
+  } else if (closestHooks.length > 1) {
+    // Multiple hooks - still has hooks, but no auto-fix
     return {
       start,
       end,
       replacement: rawValue,
+      displayValue: closestHooks.join(', '),
+      hasHook: true
+    };
+  } else {
+    // No hooks - keep original value
+    return {
+      start,
+      end,
+      replacement: rawValue,
+      displayValue: rawValue,
       hasHook: false
     };
   }
 }
 
-/**
- * Handle individual font value and report issues (simplified like color handler)
- */
-function handleIndividualFontValue(
-  fontValue: ParsedUnitValue, 
-  cssProperty: string, 
-  declarationNode: any, 
-  context: HandlerContext
-) {
-  if (!fontValue) {
-    return;
-  }
-
-  // Reconstruct raw value from parsed data for reporting
-  const rawValue = fontValue.unit 
-    ? `${fontValue.number}${fontValue.unit}`
-    : fontValue.number.toString();
-
-  const propToMatch = resolvePropertyToMatch(cssProperty);
-  const closestHooks = getStylingHooksForDensityValue(fontValue, context.valueToStylinghook, propToMatch);
-
-  if (closestHooks.length > 0) {
-    // Auto-fix for single suggestions only (like color handler)
-    const fix = closestHooks.length === 1 ? (fixer: any) => {
-      return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${rawValue})`);
-    } : undefined;
-
-    context.context.report({
-      node: declarationNode.value,
-      messageId: 'hardcodedValue',
-      data: {
-        oldValue: rawValue,
-        newValue: closestHooks.join(', ')
-      },
-      fix
-    });
-  } else {
-    // No suggestions available
-    context.context.report({
-      node: declarationNode.value,
-      messageId: 'noReplacement',
-      data: {
-        oldValue: rawValue
-      }
-    });
-  }
-}

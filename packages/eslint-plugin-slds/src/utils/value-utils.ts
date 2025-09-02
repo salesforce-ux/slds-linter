@@ -38,7 +38,7 @@ export function isGlobalValue(value: string): boolean {
   }
 
 export type ParsedUnitValue = {
-  unit: 'px' | 'rem' | null;
+  unit: 'px' | 'rem' | '%' | null;
   number: number;
 } | null;
 
@@ -46,18 +46,18 @@ export function parseUnitValue(value: string): ParsedUnitValue {
   if (!value) return null;
   
   // Simple regex to parse number and unit
-  const match = value.match(/^(-?\d*\.?\d+)(px|rem)?$/);
+  const match = value.match(/^(-?\d*\.?\d+)(px|rem|%)?$/);
   if (!match) return null;
   
   const number = parseFloat(match[1]);
-  const unit = (match[2] || 'px') as 'px' | 'rem';
+  const unit = (match[2] || 'px') as 'px' | 'rem' | '%';
   
   if (isNaN(number)) return null;
   
   return { number, unit };
 }
 
-export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem' | null): ParsedUnitValue {
+export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem' | '%' | null): ParsedUnitValue {
     if (unitType === 'px') {
       let floatValue = parseFloat(`${numberVal / 16}`);
       if (!isNaN(floatValue)) {

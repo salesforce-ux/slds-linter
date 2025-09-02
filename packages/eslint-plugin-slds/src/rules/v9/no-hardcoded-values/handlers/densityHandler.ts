@@ -3,11 +3,13 @@ import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
+// Import CSS function utilities for consistent function detection
+import { isCssFunction, isCssColorFunction } from '../../../../utils/css-functions';
+
 // Import shared utilities for common logic
 import { 
   handleShorthandAutoFix, 
-  forEachValueWithPosition, 
-  countValues,
+  forEachValue,
   type ReplacementInfo,
   type PositionInfo
 } from '../../../../utils/hardcoded-shared-utils';
@@ -19,83 +21,63 @@ import {
  */
 export const handleDensityDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
-  
-  // Get the raw CSS value as string and parse with css-tree
   const valueText = context.sourceCode.getText(node.value);
   
-  // Detect shorthand by counting dimension tokens
-  const isShorthand = countDimensionTokens(valueText) > 1;
-  
-  // For shorthand properties, collect all replacements first
-  if (isShorthand) {
-    const replacements: ReplacementInfo[] = [];
-    
-    // Collect all potential replacements
-    forEachDimensionValue(valueText, cssProperty, (parsedDimension, positionInfo) => {
-      const result = getDimensionReplacement(parsedDimension, cssProperty, context, positionInfo);
-      if (result) {
-        replacements.push(result);
-      }
-    });
-    
-    // Apply shorthand auto-fix if all dimensions have hooks
-    handleShorthandAutoFix(node, context, valueText, replacements);
-  } else {
-    // Use original pattern for single values
-    forEachDimensionValue(valueText, cssProperty, (parsedDimension, positionInfo) => {
-      handleDimensionValue(parsedDimension, cssProperty, node, positionInfo, false, context);
-    });
-  }
+  // Process all dimension values and apply shorthand auto-fix
+  handleDensityProps(valueText, cssProperty, context, node);
 };
 
 /**
- * Extract dimension token from CSS AST node (for counting purposes)
- */
-function extractDimensionToken(node: any): boolean | null {
-  // Return true for dimensions and numbers (including zeros) to count them
-  return node.type === 'Dimension' || node.type === 'Number' ? true : null;
-}
-
-/**
  * Check if node should be skipped during dimension traversal
+ * Skip CSS functions like calc(), var(), and also color functions 
  */
-function shouldSkipDimensionNode(): boolean {
-  // For dimension counting, we don't skip any nodes
+function shouldSkipDimensionNode(node: any): boolean {
+  if (node.type === 'Function') {
+    return isCssFunction(node.name) || isCssColorFunction(node.name);
+  }
   return false;
 }
 
 /**
- * Count all dimension tokens in CSS value (including zeros and invalid values)
- * Used to detect shorthand properties for auto-fix logic
+ * Replace dimension value with hook in CSS variable format
  */
-function countDimensionTokens(valueText: string): number {
-  return countValues(valueText, extractDimensionToken, shouldSkipDimensionNode);
+function replaceWithHook(dimensionValue: string, hook: string): string {
+  return `var(${hook}, ${dimensionValue})`;
+}
+
+
+
+/**
+ * Handle density properties by finding and replacing hardcoded values with hooks
+ */
+function handleDensityProps(
+  valueText: string,
+  cssProperty: string,
+  context: HandlerContext,
+  declarationNode: any
+): void {
+  const replacements: ReplacementInfo[] = [];
+  
+  forEachValue(valueText, (node) => extractDimensionValue(node, cssProperty), shouldSkipDimensionNode, (parsedDimension, positionInfo) => {
+    if (parsedDimension) {
+      const replacement = createDimensionReplacement(parsedDimension, cssProperty, context, positionInfo);
+      if (replacement) {
+        replacements.push(replacement);
+      }
+    }
+  });
+  
+  // Apply shorthand auto-fix once all values are processed
+  handleShorthandAutoFix(declarationNode, context, valueText, replacements);
 }
 
 /**
- * Extract dimension value from CSS AST node for processing
- */
-function extractDimensionValue(cssProperty: string) {
-  return (node: any): ParsedUnitValue | null => {
-    return extractDimensionFromAST(node, cssProperty);
-  };
-}
-
-/**
- * Iterate over dimension values in CSS using optimized css-tree traversal
- * Uses callback pattern to handle each dimension value as it's encountered
- * Supports shorthand properties like padding, margin, etc.
- */
-function forEachDimensionValue(valueText: string, cssProperty: string, callback: (parsedDimension: ParsedUnitValue, positionInfo?: PositionInfo) => void): void {
-  forEachValueWithPosition(valueText, extractDimensionValue(cssProperty), shouldSkipDimensionNode, callback);
-}
-
-/**
- * Extract parsed dimension value directly from CSS AST nodes
+ * Extract dimension value from CSS AST node
  * Returns structured data with number and unit to eliminate regex parsing
  */
-function extractDimensionFromAST(valueNode: any, cssProperty?: string): ParsedUnitValue | null {
+function extractDimensionValue(valueNode: any, cssProperty?: string): ParsedUnitValue | null {
   if (!valueNode) return null;
+  
   
   switch (valueNode.type) {
     case 'Dimension':
@@ -104,11 +86,11 @@ function extractDimensionFromAST(valueNode: any, cssProperty?: string): ParsedUn
       if (numValue === 0) return null; // Skip zero values
       
       const unit = valueNode.unit.toLowerCase();
-      if (unit !== 'px' && unit !== 'rem') return null; // Only support px and rem
+      if (unit !== 'px' && unit !== 'rem' && unit !== '%') return null; // Support px, rem, and % units
       
       return {
         number: numValue,
-        unit: unit as 'px' | 'rem'
+        unit: unit as 'px' | 'rem' | '%'
       };
       
     case 'Number':
@@ -121,34 +103,29 @@ function extractDimensionFromAST(valueNode: any, cssProperty?: string): ParsedUn
         unit: null
       };
       
-    case 'Identifier':
-      // Handle named values only for specific properties where we know the mapping
-      const namedValue = valueNode.name.toLowerCase();
+    case 'Percentage':
+      // Percentage values: 100%, 50% -> extract value and add % unit
+      const percentValue = Number(valueNode.value);
+      if (percentValue === 0) return null; // Skip zero values
       
-      // Only handle font-weight: normal → 400 conversion
-      if (cssProperty === 'font-weight' && namedValue === 'normal') {
-        return {
-          number: 400,
-          unit: null
-        };
-      }
-      
-      // For all other properties and unknown keywords, skip processing
-      return null;
+      return {
+        number: percentValue,
+        unit: '%'
+      };
       
     case 'Value':
       // Value wrapper - extract from first child
-      return valueNode.children?.[0] ? extractDimensionFromAST(valueNode.children[0], cssProperty) : null;
+      return valueNode.children?.[0] ? extractDimensionValue(valueNode.children[0], cssProperty) : null;
   }
   
   return null;
 }
 
 /**
- * Get dimension replacement info for shorthand auto-fix
+ * Create dimension replacement info for shorthand auto-fix
  * Returns replacement data or null if no valid replacement
  */
-function getDimensionReplacement(
+function createDimensionReplacement(
   parsedDimension: ParsedUnitValue,
   cssProperty: string,
   context: HandlerContext,
@@ -174,7 +151,17 @@ function getDimensionReplacement(
     return {
       start,
       end,
-      replacement: `var(${closestHooks[0]}, ${rawValue})`,
+      replacement: replaceWithHook(rawValue, closestHooks[0]),
+      displayValue: closestHooks[0],
+      hasHook: true
+    };
+  } else if (closestHooks.length > 1) {
+    // Multiple hooks - still has hooks, but no auto-fix
+    return {
+      start,
+      end,
+      replacement: rawValue,
+      displayValue: closestHooks.join(', '),
       hasHook: true
     };
   } else {
@@ -183,6 +170,7 @@ function getDimensionReplacement(
       start,
       end,
       replacement: rawValue,
+      displayValue: rawValue,
       hasHook: false
     };
   }
@@ -190,78 +178,3 @@ function getDimensionReplacement(
 
 
 
-/**
- * Handle dimension value using parsed CSS AST data and report issues
- * Used for single-value properties (non-shorthand)
- */
-function handleDimensionValue(
-  parsedDimension: ParsedUnitValue, 
-  cssProperty: string, 
-  declarationNode: any, 
-  positionInfo: PositionInfo,
-  isShorthand: boolean,
-  context: HandlerContext
-) {
-  if (!parsedDimension) {
-    return;
-  }
-
-  // Reconstruct raw value from parsed data for reporting
-  const rawValue = parsedDimension.unit 
-    ? `${parsedDimension.number}${parsedDimension.unit}`
-    : parsedDimension.number.toString();
-
-  const propToMatch = resolvePropertyToMatch(cssProperty);
-  const closestHooks = getStylingHooksForDensityValue(parsedDimension, context.valueToStylinghook, propToMatch);
-
-  // Create a more specific location node if position info is available
-  let reportNode = declarationNode.value;
-  
-  if (positionInfo?.start) {
-    // Calculate the actual column position based on css-tree position info
-    const valueStartColumn = declarationNode.value.loc.start.column;
-    const dimensionColumn = valueStartColumn + (positionInfo.start.column - 1);
-    
-    // Create a virtual node with corrected position for better error reporting
-    reportNode = {
-      ...declarationNode.value,
-      loc: {
-        ...declarationNode.value.loc,
-        start: {
-          ...declarationNode.value.loc.start,
-          column: dimensionColumn
-        },
-        end: {
-          ...declarationNode.value.loc.end,
-          column: dimensionColumn + rawValue.length
-        }
-      }
-    };
-  }
-
-  if (closestHooks.length > 0) {
-    // Auto-fix for single-value properties only
-    const fix = closestHooks.length === 1 ? (fixer: any) => {
-      return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${rawValue})`);
-    } : undefined;
-
-    context.context.report({
-      node: reportNode,
-      messageId: 'hardcodedValue',
-      data: {
-        oldValue: rawValue,
-        newValue: closestHooks.join(', ')
-      },
-      fix
-    });
-  } else {
-    // No suggestions available
-    context.context.report({
-      node: reportNode,
-      messageId: 'noReplacement',
-      data: {
-        oldValue: rawValue
-      }
-    });
-  }
-}

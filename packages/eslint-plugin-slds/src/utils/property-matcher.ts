@@ -100,6 +100,66 @@ export const densificationProperties = [
   'outline-width'
 ]; 
 
+// Import @eslint/css-tree for robust shorthand property detection
+import * as csstree from '@eslint/css-tree';
+
+/**
+ * Check if a CSS property is a shorthand property using css-tree lexer
+ * This is more reliable than maintaining a manual list
+ * 
+ * A property is considered shorthand if it has one of these patterns:
+ * 1. Group with multiple terms and '||' combinator (unordered values like border, outline)
+ * 2. Group with Multiplier allowing multiple values (like margin: 1px 2px 3px 4px)
+ */
+export function isShorthandProperty(cssProperty: string): boolean {
+  try {
+    const prop = csstree.lexer.getProperty(cssProperty.toLowerCase());
+    if (!prop || !prop.syntax) {
+      return false;
+    }
+    
+    const syntax = prop.syntax as any; // Cast to any to access runtime properties
+    
+    // Must be a Group type to be shorthand
+    if (syntax.type !== 'Group') {
+      return false;
+    }
+    
+    // Pattern 1: Multiple terms with shorthand combinators
+    if (syntax.terms && syntax.terms.length > 1) {
+      // Unordered shorthand (border, outline): '||' combinator - accepts multiple different types
+      if (syntax.combinator === '||') {
+        return true;
+      }
+      
+      // Ordered shorthand (background, border-radius): ' ' combinator - sequence of values
+      if (syntax.combinator === ' ') {
+        return true;
+      }
+      
+      // Be more selective with '|' combinator - only for known shorthand properties
+      // '|' typically means alternatives, not shorthand, except for specific cases like font
+      if (syntax.combinator === '|') {
+        const knownPipedShorthands = ['font', 'list-style', 'text-decoration'];
+        return knownPipedShorthands.includes(cssProperty.toLowerCase());
+      }
+    }
+    
+    // Pattern 2: Single term with Multiplier allowing multiple values (like margin, padding)
+    if (syntax.terms && syntax.terms.length === 1) {
+      const term = syntax.terms[0];
+      if (term.type === 'Multiplier' && term.max > 1) {
+        return true;
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    // If css-tree doesn't recognize the property, assume it's not shorthand
+    return false;
+  }
+}
+
 /**
  * Convert property patterns to CSS AST selector patterns
  * Handles wildcards (*) and creates proper ESLint CSS selector syntax

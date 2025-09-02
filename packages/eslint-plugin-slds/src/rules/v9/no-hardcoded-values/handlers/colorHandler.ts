@@ -11,9 +11,7 @@ import { isCssFunction, isCssColorFunction } from '../../../../utils/css-functio
 // Import shared utilities for common logic
 import { 
   handleShorthandAutoFix, 
-  forEachValueWithPosition, 
-  forEachValue, 
-  countValues,
+  forEachValue,
   type ReplacementInfo,
   type PositionInfo
 } from '../../../../utils/hardcoded-shared-utils';
@@ -25,37 +23,10 @@ import {
  */
 export const handleColorDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
-  
-  // Get the raw CSS value as string and parse with css-tree
   const valueText = context.sourceCode.getText(node.value);
   
-  // Detect shorthand by counting color values
-  const isShorthand = countColorValues(valueText) > 1;
-  
-  // For shorthand properties, collect all replacements first
-  if (isShorthand) {
-    const replacements: ReplacementInfo[] = [];
-    
-    // Collect all potential replacements
-    forEachColorValueWithPosition(valueText, (colorValue, positionInfo) => {
-      if (colorValue !== 'transparent') {
-        const result = getColorReplacement(colorValue, cssProperty, context, positionInfo);
-        if (result) {
-          replacements.push(result);
-        }
-      }
-    });
-    
-    // Apply shorthand auto-fix if any colors have hooks
-    handleShorthandAutoFix(node, context, valueText, replacements);
-  } else {
-    // Use original pattern for single values
-    forEachColorValue(valueText, (colorValue) => {
-      if (colorValue !== 'transparent') {
-        handleColorValue(colorValue, cssProperty, node, context);
-      }
-    });
-  }
+  // Process all color values and apply shorthand auto-fix
+  handleColorProps(valueText, cssProperty, context, node);
 };
 
 /**
@@ -90,41 +61,48 @@ function shouldSkipColorNode(node: any): boolean {
 }
 
 /**
- * Count all color values in CSS value (excluding functions like var(), calc())
- * Used to detect shorthand properties for auto-fix logic
+ * Replace color value with hook in CSS variable format
  */
-function countColorValues(valueText: string): number {
-  return countValues(valueText, extractColorValue, shouldSkipColorNode);
+function replaceColorWithHook(colorValue: string, hook: string): string {
+  return `var(${hook}, ${colorValue})`;
 }
 
 /**
- * Iterate over color values in CSS using optimized css-tree traversal
- * Uses callback pattern to handle each color value as it's encountered
- * Uses this.skip to efficiently prevent traversing skip function children
+ * Handle color properties by finding and replacing hardcoded values with hooks
  */
-function forEachColorValue(valueText: string, callback: (colorValue: string) => void): void {
-  forEachValue(valueText, extractColorValue, shouldSkipColorNode, callback);
+function handleColorProps(
+  valueText: string,
+  cssProperty: string,
+  context: HandlerContext,
+  declarationNode: any
+): void {
+  const replacements: ReplacementInfo[] = [];
+  
+  forEachValue(valueText, extractColorValue, shouldSkipColorNode, (colorValue, positionInfo) => {
+    if (colorValue !== 'transparent' && isValidColor(colorValue)) {
+      const replacement = createColorReplacement(colorValue, cssProperty, context, positionInfo, valueText);
+      if (replacement) {
+        replacements.push(replacement);
+      }
+    }
+  });
+  
+  // Apply shorthand auto-fix once all values are processed
+  handleShorthandAutoFix(declarationNode, context, valueText, replacements);
 }
 
-/**
- * Iterate over color values in CSS with position tracking for shorthand auto-fix
- * Uses callback pattern to handle each color value with position info
- */
-function forEachColorValueWithPosition(valueText: string, callback: (colorValue: string, positionInfo?: PositionInfo) => void): void {
-  forEachValueWithPosition(valueText, extractColorValue, shouldSkipColorNode, callback);
-}
-
 
 
 /**
- * Get color replacement info for shorthand auto-fix
+ * Create color replacement info for shorthand auto-fix
  * Returns replacement data or null if no valid replacement
  */
-function getColorReplacement(
+function createColorReplacement(
   colorValue: string,
   cssProperty: string,
   context: HandlerContext,
-  positionInfo: PositionInfo
+  positionInfo: PositionInfo,
+  originalValueText?: string
 ): ReplacementInfo | null {
   if (!positionInfo?.start) {
     return null;
@@ -138,24 +116,38 @@ function getColorReplacement(
   const propToMatch = resolvePropertyToMatch(cssProperty);
   const closestHooks = findClosestColorHook(hexValue, context.valueToStylinghook, propToMatch);
 
-  // Calculate position within the CSS value
-  const start = positionInfo.start.column - 1; // css-tree uses 1-based columns
-  const end = start + colorValue.length;
+  // Use position information directly from CSS tree (already 0-based offsets)
+  const start = positionInfo.start.offset;
+  const end = positionInfo.end.offset;
+  
+  // Extract the original value from the CSS text to preserve spacing
+  const originalValue = originalValueText ? originalValueText.substring(start, end) : colorValue;
 
   if (closestHooks.length === 1) {
-    // Has a single hook replacement
+    // Has a single hook replacement - should provide autofix
     return {
       start,
       end,
-      replacement: `var(${closestHooks[0]}, ${colorValue})`,
+      replacement: replaceColorWithHook(colorValue, closestHooks[0]),
+      displayValue: closestHooks[0],
       hasHook: true
     };
-  } else {
-    // No hook or multiple hooks - keep original value
+  } else if (closestHooks.length > 1) {
+    // Multiple hooks - still has hooks, but no auto-fix
     return {
       start,
       end,
-      replacement: colorValue,
+      replacement: originalValue,  // Use original value to preserve spacing
+      displayValue: closestHooks.join(', '),
+      hasHook: true  // ← THE FIX: Multiple hooks still means "has hooks"
+    };
+  } else {
+    // No hooks - keep original value
+    return {
+      start,
+      end,
+      replacement: originalValue,  // Use original value to preserve spacing
+      displayValue: originalValue,
       hasHook: false
     };
   }
@@ -163,47 +155,5 @@ function getColorReplacement(
 
 
 
-/**
- * Handle validated color value and report issues
- * Used for single-value properties (non-shorthand)
- */
-function handleColorValue(
-  colorValue: string, 
-  cssProperty: string, 
-  declarationNode: any, 
-  context: HandlerContext
-) {
-  const hexValue = convertToHex(colorValue);
-  if (!hexValue) {
-    return;
-  }
 
-  const propToMatch = resolvePropertyToMatch(cssProperty);
-  const closestHooks = findClosestColorHook(hexValue, context.valueToStylinghook, propToMatch);
 
-  if (closestHooks.length > 0) {
-    // Create ESLint fix for single suggestions only
-    const fix = closestHooks.length === 1 ? (fixer: any) => {
-      return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${colorValue})`);
-    } : undefined;
-
-    context.context.report({
-      node: declarationNode.value,
-      messageId: 'hardcodedValue',
-      data: {
-        oldValue: colorValue,
-        newValue: closestHooks.join(', ')
-      },
-      fix
-    });
-  } else {
-    // No suggestions available
-    context.context.report({
-      node: declarationNode.value,
-      messageId: 'noReplacement',
-      data: {
-        oldValue: colorValue
-      }
-    });
-  }
-}
