@@ -210,9 +210,9 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       code: `.example { border-width: 2px 4px; }`,
       filename: 'test.css',
       errors: [{
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }, {
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }]
       // Should detect both 2px and 4px values, but no hooks available in SLDS1
     },
@@ -262,11 +262,11 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       errors: [{
         messageId: 'hardcodedValue'
       }, {
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }, {
         messageId: 'hardcodedValue'
       }, {
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }]
       // 1px and 3px auto-fix, 2px and 4px have no hooks available
     },

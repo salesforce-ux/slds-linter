@@ -102,27 +102,21 @@ export function handleShorthandAutoFix(
 }
 
 /**
- * Core CSS tree traversal function that handles all use cases
- * Unified implementation for counting, position tracking, and simple iteration
+ * Generic CSS tree traversal with position tracking
+ * Always provides position information since both handlers need it
  */
-function forEachValueCore<T>(
+export function forEachValue<T>(
   valueText: string,
   extractValue: (node: any) => T | null,
   shouldSkipNode: (node: any) => boolean,
-  options: {
-    withPositions?: boolean;
-    countOnly?: boolean;
-    callback?: (value: T, positionInfo?: PositionInfo) => void;
-  }
-): number | void {
+  callback: (value: T, positionInfo: PositionInfo) => void
+): void {
   if (!valueText || typeof valueText !== 'string') {
-    return options.countOnly ? 0 : undefined;
+    return;
   }
 
-  let count = 0;
   try {
-    const parseOptions = options.withPositions ? { context: 'value' as const, positions: true } : { context: 'value' as const };
-    const ast = parse(valueText, parseOptions);
+    const ast = parse(valueText, { context: 'value' as const, positions: true });
     
     walk(ast, {
       enter(node: any) {
@@ -133,64 +127,16 @@ function forEachValueCore<T>(
         
         const value = extractValue(node);
         if (value !== null) {
-          if (options.countOnly) {
-            count++;
-          } else if (options.callback) {
-            const positionInfo = options.withPositions ? {
-              start: node.loc?.start,
-              end: node.loc?.end
-            } : undefined;
-            options.callback(value, positionInfo);
-          }
+          const positionInfo: PositionInfo = {
+            start: node.loc?.start,
+            end: node.loc?.end
+          };
+          callback(value, positionInfo);
         }
       }
     });
   } catch (error) {
-    return options.countOnly ? 0 : undefined;
+    // Silently handle parse errors
+    return;
   }
-
-  return options.countOnly ? count : undefined;
-}
-
-/**
- * Generic CSS tree traversal with optional position tracking
- * Unified function that handles both simple iteration and position tracking
- */
-export function forEachValue<T>(
-  valueText: string,
-  extractValue: (node: any) => T | null,
-  shouldSkipNode: (node: any) => boolean,
-  callback: (value: T, positionInfo?: PositionInfo) => void,
-  options?: { withPositions?: boolean }
-): void {
-  forEachValueCore(valueText, extractValue, shouldSkipNode, {
-    withPositions: options?.withPositions || false,
-    callback
-  });
-}
-
-/**
- * Generic count function for values in CSS
- * Handles the common logic for counting specific types of values
- */
-export function countValues<T>(
-  valueText: string,
-  extractValue: (node: any) => T | null,
-  shouldSkipNode: (node: any) => boolean
-): number {
-  return forEachValueCore(valueText, extractValue, shouldSkipNode, {
-    countOnly: true
-  }) as number;
-}
-
-/**
- * @deprecated Use forEachValue with options.withPositions instead
- */
-export function forEachValueWithPosition<T>(
-  valueText: string,
-  extractValue: (node: any) => T | null,
-  shouldSkipNode: (node: any) => boolean,
-  callback: ValueCallback<T>
-): void {
-  forEachValue(valueText, extractValue, shouldSkipNode, callback, { withPositions: true });
 }

@@ -1,5 +1,5 @@
 import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
-import { resolvePropertyToMatch, isShorthandProperty } from '../../../../utils/property-matcher';
+import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
 // Import @eslint/css-tree for ESLint-compatible CSS value parsing
@@ -11,8 +11,7 @@ import { isCssFunction, isCssColorFunction } from '../../../../utils/css-functio
 // Import shared utilities for common logic
 import { 
   handleShorthandAutoFix, 
-  forEachValue, 
-  countValues,
+  forEachValue,
   type ReplacementInfo,
   type PositionInfo
 } from '../../../../utils/hardcoded-shared-utils';
@@ -24,29 +23,10 @@ import {
  */
 export const handleColorDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
-  
-  // Get the raw CSS value as string and parse with css-tree
   const valueText = context.sourceCode.getText(node.value);
   
-  // Simplified shorthand detection
-  const isShorthand = isShorthandProperty(cssProperty);
-  const colorCount = countColorValues(valueText);
-
-  if (isShorthand && colorCount > 0) {
-    // Pure color shorthand: handle with auto-fix
-    forEachColorValue(valueText, (colorValue, positionInfo) => {
-      if (colorValue !== 'transparent') {
-        // Shorthand auto-fix handled in forEachColorValue
-      }
-    }, { shorthand: { cssProperty, context, node } });
-  } else {
-    // Single value properties: handle immediately
-    forEachColorValue(valueText, (colorValue, positionInfo) => {
-      if (colorValue !== 'transparent') {
-        handleColorValue(colorValue, cssProperty, node, context);
-      }
-    }, { withPositions: true });
-  }
+  // Process all color values and apply shorthand auto-fix
+  processColorValues(valueText, cssProperty, context, node);
 };
 
 /**
@@ -81,50 +61,27 @@ function shouldSkipColorNode(node: any): boolean {
 }
 
 /**
- * Count all color values in CSS value (excluding functions like var(), calc())
- * Used to detect shorthand properties for auto-fix logic
+ * Process all color values in CSS and apply shorthand auto-fix
  */
-function countColorValues(valueText: string): number {
-  return countValues(valueText, extractColorValue, shouldSkipColorNode);
-}
-
-/**
- * Unified function to iterate over color values in CSS
- * Supports both simple iteration and shorthand auto-fix through options
- */
-function forEachColorValue(
-  valueText: string, 
-  callback: (colorValue: string, positionInfo?: PositionInfo) => void | ReplacementInfo,
-  options?: { 
-    withPositions?: boolean;
-    shorthand?: {
-      cssProperty: string;
-      context: HandlerContext;
-      node: any;
-    };
-  }
+function processColorValues(
+  valueText: string,
+  cssProperty: string,
+  context: HandlerContext,
+  node: any
 ): void {
-  if (options?.shorthand) {
-    // Shorthand mode: collect replacements and apply auto-fix
-    const replacements: ReplacementInfo[] = [];
-    
-    forEachValue(valueText, extractColorValue, shouldSkipColorNode, (colorValue, positionInfo) => {
-      if (colorValue !== 'transparent' && isValidColor(colorValue)) {
-        const result = getColorReplacement(colorValue, options.shorthand!.cssProperty, options.shorthand!.context, positionInfo!, valueText);
-        if (result) {
-          replacements.push(result);
-        }
+  const replacements: ReplacementInfo[] = [];
+  
+  forEachValue(valueText, extractColorValue, shouldSkipColorNode, (colorValue, positionInfo) => {
+    if (colorValue !== 'transparent' && isValidColor(colorValue)) {
+      const result = getColorReplacement(colorValue, cssProperty, context, positionInfo, valueText);
+      if (result) {
+        replacements.push(result);
       }
-      // Call original callback for any additional processing
-      callback(colorValue, positionInfo);
-    }, { withPositions: true });
-    
-    // Apply shorthand auto-fix once all values are processed
-    handleShorthandAutoFix(options.shorthand.node, options.shorthand.context, valueText, replacements);
-  } else {
-    // Normal mode: process each value immediately
-    forEachValue(valueText, extractColorValue, shouldSkipColorNode, callback, { withPositions: options?.withPositions });
-  }
+    }
+  });
+  
+  // Apply shorthand auto-fix once all values are processed
+  handleShorthandAutoFix(node, context, valueText, replacements);
 }
 
 
@@ -191,53 +148,5 @@ function getColorReplacement(
 
 
 
-/**
- * Handle validated color value and report issues
- * Used for single-value properties (non-shorthand)
- */
-function handleColorValue(
-  colorValue: string, 
-  cssProperty: string, 
-  declarationNode: any, 
-  context: HandlerContext
-) {
-  // Skip if this is not actually a valid color (e.g., dimension values like "1px")
-  if (!isValidColor(colorValue)) {
-    return;
-  }
-  
-  const hexValue = convertToHex(colorValue);
-  if (!hexValue) {
-    return;
-  }
 
-  const propToMatch = resolvePropertyToMatch(cssProperty);
-  const closestHooks = findClosestColorHook(hexValue, context.valueToStylinghook, propToMatch);
-
-  if (closestHooks.length > 0) {
-    // Create ESLint fix for single suggestions only
-    const fix = closestHooks.length === 1 ? (fixer: any) => {
-      return fixer.replaceText(declarationNode.value, `var(${closestHooks[0]}, ${colorValue})`);
-    } : undefined;
-
-    context.context.report({
-      node: declarationNode.value,
-      messageId: 'hardcodedValue',
-      data: {
-        oldValue: colorValue,
-        newValue: closestHooks.join(', ')
-      },
-      fix
-    });
-  } else {
-    // No suggestions available
-    context.context.report({
-      node: declarationNode.value,
-      messageId: 'noReplacement',
-      data: {
-        oldValue: colorValue
-      }
-    });
-  }
-}
 
