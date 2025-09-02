@@ -13,63 +13,51 @@ import {
 
 /**
  * Handle font declarations including shorthand property
- * Follows the same pattern as colorHandler and densityHandler
+ * font-size and font-weight are dimension-like values
  */
 export const handleFontDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
   const valueText = context.sourceCode.getText(node.value);
   
-  // Process all font values and apply shorthand auto-fix
+  // Process font values
   handleFontProps(valueText, cssProperty, context, node);
 };
 
 /**
- * Extract font-related values from CSS AST node (simplified like density handler)
- * Returns parsed font value for font-size and font-weight properties only
+ * Extract font-related values from CSS AST node
+ * Simplified to focus only on font-specific validation while reusing dimension logic
  */
-function extractFontValue(node: any): ParsedUnitValue | null {
+function extractFontValue(node: any, cssProperty: string): ParsedUnitValue | null {
   if (!node) return null;
   
   switch (node.type) {
     case 'Dimension':
-      // Font-size: 16px, 1rem, etc.
+      // Font-size: 16px, 1rem, etc. (same as density handler)
       const numValue = Number(node.value);
       if (numValue <= 0) return null; // Skip zero/negative values
       
       const unit = node.unit.toLowerCase();
-      if (unit !== 'px' && unit !== 'rem') return null; // Only support px and rem for font-size
+      if (unit !== 'px' && unit !== 'rem' && unit !== '%') return null;
       
       return {
         number: numValue,
-        unit: unit as 'px' | 'rem'
+        unit: unit as 'px' | 'rem' | '%'
       };
       
     case 'Number':
-      // Font-weight: 400, 700, etc. or line-height values
+      // Font-weight: 400, 700, etc. or unitless font-size
       const numberValue = Number(node.value);
-      if (numberValue <= 0) return null; // Skip zero/negative values
-      
-      // Font-weight typically ranges from 100-900
-      // Line-height is typically 1.0-3.0, so we need to distinguish
-      if (numberValue >= 100 && numberValue <= 900) {
-        return {
-          number: numberValue,
-          unit: null
-        };
+      if (numberValue <= 0) {
+        return null; // Skip zero/negative values
       } else if (numberValue >= 1 && numberValue <= 3) {
         // This looks like a line-height value - skip it
         return null;
       }
       
-      // Could also be font-size as unitless value (rare but possible)
-      if (numberValue >= 6 && numberValue <= 100) {
-        return {
-          number: numberValue,
-          unit: null
-        };
-      }
-      
-      return null;
+      return {
+        number: numberValue,
+        unit: null
+      };
       
     case 'Identifier':
       // Font-weight keywords: normal, bold, etc.
@@ -81,39 +69,53 @@ function extractFontValue(node: any): ParsedUnitValue | null {
         return { number: 700, unit: null };
       }
       
-      // Skip other keywords (font-family names, font-style values, etc.)
       return null;
+      
+    case 'Percentage':
+      // Percentage values for font-size
+      const percentValue = Number(node.value);
+      if (percentValue === 0) return null; // Skip zero values
+      
+      return {
+        number: percentValue,
+        unit: '%'
+      };
+      
+    case 'Value':
+      // Value wrapper - extract from first child
+      return node.children?.[0] ? extractFontValue(node.children[0], cssProperty) : null;
   }
   
   return null;
 }
 
 /**
- * Filter font values for specific properties (like density handler pattern)
+ * Extract font value with property-specific validation
+ * Adds font-specific filtering on top of basic extraction
  */
 function extractFontValueForProperty(cssProperty: string) {
   return (node: any): ParsedUnitValue | null => {
-    const fontValue = extractFontValue(node);
+    const fontValue = extractFontValue(node, cssProperty);
     if (!fontValue) return null;
     
-    // For individual properties, validate the value makes sense for that property
+    // Add font-specific validation
     if (cssProperty === 'font-size') {
-      // Font-size should have units or be reasonable unitless values
+      // Font-size: must have units OR be reasonable unitless value
       return fontValue.unit || (fontValue.number >= 6 && fontValue.number <= 100) ? fontValue : null;
     } else if (cssProperty === 'font-weight') {
-      // Font-weight should be unitless and in valid range
+      // Font-weight: must be unitless and in valid range
       return !fontValue.unit && fontValue.number >= 100 && fontValue.number <= 900 ? fontValue : null;
     }
     
-    return fontValue; // For shorthand, accept all valid font values
+    // For font shorthand, accept all valid extracted values
+    return fontValue;
   };
 }
 
 /**
- * Check if node should be skipped during font traversal (like other handlers)
+ * Check if node should be skipped during font traversal
  */
 function shouldSkipFontNode(node: any): boolean {
-  // Skip CSS functions like var(), calc(), etc.
   return node.type === 'Function';
 }
 
@@ -126,6 +128,7 @@ function replaceWithHook(fontValue: string, hook: string): string {
 
 /**
  * Handle font properties by finding and replacing hardcoded values with hooks
+ * Reuses the same pattern as density handler
  */
 function handleFontProps(
   valueText: string,
@@ -135,7 +138,7 @@ function handleFontProps(
 ): void {
   const replacements: ReplacementInfo[] = [];
   
-  forEachValue(valueText, (node) => extractFontValueForProperty(cssProperty)(node), shouldSkipFontNode, (fontValue, positionInfo) => {
+  forEachValue(valueText, extractFontValueForProperty(cssProperty), shouldSkipFontNode, (fontValue, positionInfo) => {
     if (fontValue) {
       const replacement = createFontReplacement(fontValue, cssProperty, context, positionInfo);
       if (replacement) {
@@ -150,6 +153,7 @@ function handleFontProps(
 
 /**
  * Create font replacement info for shorthand auto-fix
+ * Simplified to use font-specific property resolution
  */
 function createFontReplacement(
   fontValue: ParsedUnitValue,
@@ -165,27 +169,18 @@ function createFontReplacement(
     ? `${fontValue.number}${fontValue.unit}`
     : fontValue.number.toString();
 
-  // Determine the actual CSS property for hook matching
-  let propToMatch: string;
-  if (fontValue.unit) {
-    // Has units, likely font-size
-    propToMatch = resolvePropertyToMatch('font-size');
-  } else if (fontValue.number >= 100 && fontValue.number <= 900) {
-    // Unitless in font-weight range
-    propToMatch = resolvePropertyToMatch('font-weight');
-  } else {
-    // Unitless font-size
-    propToMatch = resolvePropertyToMatch('font-size');
-  }
+  // Font-specific property resolution
+  // Font-weight: unitless values in 100-900 range, otherwise font-size
+  const propToMatch = (!fontValue.unit && fontValue.number >= 100 && fontValue.number <= 900) 
+    ? resolvePropertyToMatch('font-weight')
+    : resolvePropertyToMatch('font-size');
 
   const closestHooks = getStylingHooksForDensityValue(fontValue, context.valueToStylinghook, propToMatch);
 
-  // Use position information directly from CSS tree (already 0-based offsets)
   const start = positionInfo.start.offset;
   const end = positionInfo.end.offset;
 
   if (closestHooks.length === 1) {
-    // Has a single hook replacement
     return {
       start,
       end,
@@ -194,7 +189,6 @@ function createFontReplacement(
       hasHook: true
     };
   } else if (closestHooks.length > 1) {
-    // Multiple hooks - still has hooks, but no auto-fix
     return {
       start,
       end,
@@ -203,7 +197,6 @@ function createFontReplacement(
       hasHook: true
     };
   } else {
-    // No hooks - keep original value
     return {
       start,
       end,
