@@ -60,12 +60,9 @@ export function isInsetProperty(cssProperty: string): boolean {
 }
 
 export const fontProperties = [
+  'font',
   'font-size', 
   'font-weight'
-];
-
-export const fontShorthandProperties = [
-  'font'
 ];
 
 export const colorProperties = [

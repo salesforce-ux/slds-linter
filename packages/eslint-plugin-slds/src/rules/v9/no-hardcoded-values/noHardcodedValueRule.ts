@@ -5,7 +5,7 @@ import {
   handleDensityDeclaration,
   handleFontDeclaration 
 } from './handlers/index';
-import { colorProperties, densificationProperties, fontProperties, fontShorthandProperties, toSelector } from '../../../utils/property-matcher';
+import { colorProperties, densificationProperties, fontProperties, toSelector } from '../../../utils/property-matcher';
 import type { RuleConfig, HandlerContext } from '../../../types';
 
 
@@ -43,7 +43,6 @@ export function defineNoHardcodedValueRule(config: RuleConfig): Rule.RuleModule 
       const colorOnlySelector = toSelector(colorProperties);
       const densityOnlySelector = toSelector(densificationProperties);
       const fontDensitySelector = toSelector(fontProperties);
-      const fontShorthandSelector = toSelector(fontShorthandProperties);
 
       // Find overlapping properties that need both handlers
       // This includes exact matches and wildcard pattern matches
@@ -85,13 +84,8 @@ export function defineNoHardcodedValueRule(config: RuleConfig): Rule.RuleModule 
         };
       }
       
-      // Font density properties (font-size, font-weight)
+      // Font shorthand property, Font density properties (font-size, font-weight)
       visitors[fontDensitySelector] = (node: any) => {
-        handleFontDeclaration(node, handlerContext);
-      };
-      
-      // Font shorthand property
-      visitors[fontShorthandSelector] = (node: any) => {
         handleFontDeclaration(node, handlerContext);
       };
 
