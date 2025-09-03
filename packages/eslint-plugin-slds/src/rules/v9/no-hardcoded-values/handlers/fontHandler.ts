@@ -35,7 +35,8 @@ export const handleFontDeclaration: DeclarationHandler = (node: any, context: Ha
 };
 
 /**
- * Validate font value based on property type
+ * Validate font value based on property type or value characteristics for shorthand
+ * Only accepts what we explicitly handle in createFontReplacement
  */
 function isValidFontValue(fontValue: ParsedUnitValue, cssProperty: string): boolean {
   if (cssProperty === 'font-size') {
@@ -44,10 +45,22 @@ function isValidFontValue(fontValue: ParsedUnitValue, cssProperty: string): bool
   } else if (cssProperty === 'font-weight') {
     // Font-weight: must be unitless and a known font-weight value
     return !fontValue.unit && isKnownFontWeight(fontValue.number);
+  } else if (cssProperty === 'font') {
+    // Font shorthand: determine validation based on value characteristics
+    if (!fontValue.unit && isKnownFontWeight(fontValue.number)) {
+      // This is a font-weight value
+      return true;
+    } else if (fontValue.unit) {
+      // font-size
+      return true;
+    } else {
+      // Unitless value that's not a known font-weight - invalid
+      return false;
+    }
   }
   
-  // For font shorthand, accept all valid extracted values
-  return true;
+  // For other font properties, reject extracted values
+  return false;
 }
 
 function createFontReplacement(
