@@ -1,6 +1,8 @@
 //stylelint-sds/packages/stylelint-plugin-slds/src/utils/color-lib-utils.ts
 import { ValueToStylingHooksMapping, ValueToStylingHookEntry } from '@salesforce-ux/sds-metadata';
 import chroma from 'chroma-js';
+import { generate } from '@eslint/css-tree';
+import { isCssColorFunction } from './css-functions';
 
 const LAB_THRESHOLD = 25; // Adjust this to set how strict the matching should be
 
@@ -106,4 +108,28 @@ for (const group of closesthookGroups) {
  */
 const isValidColor = (val:string):boolean => chroma.valid(val);
 
-export { findClosestColorHook, convertToHex, isHexCode, isHardCodedColor, isValidColor };
+/**
+ * Extract color value from CSS AST node
+ */
+const extractColorValue = (node: any): string | null => {
+  let colorValue: string | null = null;
+  
+  switch (node.type) {
+    case 'Hash':
+      colorValue = `#${node.value}`;
+      break;
+    case 'Identifier':
+      colorValue = node.name;
+      break;
+    case 'Function':
+      // Only extract color functions
+      if (isCssColorFunction(node.name)) {
+        colorValue = generate(node);
+      }
+      break;
+  }
+  
+  return colorValue && isValidColor(colorValue) ? colorValue : null;
+};
+
+export { findClosestColorHook, convertToHex, isHexCode, isHardCodedColor, isValidColor, extractColorValue };

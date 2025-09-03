@@ -1,9 +1,6 @@
-import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
+import { findClosestColorHook, convertToHex, isValidColor, extractColorValue } from '../../../../utils/color-lib-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
-
-// Import @eslint/css-tree for ESLint-compatible CSS value parsing
-import { generate } from '@eslint/css-tree';
 
 // Import CSS function utilities for consistent function detection
 import { isCssFunction, isCssColorFunction } from '../../../../utils/css-functions';
@@ -24,58 +21,6 @@ import {
 export const handleColorDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
   const valueText = context.sourceCode.getText(node.value);
-  
-  // Process all color values and apply shorthand auto-fix
-  handleColorProps(valueText, cssProperty, context, node);
-};
-
-/**
- * Extract color value from CSS AST node
- */
-function extractColorValue(node: any): string | null {
-  let colorValue: string | null = null;
-  
-  switch (node.type) {
-    case 'Hash':
-      colorValue = `#${node.value}`;
-      break;
-    case 'Identifier':
-      colorValue = node.name;
-      break;
-    case 'Function':
-      // Only extract color functions
-      if (isCssColorFunction(node.name)) {
-        colorValue = generate(node);
-      }
-      break;
-  }
-  
-  return colorValue && isValidColor(colorValue) ? colorValue : null;
-}
-
-/**
- * Check if node should be skipped during traversal
- */
-function shouldSkipColorNode(node: any): boolean {
-  return node.type === 'Function' && isCssFunction(node.name);
-}
-
-/**
- * Replace color value with hook in CSS variable format
- */
-function replaceColorWithHook(colorValue: string, hook: string): string {
-  return `var(${hook}, ${colorValue})`;
-}
-
-/**
- * Handle color properties by finding and replacing hardcoded values with hooks
- */
-function handleColorProps(
-  valueText: string,
-  cssProperty: string,
-  context: HandlerContext,
-  declarationNode: any
-): void {
   const replacements: ReplacementInfo[] = [];
   
   forEachValue(valueText, extractColorValue, shouldSkipColorNode, (colorValue, positionInfo) => {
@@ -88,8 +33,19 @@ function handleColorProps(
   });
   
   // Apply shorthand auto-fix once all values are processed
-  handleShorthandAutoFix(declarationNode, context, valueText, replacements);
+  handleShorthandAutoFix(node, context, valueText, replacements);
+};
+
+
+
+/**
+ * Check if node should be skipped during traversal
+ */
+function shouldSkipColorNode(node: any): boolean {
+  return node.type === 'Function' && isCssFunction(node.name);
 }
+
+
 
 
 
@@ -128,7 +84,7 @@ function createColorReplacement(
     return {
       start,
       end,
-      replacement: replaceColorWithHook(colorValue, closestHooks[0]),
+      replacement: `var(${closestHooks[0]}, ${colorValue})`,
       displayValue: closestHooks[0],
       hasHook: true
     };
