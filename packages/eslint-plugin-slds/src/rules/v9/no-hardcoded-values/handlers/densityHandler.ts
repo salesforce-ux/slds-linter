@@ -8,7 +8,7 @@ import type { HandlerContext, DeclarationHandler } from '../../../../types';
 // Import shared utilities for common logic
 import { 
   handleShorthandAutoFix, 
-  forEachValue,
+  forEachDensityValue,
   type ReplacementInfo,
   type PositionInfo
 } from '../../../../utils/hardcoded-shared-utils';
@@ -23,7 +23,7 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
   const valueText = context.sourceCode.getText(node.value);
   const replacements: ReplacementInfo[] = [];
   
-  forEachValue(valueText, (node) => extractDimensionValue(node, cssProperty), shouldSkipDimensionNode, (parsedDimension, positionInfo) => {
+  forEachDensityValue(valueText, cssProperty, (parsedDimension, positionInfo) => {
     if (parsedDimension) {
       const replacement = createDimensionReplacement(parsedDimension, cssProperty, context, positionInfo);
       if (replacement) {
@@ -36,70 +36,7 @@ export const handleDensityDeclaration: DeclarationHandler = (node: any, context:
   handleShorthandAutoFix(node, context, valueText, replacements);
 };
 
-/**
- * Check if node should be skipped during dimension traversal
- * Skip all function nodes by default
- */
-function shouldSkipDimensionNode(node: any): boolean {
-  return node.type === 'Function';
-}
 
-/**
- * Replace dimension value with hook in CSS variable format
- */
-function replaceWithHook(dimensionValue: string, hook: string): string {
-  return `var(${hook}, ${dimensionValue})`;
-}
-
-
-/**
- * Extract dimension value from CSS AST node
- * Returns structured data with number and unit to eliminate regex parsing
- */
-function extractDimensionValue(valueNode: any, cssProperty?: string): ParsedUnitValue | null {
-  if (!valueNode) return null;
-  
-  switch (valueNode.type) {
-    case 'Dimension':
-      // Dimensions: 16px, 1rem -> extract value and unit directly from AST
-      const numValue = Number(valueNode.value);
-      if (numValue === 0) return null; // Skip zero values
-      
-      const unit = valueNode.unit.toLowerCase();
-      if (unit !== 'px' && unit !== 'rem' && unit !== '%') return null; // Support px, rem, and % units
-      
-      return {
-        number: numValue,
-        unit: unit as 'px' | 'rem' | '%'
-      };
-      
-    case 'Number':
-      // Numbers: 400, 1.5 -> treat as unitless (font-weight, line-height, etc.)
-      const numberValue = Number(valueNode.value);
-      if (numberValue === 0) return null; // Skip zero values
-      
-      return {
-        number: numberValue,
-        unit: null
-      };
-      
-    case 'Percentage':
-      // Percentage values: 100%, 50% -> extract value and add % unit
-      const percentValue = Number(valueNode.value);
-      if (percentValue === 0) return null; // Skip zero values
-      
-      return {
-        number: percentValue,
-        unit: '%'
-      };
-      
-    case 'Value':
-      // Value wrapper - extract from first child
-      return valueNode.children?.[0] ? extractDimensionValue(valueNode.children[0], cssProperty) : null;
-  }
-  
-  return null;
-}
 
 /**
  * Create dimension replacement info for shorthand auto-fix
@@ -131,7 +68,7 @@ function createDimensionReplacement(
     return {
       start,
       end,
-      replacement: replaceWithHook(rawValue, closestHooks[0]),
+      replacement: `var(${closestHooks[0]}, ${rawValue})`,
       displayValue: closestHooks[0],
       hasHook: true
     };
