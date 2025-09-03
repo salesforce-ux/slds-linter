@@ -4,6 +4,8 @@
 
 .wrapper {
   outline: 1px solid red;
+  outline-width: 1px;
+  outline-color: red;
 }
 
 .wrapper {
