@@ -97,9 +97,6 @@ export const densificationProperties = [
   'line-height'
 ]; 
 
-// Import @eslint/css-tree for robust shorthand property detection
-import * as csstree from '@eslint/css-tree';
-
 /**
  * Convert property patterns to CSS AST selector patterns
  * Handles wildcards (*) and creates proper ESLint CSS selector syntax
