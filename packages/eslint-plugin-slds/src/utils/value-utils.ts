@@ -50,7 +50,7 @@ export function parseUnitValue(value: string): ParsedUnitValue {
   if (!match) return null;
   
   const number = parseFloat(match[1]);
-  const unit = (match[2] || 'px') as 'px' | 'rem' | '%';
+  const unit = match[2] ? (match[2] as 'px' | 'rem' | '%') : null; // Keep unitless values as null
   
   if (isNaN(number)) return null;
   
