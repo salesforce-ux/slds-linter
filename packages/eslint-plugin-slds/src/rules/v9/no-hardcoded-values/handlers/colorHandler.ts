@@ -1,14 +1,11 @@
-import { findClosestColorHook, convertToHex, isValidColor, extractColorValue } from '../../../../utils/color-lib-utils';
+import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
-
-// Import CSS function utilities for consistent function detection
-import { isCssFunction, isCssColorFunction } from '../../../../utils/css-functions';
 
 // Import shared utilities for common logic
 import { 
   handleShorthandAutoFix, 
-  forEachValue,
+  forEachColorValue,
   type ReplacementInfo,
   type PositionInfo
 } from '../../../../utils/hardcoded-shared-utils';
@@ -23,7 +20,7 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
   const valueText = context.sourceCode.getText(node.value);
   const replacements: ReplacementInfo[] = [];
   
-  forEachValue(valueText, extractColorValue, shouldSkipColorNode, (colorValue, positionInfo) => {
+  forEachColorValue(valueText, (colorValue, positionInfo) => {
     if (colorValue !== 'transparent' && isValidColor(colorValue)) {
       const replacement = createColorReplacement(colorValue, cssProperty, context, positionInfo, valueText);
       if (replacement) {
@@ -35,15 +32,6 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
   // Apply shorthand auto-fix once all values are processed
   handleShorthandAutoFix(node, context, valueText, replacements);
 };
-
-
-
-/**
- * Check if node should be skipped during traversal
- */
-function shouldSkipColorNode(node: any): boolean {
-  return node.type === 'Function' && isCssFunction(node.name);
-}
 
 
 
