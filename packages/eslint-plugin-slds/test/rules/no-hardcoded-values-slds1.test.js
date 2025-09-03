@@ -59,11 +59,6 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       code: `.example { margin: 0 0 0 0; }`,
       filename: 'test.css',
     },
-    // Font shorthand with CSS variables - TODO: 16px should be ignored when adjacent to variables
-    // {
-    //   code: `.example { font: var(--font-weight-bold) 16px var(--font-family-base); }`,
-    //   filename: 'test.css',
-    // },
     // Font shorthand with zero font-size should be ignored
     {
       code: `.example { font: 0 Arial; }`,
