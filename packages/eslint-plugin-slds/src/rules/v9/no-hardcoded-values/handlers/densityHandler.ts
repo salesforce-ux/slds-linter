@@ -59,9 +59,9 @@ function createDimensionReplacement(
   const propToMatch = resolvePropertyToMatch(cssProperty);
   const closestHooks = getStylingHooksForDensityValue(parsedDimension, context.valueToStylinghook, propToMatch);
 
-  // Calculate position within the CSS value
-  const start = positionInfo.start.column - 1; // css-tree uses 1-based columns
-  const end = start + rawValue.length;
+  // Use position information directly from CSS tree (already 0-based offsets)
+  const start = positionInfo.start.offset;
+  const end = positionInfo.end.offset;
 
   if (closestHooks.length === 1) {
     // Has a single hook replacement

@@ -68,6 +68,11 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { margin: 0 0 0 0; }`,
       filename: 'test.css',
     },
+    // Line-height with CSS variables should be ignored
+    {
+      code: `.example { line-height: var(--slds-g-font-lineheight-base, 1.5); }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
@@ -133,6 +138,42 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }],
       output: `.example { font-size: var(--slds-g-font-scale-2, 1rem); }`
     },
+    // Line-height 1.25 with single suggestion (auto-fixable)
+    {
+      code: `.example { line-height: 1.25; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { line-height: var(--slds-g-font-lineheight-2, 1.25); }`
+    },
+    // Line-height 1.375 with single suggestion (auto-fixable)
+    {
+      code: `.example { line-height: 1.375; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { line-height: var(--slds-g-font-lineheight-3, 1.375); }`
+    },
+    // Line-height 1.75 with single suggestion (auto-fixable)
+    {
+      code: `.example { line-height: 1.75; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { line-height: var(--slds-g-font-lineheight-5, 1.75); }`
+    },
+    // Line-height 1.5 with multiple suggestions (no auto-fix)
+    {
+      code: `.example { line-height: 1.5; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'hardcodedValue'
+      }]
+      // No output because multiple suggestions (--slds-g-font-lineheight-base and --slds-g-font-lineheight-4)
+    },
     // Background color with multiple suggestions
     {
       code: `.example { background-color: #123456; }`,
@@ -186,6 +227,15 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         messageId: 'noReplacement'
       }]
       // Should detect #0000ff but ignore var() content
+    },
+    // Line-height with no styling hook available
+    {
+      code: `.example { line-height: 2.5; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'noReplacement'
+      }]
+      // No styling hook exists for 2.5 line-height
     },
     // Shorthand property support - padding with rem units
     {
