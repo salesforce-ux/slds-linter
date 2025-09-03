@@ -49,16 +49,17 @@ export function handleShorthandAutoFix(
     const valueColumn = valueStartColumn + start;
     
     // Create precise error location for this value
+    const { loc: { start: locStart, end: locEnd } } = declarationNode.value;
     const reportNode = {
       ...declarationNode.value,
       loc: {
         ...declarationNode.value.loc,
         start: {
-          ...declarationNode.value.loc.start,
+          ...locStart,
           column: valueColumn
         },
         end: {
-          ...declarationNode.value.loc.end,
+          ...locEnd,
           column: valueColumn + originalValue.length
         }
       }

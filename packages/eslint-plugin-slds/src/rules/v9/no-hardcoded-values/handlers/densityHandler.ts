@@ -3,8 +3,7 @@ import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
-// Import CSS function utilities for consistent function detection
-import { isCssFunction, isCssColorFunction } from '../../../../utils/css-functions';
+
 
 // Import shared utilities for common logic
 import { 
@@ -22,40 +21,6 @@ import {
 export const handleDensityDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
   const valueText = context.sourceCode.getText(node.value);
-  
-  // Process all dimension values and apply shorthand auto-fix
-  handleDensityProps(valueText, cssProperty, context, node);
-};
-
-/**
- * Check if node should be skipped during dimension traversal
- * Skip CSS functions like calc(), var(), and also color functions 
- */
-function shouldSkipDimensionNode(node: any): boolean {
-  if (node.type === 'Function') {
-    return isCssFunction(node.name) || isCssColorFunction(node.name);
-  }
-  return false;
-}
-
-/**
- * Replace dimension value with hook in CSS variable format
- */
-function replaceWithHook(dimensionValue: string, hook: string): string {
-  return `var(${hook}, ${dimensionValue})`;
-}
-
-
-
-/**
- * Handle density properties by finding and replacing hardcoded values with hooks
- */
-function handleDensityProps(
-  valueText: string,
-  cssProperty: string,
-  context: HandlerContext,
-  declarationNode: any
-): void {
   const replacements: ReplacementInfo[] = [];
   
   forEachValue(valueText, (node) => extractDimensionValue(node, cssProperty), shouldSkipDimensionNode, (parsedDimension, positionInfo) => {
@@ -68,8 +33,24 @@ function handleDensityProps(
   });
   
   // Apply shorthand auto-fix once all values are processed
-  handleShorthandAutoFix(declarationNode, context, valueText, replacements);
+  handleShorthandAutoFix(node, context, valueText, replacements);
+};
+
+/**
+ * Check if node should be skipped during dimension traversal
+ * Skip all function nodes by default
+ */
+function shouldSkipDimensionNode(node: any): boolean {
+  return node.type === 'Function';
 }
+
+/**
+ * Replace dimension value with hook in CSS variable format
+ */
+function replaceWithHook(dimensionValue: string, hook: string): string {
+  return `var(${hook}, ${dimensionValue})`;
+}
+
 
 /**
  * Extract dimension value from CSS AST node
@@ -77,7 +58,6 @@ function handleDensityProps(
  */
 function extractDimensionValue(valueNode: any, cssProperty?: string): ParsedUnitValue | null {
   if (!valueNode) return null;
-  
   
   switch (valueNode.type) {
     case 'Dimension':
