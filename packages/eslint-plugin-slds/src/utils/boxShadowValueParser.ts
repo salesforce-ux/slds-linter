@@ -1,5 +1,7 @@
 import { parse, walk } from '@eslint/css-tree';
 import { isValidColor } from './color-lib-utils';
+import { parseUnitValue, type ParsedUnitValue } from './value-utils';
+import { isCssColorFunction } from './css-functions';
 
 export interface BoxShadowValue {
   offsetX?: string;
@@ -26,11 +28,9 @@ function isColorValue(node: any): boolean {
     case 'Hash':
       return true; // #hex colors
     case 'Identifier':
-      return isValidColor(node.name); // named colors
+      return isValidColor(node.name);
     case 'Function':
-      // Color functions: rgb(), rgba(), hsl(), hsla()
-      const colorFunctions = ['rgb', 'rgba', 'hsl', 'hsla', 'color'];
-      return colorFunctions.includes(node.name.toLowerCase());
+      return isCssColorFunction(node.name.toLowerCase());
     default:
       return false;
   }
@@ -44,11 +44,11 @@ function isLengthValue(node: any): boolean {
   
   switch (node.type) {
     case 'Dimension':
-      // Length units: px, rem, em, etc.
-      const lengthUnits = ['px', 'rem', 'em', '%', 'ch', 'vh', 'vw'];
-      return lengthUnits.includes(node.unit.toLowerCase());
+      // Use existing unit parsing to validate the unit
+      const dimensionStr = `${node.value}${node.unit}`;
+      return parseUnitValue(dimensionStr) !== null;
     case 'Number':
-      // Zero values without units
+      // Zero values without units are valid lengths
       return Number(node.value) === 0;
     default:
       return false;
@@ -123,7 +123,6 @@ function extractShadowParts(valueText: string): ShadowParts[] {
     }
     
   } catch (error) {
-    // If parsing fails, return empty array
     return [];
   }
 
@@ -180,14 +179,10 @@ export function parseBoxShadowValue(value: string): BoxShadowValue[] {
 
 /**
  * Normalize length value for comparison
- * Simplified version without full unit conversion
  */
 function normalizeLengthValue(value: string | undefined): string {
   if (!value) return '0px';
-  
-  // Convert 0 to 0px for consistency
   if (value === '0') return '0px';
-  
   return value;
 }
 
