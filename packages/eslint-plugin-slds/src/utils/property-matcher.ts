@@ -60,6 +60,7 @@ export function isInsetProperty(cssProperty: string): boolean {
 }
 
 export const fontProperties = [
+  'font',
   'font-size', 
   'font-weight'
 ];

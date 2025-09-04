@@ -58,6 +58,11 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { margin: 0 0 0 0; }`,
       filename: 'test.css',
+    },
+    // Font shorthand with zero font-size should be ignored
+    {
+      code: `.example { font: 0 Arial; }`,
+      filename: 'test.css',
     }
   ],
   invalid: [

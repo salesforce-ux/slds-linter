@@ -29,6 +29,33 @@ export interface PositionInfo {
 export type ValueCallback<T> = (value: T, positionInfo?: PositionInfo) => void;
 
 /**
+ * Known valid font-weight values
+ */
+const FONT_WEIGHTS = [
+  'normal',
+  'bold', 
+  'bolder',
+  'lighter',
+  '100',
+  '200', 
+  '300',
+  '400',
+  '500',
+  '600',
+  '700',
+  '800',
+  '900'
+];
+
+/**
+ * Check if a value is a known font-weight
+ */
+export function isKnownFontWeight(value: string | number): boolean {
+  const stringValue = value.toString();
+  return FONT_WEIGHTS.includes(stringValue.toLowerCase());
+}
+
+/**
  * Generic shorthand auto-fix handler
  * Handles the common logic for reconstructing shorthand values with replacements
  */
@@ -235,4 +262,97 @@ export function forEachDensityValue(
     shouldSkipDimensionNode, 
     callback
   );
+}
+
+/**
+ * Extract font-related values from CSS AST node
+ * Handles font-size and font-weight values
+ */
+function extractFontValue(node: any): ParsedUnitValue | null {
+  if (!node) return null;
+  
+  switch (node.type) {
+    case 'Dimension':
+      // Font-size: 16px, 1rem, etc.
+      const numValue = Number(node.value);
+      if (numValue <= 0) return null; // Skip zero/negative values
+      
+      const unit = node.unit.toLowerCase();
+      if (unit !== 'px' && unit !== 'rem' && unit !== '%') return null;
+      
+      return {
+        number: numValue,
+        unit: unit as 'px' | 'rem' | '%'
+      };
+      
+    case 'Number':
+      // Font-weight: 400, 700, etc.
+      const numberValue = Number(node.value);
+      if (numberValue <= 0) {
+        return null; // Skip zero/negative values
+      }
+      
+      // Only accept known font-weight values for unitless numbers
+      if (!isKnownFontWeight(numberValue)) {
+        return null; // Skip values that aren't valid font-weights
+      }
+      
+      return {
+        number: numberValue,
+        unit: null
+      };
+      
+    case 'Identifier':
+      // Font-weight keywords: normal, bold, etc.
+      const namedValue = node.name.toLowerCase();
+      
+      // Only accept known font-weight keywords
+      if (!isKnownFontWeight(namedValue)) {
+        return null;
+      }
+      
+      // Convert known keywords to numeric values
+      if (namedValue === 'normal') {
+        return { number: 400, unit: null };
+      }
+      
+      // For other keywords (bolder, lighter), we can't determine exact numeric value
+      // but we know they're valid font-weight values
+      return { number: namedValue, unit: null };
+      
+    case 'Percentage':
+      // Percentage values for font-size
+      const percentValue = Number(node.value);
+      if (percentValue === 0) return null; // Skip zero values
+      
+      return {
+        number: percentValue,
+        unit: '%'
+      };
+      
+    case 'Value':
+      // Value wrapper - extract from first child
+      return node.children?.[0] ? extractFontValue(node.children[0]) : null;
+  }
+  
+  return null;
+}
+
+/**
+ * Check if font node should be skipped during traversal
+ * Skip all function nodes by default
+ */
+function shouldSkipFontNode(node: any): boolean {
+  return node.type === 'Function';
+}
+
+/**
+ * Specialized font value traversal
+ * Handles font-specific extraction and skipping logic
+ */
+export function forEachFontValue(
+  valueText: string,
+  callback: (fontValue: ParsedUnitValue, positionInfo: PositionInfo) => void
+): void {
+  forEachValue(valueText, extractFontValue, shouldSkipFontNode, callback);
 }

@@ -68,9 +68,23 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { margin: 0 0 0 0; }`,
       filename: 'test.css',
     },
+    // Font shorthand with zero font-size should be ignored
+    {
+      code: `.example { font: 0 Arial; }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.example { font-weight: var(--slds-g-font-weight-bold, 700); }`,
+      filename: 'test.css',
+    },
     // Line-height with CSS variables should be ignored
     {
       code: `.example { line-height: var(--slds-g-font-lineheight-base, 1.5); }`,
+      filename: 'test.css',
+    },
+    // Invalid font-weight values should be ignored (450 is not a known font-weight)
+    {
+      code: `.example { font-weight: 450; }`,
       filename: 'test.css',
     },
   ],
@@ -340,8 +354,126 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }]
       // All 4 values have single hooks, should provide autofix
     },
-    // Note: Font shorthand parsing not yet implemented, 
-    // individual font properties (font-size, line-height, etc.) are supported separately
+
+    // Font-weight tests
+    // Font-weight 400 (normal) with single suggestion
+    {
+      code: `.example { font-weight: 400; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { font-weight: var(--slds-g-font-weight-4, 400); }`
+    },
+    // Font-weight 700 (bold) with single suggestion
+    {
+      code: `.example { font-weight: 700; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { font-weight: var(--slds-g-font-weight-7, 700); }`
+    },
+    // Font-weight keyword 'normal' with single suggestion (converted to 400)
+    {
+      code: `.example { font-weight: normal; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { font-weight: var(--slds-g-font-weight-4, 400); }`
+    },
+    // Font-weight keyword 'bold' - no hook available
+    {
+      code: `.example { font-weight: bold; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'noReplacement'
+      }]
+    },
+
+    // Font shorthand tests
+    // Font shorthand: weight + size + family
+    {
+      code: `.example { font: 700 16px Arial; }`,
+      filename: 'test.css',
+      errors: [
+        { messageId: 'hardcodedValue' }, // font-weight: 700
+        { messageId: 'hardcodedValue' }  // font-size: 16px
+      ],
+      output: `.example { font: var(--slds-g-font-weight-7, 700) var(--slds-g-font-scale-2, 16px) Arial; }`
+    },
+    // Font shorthand: keyword weight + size + family (bold has no hook, but font-size does)
+    {
+      code: `.example { font: bold 1rem 'Helvetica Neue'; }`,
+      filename: 'test.css',
+      errors: [
+        { messageId: 'noReplacement' }, // font-weight: bold (no hook available)
+        { messageId: 'hardcodedValue' }  // font-size: 1rem
+      ],
+      output: `.example { font: bold var(--slds-g-font-scale-2, 1rem) 'Helvetica Neue'; }`
+    },
+    // Font shorthand: size/line-height + family (line-height not parsed from shorthand yet)
+    {
+      code: `.example { font: 16px/1.5 Arial; }`,
+      filename: 'test.css',
+      errors: [
+        { messageId: 'hardcodedValue' }  // font-size: 16px only (line-height parsing not implemented)
+      ],
+      output: `.example { font: var(--slds-g-font-scale-2, 16px)/1.5 Arial; }`
+    },
+    // Font shorthand: weight + size/line-height + family (line-height not parsed from shorthand yet)
+    {
+      code: `.example { font: 400 14px/1.25 'Times New Roman'; }`,
+      filename: 'test.css',
+      errors: [
+        { messageId: 'hardcodedValue' }, // font-weight: 400
+        { messageId: 'hardcodedValue' }  // font-size: 14px (line-height parsing not implemented)
+      ],
+      output: `.example { font: var(--slds-g-font-weight-4, 400) var(--slds-g-font-scale-1, 14px)/1.25 'Times New Roman'; }`
+    },
+    // Font shorthand: normal weight + percentage size (normal has hook, percentage doesn't)
+    {
+      code: `.example { font: normal 120% Georgia; }`,
+      filename: 'test.css',
+      errors: [
+        { messageId: 'hardcodedValue' }, // font-weight: normal (converted to 400)
+        { messageId: 'noReplacement' }   // font-size: 120% (no hook available)
+      ],
+      output: `.example { font: var(--slds-g-font-weight-4, 400) 120% Georgia; }`
+    },
+    // Font shorthand: complex with multiple values (bold has no hook, font-size does)
+    {
+      code: `.example { font: bold 0.875rem/1.375 'Segoe UI', sans-serif; }`,
+      filename: 'test.css',
+      errors: [
+        { messageId: 'noReplacement' }, // font-weight: bold (no hook available)
+        { messageId: 'hardcodedValue' } // font-size: 0.875rem (line-height parsing not implemented)
+      ],
+      output: `.example { font: bold var(--slds-g-font-scale-1, 0.875rem)/1.375 'Segoe UI', sans-serif; }`
+    },
+
+    // Edge cases and mixed scenarios
+    // Font shorthand with only some hardcoded values
+    {
+      code: `.example { font: var(--weight-variable) 16px Arial; }`,
+      filename: 'test.css',
+      errors: [
+        { messageId: 'hardcodedValue' }  // font-size: 16px only
+      ],
+      output: `.example { font: var(--weight-variable) var(--slds-g-font-scale-2, 16px) Arial; }`
+    },
+
+    // Font shorthand with line-height (line-height parsing from shorthand not implemented yet)
+    {
+      code: `.example { font: 700 1rem/1.5 Arial; }`,
+      filename: 'test.css',
+      errors: [
+        { messageId: 'hardcodedValue' }, // font-weight: 700
+        { messageId: 'hardcodedValue' }  // font-size: 1rem (line-height parsing not implemented)
+      ],
+      output: `.example { font: var(--slds-g-font-weight-7, 700) var(--slds-g-font-scale-2, 1rem)/1.5 Arial; }`
+    }
   ]
 });
 
