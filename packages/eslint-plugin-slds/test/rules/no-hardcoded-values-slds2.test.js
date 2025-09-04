@@ -73,6 +73,26 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { font: 0 Arial; }`,
       filename: 'test.css',
     },
+    // Font shorthand with SLDS variables should be ignored
+    {
+      code: `.example { font: var(--slds-g-font-weight-bold, 700) var(--slds-g-font-scale-2, 1rem) sans-serif; }`,
+      filename: 'test.css',
+    },
+    // Box-shadow with SLDS variables should be ignored
+    {
+      code: `.example { box-shadow: var(--slds-g-shadow-1, 0px 0px 1.5px 0px #00000017); }`,
+      filename: 'test.css',
+    },
+    // Box-shadow with nested fallbacks should be ignored
+    {
+      code: `.example { box-shadow: var(--slds-g-shadow-2, var(--custom-shadow, 2px 2px 4px rgba(0,0,0,0.1))); }`,
+      filename: 'test.css',
+    },
+    // Box-shadow with 'none' value should be ignored
+    {
+      code: `.example { box-shadow: none; }`,
+      filename: 'test.css',
+    },
     {
       code: `.example { font-weight: var(--slds-g-font-weight-bold, 700); }`,
       filename: 'test.css',
@@ -338,6 +358,17 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }]
       // First has hook, second doesn't in SLDS2
     },
+    // FONT SHORTHAND TESTS
+    // Font shorthand with font-size (auto-fixable)
+    {
+      code: `.example { font: 16px Arial; }`,
+      filename: 'test.css',
+      output: `.example { font: var(--slds-g-font-scale-2, 16px) Arial; }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Font-size 16px should be auto-fixed
+    },
     // Color shorthand with identical values that have single hooks - should autofix
     {
       code: `.example { border-color: #001639 #001639 #001639 #001639; }`,
@@ -354,7 +385,36 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }]
       // All 4 values have single hooks, should provide autofix
     },
-
+    // BOX-SHADOW TESTS
+    // Box-shadow with exact hook match (auto-fixable)
+    {
+      code: `.test-cls2 { box-shadow: 0px 0px 1.5px 0px #00000017, 0px 1.4px 1.5px 0px #00000017, 0px -1px 1px 0px #00000009; }`,
+      filename: 'test.css',
+      output: `.test-cls2 { box-shadow: var(--slds-g-shadow-1, 0px 0px 1.5px 0px #00000017, 0px 1.4px 1.5px 0px #00000017, 0px -1px 1px 0px #00000009); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Complex box-shadow with exact hook match should be auto-fixed
+    },
+    // Box-shadow with another exact hook match (auto-fixable)
+    {
+      code: `.test-cls2 { box-shadow: 0px 0px 4.5px 0px #00000014, 0px 4.2px 4.5px 0px #00000017, 0px -1px 1.44px 0px #00000008; }`,
+      filename: 'test.css',
+      output: `.test-cls2 { box-shadow: var(--slds-g-shadow-3, 0px 0px 4.5px 0px #00000014, 0px 4.2px 4.5px 0px #00000017, 0px -1px 1.44px 0px #00000008); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Another complex box-shadow with exact hook match should be auto-fixed
+    },
+    // Box-shadow with no hook match
+    {
+      code: `.example { box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'noReplacement'
+      }]
+      // Custom box-shadow with no matching hook should report no replacement
+    },
     // Font-weight tests
     // Font-weight 400 (normal) with single suggestion
     {
