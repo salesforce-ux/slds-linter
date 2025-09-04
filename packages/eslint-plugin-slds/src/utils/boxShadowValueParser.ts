@@ -1,4 +1,4 @@
-import { parse, walk } from '@eslint/css-tree';
+import { parse, walk, generate } from '@eslint/css-tree';
 import { isValidColor } from './color-lib-utils';
 import { parseUnitValue, type ParsedUnitValue } from './value-utils';
 import { isCssColorFunction } from './css-functions';
@@ -63,30 +63,6 @@ function isInsetKeyword(node: any): boolean {
 }
 
 /**
- * Convert CSS tree node to string representation
- */
-function nodeToString(node: any): string {
-  if (!node) return '';
-  
-  switch (node.type) {
-    case 'Dimension':
-      return `${node.value}${node.unit}`;
-    case 'Number':
-      return node.value.toString();
-    case 'Hash':
-      return `#${node.value}`;
-    case 'Identifier':
-      return node.name;
-    case 'Function':
-      // This is a simplified function serialization
-      // For full serialization, we'd need to walk the function's children
-      return `${node.name}(...)`;
-    default:
-      return '';
-  }
-}
-
-/**
  * Extract shadow parts from CSS tree nodes
  */
 function extractShadowParts(valueText: string): ShadowParts[] {
@@ -110,9 +86,9 @@ function extractShadowParts(valueText: string): ShadowParts[] {
         if (isInsetKeyword(node)) {
           currentShadow.inset = true;
         } else if (isLengthValue(node)) {
-          currentShadow.lengthParts.push(nodeToString(node));
+          currentShadow.lengthParts.push(generate(node));
         } else if (isColorValue(node)) {
-          currentShadow.colorParts.push(nodeToString(node));
+          currentShadow.colorParts.push(generate(node));
         }
       }
     });
