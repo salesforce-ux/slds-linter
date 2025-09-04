@@ -385,9 +385,6 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }]
       // All 4 values have single hooks, should provide autofix
     },
-    // Note: Font shorthand parsing not yet implemented, 
-    // individual font properties (font-size, line-height, etc.) are supported separately
-    
     // BOX-SHADOW TESTS
     // Box-shadow with exact hook match (auto-fixable)
     {

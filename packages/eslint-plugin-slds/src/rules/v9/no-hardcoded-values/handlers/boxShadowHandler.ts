@@ -18,7 +18,6 @@ function containsCssVariable(valueText: string): boolean {
 
 /**
  * Handle box-shadow declarations using CSS tree parsing
- * Follows the same pattern as color and density handlers but with complete value matching
  */
 export const handleBoxShadowDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
@@ -30,20 +29,42 @@ export const handleBoxShadowDeclaration: DeclarationHandler = (node: any, contex
   }
   
   // Box-shadow uses complete value matching, not individual value extraction
-  handleBoxShadowProps(valueText, cssProperty, context, node);
+  const replacements: ReplacementInfo[] = [];
+  
+  // Parse and find matching hooks for the complete box-shadow value
+  const parsedCssValue = parseAndValidateBoxShadow(valueText);
+  if (parsedCssValue) {
+    const shadowHooks = getBoxShadowHooks(context.valueToStylinghook);
+    const closestHooks = findMatchingBoxShadowHooks(parsedCssValue, shadowHooks);
+    
+    // Create position info for the entire box-shadow value
+    // hardcoded position is needed for string manipulation, not error reporting
+    const positionInfo: PositionInfo = {
+      start: { offset: 0, line: 1, column: 1 },
+      end: { offset: valueText.length, line: 1, column: valueText.length + 1 }
+    };
+    
+    const replacement = createBoxShadowReplacement(
+      valueText,
+      closestHooks,
+      context,
+      positionInfo
+    );
+    
+    if (replacement) {
+      replacements.push(replacement);
+    }
+  }
+  
+  // Apply shorthand auto-fix once processing is complete
+  handleShorthandAutoFix(node, context, valueText, replacements);
 };
 
-/**
- * Replace box-shadow value with hook in CSS variable format
- */
-function replaceBoxShadowWithHook(shadowValue: string, hook: string): string {
-  return `var(${hook}, ${shadowValue})`;
-}
 
 /**
  * Extract box-shadow hook entries from styling hooks mapping
  */
-function shadowValueToHookEntries(supportedStylinghooks: ValueToStylingHooksMapping): Array<[string, string[]]> {
+function getBoxShadowHooks(supportedStylinghooks: ValueToStylingHooksMapping): Array<[string, string[]]> {
   return Object.entries(supportedStylinghooks).filter(([key, value]) => {
     return value.some((hook) => hook.properties.includes('box-shadow'));
   }).map(([key, value]) => {
@@ -63,76 +84,48 @@ function parseAndValidateBoxShadow(cssValue: string): BoxShadowValue[] | null {
 }
 
 /**
- * Handle box-shadow properties by finding and replacing complete values with hooks
- * Unlike other handlers, box-shadow matches complete values rather than individual components
+ * Find matching hooks for a parsed box-shadow value
  */
-function handleBoxShadowProps(
-  valueText: string,
-  cssProperty: string,
-  context: HandlerContext,
-  declarationNode: any
-): void {
-  const shadowHooks = shadowValueToHookEntries(context.valueToStylinghook);
-  const parsedCssValue = parseAndValidateBoxShadow(valueText);
-  
-  if (!parsedCssValue) {
-    return; // No valid box-shadow values found
-  }
-
+function findMatchingBoxShadowHooks(
+  parsedCssValue: BoxShadowValue[], 
+  shadowHooks: Array<[string, string[]]>
+): string[] {
   // Try to find a matching hook for the complete box-shadow value
   for (const [shadowHookValue, closestHooks] of shadowHooks) {
     const parsedHookValue = parseAndValidateBoxShadow(shadowHookValue);
     
     if (parsedHookValue && isBoxShadowMatch(parsedCssValue, parsedHookValue)) {
-      // Found a matching hook - create replacement
-      const replacement = createBoxShadowReplacement(
-        valueText,
-        closestHooks,
-        declarationNode,
-        context
-      );
-      
-      if (replacement) {
-        // Apply the replacement using shared auto-fix logic
-        handleShorthandAutoFix(declarationNode, context, valueText, [replacement]);
-      }
-      return; // Exit after first match
+      return closestHooks;
     }
   }
   
-  // No matching hooks found - report the value without replacement
-  const noReplacementInfo = createBoxShadowReplacement(
-    valueText,
-    [], // No hooks
-    declarationNode,
-    context
-  );
-  
-  if (noReplacementInfo) {
-    handleShorthandAutoFix(declarationNode, context, valueText, [noReplacementInfo]);
-  }
+  return []; // No matching hooks found
 }
 
 /**
  * Create box-shadow replacement info for shorthand auto-fix
- * Handles the complete box-shadow value as a single unit
+ * Returns replacement data or null if no valid replacement
  */
 function createBoxShadowReplacement(
   originalValue: string,
   hooks: string[],
-  declarationNode: any,
-  context: HandlerContext
+  context: HandlerContext,
+  positionInfo: PositionInfo
 ): ReplacementInfo | null {
-  // For box-shadow, we replace the entire value
-  const start = 0;
-  const end = originalValue.length;
+  if (!positionInfo?.start) {
+    return null;
+  }
+
+  // Use position information directly from CSS tree (already 0-based offsets)
+  const start = positionInfo.start.offset;
+  const end = positionInfo.end.offset;
 
   if (hooks.length === 1) {
-    // Has a single hook replacement
+    // Has a single hook replacement - should provide autofix
     return {
       start,
       end,
-      replacement: replaceBoxShadowWithHook(originalValue, hooks[0]),
+      replacement: `var(${hooks[0]}, ${originalValue})`,
       displayValue: hooks[0],
       hasHook: true
     };
