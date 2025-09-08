@@ -3,7 +3,7 @@ import { FileScanner } from '../services/file-scanner';
 import { LintRunner } from '../services/lint-runner';
 import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
 import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
-import { DEFAULT_ESLINT_CONFIG_PATH, DEFAULT_STYLELINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
+import { DEFAULT_ESLINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
 import { LintResult, LintConfig, ReportConfig } from '../types';
 import { normalizeCliOptions } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
@@ -22,7 +22,6 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     // Normalize configuration to ensure all required fields have values
     const normalizedConfig = normalizeCliOptions(config, {
       configEslint: DEFAULT_ESLINT_CONFIG_PATH,
-      configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
     });
     
     // Scan directory for style files (CSS, SCSS, etc.)
@@ -37,25 +36,15 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
       batchSize: 100,
     });
     
-    const { fix, configStylelint, configEslint } = normalizedConfig;
+    const { fix, configEslint } = normalizedConfig;
     
-    // Run linting on style files
-    const styleResults = await LintRunner.runLinting(styleFiles, 'style', {
-      fix,
-      configPath: configStylelint,
-    });
-    
-    // Combine all files into a single array for unified processing
-    const allFiles = [...styleFiles, ...componentFiles];
-    // Run linting on all files
-    const allResults = await LintRunner.runLinting(allFiles, 'component', {
+    // Run ESLint on all files
+    const lintResults = await LintRunner.runLinting([...styleFiles, ...componentFiles], 'component', {
       fix,
       configPath: configEslint,
     });
     
-    // Combine results from both linters
-    const combinedResults = [...styleResults, ...allResults];
-    return standardizeLintMessages(combinedResults);
+    return standardizeLintMessages(lintResults);
   } catch (error: any) {
     // Enhance error with context for better debugging
     const errorMessage = `Linting failed: ${error.message}`;
@@ -78,7 +67,6 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
     
     // Normalize configuration to ensure all required fields have values
     const normalizedConfig = normalizeCliOptions(config, {
-      configStylelint: DEFAULT_STYLELINT_CONFIG_PATH,
       configEslint: DEFAULT_ESLINT_CONFIG_PATH,
     });
     

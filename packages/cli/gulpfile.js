@@ -3,7 +3,6 @@ import { esbuildPluginFilePathExtensions } from "esbuild-plugin-file-path-extens
 import { series, watch } from 'gulp';
 import { task } from "gulp-execa";
 import { rimraf } from 'rimraf';
-import stylelintPackage from "stylelint/package.json" with {type:"json"};
 import eslintPackage from "eslint/package.json" with {type:"json"};
 import pkg from "./package.json" with {type:"json"};
 
@@ -30,7 +29,6 @@ const compileTs = async ()=>{
     packages:'external',
     sourcemap:ENABLE_SOURCE_MAPS,
     define:{
-      'process.env.STYLELINT_VERSION': `"${stylelintPackage.version}"`,
       'process.env.ESLINT_VERSION': `"${eslintPackage.version}"`,
       'process.env.CLI_VERSION': `"${pkg.version}"`,
       'process.env.CLI_DESCRIPTION': `"${pkg.description}"`

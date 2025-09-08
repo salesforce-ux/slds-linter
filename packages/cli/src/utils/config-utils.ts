@@ -86,7 +86,6 @@ export function normalizeCliOptions<T extends CliOptions | LintConfig | ReportCo
   // Set up defaults based on context
   const baseDefaults: Partial<CliOptions> = {
     files: [],
-    configStylelint: "",
     configEslint: "",
     fix: false,
     editor: detectCurrentEditor(),

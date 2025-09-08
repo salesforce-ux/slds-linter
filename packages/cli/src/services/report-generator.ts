@@ -5,7 +5,7 @@ import { LintResult, LintResultEntry, SarifResultEntry } from '../types';
 import { SarifBuilder, SarifRunBuilder, SarifResultBuilder, SarifRuleBuilder } from 'node-sarif-builder';
 import { createWriteStream } from 'fs';
 import { JsonStreamStringify } from 'json-stream-stringify';
-import {getRuleDescription} from "./config.resolver";
+import { getRuleDescription } from './config.resolver';
 import { parseText, replaceNamespaceinRules, transformedResults } from '../utils/lintResultsUtil';
 import { Readable } from 'stream';
 import { processArtifacts } from './artifact-processor';
