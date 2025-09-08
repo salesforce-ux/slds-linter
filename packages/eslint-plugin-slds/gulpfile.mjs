@@ -50,6 +50,10 @@ const compileTs = async () => {
           {
             search: /from\s+['"]@salesforce-ux\/sds-metadata['"]/g,
             replace: "from '@salesforce-ux/sds-metadata/next'"
+          },
+          {
+            search: /import\s+ruleConfigs\s+from\s+['"]\.\.\/eslint\.rules\.json['"]/g,
+            replace: "import ruleConfigs from '../eslint.rules.internal.json'"
           }
         ]
       })

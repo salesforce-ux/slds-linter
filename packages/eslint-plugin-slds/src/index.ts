@@ -22,6 +22,9 @@ import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-
 import htmlParser from "@html-eslint/parser";
 import cssPlugin from "@eslint/css";
 
+// Import rule configurations based on persona
+import ruleConfigs from '../eslint.rules.json';
+
 const rules = {
   "enforce-bem-usage": enforceBemUsage,
   "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
@@ -65,11 +68,7 @@ Object.assign(plugin.configs, {
       plugins: {
         "@salesforce-ux/slds": plugin
       },
-      rules: {
-        "@salesforce-ux/slds/enforce-bem-usage": "error",
-        "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
-        "@salesforce-ux/slds/modal-close-button-issue": "error"
-      }
+      rules: ruleConfigs.html
     },
     // CSS config - Standard CSS files
     {
@@ -83,33 +82,13 @@ Object.assign(plugin.configs, {
         css: cssPlugin,
         "@salesforce-ux/slds": plugin
       },
-      rules: {
-        "@salesforce-ux/slds/no-slds-class-overrides": "warn",
-        "@salesforce-ux/slds/no-deprecated-slds-classes": "warn",
-        "@salesforce-ux/slds/no-deprecated-tokens-slds1": "error",
-        "@salesforce-ux/slds/lwc-token-to-slds-hook": "error",
-        "@salesforce-ux/slds/enforce-bem-usage": "warn",
-        "@salesforce-ux/slds/enforce-sds-to-slds-hooks": "warn",
-        "@salesforce-ux/slds/no-sldshook-fallback-for-lwctoken": "warn",
-        "@salesforce-ux/slds/no-unsupported-hooks-slds2": "warn",
-        "@salesforce-ux/slds/no-slds-var-without-fallback": "warn",
-        "@salesforce-ux/slds/no-slds-namespace-for-custom-hooks": "warn",
-        "@salesforce-ux/slds/enforce-component-hook-naming-convention": "error",
-        "@salesforce-ux/slds/no-slds-private-var": "warn",
-        "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
-        "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn",
-        "@salesforce-ux/slds/reduce-annotations": "warn"
-      }
+      rules: ruleConfigs.css
     }
   ],
   // legacy config for ESLint v8-
   recommended: {
     plugins: ["@salesforce-ux/slds"],
-    rules: {
-      "@salesforce-ux/slds/enforce-bem-usage": "error",
-      "@salesforce-ux/slds/no-deprecated-classes-slds2": "error",
-      "@salesforce-ux/slds/modal-close-button-issue": "error"
-    },
+    rules: ruleConfigs.html,
     parser: htmlParser,
     parserOptions: {
       ecmaVersion: 2021,

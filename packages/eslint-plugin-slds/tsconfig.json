@@ -9,6 +9,7 @@
     "noEmitOnError": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "typeRoots": ["./src/types", "./node_modules/@types", "../../node_modules/@types"]
   },
   "include": ["./src/**/*.ts"],
