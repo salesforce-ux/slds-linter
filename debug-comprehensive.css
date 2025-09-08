@@ -1,0 +1,25 @@
+/* Should be detected by font handler -> density handler */
+.font-test {
+  font-weight: bold;
+}
+
+/* Should be detected by density handler only */
+.density-test {
+  height: 100px;
+}
+
+/* Should be detected by density handler only - PERCENTAGE VALUES */
+.percentage-test {
+  width: 50%;
+}
+
+/* Should be detected by color handler only */
+.color-test {
+  color: #ff0000;
+}
+
+/* Mixed property - should be detected by both handlers */
+.border-test {
+  border: 1px solid #ff0000;
+}
+

@@ -1,0 +1,43 @@
+ℹ Starting lint process...
+
+
+ℹ demo/small-set/hardcoded-values.css
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:15:1015:10]8;;  There's no replacement styling hook for the 25% static value. Remove the static value. (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:31:1431:14]8;;  Consider replacing the 1rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-spacing-4 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:35:1435:14]8;;  Consider replacing the 0.875rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-font-scale-1 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:39:1539:15]8;;  Consider replacing the 0px 0px 1.5px 0px #00000017, 0px 1.4px 1.5px 0px #00000017, 0px -1px 1px 0px #00000009 static value with an SLDS 2 styling hook that has a similar value: --slds-g-shadow-1 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:43:1543:15]8;;  Consider replacing the 0px 0px 4.5px 0px #00000014, 0px 4.2px 4.5px 0px #00000017, 0px -1px 1.44px 0px #00000008 static value with an SLDS 2 styling hook that has a similar value: --slds-g-shadow-3 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:62:1862:18]8;;  Consider replacing the 1rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-spacing-4 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:63:1763:17]8;;  Consider replacing the 1rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-spacing-4 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:89:1789:17]8;;  Consider replacing the 0.5rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-spacing-2 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:96:1596:15]8;;  Consider replacing the 1rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-spacing-4 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:97:1897:18]8;;  Consider replacing the 1rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-spacing-4 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:115:15115:15]8;;  There's no replacement styling hook for the 1px static value. Remove the static value. (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:116:17116:17]8;;  There's no replacement styling hook for the 1px static value. Remove the static value. (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:117:18117:18]8;;  There's no replacement styling hook for the 1px static value. Remove the static value. (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:118:16118:16]8;;  There's no replacement styling hook for the 1px static value. Remove the static value. (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:127:10127:10]8;;  Consider replacing the 20rem static value with an SLDS 2 styling hook that has a similar value: --slds-g-sizing-15 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:155:10155:10]8;;  There's no replacement styling hook for the 50% static value. Remove the static value. (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:159:20159:20]8;;  Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: 
+1. --slds-g-color-palette-neutral-100
+2. --slds-g-color-neutral-base-100
+3. --slds-g-color-brand-base-100
+4. --slds-g-color-error-base-100
+5. --slds-g-color-warning-base-100 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:160:16160:16]8;;  Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: 
+1. --slds-g-color-palette-neutral-100
+2. --slds-g-color-neutral-base-100
+3. --slds-g-color-brand-base-100
+4. --slds-g-color-error-base-100
+5. --slds-g-color-warning-base-100 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:161:9161:9]8;;  Consider replacing the #fff static value with an SLDS 2 styling hook that has a similar value: 
+1. --slds-g-color-palette-neutral-100
+2. --slds-g-color-neutral-base-100
+3. --slds-g-color-brand-base-100
+4. --slds-g-color-error-base-100
+5. --slds-g-color-warning-base-100 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+⚠   ]8;;cursor://file//Users/ritesh.kumar2/Documents/projects/stylelint-sds/demo/small-set/hardcoded-values.css:162:9162:9]8;;  Consider replacing the #05628a static value with an SLDS 2 styling hook that has a similar value: --slds-g-color-palette-cloud-blue-40 (slds/no-hardcoded-values-slds2).  slds/no-hardcoded-values-slds2
+ℹ 
+0 errors  20 warnings
+✓ 
+Linting completed in 0.23 seconds.

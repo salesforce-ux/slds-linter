@@ -1,0 +1,8 @@
+.test {
+  border-radius: 100%;
+  width: 50%; 
+  margin: 25%;
+  font-weight: bold;
+  padding: calc(10px + 5px);
+}
+

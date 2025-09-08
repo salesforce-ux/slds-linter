@@ -1,0 +1,13 @@
+.wrapper {
+  background: white;
+}
+
+.wrapper {
+  outline: var(--slds-g-sizing-border-1, 1px) solid red;
+  outline-width: var(--slds-g-sizing-border-1, 1px);
+  outline-color: red;
+}
+
+.wrapper {
+  outline-width: 2px;
+}
