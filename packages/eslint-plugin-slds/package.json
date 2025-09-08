@@ -11,13 +11,15 @@
     "./config": {
       "import": "./eslint.config.mjs",
       "require": "./eslint.config.mjs"
-    }
+    },
+    "./rule-messages.yml": "./src/config/rule-messages.yml"
   },
   "files": [
     "build/**",
     "README.md",
     "RULES.md",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "src/config/rule-messages.yml"
   ],
   "engines": {
     "node": ">=18.18.0"

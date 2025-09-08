@@ -5,7 +5,6 @@
   "type": "module",
   "workspaces": [
     "packages/eslint-plugin-slds",
-    "packages/stylelint-plugin-slds",
     "packages/cli"
   ],
   "packageManager": "yarn@4.2.2",

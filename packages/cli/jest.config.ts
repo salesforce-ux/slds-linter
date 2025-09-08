@@ -8,7 +8,11 @@ const jestConfig: JestConfigWithTsJest = {
       useESM: true,
       tsconfig: "tsconfig.spec.json"
     }],
+    '^.+\\.(yml|yaml)$': '<rootDir>/jest-yaml-transform.mjs',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@salesforce-ux/eslint-plugin-slds)/)'
+  ],
   testPathIgnorePatterns: [
     "<rootDir>/build/",
     "<rootDir>/node_modules/"
@@ -21,7 +25,7 @@ const jestConfig: JestConfigWithTsJest = {
     "lcov",
     "json-summary"
   ],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'yml', 'yaml'],
   roots: ['<rootDir>'],
   testEnvironment: 'node',
   verbose: true,

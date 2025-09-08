@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "@salesforce-ux/eslint-plugin-slds": "0.5.0-internal",
-    "@salesforce-ux/stylelint-plugin-slds": "0.5.0-internal",
     "@typescript-eslint/eslint-plugin": "^8.36.0",
     "@typescript-eslint/parser": "^8.36.0",
     "chalk": "^4.1.2",
@@ -49,13 +48,13 @@
     "json-stream-stringify": "^3.1.6",
     "node-sarif-builder": "^3.2.0",
     "ora": "^5.4.1",
-    "semver": "^7.7.1",
-    "stylelint": "16.14.1"
+    "semver": "^7.7.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
-    "ts-jest": "^29.2.5"
+    "ts-jest": "^29.2.5",
+    "yaml": "^2.8.1"
   },
   "engines": {
     "node": ">=18.18.0"

@@ -8,7 +8,7 @@ SLDS Linter checks your Aura and Lightning web components' CSS and markup files 
 
 ## Features
 
-SLDS Linter is a custom-built linting solution based on open source [Stylelint](https://stylelint.io/) and [ESLint](https://eslint.org/) projects. It supports linting for both types of Lightning components. 
+SLDS Linter is a custom-built linting solution based on open source [ESLint](https://eslint.org/) with CSS support. It supports linting for both types of Lightning components. 
 
 SLDS Linter runs on these types of files.
 
@@ -100,7 +100,6 @@ These options are available on SLDS Linter commands.
 | `-d, --directory <path>` | Target directory to scan (defaults to current directory). Supports glob patterns.                     | `lint`, `report` |
 | `-o, --output <path>`    | Output directory for reports (defaults to current directory)                 | `report`                                     |
 | `--fix`                  | Automatically fix problems                                                   | `lint`         |
-| `--config-stylelint <path>`  | Path to stylelint config file             | `lint`, `report`|
 | `--config-eslint <path>` | Path to eslint config file                    | `lint`, `report`|
 | `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Auto-detects if not specified | `lint` |
 | `--format <type>`        | Output format (sarif, csv). Defaults to sarif | `report` |
@@ -112,8 +111,7 @@ To view help for these options, add `--help` to each command. For example, run `
 
 To enhance your linting and error analysis experience, we recommend that you install these VS Code extensions. These extensions significantly improve your development workflow and make it easier to navigate and address linting issues.
 
-- *[ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)*:  Essential for JavaScript and TypeScript linting, it checks your code and flags any violations of the ESLint rules with squiggly lines to show you what to fix.
-- *[Stylelint Extension](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint)*: When linting CSS, SCSS, or other stylesheets, this tool highlights errors with squiggly lines.
+- *[ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)*:  Essential for JavaScript, TypeScript, HTML, and CSS linting, it checks your code and flags any violations of the ESLint rules with squiggly lines to show you what to fix.
 
 ## Best Practices
 
