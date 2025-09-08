@@ -12,7 +12,7 @@
       "import": "./eslint.config.mjs",
       "require": "./eslint.config.mjs"
     },
-    "./rule-messages": "./src/config/rule-messages.yml"
+    "./rule-messages.yml": "./src/config/rule-messages.yml"
   },
   "files": [
     "build/**",

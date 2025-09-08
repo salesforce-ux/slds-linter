@@ -5,8 +5,39 @@ import { task } from "gulp-execa";
 import { rimraf } from 'rimraf';
 import eslintPackage from "eslint/package.json" with {type:"json"};
 import pkg from "./package.json" with {type:"json"};
+import { parse } from 'yaml';
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE!=='release';
+
+/**
+ * esbuild plugin to handle YAML imports
+ */
+const yamlPlugin = {
+  name: 'yaml',
+  setup(build) {
+    build.onResolve({ filter: /\.ya?ml$/ }, args => {
+      // Handle package imports vs relative imports
+      const resolvedPath = args.path.startsWith('.') 
+        ? resolve(dirname(args.importer), args.path)
+        : require.resolve(args.path, { paths: [dirname(args.importer)] });
+      
+      return {
+        path: resolvedPath,
+        namespace: 'yaml-file',
+        external: false  // Mark as internal to bundle into output
+      };
+    });
+    build.onLoad({ filter: /.*/, namespace: 'yaml-file' }, args => ({
+      contents: `export default ${JSON.stringify(parse(readFileSync(args.path, 'utf8')), null, 2)};`,
+      loader: 'js',
+    }));
+  },
+};
 
 /**
  * Clean all generated folder
@@ -33,9 +64,12 @@ const compileTs = async ()=>{
       'process.env.CLI_VERSION': `"${pkg.version}"`,
       'process.env.CLI_DESCRIPTION': `"${pkg.description}"`
     },
-    plugins:[esbuildPluginFilePathExtensions({
-      esmExtension:"js"
-    })]
+    plugins:[
+      yamlPlugin,
+      esbuildPluginFilePathExtensions({
+        esmExtension:"js"
+      })
+    ]
   })
 };
 
