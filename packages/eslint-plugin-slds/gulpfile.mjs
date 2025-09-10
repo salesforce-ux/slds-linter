@@ -38,27 +38,39 @@ function cleanDirs(){
   * Compile typescript files with version injection
   * */
 const compileTs = async () => {
-  const isInternal = process.env.TARGET_PERSONA === 'internal';
+  const targetPersona = process.env.TARGET_PERSONA || 'external';
+  const validPersonas = ['external', 'internal', 'slds1', 'slds2'];
+  
+  if (!validPersonas.includes(targetPersona)) {
+    throw new Error(`Invalid TARGET_PERSONA: ${targetPersona}. Valid options: ${validPersonas.join(', ')}`);
+  }
+  
+  console.log(`Building for persona: ${targetPersona}`);
   
   const plugins = [yamlPlugin];
   
-  if (isInternal) {
-    plugins.push(
-      conditionalReplacePlugin({
-        filter: /\.ts$/,
-        replacements: [
-          {
-            search: /from\s+['"]@salesforce-ux\/sds-metadata['"]/g,
-            replace: "from '@salesforce-ux/sds-metadata/next'"
-          },
-          {
-            search: /import\s+ruleConfigs\s+from\s+['"]\.\.\/eslint\.rules\.json['"]/g,
-            replace: "import ruleConfigs from '../eslint.rules.internal.json'"
-          }
-        ]
-      })
-    );
+  // Configure persona-specific replacements
+  const replacements = [
+    {
+      search: /import\s+ruleConfigs\s+from\s+['"]\.\.\/eslint\.rules\.json['"]/g,
+      replace: `import ruleConfigs from '../eslint.rules.${targetPersona}.json'`
+    }
+  ];
+  
+  // Add internal-specific replacements
+  if (targetPersona === 'internal') {
+    replacements.push({
+      search: /from\s+['"]@salesforce-ux\/sds-metadata['"]/g,
+      replace: "from '@salesforce-ux/sds-metadata/next'"
+    });
   }
+  
+  plugins.push(
+    conditionalReplacePlugin({
+      filter: /\.ts$/,
+      replacements
+    })
+  );
   
   await esbuild.build({
     entryPoints: ["./src/**/*.ts"],

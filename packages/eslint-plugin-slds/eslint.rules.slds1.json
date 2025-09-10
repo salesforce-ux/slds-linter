@@ -1,0 +1,22 @@
+{
+  "css": {
+    "@salesforce-ux/slds/enforce-bem-usage": "error",
+    "@salesforce-ux/slds/modal-close-button-issue": "error", 
+    "@salesforce-ux/slds/no-deprecated-classes-slds2": "warn",
+    "@salesforce-ux/slds/enforce-component-hook-naming-convention": "warn",
+    "@salesforce-ux/slds/enforce-sds-to-slds-hooks": "error",
+    "@salesforce-ux/slds/no-slds-class-overrides": "warn",
+    "@salesforce-ux/slds/no-slds-private-var": "warn",
+    "@salesforce-ux/slds/no-slds-namespace-for-custom-hooks": "warn",
+    "@salesforce-ux/slds/reduce-annotations": "warn",
+    "@salesforce-ux/slds/length-zero-no-unit": "warn",
+    "@salesforce-ux/slds/no-deprecated-tokens-slds1": "error",
+    "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
+    "@salesforce-ux/slds/lwc-token-to-slds-hook": "error"
+  },
+  "html": {
+    "@salesforce-ux/slds/enforce-bem-usage": "error",
+    "@salesforce-ux/slds/no-deprecated-classes-slds2": "warn",
+    "@salesforce-ux/slds/modal-close-button-issue": "error"
+  }
+}
