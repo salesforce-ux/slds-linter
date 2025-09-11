@@ -1,5 +1,6 @@
 {
   "css": {
+    "@salesforce-ux/slds/enforce-bem-usage": "warn",
     "@salesforce-ux/slds/no-slds-class-overrides": "warn",
     "@salesforce-ux/slds/no-deprecated-slds-classes": "warn",
     "@salesforce-ux/slds/no-deprecated-tokens-slds1": "error",
