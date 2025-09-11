@@ -54,37 +54,44 @@ const plugin = {
   configs: {}
 };
 
+const cssConfigArray = [
+  // CSS config - Standard CSS files
+  {
+    files: ["**/*.{css,scss}"],
+    language: "css/css",
+    ...cssPlugin.configs.recommended,
+    languageOptions: {
+      tolerant: true  // Allow recoverable parsing errors for SCSS syntax
+    },
+    plugins: {
+      css: cssPlugin,
+      "@salesforce-ux/slds": plugin
+    },
+    rules: ruleConfigs.css
+  }
+];
+
+const htmlConfigArray = [
+  // HTML/Component config
+  {
+    files: ["**/*.html", "**/*.cmp"],
+    languageOptions: {
+      parser: htmlParser,
+      ecmaVersion: 2021,
+      sourceType: "module"
+    },
+    plugins: {
+      "@salesforce-ux/slds": plugin
+    },
+    rules: ruleConfigs.html
+  }
+];
+
 Object.assign(plugin.configs, {
   // Flat config for ESLint v9+
-  "flat/recommended": [
-    // HTML/Component config
-    {
-      files: ["**/*.html", "**/*.cmp"],
-      languageOptions: {
-        parser: htmlParser,
-        ecmaVersion: 2021,
-        sourceType: "module"
-      },
-      plugins: {
-        "@salesforce-ux/slds": plugin
-      },
-      rules: ruleConfigs.html
-    },
-    // CSS config - Standard CSS files
-    {
-      files: ["**/*.{css,scss}"],
-      language: "css/css",
-      ...cssPlugin.configs.recommended,
-      languageOptions: {
-        tolerant: true  // Allow recoverable parsing errors for SCSS syntax
-      },
-      plugins: {
-        css: cssPlugin,
-        "@salesforce-ux/slds": plugin
-      },
-      rules: ruleConfigs.css
-    }
-  ],
+  "flat/recommended-css": cssConfigArray,
+  "flat/recommended-html": htmlConfigArray,
+  "flat/recommended": [...cssConfigArray, ...htmlConfigArray],
   // legacy config for ESLint v8-
   recommended: {
     plugins: ["@salesforce-ux/slds"],
