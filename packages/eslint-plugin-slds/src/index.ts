@@ -67,7 +67,11 @@ const cssConfigArray = [
       css: cssPlugin,
       "@salesforce-ux/slds": plugin
     },
-    rules: ruleConfigs.css
+    rules: ruleConfigs.css,
+    settings: {
+      // Pass rules configuration to context for runtime access
+      sldsRules: { ...ruleConfigs.css }
+    }
   }
 ];
 
