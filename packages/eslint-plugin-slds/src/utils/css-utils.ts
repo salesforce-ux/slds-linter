@@ -31,36 +31,22 @@ export interface CssVariableInfo {
  * Extract CSS variable information from var() function nodes
  * Used specifically for SLDS variable fallback detection
  */
-function extractCssVariable(node: any): CssVariableInfo | null {
+function extractSldsVariable(node: any): CssVariableInfo | null {
   if (!node || node.type !== 'Function' || node.name !== 'var') {
     return null;
   }
 
-  // The children are in the node.children property as an array-like structure
-  // We need to access the first child to get the variable name
-  let firstChild = null;
-  let hasComma = false;
-  
-  // Check if node has children and iterate through them
-  if (node.children) {
-    // children is an iterable but not always an array
-    const childrenArray = Array.from(node.children);
-    
-    if (childrenArray.length === 0) {
-      return null;
-    }
-    
-    firstChild = childrenArray[0];
-    
-    // Check if there's a comma (fallback separator)
-    hasComma = childrenArray.some((child: any) => 
-      child.type === 'Operator' && child.value === ','
-    );
-  } else {
+  if (!node.children) {
     return null;
   }
 
-  // First child should be the variable name (Identifier)
+  // Convert children to array and get the first child (variable name)
+  const childrenArray = Array.from(node.children);
+  if (childrenArray.length === 0) {
+    return null;
+  }
+  
+  const firstChild = childrenArray[0] as any;
   if (!firstChild || firstChild.type !== 'Identifier') {
     return null;
   }
@@ -70,22 +56,16 @@ function extractCssVariable(node: any): CssVariableInfo | null {
     return null;
   }
 
-  // Reconstruct the function text for replacement
-  const functionText = `var(${variableName}${hasComma ? ', ...' : ''})`;
+  // Check if there's a fallback (comma separator)
+  const hasFallback = childrenArray.some((child: any) => 
+    child.type === 'Operator' && child.value === ','
+  );
 
   return {
     name: variableName,
-    hasFallback: hasComma,
-    functionText
+    hasFallback,
+    functionText: `var(${variableName}${hasFallback ? ', ...' : ''})`
   };
-}
-
-/**
- * Check if CSS variable node should be skipped during traversal
- * We don't skip any nodes since we want to find all var() functions
- */
-function shouldSkipVariableNode(node: any): boolean {
-  return false; // Don't skip any nodes - we want to traverse everything
 }
 
 /**
@@ -96,5 +76,5 @@ export function forEachSldsVariable(
   valueText: string,
   callback: (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => void
 ): void {
-  forEachValue(valueText, extractCssVariable, shouldSkipVariableNode, callback);
+  forEachValue(valueText, extractSldsVariable, () => false, callback);
 }
