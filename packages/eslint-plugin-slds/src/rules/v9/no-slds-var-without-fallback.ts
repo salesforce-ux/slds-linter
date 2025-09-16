@@ -1,6 +1,14 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages.yml';
+import { 
+  forEachSldsVariable, 
+  type CssVariableInfo
+} from '../../utils/css-utils';
+import { 
+  type PositionInfo, 
+  type ReplacementInfo 
+} from '../../utils/hardcoded-shared-utils';
 
 const ruleConfig = ruleMessages['no-slds-var-without-fallback'];
 const { type, description, url, messages } = ruleConfig;
@@ -9,22 +17,74 @@ const { type, description, url, messages } = ruleConfig;
 const sldsVariables = metadata.slds1ExcludedVars || {};
 
 /**
- * Check if a CSS variable name starts with --slds-
+ * Handler for processing SLDS variables found in CSS values
  */
-function isSldsCssVariable(cssVar: string): boolean {
-  return cssVar.startsWith('--slds-');
-}
-
-/**
- * Checks if a var() function has a fallback value by looking for an Operator node with value ","
- */
-function hasFallbackValue(varFunctionNode: any): boolean {
-  if (!varFunctionNode || !varFunctionNode.children) return false;
+function handleSldsVariables(
+  declarationNode: any,
+  context: Rule.RuleContext,
+  valueText: string
+): void {
+  const replacements: ReplacementInfo[] = [];
   
-  // Look for an Operator node with value "," which indicates a fallback parameter
-  return varFunctionNode.children.some((child: any) => 
-    child.type === 'Operator' && child.value === ','
-  );
+  // Use AST parsing to find all SLDS variables
+  forEachSldsVariable(valueText, (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => {
+    const { name: cssVar, hasFallback } = variableInfo;
+    
+    // Skip if variable already has a fallback
+    if (hasFallback) {
+      return;
+    }
+    
+    // Check if we have a fallback value for this SLDS variable
+    const fallbackValue = sldsVariables[cssVar];
+    if (!fallbackValue) {
+      return; // No fallback available in metadata
+    }
+    
+    // Calculate position information for precise error reporting
+    const start = positionInfo.start?.offset || 0;
+    const end = positionInfo.end?.offset || start;
+    
+    // Create the replacement with fallback
+    const replacement = `var(${cssVar}, ${fallbackValue})`;
+    const displayValue = cssVar;
+    
+    replacements.push({
+      start,
+      end,
+      replacement,
+      displayValue,
+      hasHook: true // We have a fallback value available
+    });
+  });
+  
+  // If we have replacements, report them with a single combined fix
+  if (replacements.length > 0) {
+    // Create a new value with all SLDS variables fixed
+    let newValue = valueText;
+    
+    // Apply all replacements from right to left to maintain string positions
+    const sortedReplacements = replacements.sort((a, b) => b.start - a.start);
+    sortedReplacements.forEach(({ start: rStart, end: rEnd, replacement: rReplacement }) => {
+      newValue = newValue.substring(0, rStart) + rReplacement + newValue.substring(rEnd);
+    });
+
+    // Report each variable separately but with the same combined fix
+    replacements.forEach(({ displayValue }) => {
+      context.report({
+        node: declarationNode,
+        messageId: 'varWithoutFallback',
+        data: { 
+          cssVar: displayValue, 
+          recommendation: sldsVariables[displayValue] 
+        },
+        fix(fixer) {
+          // All variables get the same combined fix
+          return fixer.replaceText(declarationNode.value, newValue);
+        }
+      });
+    });
+  }
 }
 
 export default {
@@ -40,46 +100,19 @@ export default {
   },
   
   create(context) {
-    function reportAndFix(node, cssVar, fallbackValue) {
-      context.report({
-        node,
-        messageId: 'varWithoutFallback',
-        data: { cssVar, recommendation: fallbackValue },
-        fix(fixer) {
-          // Get the var() function node that contains this identifier
-          const varFunctionNode = context.sourceCode.getAncestors(node).at(-1);
-          
-          // Replace the entire var() function with one that includes the fallback
-          const varWithFallback = `var(${cssVar}, ${fallbackValue})`;
-          return fixer.replaceText(varFunctionNode, varWithFallback);
-        }
-      });
-    }
-
     return {
-      // Handle SLDS tokens inside var() functions: var(--slds-*)
-      "Function[name='var'] Identifier[name=/^--slds-/]"(node) {
-        const cssVar = node.name;
+      // Handle all CSS declarations - unified approach using AST parsing
+      "Declaration"(node) {
+        // Get the text representation of the value
+        const valueString = context.sourceCode.getText(node.value);
         
-        if (!isSldsCssVariable(cssVar)) {
+        // Skip if no value
+        if (!valueString) {
           return;
         }
-
-        // Get the var() function node that contains this identifier
-        const varFunctionNode = context.sourceCode.getAncestors(node).at(-1);
         
-        if (hasFallbackValue(varFunctionNode)) {
-          return;
-        }
-
-        // Check if we have a fallback value for this SLDS variable
-        const fallbackValue = sldsVariables[cssVar];
-        
-        if (!fallbackValue) {
-          return;
-        }
-
-        reportAndFix(node, cssVar, fallbackValue);
+        // Use AST parsing to handle all SLDS variables consistently
+        handleSldsVariables(node, context, valueString);
       }
     };
   },
