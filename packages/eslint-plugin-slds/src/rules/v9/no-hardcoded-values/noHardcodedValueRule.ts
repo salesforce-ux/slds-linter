@@ -7,6 +7,7 @@ import {
   handleBoxShadowDeclaration
 } from './handlers/index';
 import { colorProperties, densificationProperties, fontProperties, toSelector } from '../../../utils/property-matcher';
+import { isRuleEnabled } from '../../../utils/rule-utils';
 import type { RuleConfig, HandlerContext } from '../../../types';
 
 
@@ -17,8 +18,8 @@ import type { RuleConfig, HandlerContext } from '../../../types';
  * Uses property-matcher.ts to ensure comprehensive coverage without missing properties
  * Complex cases like box-shadow will be handled in future iterations
  */
-export function defineNoHardcodedValueRule(config: RuleConfig): Rule.RuleModule {
-  const { ruleConfig } = config;
+export function defineNoHardcodedValueRule(config: RuleConfig & { ruleName?: string }): Rule.RuleModule {
+  const { ruleConfig, ruleName } = config;
   const { type, description, url, messages } = ruleConfig;
 
   return {
@@ -34,6 +35,11 @@ export function defineNoHardcodedValueRule(config: RuleConfig): Rule.RuleModule 
     },
     
     create(context) {
+      if (ruleName === 'no-hardcoded-values-slds1' && 
+          isRuleEnabled(context, '@salesforce-ux/slds/no-hardcoded-values-slds2')) {
+        return {};
+      }
+
       // Create handler context
       const handlerContext: HandlerContext = {
         valueToStylinghook: config.valueToStylinghook,
