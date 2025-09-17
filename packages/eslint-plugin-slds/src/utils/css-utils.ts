@@ -1,3 +1,8 @@
+import { 
+  forEachValue, 
+  type PositionInfo 
+} from './hardcoded-shared-utils';
+
 /**
  * Check if a CSS property should be targeted for linting based on prefixes or explicit targets
  * @param property - The CSS property name to check
@@ -11,4 +16,63 @@ export function isTargetProperty(property: string, propertyTargets: string[] = [
     || property.startsWith('--lwc-')
     || propertyTargets.length === 0
     || propertyTargets.includes(property);
+}
+
+/**
+ * CSS Variable information for SLDS variable detection
+ */
+export interface CssVariableInfo {
+  name: string;           // Variable name: --slds-g-color-surface-1
+  hasFallback: boolean;   // Whether var() already has a fallback
+}
+
+/**
+ * Extract CSS variable information from var() function nodes
+ * Used specifically for SLDS variable fallback detection
+ */
+function extractSldsVariable(node: any): CssVariableInfo | null {
+  if (!node || node.type !== 'Function' || node.name !== 'var') {
+    return null;
+  }
+
+  if (!node.children) {
+    return null;
+  }
+
+  // Convert children to array and get the first child (variable name)
+  const childrenArray = Array.from(node.children);
+  if (childrenArray.length === 0) {
+    return null;
+  }
+  
+  const firstChild = childrenArray[0] as any;
+  if (!firstChild || firstChild.type !== 'Identifier') {
+    return null;
+  }
+
+  const variableName = firstChild.name;
+  if (!variableName || !variableName.startsWith('--slds-')) {
+    return null;
+  }
+
+  // Check if there's a fallback (comma separator)
+  const hasFallback = childrenArray.some((child: any) => 
+    child.type === 'Operator' && child.value === ','
+  );
+
+  return {
+    name: variableName,
+    hasFallback
+  };
+}
+
+/**
+ * Specialized CSS variable traversal for SLDS variables
+ * Finds var(--slds-*) functions and reports their fallback status
+ */
+export function forEachSldsVariable(
+  valueText: string,
+  callback: (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => void
+): void {
+  forEachValue(valueText, extractSldsVariable, () => false, callback);
 }
