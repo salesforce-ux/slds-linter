@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients for different layers -->
+    <linearGradient id="inputGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e3f2fd;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#bbdefb;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="eslintGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f3e5f5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e1bee7;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="contextGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff3e0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffcc02;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="analysisGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fce4ec;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f8bbd9;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="outputGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f1f8e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c8e6c9;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Arrow marker -->
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+              refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+      </marker>
+    </defs>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="600" y="30" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="24" font-weight="bold" fill="#333">
+    🏗️ Context-Aware Linting Architecture
+  </text>
+
+  <!-- Input Layer -->
+  <g id="inputLayer">
+    <rect x="50" y="60" width="1100" height="80" rx="10" fill="url(#inputGradient)" 
+          stroke="#2196f3" stroke-width="2"/>
+    <text x="600" y="85" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="16" font-weight="bold" fill="#1976d2">
+      📁 INPUT FILES
+    </text>
+    
+    <!-- CSS Files -->
+    <rect x="80" y="100" width="120" height="30" rx="5" fill="#ffffff" 
+          stroke="#2196f3" stroke-width="1"/>
+    <text x="140" y="118" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="12" fill="#333">button.css</text>
+    
+    <rect x="220" y="100" width="120" height="30" rx="5" fill="#ffffff" 
+          stroke="#2196f3" stroke-width="1"/>
+    <text x="280" y="118" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="12" fill="#333">modal.css</text>
+    
+    <!-- HTML Files -->
+    <rect x="880" y="100" width="120" height="30" rx="5" fill="#ffffff" 
+          stroke="#2196f3" stroke-width="1"/>
+    <text x="940" y="118" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="12" fill="#333">button.html</text>
+    
+    <rect x="1020" y="100" width="120" height="30" rx="5" fill="#ffffff" 
+          stroke="#2196f3" stroke-width="1"/>
+    <text x="1080" y="118" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="12" fill="#333">modal.html</text>
+  </g>
+
+  <!-- Arrow from Input to ESLint -->
+  <line x1="600" y1="150" x2="600" y2="170" stroke="#666" stroke-width="3" 
+        marker-end="url(#arrowhead)"/>
+
+  <!-- ESLint Layer -->
+  <g id="eslintLayer">
+    <rect x="50" y="180" width="1100" height="120" rx="10" fill="url(#eslintGradient)" 
+          stroke="#9c27b0" stroke-width="2"/>
+    <text x="600" y="205" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="16" font-weight="bold" fill="#7b1fa2">
+      🔧 ESLINT ENGINE
+    </text>
+    
+    <!-- Standard Rule -->
+    <rect x="200" y="220" width="200" height="60" rx="8" fill="#ffffff" 
+          stroke="#9c27b0" stroke-width="1"/>
+    <text x="300" y="240" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="12" font-weight="bold" fill="#333">Standard Rule</text>
+    <text x="300" y="255" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">no-hardcoded-values-slds2</text>
+    <text x="300" y="270" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">Generic suggestions</text>
+    
+    <!-- Enhanced Rule -->
+    <rect x="800" y="220" width="200" height="60" rx="8" fill="#fff3e0" 
+          stroke="#ff9800" stroke-width="2"/>
+    <text x="900" y="240" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="12" font-weight="bold" fill="#333">🎯 Enhanced Rule</text>
+    <text x="900" y="255" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">no-hardcoded-values-slds2-enhanced</text>
+    <text x="900" y="270" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">Context-aware suggestions</text>
+  </g>
+
+  <!-- Arrow from ESLint to Context -->
+  <line x1="900" y1="310" x2="900" y2="330" stroke="#666" stroke-width="3" 
+        marker-end="url(#arrowhead)"/>
+
+  <!-- Context Analysis Layer -->
+  <g id="contextLayer">
+    <rect x="50" y="340" width="1100" height="120" rx="10" fill="url(#contextGradient)" 
+          stroke="#ff9800" stroke-width="2"/>
+    <text x="600" y="365" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="16" font-weight="bold" fill="#f57c00">
+      🧠 CONTEXT ANALYSIS ENGINE
+    </text>
+    
+    <!-- Context Collector -->
+    <rect x="100" y="380" width="180" height="60" rx="8" fill="#ffffff" 
+          stroke="#ff9800" stroke-width="1"/>
+    <text x="190" y="395" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">📂 Context Collector</text>
+    <text x="190" y="408" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Find related files</text>
+    <text x="190" y="420" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Detect component types</text>
+    <text x="190" y="432" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Extract semantics</text>
+    
+    <!-- Suggestion Scorer -->
+    <rect x="320" y="380" width="180" height="60" rx="8" fill="#ffffff" 
+          stroke="#ff9800" stroke-width="1"/>
+    <text x="410" y="395" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">📊 Suggestion Scorer</text>
+    <text x="410" y="408" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Multi-factor scoring</text>
+    <text x="410" y="420" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Confidence calculation</text>
+    <text x="410" y="432" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Hook prioritization</text>
+    
+    <!-- Message Generator -->
+    <rect x="920" y="380" width="180" height="60" rx="8" fill="#ffffff" 
+          stroke="#ff9800" stroke-width="1"/>
+    <text x="1010" y="395" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">📝 Message Generator</text>
+    <text x="1010" y="408" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Rich message creation</text>
+    <text x="1010" y="420" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Educational content</text>
+    <text x="1010" y="432" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Contextual explanations</text>
+  </g>
+
+  <!-- Arrow from Context to Analysis -->
+  <line x1="600" y1="470" x2="600" y2="490" stroke="#666" stroke-width="3" 
+        marker-end="url(#arrowhead)"/>
+
+  <!-- Property Analysis Layer -->
+  <g id="analysisLayer">
+    <rect x="50" y="500" width="1100" height="120" rx="10" fill="url(#analysisGradient)" 
+          stroke="#e91e63" stroke-width="2"/>
+    <text x="600" y="525" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="16" font-weight="bold" fill="#c2185b">
+      🔍 PROPERTY-SPECIFIC ANALYSIS
+    </text>
+    
+    <!-- Color Analysis -->
+    <rect x="100" y="540" width="140" height="60" rx="8" fill="#ffffff" 
+          stroke="#e91e63" stroke-width="1"/>
+    <text x="170" y="555" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">🎯 Colors</text>
+    <text x="170" y="568" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Brand colors</text>
+    <text x="170" y="580" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Theme awareness</text>
+    <text x="170" y="592" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• State-based</text>
+    
+    <!-- Density Analysis -->
+    <rect x="280" y="540" width="140" height="60" rx="8" fill="#ffffff" 
+          stroke="#e91e63" stroke-width="1"/>
+    <text x="350" y="555" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">📏 Spacing</text>
+    <text x="350" y="568" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Layout patterns</text>
+    <text x="350" y="580" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Density analysis</text>
+    <text x="350" y="592" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Component sizing</text>
+    
+    <!-- Shadow Analysis -->
+    <rect x="780" y="540" width="140" height="60" rx="8" fill="#ffffff" 
+          stroke="#e91e63" stroke-width="1"/>
+    <text x="850" y="555" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">🌫️ Shadows</text>
+    <text x="850" y="568" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Elevation context</text>
+    <text x="850" y="580" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Component shadows</text>
+    <text x="850" y="592" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Interaction states</text>
+    
+    <!-- Font Analysis -->
+    <rect x="960" y="540" width="140" height="60" rx="8" fill="#ffffff" 
+          stroke="#e91e63" stroke-width="1"/>
+    <text x="1030" y="555" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">✏️ Fonts</text>
+    <text x="1030" y="568" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Typography hierarchy</text>
+    <text x="1030" y="580" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Font scale</text>
+    <text x="1030" y="592" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Accessibility</text>
+  </g>
+
+  <!-- Arrow from Analysis to Output -->
+  <line x1="600" y1="630" x2="600" y2="650" stroke="#666" stroke-width="3" 
+        marker-end="url(#arrowhead)"/>
+
+  <!-- Output Layer -->
+  <g id="outputLayer">
+    <rect x="50" y="660" width="1100" height="200" rx="10" fill="url(#outputGradient)" 
+          stroke="#4caf50" stroke-width="2"/>
+    <text x="600" y="685" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="16" font-weight="bold" fill="#388e3c">
+      📤 ENHANCED OUTPUT
+    </text>
+    
+    <!-- Enhanced Violation Example -->
+    <rect x="100" y="700" width="1000" height="140" rx="8" fill="#ffffff" 
+          stroke="#4caf50" stroke-width="1"/>
+    
+    <text x="120" y="720" font-family="Arial, sans-serif" 
+          font-size="12" font-weight="bold" fill="#333">
+      🎯 Context-Aware Violation Example:
+    </text>
+    
+    <rect x="120" y="730" width="960" height="100" rx="5" fill="#f8f8f8" 
+          stroke="#ddd" stroke-width="1"/>
+    
+    <text x="140" y="750" font-family="Monaco, monospace" 
+          font-size="11" fill="#d32f2f">
+      Replace '#0176d3' with '--slds-c-button-brand-color-background'
+    </text>
+    <text x="140" y="765" font-family="Monaco, monospace" 
+          font-size="11" fill="#1976d2">
+      (button component context)
+    </text>
+    
+    <text x="140" y="785" font-family="Arial, sans-serif" 
+          font-size="10" fill="#388e3c" font-weight="bold">
+      85% confidence based on:
+    </text>
+    <text x="140" y="800" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">
+      • Component contains button elements
+    </text>
+    <text x="140" y="815" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">
+      • Matches background-color property
+    </text>
+  </g>
+
+  <!-- Data Flow Arrows -->
+  <g id="dataFlowArrows">
+    <!-- Context Collector to Scorer -->
+    <line x1="280" y1="410" x2="320" y2="410" stroke="#ff9800" stroke-width="2" 
+          marker-end="url(#arrowhead)"/>
+    
+    <!-- Scorer to Message Generator -->
+    <line x1="500" y1="410" x2="920" y2="410" stroke="#ff9800" stroke-width="2" 
+          marker-end="url(#arrowhead)"/>
+    
+    <!-- Analysis components to output -->
+    <line x1="170" y1="600" x2="300" y2="700" stroke="#e91e63" stroke-width="2" 
+          marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+    <line x1="350" y1="600" x2="400" y2="700" stroke="#e91e63" stroke-width="2" 
+          marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+    <line x1="850" y1="600" x2="800" y2="700" stroke="#e91e63" stroke-width="2" 
+          marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+    <line x1="1030" y1="600" x2="900" y2="700" stroke="#e91e63" stroke-width="2" 
+          marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+  </g>
+
+  <!-- Side Labels -->
+  <g id="sideLabels">
+    <text x="20" y="105" font-family="Arial, sans-serif" font-size="12" 
+          fill="#666" transform="rotate(-90, 20, 105)">INPUT</text>
+    <text x="20" y="245" font-family="Arial, sans-serif" font-size="12" 
+          fill="#666" transform="rotate(-90, 20, 245)">PROCESSING</text>
+    <text x="20" y="405" font-family="Arial, sans-serif" font-size="12" 
+          fill="#666" transform="rotate(-90, 20, 405)">ANALYSIS</text>
+    <text x="20" y="565" font-family="Arial, sans-serif" font-size="12" 
+          fill="#666" transform="rotate(-90, 20, 565)">HANDLERS</text>
+    <text x="20" y="765" font-family="Arial, sans-serif" font-size="12" 
+          fill="#666" transform="rotate(-90, 20, 765)">OUTPUT</text>
+  </g>
+
+  <!-- Legend -->
+  <g id="legend">
+    <rect x="850" y="870" width="300" height="25" rx="5" fill="#f5f5f5" 
+          stroke="#ddd" stroke-width="1"/>
+    <text x="860" y="885" font-family="Arial, sans-serif" font-size="10" 
+          fill="#666">Legend:</text>
+    <line x1="900" y1="882" x2="920" y2="882" stroke="#666" stroke-width="2"/>
+    <text x="925" y="885" font-family="Arial, sans-serif" font-size="9" 
+          fill="#666">Data Flow</text>
+    <line x1="980" y1="882" x2="1000" y2="882" stroke="#666" stroke-width="2" 
+          stroke-dasharray="3,3"/>
+    <text x="1005" y="885" font-family="Arial, sans-serif" font-size="9" 
+          fill="#666">Analysis Results</text>
+  </g>
+</svg>

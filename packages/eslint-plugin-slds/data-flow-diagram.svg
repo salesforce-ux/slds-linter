@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="processGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f5e8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c8e6c9;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="dataGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff3e0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffcc02;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="resultGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e3f2fd;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#bbdefb;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Arrow markers -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    
+    <marker id="dataArrow" markerWidth="10" markerHeight="7" 
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ff9800" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="800" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="500" y="30" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="22" font-weight="bold" fill="#333">
+    🔄 Context-Aware Linting Data Flow
+  </text>
+
+  <!-- Step 1: File Discovery -->
+  <g id="step1">
+    <circle cx="120" cy="100" r="40" fill="url(#processGradient)" 
+            stroke="#4caf50" stroke-width="3"/>
+    <text x="120" y="90" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="20" fill="#333">1️⃣</text>
+    <text x="120" y="105" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">FILE</text>
+    <text x="120" y="115" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">DISCOVERY</text>
+    
+    <rect x="200" y="70" width="150" height="60" rx="8" fill="url(#dataGradient)" 
+          stroke="#ff9800" stroke-width="1"/>
+    <text x="275" y="85" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">📁 Files Found</text>
+    <text x="275" y="98" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• button.css, modal.css</text>
+    <text x="275" y="110" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• button.html, modal.html</text>
+    <text x="275" y="122" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Related components</text>
+  </g>
+
+  <!-- Arrow 1 to 2 -->
+  <path d="M 160 100 Q 200 100 240 150" stroke="#333" stroke-width="3" 
+        fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Step 2: Context Analysis -->
+  <g id="step2">
+    <circle cx="280" cy="200" r="40" fill="url(#processGradient)" 
+            stroke="#4caf50" stroke-width="3"/>
+    <text x="280" y="190" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="20" fill="#333">2️⃣</text>
+    <text x="280" y="205" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">CONTEXT</text>
+    <text x="280" y="215" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">ANALYSIS</text>
+    
+    <rect x="360" y="170" width="150" height="60" rx="8" fill="url(#dataGradient)" 
+          stroke="#ff9800" stroke-width="1"/>
+    <text x="435" y="185" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">🧠 Context Built</text>
+    <text x="435" y="198" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Component: Button</text>
+    <text x="435" y="210" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• SLDS classes detected</text>
+    <text x="435" y="222" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Semantic context</text>
+  </g>
+
+  <!-- Arrow 2 to 3 -->
+  <path d="M 320 200 Q 380 200 420 250" stroke="#333" stroke-width="3" 
+        fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Step 3: Property Analysis -->
+  <g id="step3">
+    <circle cx="460" cy="300" r="40" fill="url(#processGradient)" 
+            stroke="#4caf50" stroke-width="3"/>
+    <text x="460" y="290" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="20" fill="#333">3️⃣</text>
+    <text x="460" y="305" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">PROPERTY</text>
+    <text x="460" y="315" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">ANALYSIS</text>
+    
+    <rect x="540" y="270" width="150" height="60" rx="8" fill="url(#dataGradient)" 
+          stroke="#ff9800" stroke-width="1"/>
+    <text x="615" y="285" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">🔍 Values Found</text>
+    <text x="615" y="298" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• #0176d3 (background)</text>
+    <text x="615" y="310" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• 8px (padding)</text>
+    <text x="615" y="322" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Hardcoded values</text>
+  </g>
+
+  <!-- Arrow 3 to 4 -->
+  <path d="M 500 300 Q 560 300 600 350" stroke="#333" stroke-width="3" 
+        fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Step 4: Suggestion Scoring -->
+  <g id="step4">
+    <circle cx="640" cy="400" r="40" fill="url(#processGradient)" 
+            stroke="#4caf50" stroke-width="3"/>
+    <text x="640" y="390" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="20" fill="#333">4️⃣</text>
+    <text x="640" y="405" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">SUGGESTION</text>
+    <text x="640" y="415" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">SCORING</text>
+    
+    <rect x="720" y="370" width="180" height="60" rx="8" fill="url(#dataGradient)" 
+          stroke="#ff9800" stroke-width="1"/>
+    <text x="810" y="385" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">📊 Scored Suggestions</text>
+    <text x="810" y="398" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• --slds-c-button-brand... (85%)</text>
+    <text x="810" y="410" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• --slds-g-color-blue... (60%)</text>
+    <text x="810" y="422" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">• Confidence ranking</text>
+  </g>
+
+  <!-- Arrow 4 to 5 -->
+  <path d="M 680 400 Q 740 400 780 450" stroke="#333" stroke-width="3" 
+        fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Step 5: Message Generation -->
+  <g id="step5">
+    <circle cx="820" cy="500" r="40" fill="url(#processGradient)" 
+            stroke="#4caf50" stroke-width="3"/>
+    <text x="820" y="490" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="20" fill="#333">5️⃣</text>
+    <text x="820" y="505" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">MESSAGE</text>
+    <text x="820" y="515" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">GENERATION</text>
+    
+    <rect x="600" y="570" width="300" height="80" rx="8" fill="url(#resultGradient)" 
+          stroke="#2196f3" stroke-width="1"/>
+    <text x="750" y="585" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="11" font-weight="bold" fill="#333">📤 Enhanced Output</text>
+    <text x="750" y="600" text-anchor="middle" font-family="Monaco, monospace" 
+          font-size="8" fill="#d32f2f">Replace '#0176d3' with</text>
+    <text x="750" y="612" text-anchor="middle" font-family="Monaco, monospace" 
+          font-size="8" fill="#d32f2f">'--slds-c-button-brand-color-background'</text>
+    <text x="750" y="625" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="8" fill="#1976d2">(button component context)</text>
+    <text x="750" y="640" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="8" fill="#388e3c">85% confidence - component contains buttons</text>
+  </g>
+
+  <!-- Arrow 5 to output -->
+  <line x1="820" y1="540" x2="750" y2="570" stroke="#333" stroke-width="3" 
+        marker-end="url(#arrowhead)"/>
+
+  <!-- Parallel Processing Indicators -->
+  <g id="parallelProcessing">
+    <!-- Color Analysis -->
+    <rect x="50" y="350" width="120" height="40" rx="5" fill="#fce4ec" 
+          stroke="#e91e63" stroke-width="1"/>
+    <text x="110" y="365" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">🎯 Color Analysis</text>
+    <text x="110" y="378" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="8" fill="#666">Brand colors, themes</text>
+    
+    <!-- Spacing Analysis -->
+    <rect x="50" y="400" width="120" height="40" rx="5" fill="#fce4ec" 
+          stroke="#e91e63" stroke-width="1"/>
+    <text x="110" y="415" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">📏 Spacing Analysis</text>
+    <text x="110" y="428" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="8" fill="#666">Layout patterns</text>
+    
+    <!-- Shadow Analysis -->
+    <rect x="50" y="450" width="120" height="40" rx="5" fill="#fce4ec" 
+          stroke="#e91e63" stroke-width="1"/>
+    <text x="110" y="465" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">🌫️ Shadow Analysis</text>
+    <text x="110" y="478" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="8" fill="#666">Elevation context</text>
+    
+    <!-- Arrows from parallel processing to main flow -->
+    <line x1="170" y1="370" x2="420" y2="300" stroke="#e91e63" stroke-width="2" 
+          marker-end="url(#dataArrow)" stroke-dasharray="3,3"/>
+    <line x1="170" y1="420" x2="420" y2="300" stroke="#e91e63" stroke-width="2" 
+          marker-end="url(#dataArrow)" stroke-dasharray="3,3"/>
+    <line x1="170" y1="470" x2="420" y2="300" stroke="#e91e63" stroke-width="2" 
+          marker-end="url(#dataArrow)" stroke-dasharray="3,3"/>
+  </g>
+
+  <!-- Confidence Scoring Breakdown -->
+  <g id="confidenceBreakdown">
+    <rect x="50" y="600" width="450" height="150" rx="8" fill="#ffffff" 
+          stroke="#333" stroke-width="1"/>
+    <text x="275" y="620" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="14" font-weight="bold" fill="#333">
+      📊 Multi-Factor Confidence Scoring
+    </text>
+    
+    <!-- Semantic Match -->
+    <rect x="70" y="635" width="90" height="50" rx="5" fill="#e8f5e8" 
+          stroke="#4caf50" stroke-width="1"/>
+    <text x="115" y="650" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">Semantic Match</text>
+    <text x="115" y="662" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">40% weight</text>
+    <text x="115" y="674" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">Component type</text>
+    
+    <!-- Property Match -->
+    <rect x="175" y="635" width="90" height="50" rx="5" fill="#fff3e0" 
+          stroke="#ff9800" stroke-width="1"/>
+    <text x="220" y="650" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">Property Match</text>
+    <text x="220" y="662" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">30% weight</text>
+    <text x="220" y="674" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">CSS property</text>
+    
+    <!-- Value Proximity -->
+    <rect x="280" y="635" width="90" height="50" rx="5" fill="#e3f2fd" 
+          stroke="#2196f3" stroke-width="1"/>
+    <text x="325" y="650" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">Value Proximity</text>
+    <text x="325" y="662" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">20% weight</text>
+    <text x="325" y="674" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">Color/size match</text>
+    
+    <!-- Usage Patterns -->
+    <rect x="385" y="635" width="90" height="50" rx="5" fill="#fce4ec" 
+          stroke="#e91e63" stroke-width="1"/>
+    <text x="430" y="650" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" font-weight="bold" fill="#333">Usage Patterns</text>
+    <text x="430" y="662" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">10% weight</text>
+    <text x="430" y="674" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">Best practices</text>
+    
+    <!-- Formula -->
+    <text x="275" y="710" text-anchor="middle" font-family="Monaco, monospace" 
+          font-size="11" fill="#333">
+      Confidence = Σ(Factor × Weight) = 85%
+    </text>
+    
+    <!-- Example calculation -->
+    <text x="275" y="730" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="9" fill="#666">
+      Example: (90% × 40%) + (85% × 30%) + (80% × 20%) + (75% × 10%) = 85%
+    </text>
+  </g>
+
+  <!-- Timeline -->
+  <g id="timeline">
+    <line x1="120" y1="750" x2="820" y2="750" stroke="#ddd" stroke-width="2"/>
+    
+    <text x="120" y="770" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">~5ms</text>
+    <text x="280" y="770" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">~15ms</text>
+    <text x="460" y="770" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">~10ms</text>
+    <text x="640" y="770" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">~20ms</text>
+    <text x="820" y="770" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="10" fill="#666">~5ms</text>
+    
+    <text x="470" y="790" text-anchor="middle" font-family="Arial, sans-serif" 
+          font-size="12" font-weight="bold" fill="#333">
+      Total Processing Time: ~55ms per file
+    </text>
+  </g>
+</svg>
