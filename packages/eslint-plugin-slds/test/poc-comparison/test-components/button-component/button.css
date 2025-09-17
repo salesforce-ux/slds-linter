@@ -1,0 +1,87 @@
+/* Button Component Styles - Test Cases for Context Analysis */
+
+.custom-primary-button {
+  /* Test Case 1: Primary button colors - should get high confidence button-specific suggestions */
+  background-color: #0176d3;
+  border-color: #0176d3;
+  color: #ffffff;
+  
+  /* Test Case 2: Button hover state */
+  &:hover {
+    background-color: #014486;
+    border-color: #014486;
+  }
+  
+  /* Test Case 3: Button spacing/sizing */
+  padding: 8px 16px;
+  min-height: 36px;
+  border-radius: 4px;
+}
+
+.custom-secondary-button {
+  /* Test Case 4: Secondary button styling */
+  background-color: transparent;
+  border-color: #747474;
+  color: #0176d3;
+  
+  /* Test Case 5: Secondary button hover */
+  &:hover {
+    background-color: #f3f3f3;
+    border-color: #0176d3;
+  }
+}
+
+.custom-danger-button {
+  /* Test Case 6: Destructive/error button colors */
+  background-color: #ea001e;
+  border-color: #ea001e;
+  color: #ffffff;
+  
+  &:hover {
+    background-color: #ba0517;
+    border-color: #ba0517;
+  }
+}
+
+.custom-icon-button {
+  /* Test Case 7: Icon button specific styling */
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  
+  /* Test Case 8: Icon button background */
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.button-container {
+  /* Test Case 9: Container spacing around buttons */
+  padding: 16px;
+  gap: 8px;
+  
+  /* Test Case 10: Container background */
+  background-color: #f8f9fa;
+}
+
+.button-group {
+  /* Test Case 11: Button group styling */
+  border: 1px solid #d8dde6;
+  border-radius: 4px;
+  
+  /* Test Case 12: Group spacing */
+  margin-top: 12px;
+}
+
+/* Test Case 13: Focus states */
+.custom-primary-button:focus,
+.custom-secondary-button:focus {
+  box-shadow: 0 0 0 2px #0176d3;
+  outline: none;
+}
+
+/* Test Case 14: Disabled states */
+.custom-primary-button:disabled {
+  background-color: #c9c9c9;
+  border-color: #c9c9c9;
+  color: #747474;
+}

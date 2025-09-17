@@ -1,0 +1,55 @@
+/* Modal Component Styles - Test Cases for Context Analysis */
+
+.modal-custom {
+  /* Test Case 1: Modal-specific color that should get high confidence suggestion */
+  background-color: #ffffff;
+  
+  /* Test Case 2: Modal border that should be context-aware */
+  border: 1px solid #d8dde6;
+  
+  /* Test Case 3: Modal shadow - should recognize modal context */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header-custom {
+  /* Test Case 4: Typography in modal context */
+  font-size: 16px;
+  font-weight: 600;
+  
+  /* Test Case 5: Spacing in modal header */
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+
+.modal-button-custom {
+  /* Test Case 6: Button colors within modal - should get button + modal context */
+  background-color: #0176d3;
+  border-color: #0176d3;
+  color: #ffffff;
+  
+  /* Test Case 7: Button spacing */
+  padding: 8px 12px;
+  margin-right: 8px;
+}
+
+.modal-input-custom {
+  /* Test Case 8: Form elements within modal */
+  border-color: #747474;
+  background-color: #ffffff;
+  
+  /* Test Case 9: Input sizing */
+  height: 36px;
+  min-height: 36px;
+}
+
+.modal-backdrop-custom {
+  /* Test Case 10: Backdrop/overlay colors */
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Test Case 11: Non-modal specific styles (should get lower confidence) */
+.generic-utility {
+  color: #333333;
+  font-size: 14px;
+  margin: 4px;
+}
