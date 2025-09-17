@@ -1,0 +1,53 @@
+<template>
+  <!-- Modal Component Demo Template -->
+  
+  <!-- Modal Backdrop -->
+  <div class="slds-backdrop slds-backdrop_open custom-modal-backdrop" tabindex="-1"></div>
+  
+  <!-- Modal Container -->
+  <div class="slds-modal slds-fade-in-open custom-modal" tabindex="-1" role="dialog">
+    <div class="slds-modal__container">
+      
+      <!-- Modal Header -->
+      <header class="slds-modal__header custom-modal-header">
+        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" 
+                title="Close Modal">
+          <lightning-icon icon-name="utility:close" size="large"></lightning-icon>
+          <span class="slds-assistive-text">Close Modal</span>
+        </button>
+        <h2 class="slds-modal__title slds-hyphenate custom-modal-title">
+          Confirm Action
+        </h2>
+      </header>
+      
+      <!-- Modal Body -->
+      <div class="slds-modal__content slds-p-around_medium custom-modal-body">
+        <p>Are you sure you want to delete this item? This action cannot be undone.</p>
+        
+        <!-- Form within modal -->
+        <div class="slds-form-element slds-m-top_medium">
+          <label class="slds-form-element__label" for="confirmation-input">
+            Type "DELETE" to confirm:
+          </label>
+          <div class="slds-form-element__control">
+            <input type="text" 
+                   id="confirmation-input" 
+                   class="slds-input" 
+                   placeholder="Type DELETE here" />
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <footer class="slds-modal__footer custom-modal-footer">
+        <button class="slds-button slds-button_neutral">
+          Cancel
+        </button>
+        <button class="slds-button slds-button_destructive">
+          Delete Item
+        </button>
+      </footer>
+      
+    </div>
+  </div>
+</template>

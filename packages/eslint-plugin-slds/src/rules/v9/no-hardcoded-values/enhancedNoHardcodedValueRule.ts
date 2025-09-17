@@ -249,67 +249,63 @@ export function defineEnhancedNoHardcodedValueRule(config: EnhancedRuleConfig): 
  */
 
 async function handleEnhancedColorDeclaration(node: any, context: EnhancedHandlerContext): Promise<void> {
-  // Use context-aware analysis if available, otherwise fall back to standard handler
+  // Add context analysis logging for POC demonstration
   if (context.componentContext && context.suggestionScorer && context.messageGenerator) {
-    // Implementation would use enhanced context analysis
-    // For POC, we'll delegate to standard handler with enhanced reporting
-    handleColorDeclaration(node, context);
-    
-    // Add context analysis logging for POC demonstration
     console.log('🎯 Enhanced Color Analysis:', {
       property: node.property,
       componentType: context.componentContext.componentType,
       hasModal: context.componentContext.semanticContext.hasModal,
       hasButton: context.componentContext.semanticContext.hasButton,
       relatedFiles: context.componentContext.htmlFiles.length + context.componentContext.cssFiles.length,
-      existingHooks: context.componentContext.cssContext.existingHooks.length
+      existingHooks: context.componentContext.cssContext?.existingHooks?.length || 0
     });
-  } else {
-    handleColorDeclaration(node, context);
   }
+  
+  // Always call the standard handler to ensure violations are reported
+  handleColorDeclaration(node, context);
 }
 
 async function handleEnhancedDensityDeclaration(node: any, context: EnhancedHandlerContext): Promise<void> {
+  // Add context analysis logging for POC demonstration
   if (context.componentContext && context.suggestionScorer && context.messageGenerator) {
-    handleDensityDeclaration(node, context);
-    
     console.log('📏 Enhanced Density Analysis:', {
       property: node.property,
       componentType: context.componentContext.componentType,
       spacingContext: context.componentContext.semanticContext,
       relatedFiles: context.componentContext.htmlFiles.length + context.componentContext.cssFiles.length
     });
-  } else {
-    handleDensityDeclaration(node, context);
   }
+  
+  // Always call the standard handler to ensure violations are reported
+  handleDensityDeclaration(node, context);
 }
 
 async function handleEnhancedFontDeclaration(node: any, context: EnhancedHandlerContext): Promise<void> {
+  // Add context analysis logging for POC demonstration  
   if (context.componentContext && context.suggestionScorer && context.messageGenerator) {
-    handleFontDeclaration(node, context);
-    
     console.log('🔤 Enhanced Font Analysis:', {
       property: node.property,
       componentType: context.componentContext.componentType,
       typographyContext: context.componentContext.semanticContext,
       relatedFiles: context.componentContext.htmlFiles.length + context.componentContext.cssFiles.length
     });
-  } else {
-    handleFontDeclaration(node, context);
   }
+  
+  // Always call the standard handler to ensure violations are reported
+  handleFontDeclaration(node, context);
 }
 
 async function handleEnhancedBoxShadowDeclaration(node: any, context: EnhancedHandlerContext): Promise<void> {
+  // Add context analysis logging for POC demonstration
   if (context.componentContext && context.suggestionScorer && context.messageGenerator) {
-    handleBoxShadowDeclaration(node, context);
-    
     console.log('🌫️ Enhanced Shadow Analysis:', {
       property: node.property,
       componentType: context.componentContext.componentType,
       shadowContext: context.componentContext.semanticContext,
       relatedFiles: context.componentContext.htmlFiles.length + context.componentContext.cssFiles.length
     });
-  } else {
-    handleBoxShadowDeclaration(node, context);
   }
+  
+  // Always call the standard handler to ensure violations are reported
+  handleBoxShadowDeclaration(node, context);
 }

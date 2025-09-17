@@ -1,0 +1,97 @@
+/* Modal Component - Demo for Context-Aware Linting */
+
+.custom-modal {
+  /* Modal background - should suggest modal-specific hook */
+  background-color: #ffffff;
+  
+  /* Modal border */
+  border: 1px solid #d8dde6;
+  
+  /* Modal shadow - should recognize modal context */
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  
+  /* Modal border radius */
+  border-radius: 8px;
+  
+  /* Modal max width */
+  max-width: 480px;
+  
+  /* Modal positioning */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  /* Z-index for overlay */
+  z-index: 9000;
+}
+
+.custom-modal-header {
+  /* Header padding */
+  padding: 16px 24px;
+  
+  /* Header border bottom */
+  border-bottom: 1px solid #e0e0e0;
+  
+  /* Header background */
+  background-color: #fafafa;
+}
+
+.custom-modal-title {
+  /* Title color */
+  color: #181818;
+  
+  /* Title font size */
+  font-size: 18px;
+  
+  /* Title font weight */
+  font-weight: 600;
+  
+  /* Title line height */
+  line-height: 1.25;
+}
+
+.custom-modal-body {
+  /* Body padding */
+  padding: 24px;
+  
+  /* Body text color */
+  color: #444444;
+  
+  /* Body font size */
+  font-size: 14px;
+  
+  /* Body line height */
+  line-height: 1.5;
+}
+
+.custom-modal-footer {
+  /* Footer padding */
+  padding: 16px 24px;
+  
+  /* Footer border top */
+  border-top: 1px solid #e0e0e0;
+  
+  /* Footer background */
+  background-color: #fafafa;
+  
+  /* Footer flex layout */
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.custom-modal-backdrop {
+  /* Backdrop overlay */
+  background-color: rgba(0, 0, 0, 0.5);
+  
+  /* Full viewport coverage */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  /* Behind modal */
+  z-index: 8999;
+}

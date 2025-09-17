@@ -28,6 +28,12 @@ function enableEnhancedRule() {
     fs.writeFileSync(backupPath, indexContent);
     console.log('✅ Created backup: src/index.ts.backup');
     
+    // Check if already using enhanced rule
+    if (indexContent.includes('no-hardcoded-values-slds2-enhanced')) {
+      console.log('✅ Enhanced rule is already enabled');
+      return true;
+    }
+    
     // Modify to use enhanced rule
     const modifiedContent = indexContent.replace(
       'import noHardcodedValuesSlds2 from \'./rules/v9/no-hardcoded-values/no-hardcoded-values-slds2\';',

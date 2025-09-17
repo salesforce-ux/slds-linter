@@ -16,7 +16,7 @@ import enforceComponentHookNamingConvention from './rules/v9/enforce-component-h
 import reduceAnnotations from './rules/v9/reduce-annotations';
 import noSldsPrivateVar from './rules/v9/no-slds-private-var';
 import noHardcodedValuesSlds1 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds1';
-import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds2';
+import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds2-enhanced';
 import noHardcodedValuesSlds2Enhanced from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds2-enhanced';
 
 

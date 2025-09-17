@@ -1,0 +1,65 @@
+/* Button Component - Demo for Context-Aware Linting */
+
+.custom-primary-button {
+  /* Brand primary color - should suggest button-specific hook */
+  background-color: #0176d3;
+  
+  /* Text color on brand background */
+  color: #ffffff;
+  
+  /* Border matching brand color */
+  border: 1px solid #0176d3;
+  
+  /* Standard button padding */
+  padding: 8px 16px;
+  
+  /* Button border radius */
+  border-radius: 4px;
+}
+
+.custom-secondary-button {
+  /* Secondary button background */
+  background-color: #ffffff;
+  
+  /* Secondary text color */
+  color: #0176d3;
+  
+  /* Secondary border */
+  border: 1px solid #0176d3;
+  
+  /* Same padding as primary */
+  padding: 8px 16px;
+  
+  /* Same radius */
+  border-radius: 4px;
+}
+
+.custom-danger-button {
+  /* Destructive action color */
+  background-color: #ea001e;
+  
+  /* White text on red */
+  color: #ffffff;
+  
+  /* Matching border */
+  border: 1px solid #ea001e;
+  
+  /* Standard padding */
+  padding: 8px 16px;
+}
+
+.custom-button:hover {
+  /* Hover state - darker brand color */
+  background-color: #014486;
+  
+  /* Hover border */
+  border-color: #014486;
+}
+
+.custom-button:focus {
+  /* Focus outline */
+  outline: 2px solid #0176d3;
+  
+  /* Focus offset */
+  outline-offset: 2px;
+}

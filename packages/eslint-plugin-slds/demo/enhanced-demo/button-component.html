@@ -1,0 +1,53 @@
+<template>
+  <!-- Button Component Demo Template -->
+  <div class="button-demo-container">
+    
+    <!-- Primary Actions -->
+    <div class="slds-grid slds-gutters">
+      <div class="slds-col">
+        <button class="slds-button slds-button_brand custom-primary-button">
+          Save Changes
+        </button>
+      </div>
+      
+      <div class="slds-col">
+        <button class="slds-button slds-button_neutral custom-secondary-button">
+          Cancel
+        </button>
+      </div>
+      
+      <div class="slds-col">
+        <button class="slds-button slds-button_destructive custom-danger-button">
+          Delete Item
+        </button>
+      </div>
+    </div>
+    
+    <!-- Button Group -->
+    <div class="slds-button-group" role="group">
+      <button class="slds-button slds-button_neutral custom-button">
+        Edit
+      </button>
+      <button class="slds-button slds-button_neutral custom-button">
+        Clone
+      </button>
+      <button class="slds-button slds-button_neutral custom-button">
+        Share
+      </button>
+    </div>
+    
+    <!-- Icon Buttons -->
+    <div class="slds-grid slds-gutters">
+      <button class="slds-button slds-button_icon slds-button_icon-brand">
+        <lightning-icon icon-name="utility:add" size="small"></lightning-icon>
+        <span class="slds-assistive-text">Add Item</span>
+      </button>
+      
+      <button class="slds-button slds-button_icon slds-button_icon-neutral">
+        <lightning-icon icon-name="utility:edit" size="small"></lightning-icon>
+        <span class="slds-assistive-text">Edit</span>
+      </button>
+    </div>
+    
+  </div>
+</template>
