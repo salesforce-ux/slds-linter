@@ -315,8 +315,8 @@ async function main() {
         {
           title: "Handle version generation",
           task: async (ctx) => {
-            // CA distribution is treated as external for versioning (no suffix)
-            const suffix = (ctx.targetPersona === "external" || ctx.targetPersona === "ca") ? "" : `-${ctx.targetPersona}`;
+            // CA distribution gets -ca suffix to avoid version conflicts with external releases
+            const suffix = ctx.targetPersona === "external" ? "" : `-${ctx.targetPersona}`;
             const version = ctx.version + suffix;
             ctx.finalVersion = version;
             if (ctx.releaseType !== "final") {
