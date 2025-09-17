@@ -24,7 +24,6 @@ export function isTargetProperty(property: string, propertyTargets: string[] = [
 export interface CssVariableInfo {
   name: string;           // Variable name: --slds-g-color-surface-1
   hasFallback: boolean;   // Whether var() already has a fallback
-  functionText: string;   // Full function text: var(--slds-g-color-surface-1)
 }
 
 /**
@@ -63,8 +62,7 @@ function extractSldsVariable(node: any): CssVariableInfo | null {
 
   return {
     name: variableName,
-    hasFallback,
-    functionText: `var(${variableName}${hasFallback ? ', ...' : ''})`
+    hasFallback
   };
 }
 
