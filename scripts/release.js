@@ -149,7 +149,15 @@ async function generateTarballs(workspaceInfo) {
 async function publishPackages(tarballs, version, releaseType, targetPersona) {
   const tag = releaseType === "final" ? "latest" : releaseType;
   // all internal packages are published to the internal tag
-  const personaTag = targetPersona === "external" ? tag : `internal${tag==="latest" ? "" : `-${tag}`}`;
+  // CA distribution gets special ca- prefix for npm tags
+  let personaTag;
+  if (targetPersona === "external") {
+    personaTag = tag;
+  } else if (targetPersona === "ca") {
+    personaTag = `ca-${tag}`;
+  } else {
+    personaTag = `internal${tag==="latest" ? "" : `-${tag}`}`;
+  }
   let sldsLinterTarball = "";
 
   for (const { pkgName, tarball, pkgPath } of tarballs) {
@@ -260,7 +268,8 @@ async function main() {
               message: "Select target persona:",
               choices: [
                 { name: "Internal", value: "internal" },
-                { name: "External", value: "external" },  
+                { name: "External", value: "external" },
+                { name: "External CA Distribution", value: "ca" },  
               ],
               default: "internal",
             });
@@ -306,6 +315,7 @@ async function main() {
         {
           title: "Handle version generation",
           task: async (ctx) => {
+            // CA distribution gets -ca suffix to avoid version conflicts with external releases
             const suffix = ctx.targetPersona === "external" ? "" : `-${ctx.targetPersona}`;
             const version = ctx.version + suffix;
             ctx.finalVersion = version;
@@ -336,7 +346,8 @@ async function main() {
           title: "Building workspace",
           task: async (ctx) => {
             const envVar = ["CLI_BUILD_MODE=release"];
-            if(ctx.targetPersona !== "external") {
+            // CA distribution is treated as external for build purposes
+            if(ctx.targetPersona !== "external" && ctx.targetPersona !== "ca") {
               envVar.push(`TARGET_PERSONA=${ctx.targetPersona}`);
             }           
             execSync(`${envVar.join(" ")} yarn build`, {
@@ -383,7 +394,7 @@ async function main() {
         },
         {
           title: "Create GitHub release",
-          skip: (ctx) => isDryRun || ctx.releaseType !== "final" || !ctx.sldsLinterTarball || ctx.targetPersona !== "external",
+          skip: (ctx) => isDryRun || ctx.releaseType !== "final" || !ctx.sldsLinterTarball || (ctx.targetPersona !== "external" && ctx.targetPersona !== "ca"),
           task: async (ctx) => {
             await createGitHubRelease(
               ctx.finalVersion,
