@@ -106,8 +106,9 @@ export function toSelector(properties: string[]): string {
   const selectorParts = properties.map(prop => {
     if (prop.includes('*')) {
       // Convert wildcards to regex patterns for CSS AST selectors
+      // Anchor to start of string to prevent matching CSS custom properties
       const regexPattern = prop.replace(/\*/g, '.*');
-      return `Declaration[property=/${regexPattern}$/]`;
+      return `Declaration[property=/^${regexPattern}$/]`;
     } else {
       // Exact property match
       return `Declaration[property='${prop}']`;
