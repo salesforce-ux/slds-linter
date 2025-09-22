@@ -116,6 +116,36 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { font-size: 0em; }`,
       filename: 'test.css',
     },
+    // CSS custom property declarations should be ignored (these define the hooks, not use hardcoded values)
+    {
+      code: `.global-example { --slds-g-color-border-base-2: #dddbda; }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.global-example { --slds-g-color-border-base-3: #c9c7c5; }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.global-example { --slds-g-spacing-small: 0.5rem; }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.global-example { --slds-g-font-size-1: 0.75rem; }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.global-example { --slds-g-shadow-outset: 0 0 0 1px #e5e5e5; }`,
+      filename: 'test.css',
+    },
+    // Multiple CSS custom property declarations in one rule
+    {
+      code: `.global-example {
+        --slds-g-color-border-base-2: #dddbda;
+        --slds-g-color-border-base-3: #c9c7c5;
+        --slds-g-spacing-small: 0.5rem;
+      }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
