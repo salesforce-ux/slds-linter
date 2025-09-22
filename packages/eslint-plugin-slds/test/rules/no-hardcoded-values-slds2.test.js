@@ -146,6 +146,11 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }`,
       filename: 'test.css',
     },
+    // Box-shadow with no hook match should be ignored (no replacement available)
+    {
+      code: `.example { box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
@@ -444,15 +449,6 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         messageId: 'hardcodedValue'
       }]
       // Another complex box-shadow with exact hook match should be auto-fixed
-    },
-    // Box-shadow with no hook match
-    {
-      code: `.example { box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }`,
-      filename: 'test.css',
-      errors: [{
-        messageId: 'noReplacement'
-      }]
-      // Custom box-shadow with no matching hook should report no replacement
     },
     // Font-weight tests
     // Font-weight 400 (normal) with single suggestion

@@ -37,27 +37,31 @@ export const handleBoxShadowDeclaration: DeclarationHandler = (node: any, contex
     const shadowHooks = getBoxShadowHooks(context.valueToStylinghook);
     const closestHooks = findMatchingBoxShadowHooks(parsedCssValue, shadowHooks);
     
-    // Create position info for the entire box-shadow value
-    // hardcoded position is needed for string manipulation, not error reporting
-    const positionInfo: PositionInfo = {
-      start: { offset: 0, line: 1, column: 1 },
-      end: { offset: valueText.length, line: 1, column: valueText.length + 1 }
-    };
-    
-    const replacement = createBoxShadowReplacement(
-      valueText,
-      closestHooks,
-      context,
-      positionInfo
-    );
-    
-    if (replacement) {
-      replacements.push(replacement);
+    // Only proceed if we found matching hooks - ignore if no replacement available
+    if (closestHooks.length > 0) {
+      // Create position info for the entire box-shadow value
+      // hardcoded position is needed for string manipulation, not error reporting
+      const positionInfo: PositionInfo = {
+        start: { offset: 0, line: 1, column: 1 },
+        end: { offset: valueText.length, line: 1, column: valueText.length + 1 }
+      };
+      
+      const replacement = createBoxShadowReplacement(
+        valueText,
+        closestHooks,
+        context,
+        positionInfo
+      );
+      
+      if (replacement) {
+        replacements.push(replacement);
+      }
+      
+      // Apply shorthand auto-fix only when we have replacements to report
+      handleShorthandAutoFix(node, context, valueText, replacements);
     }
+    // If no hooks found, silently ignore - don't report any violations
   }
-  
-  // Apply shorthand auto-fix once processing is complete
-  handleShorthandAutoFix(node, context, valueText, replacements);
 };
 
 
@@ -104,7 +108,8 @@ function findMatchingBoxShadowHooks(
 
 /**
  * Create box-shadow replacement info for shorthand auto-fix
- * Returns replacement data or null if no valid replacement
+ * Only called when hooks are available (hooks.length > 0)
+ * Returns replacement data or null if invalid position info
  */
 function createBoxShadowReplacement(
   originalValue: string,
@@ -129,7 +134,7 @@ function createBoxShadowReplacement(
       displayValue: hooks[0],
       hasHook: true
     };
-  } else if (hooks.length > 1) {
+  } else {
     // Multiple hooks - still has hooks, but no auto-fix
     return {
       start,
@@ -137,15 +142,6 @@ function createBoxShadowReplacement(
       replacement: originalValue,
       displayValue: hooks.join(', '),
       hasHook: true
-    };
-  } else {
-    // No hooks - keep original value
-    return {
-      start,
-      end,
-      replacement: originalValue,
-      displayValue: originalValue,
-      hasHook: false
     };
   }
 }
