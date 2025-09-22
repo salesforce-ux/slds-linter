@@ -37,27 +37,32 @@ export function isGlobalValue(value: string): boolean {
     return value === 'initial' || value === 'inherit' || value === 'unset' || value === 'revert' || value === 'revert-layer';
   }
 
+// Configurable list of allowed CSS units
+export const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
+
 export type ParsedUnitValue = {
-  unit: 'px' | 'rem' | '%' | null;
+  unit: 'px' | 'rem' | '%' | 'em' | 'ch' | null;
   number: number;
 } | null;
 
 export function parseUnitValue(value: string): ParsedUnitValue {
   if (!value) return null;
   
-  // Simple regex to parse number and unit
-  const match = value.match(/^(-?\d*\.?\d+)(px|rem|%)?$/);
+  // Create regex pattern from allowed units
+  const unitsPattern = ALLOWED_UNITS.join('|');
+  const regex = new RegExp(`^(-?\\d*\\.?\\d+)(${unitsPattern})?$`);
+  const match = value.match(regex);
   if (!match) return null;
   
   const number = parseFloat(match[1]);
-  const unit = match[2] ? (match[2] as 'px' | 'rem' | '%') : null; // Keep unitless values as null
+  const unit = match[2] ? (match[2] as 'px' | 'rem' | '%' | 'em' | 'ch') : null; // Keep unitless values as null
   
   if (isNaN(number)) return null;
   
   return { number, unit };
 }
 
-export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem' | '%' | null): ParsedUnitValue {
+export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem' | '%' | 'em' | 'ch' | null): ParsedUnitValue {
     if (unitType === 'px') {
       let floatValue = parseFloat(`${numberVal / 16}`);
       if (!isNaN(floatValue)) {
@@ -75,6 +80,7 @@ export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem' |
         }
       }
     }
-    // For unitless values (font-weight, etc.), no alternate unit conversion
+    // For other units (%, em, ch) and unitless values, no alternate unit conversion available
+    // These units are context-dependent and don't have standard conversion ratios
     return null;
 }
