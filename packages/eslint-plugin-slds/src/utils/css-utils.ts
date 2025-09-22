@@ -76,3 +76,17 @@ export function forEachSldsVariable(
 ): void {
   forEachValue(valueText, extractSldsVariable, () => false, callback);
 }
+
+/**
+ * Format multiple hook suggestions for better readability
+ * @param hooks - Array of hook names to format
+ * @returns Formatted string with hooks
+ */
+export function formatSuggestionHooks(hooks: string[]): string {
+  if (hooks.length === 1) {
+    return `${hooks[0]}`;
+  }
+
+  // Loop through hooks and append each as a numbered list item with line breaks
+  return '\n' + hooks.map((hook, index) => `${index + 1}. ${hook}`).join('\n');
+}
