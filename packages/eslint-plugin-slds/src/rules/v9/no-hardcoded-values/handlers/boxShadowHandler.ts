@@ -10,10 +10,25 @@ import {
 } from '../../../../utils/hardcoded-shared-utils';
 
 /**
- * Check if a CSS value contains CSS variables (var() functions)
+ * Convert CSS value to parsed box-shadow values, filtering out empty ones
  */
-function containsCssVariable(valueText: string): boolean {
-  return valueText.includes('var(');
+function toBoxShadowValue(cssValue: string): BoxShadowValue[] | null {
+  const parsedCssValue = parseBoxShadowValue(cssValue).filter((shadow) => Object.keys(shadow).length > 0);
+  if (parsedCssValue.length === 0) {
+    return null;
+  }
+  return parsedCssValue;
+}
+
+/**
+ * Extract box-shadow hook entries from styling hooks mapping
+ */
+function shadowValueToHookEntries(supportedStylinghooks: ValueToStylingHooksMapping): Array<[string, string[]]> {
+  return Object.entries(supportedStylinghooks).filter(([key, value]) => {
+    return value.some((hook) => hook.properties.includes('box-shadow'));
+  }).map(([key, value]) => {
+    return [key, value.map((hook) => hook.name)];
+  });
 }
 
 /**
@@ -23,88 +38,44 @@ export const handleBoxShadowDeclaration: DeclarationHandler = (node: any, contex
   const cssProperty = node.property.toLowerCase();
   const valueText = context.sourceCode.getText(node.value);
   
-  // Skip if the value contains CSS variables
-  if (containsCssVariable(valueText)) {
+  const shadowHooks = shadowValueToHookEntries(context.valueToStylinghook);
+  
+  const parsedCssValue = toBoxShadowValue(valueText);
+  if (!parsedCssValue) {
     return;
   }
-  
-  // Box-shadow uses complete value matching, not individual value extraction
-  const replacements: ReplacementInfo[] = [];
-  
-  // Parse and find matching hooks for the complete box-shadow value
-  const parsedCssValue = parseAndValidateBoxShadow(valueText);
-  if (parsedCssValue) {
-    const shadowHooks = getBoxShadowHooks(context.valueToStylinghook);
-    const closestHooks = findMatchingBoxShadowHooks(parsedCssValue, shadowHooks);
-    
-    // Only proceed if we found matching hooks - ignore if no replacement available
-    if (closestHooks.length > 0) {
-      // Create position info for the entire box-shadow value
-      // hardcoded position is needed for string manipulation, not error reporting
-      const positionInfo: PositionInfo = {
-        start: { offset: 0, line: 1, column: 1 },
-        end: { offset: valueText.length, line: 1, column: valueText.length + 1 }
-      };
-      
-      const replacement = createBoxShadowReplacement(
-        valueText,
-        closestHooks,
-        context,
-        positionInfo
-      );
-      
-      if (replacement) {
-        replacements.push(replacement);
+
+  // Look for matching hooks
+  for (const [shadow, closestHooks] of shadowHooks) {
+    const parsedValueHook = toBoxShadowValue(shadow);
+    if (parsedValueHook && isBoxShadowMatch(parsedCssValue, parsedValueHook)) {
+      if (closestHooks.length > 0) {
+        // Create position info for the entire box-shadow value
+        const positionInfo: PositionInfo = {
+          start: { offset: 0, line: 1, column: 1 },
+          end: { offset: valueText.length, line: 1, column: valueText.length + 1 }
+        };
+        
+        const replacement = createBoxShadowReplacement(
+          valueText,
+          closestHooks,
+          context,
+          positionInfo
+        );
+        
+        if (replacement) {
+          const replacements: ReplacementInfo[] = [replacement];
+          // Apply shorthand auto-fix when we have replacements to report
+          handleShorthandAutoFix(node, context, valueText, replacements);
+        }
       }
-      
-      // Apply shorthand auto-fix only when we have replacements to report
-      handleShorthandAutoFix(node, context, valueText, replacements);
+      return;
     }
-    // If no hooks found, silently ignore - don't report any violations
   }
+  
+  // If no hooks found, silently ignore - don't report any violations
 };
 
-
-/**
- * Extract box-shadow hook entries from styling hooks mapping
- */
-function getBoxShadowHooks(supportedStylinghooks: ValueToStylingHooksMapping): Array<[string, string[]]> {
-  return Object.entries(supportedStylinghooks).filter(([key, value]) => {
-    return value.some((hook) => hook.properties.includes('box-shadow'));
-  }).map(([key, value]) => {
-    return [key, value.map((hook) => hook.name)];
-  });
-}
-
-/**
- * Parse and validate box-shadow value
- */
-function parseAndValidateBoxShadow(cssValue: string): BoxShadowValue[] | null {
-  const parsedCssValue = parseBoxShadowValue(cssValue).filter((shadow) => Object.keys(shadow).length > 0);
-  if (parsedCssValue.length === 0) {
-    return null;
-  }
-  return parsedCssValue;
-}
-
-/**
- * Find matching hooks for a parsed box-shadow value
- */
-function findMatchingBoxShadowHooks(
-  parsedCssValue: BoxShadowValue[], 
-  shadowHooks: Array<[string, string[]]>
-): string[] {
-  // Try to find a matching hook for the complete box-shadow value
-  for (const [shadowHookValue, closestHooks] of shadowHooks) {
-    const parsedHookValue = parseAndValidateBoxShadow(shadowHookValue);
-    
-    if (parsedHookValue && isBoxShadowMatch(parsedCssValue, parsedHookValue)) {
-      return closestHooks;
-    }
-  }
-  
-  return []; // No matching hooks found
-}
 
 /**
  * Create box-shadow replacement info for shorthand auto-fix
