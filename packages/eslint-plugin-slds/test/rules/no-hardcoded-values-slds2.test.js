@@ -603,6 +603,15 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       errors: [{ 
         messageId: 'noReplacement'
       }]
+    },
+    // Box-shadow with CSS variables now processed and matched to hook (previously skipped entirely)
+    {
+      code: `.example { box-shadow: 0 0 0 2px var(--slds-g-color-brand-base-15) inset, 0 0 0 4px var(--slds-g-color-neutral-base-100) inset; }`,
+      filename: 'test.css',
+      output: `.example { box-shadow: var(--slds-g-shadow-insetinverse-focus-1, 0 0 0 2px var(--slds-g-color-brand-base-15) inset, 0 0 0 4px var(--slds-g-color-neutral-base-100) inset); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
     }
   ]
 });
