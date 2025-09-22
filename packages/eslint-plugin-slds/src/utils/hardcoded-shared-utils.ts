@@ -1,6 +1,7 @@
 import { parse, walk } from '@eslint/css-tree';
 import type { HandlerContext } from '../types';
 import type { ParsedUnitValue } from './value-utils';
+import { ALLOWED_UNITS } from './value-utils';
 import { extractColorValue } from './color-lib-utils';
 import { isCssFunction } from './css-functions';
 
@@ -201,11 +202,11 @@ function extractDimensionValue(valueNode: any, cssProperty?: string): ParsedUnit
       if (numValue === 0) return null; // Skip zero values
       
       const unit = valueNode.unit.toLowerCase();
-      if (unit !== 'px' && unit !== 'rem' && unit !== '%') return null; // Support px, rem, and % units
+      if (!ALLOWED_UNITS.includes(unit)) return null; // Support only allowed units
       
       return {
         number: numValue,
-        unit: unit as 'px' | 'rem' | '%'
+        unit: unit as 'px' | 'rem' | '%' | 'em' | 'ch'
       };
       
     case 'Number':
@@ -278,11 +279,11 @@ function extractFontValue(node: any): ParsedUnitValue | null {
       if (numValue <= 0) return null; // Skip zero/negative values
       
       const unit = node.unit.toLowerCase();
-      if (unit !== 'px' && unit !== 'rem' && unit !== '%') return null;
+      if (!ALLOWED_UNITS.includes(unit)) return null;
       
       return {
         number: numValue,
-        unit: unit as 'px' | 'rem' | '%'
+        unit: unit as 'px' | 'rem' | '%' | 'em' | 'ch'
       };
       
     case 'Number':

@@ -107,6 +107,15 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { font-weight: 450; }`,
       filename: 'test.css',
     },
+    // CSS units other than px/rem/% should be ignored when they have zero values
+    {
+      code: `.example { width: 0ch; }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.example { font-size: 0em; }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
@@ -533,6 +542,41 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         { messageId: 'hardcodedValue' }  // font-size: 1rem (line-height parsing not implemented)
       ],
       output: `.example { font: var(--slds-g-font-weight-7, 700) var(--slds-g-font-scale-2, 1rem)/1.5 Arial; }`
+    },
+
+    // NEW UNIT TESTS - CH and EM units
+    // Width with ch unit (character width) - should be detected and suggest sizing hook
+    {
+      code: `.example { width: 45ch; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { width: var(--slds-g-sizing-content-2, 45ch); }`
+    },
+    // Font-size with em unit - should be detected but no hook available
+    {
+      code: `.example { font-size: 1.2em; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'noReplacement'
+      }]
+    },
+    // Max-width with ch unit - should be detected but no hook available
+    {
+      code: `.example { max-width: 80ch; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'noReplacement'
+      }]
+    },
+    // Line-height with em unit - should be detected but no hook available
+    {
+      code: `.example { line-height: 1.5em; }`,
+      filename: 'test.css',
+      errors: [{ 
+        messageId: 'noReplacement'
+      }]
     }
   ]
 });
