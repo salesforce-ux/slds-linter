@@ -1,6 +1,6 @@
 import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
-import { formatMultipleHooks } from '../../../../utils/css-utils';
+import { formatSuggestionHooks } from '../../../../utils/css-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
 // Import shared utilities for common logic
@@ -83,7 +83,7 @@ function createColorReplacement(
       start,
       end,
       replacement: originalValue,  // Use original value to preserve spacing
-      displayValue: formatMultipleHooks(closestHooks),
+      displayValue: formatSuggestionHooks(closestHooks),
       hasHook: true
     };
   } else {

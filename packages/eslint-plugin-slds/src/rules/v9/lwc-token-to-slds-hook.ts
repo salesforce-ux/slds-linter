@@ -1,7 +1,7 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages.yml';
-import { formatMultipleHooks } from '../../utils/css-utils';
+import { formatSuggestionHooks } from '../../utils/css-utils';
 
 const ruleConfig = ruleMessages['lwc-token-to-slds-hook'];
 const { type, description, url, messages } = ruleConfig;
@@ -56,7 +56,7 @@ function getReportMessage(cssVar: string, replacementCategory: ReplacementCatego
   } else if (replacementCategory === ReplacementCategory.ARRAY) {
     return {
       messageId: 'errorWithStyleHooks',
-      data: { oldValue: cssVar, newValue: formatMultipleHooks(recommendation as string[]) }
+      data: { oldValue: cssVar, newValue: formatSuggestionHooks(recommendation as string[]) }
     };
   } else if (replacementCategory === ReplacementCategory.SLDS_TOKEN) {
     return {

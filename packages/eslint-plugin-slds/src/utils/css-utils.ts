@@ -82,7 +82,7 @@ export function forEachSldsVariable(
  * @param hooks - Array of hook names to format
  * @returns Formatted string with hooks
  */
-export function formatMultipleHooks(hooks: string[]): string {
+export function formatSuggestionHooks(hooks: string[]): string {
   if (hooks.length === 1) {
     return `${hooks[0]}`;
   }

@@ -1,7 +1,7 @@
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { parseBoxShadowValue, isBoxShadowMatch, type BoxShadowValue } from '../../../../utils/boxShadowValueParser';
-import { formatMultipleHooks } from '../../../../utils/css-utils';
+import { formatSuggestionHooks } from '../../../../utils/css-utils';
 
 // Import shared utilities for common logic
 import { 
@@ -112,7 +112,7 @@ function createBoxShadowReplacement(
       start,
       end,
       replacement: originalValue,
-      displayValue: formatMultipleHooks(hooks),
+      displayValue: formatSuggestionHooks(hooks),
       hasHook: true
     };
   }
