@@ -1,5 +1,6 @@
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
+import { formatMultipleHooks } from '../../../../utils/css-utils';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
@@ -78,7 +79,7 @@ function createDimensionReplacement(
       start,
       end,
       replacement: rawValue,
-      displayValue: closestHooks.join(', '),
+      displayValue: formatMultipleHooks(closestHooks),
       hasHook: true
     };
   } else {

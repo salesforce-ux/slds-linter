@@ -1,5 +1,6 @@
 import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
 import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
+import { formatMultipleHooks } from '../../../../utils/css-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
 // Import shared utilities for common logic
@@ -77,13 +78,13 @@ function createColorReplacement(
       hasHook: true
     };
   } else if (closestHooks.length > 1) {
-    // Multiple hooks - still has hooks, but no auto-fix
+    // Multiple hooks - format them for better readability
     return {
       start,
       end,
       replacement: originalValue,  // Use original value to preserve spacing
-      displayValue: closestHooks.join(', '),
-      hasHook: true  // ← THE FIX: Multiple hooks still means "has hooks"
+      displayValue: formatMultipleHooks(closestHooks),
+      hasHook: true
     };
   } else {
     // No hooks - keep original value
