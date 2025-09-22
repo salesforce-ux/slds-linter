@@ -4,7 +4,7 @@
 
 SLDS Linter provides custom linting rules built for Salesforce Lightning Design System 2 (SLDS 2 beta). Lint your components against SLDS 2 best practices to ensure they adhere to the latest styling standards. 
 
-SLDS Linter checks your Aura and Lightning web components’ CSS and markup files to identify styling issues that you can fix for SLDS 2 compatibility. SLDS Linter helps you maintain consistent styling and identify common issues with custom Lightning components.
+SLDS Linter checks your Aura and Lightning web components' CSS and markup files to identify styling issues that you can fix for SLDS 2 compatibility. SLDS Linter helps you maintain consistent styling and identify common issues with custom Lightning components.
 
 ## Features
 
@@ -28,7 +28,7 @@ Install these items if they aren't installed already.
 - [VS Code](https://code.visualstudio.com/)
 - [SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=MS-SarifVSCode.sarif-viewer) VS Code extension. This extension enables you to view SLDS Linter violation reports.
 - [Node.js](https://nodejs.org/)
-  - The minimum supported version is **v18.4.0**
+  - The minimum supported version is **v18.18.0** 
   - We recommend using the latest [Active LTS](https://nodejs.org/en/about/previous-releases) version of Node.js.  
 
 ## Install SLDS Linter
@@ -78,7 +78,7 @@ In your project root directory, follow these steps.
 
 ### Troubleshoot SARIF Viewer Navigation
 
-If the SARIF viewer doesn’t automatically go to the line of code when you click on an error or warning, follow these steps.
+If the SARIF viewer doesn't automatically go to the line of code when you click on an error or warning, follow these steps.
 
 1. In the SARIF viewer pop-up window, click Locate.
 2. In the file explorer or code editor, locate the file.
@@ -101,7 +101,8 @@ These options are available on SLDS Linter commands.
 | `-o, --output <path>`    | Output directory for reports (defaults to current directory)                 | `report`                                     |
 | `--fix`                  | Automatically fix problems                                                   | `lint`         |
 | `--config-eslint <path>` | Path to eslint config file                    | `lint`, `report`|
-| `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode | `lint` |
+| `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Auto-detects if not specified | `lint` |
+| `--format <type>`        | Output format (sarif, csv). Defaults to sarif | `report` |
 
 To view help for these options, add `--help` to each command. For example, run `npx @salesforce-ux/slds-linter lint --help` to see which options you can use with `lint`.
 
@@ -165,5 +166,119 @@ Linting all `.html` and `.cmp` files:
 npx @salesforce-ux/slds-linter lint "**/*.{html,cmp}"
 ```
 
-
 For any questions or issues, open an issue in this repository.
+
+## Node.js API
+
+The SLDS Linter provides a programmatic API for Node.js applications. This allows you to integrate the linter directly into your build process or other tools without relying on the command-line interface.
+
+### Installation
+
+```bash
+npm install @salesforce-ux/slds-linter
+```
+
+### Usage
+
+```javascript
+import { lint, report } from '@salesforce-ux/slds-linter/executor';
+
+// Lint files in a directory
+const results = await lint({
+  directory: './src',
+  fix: false // Set to true to auto-fix issues where possible
+});
+
+console.log(`Found ${results.length} files with issues`);
+
+// Generate a report
+const reportStream = await report({
+  directory: './src',
+  format: 'sarif'
+}, results);  // Pass the lint results as second parameter
+
+// Process the report stream
+let reportData = '';
+reportStream.on('data', chunk => {
+  reportData += chunk;
+});
+
+reportStream.on('end', () => {
+  console.log('Report:', reportData);
+});
+```
+
+### TypeScript Support
+
+The Node.js API includes comprehensive TypeScript type definitions. You can import both the API functions and their associated types:
+
+```typescript
+// Import from the executor entrypoint
+import {
+  lint,
+  report,
+  type LintConfig,
+  type ReportConfig,
+  type LintResult
+} from '@salesforce-ux/slds-linter/executor';
+
+// Define configuration with typed interface
+const config: LintConfig = {
+  directory: './src',
+  fix: false
+};
+
+// Results will be properly typed
+const results: LintResult[] = await lint(config);
+```
+
+All relevant types (such as `LintConfig`, `ReportConfig`, `LintResult`, etc.) are exported from the executor entrypoint for use in your TypeScript projects.
+
+### API Reference
+
+The Node.js API provides the following methods:
+
+#### `lint(options)`
+
+Lints files for SLDS compliance.
+
+**Options:**
+- `directory`: Path to directory to scan for files to lint
+- `fix`: Boolean indicating whether to automatically fix issues when possible
+- `configStylelint`: Path to custom stylelint configuration file
+- `configEslint`: Path to custom eslint configuration file
+
+**Returns:** Promise resolving to an array of result objects containing linting issues
+
+#### `report(options)`
+
+Generates a report of linting issues.
+
+**Options:**
+- `directory`: Path to directory to scan (if `results` is not provided)
+- `format`: Report format ('sarif' or 'csv')
+- `configStylelint`: Path to custom stylelint configuration file (if `directory` is used)
+- `configEslint`: Path to custom eslint configuration file (if `directory` is used)
+
+**Parameters:**
+- `options`: Configuration options as detailed above
+- `results`: Optional array of lint results (from `lint()`). If not provided, will run lint on the specified directory
+
+**Returns:** A readable stream containing the report data
+
+### Utility Functions
+
+The package also provides utility functions to help with configuration:
+
+#### `normalizeConfig(options)`
+
+Normalizes configuration options with default values. Import from `@salesforce-ux/slds-linter/utils/config-utils`.
+
+**Options:** Same as the options for `lint()` or `report()`
+
+**Returns:** A normalized configuration object with default values applied
+
+### Examples
+
+For complete examples, see the [examples directory](./examples/).
+
