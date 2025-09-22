@@ -146,7 +146,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
         type: 'Identifier',
         data: {
           oldValue: '--lwc-colorBackgroundLight',
-          newValue: '--slds-g-color-surface-1 or --slds-g-color-surface-container-1'
+          newValue: '\n1. --slds-g-color-surface-1\n2. --slds-g-color-surface-container-1'
         }
       }]
     },
