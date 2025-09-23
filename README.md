@@ -2,32 +2,26 @@
 
 ## Overview
 
-SLDS Linter provides custom linting rules built for Salesforce Lightning Design System 2 (SLDS 2 beta). Lint your components against SLDS 2 best practices to ensure they adhere to the latest styling standards. 
-
-SLDS Linter checks your Aura and Lightning web components’ CSS and markup files to identify styling issues that you can fix for SLDS 2 compatibility. SLDS Linter helps you maintain consistent styling and identify common issues with custom Lightning components.
+SLDS Linter is an installable npm package that analyzes your code against Salesforce Lightning Design System 2 (SLDS 2) rules and offers suggestions to better align your code with SLDS 2 guidelines. SLDS Linter can also apply the suggestions in bulk across your repository and automatically fix your code. 
 
 ## Features
 
 SLDS Linter is a custom-built linting solution based on open source [ESLint](https://eslint.org/) with CSS support. It supports linting for both types of Lightning components. 
 
-SLDS Linter runs on these types of files.
-
 - Lightning web component *.html markup and Cascading Style Sheet (CSS) files
 - Aura component *.cmp markup and CSS files
 
-You can run SLDS Linter in a terminal window or in Visual Studio (VS) Code. We recommend running in VS Code.
+Run SLDS Linter in a terminal window or in Visual Studio (VS) Code. We recommend running in VS Code.
 
-Follow these instructions to integrate SLDS Linter into your project.
+Follow these steps to integrate SLDS Linter into your project.
 
 ---
 
 ## Prerequisites
 
-Install these items if they aren't installed already.
-
-- [VS Code](https://code.visualstudio.com/)
-- [SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=MS-SarifVSCode.sarif-viewer) VS Code extension. This extension enables you to view SLDS Linter violation reports.
-- [Node.js](https://nodejs.org/)
+- Install [VS Code](https://code.visualstudio.com/)
+- Install the [SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=MS-SarifVSCode.sarif-viewer) VS Code extension. With this extension, you can view SLDS Linter violation reports.
+- Install [Node.js](https://nodejs.org/)
   - The minimum supported version is **v18.4.0**
   - We recommend using the latest [Active LTS](https://nodejs.org/en/about/previous-releases) version of Node.js.  
 
@@ -62,7 +56,7 @@ Commands:
 
 Run SLDS Linter against your project in the VS Code terminal to check for any violations and generate a SARIF report. This report helps you identify the components you need to update.
 
-In your project root directory, follow these steps.
+In your project root directory, follow these instructions.
 
 1. In your project in VS Code, open Terminal.
 2. Run `npx @salesforce-ux/slds-linter lint`. 
@@ -110,7 +104,7 @@ To view help for these options, add `--help` to each command. For example, run `
 
 To enhance your linting and error analysis experience, we recommend that you install these VS Code extensions. These extensions significantly improve your development workflow and make it easier to navigate and address linting issues.
 
-- *[ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)*:  Essential for JavaScript, TypeScript, HTML, and CSS linting, it checks your code and flags any violations of the ESLint rules with squiggly lines to show you what to fix.
+- *[ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)*:  Essential for JavaScript, TypeScript, HTML, CMP, and CSS linting. It checks your code and highlights any violations of the ESLint rules with squiggly lines to show you what to fix.
 
 ## Best Practices
 
