@@ -56,17 +56,17 @@ By default, the latest version of the plugin supports legacy and flat config sys
 
 ### CSS Rules
 
-- `no-hardcoded-values-slds2`: Replace static values with SLDS 2 styling hooks. For more information, look up design tokens on lightningdesignsystem.com.
-- `no-slds-class-overrides`: Create new custom CSS classes instead of overriding SLDS selectors.
+- `no-hardcoded-values-slds2`: Identifies static or hard-coded values that must be replaced with SLDS 2 styling hooks.
+- `no-slds-class-overrides`: Identifies existing class names that must be replaced with new custom CSS classes, instead of overriding SLDS selectors.
 - `no-slds-var-without-fallback`: Add fallback values to SLDS styling hooks. The fallback values are used in Salesforce environments where styling hooks are unavailable.
 - `no-slds-namespace-for-custom-hooks`: To differentiate custom styling hooks from SLDS styling hooks, create custom styling hooks in your namespace.
-- `no-slds-private-var`: Some SLDS styling hooks are private and reserved only for internal Salesforce use. Private SLDS styling hooks have prefixes --_slds- and --slds-s-.
+- `no-slds-private-var`: Identifies SLDS styling hooks that are reserved only for internal Salesforce use. Private SLDS styling hooks have prefixes --_slds- and --slds-s-.
 - `no-unsupported-hooks-slds2`: Identifies styling hooks that aren't present in SLDS 2. They must be replaced with styling hooks that have a similar effect, or they must be removed.
-- `no-sldshook-fallback-for-lwctoken`: Avoid using --slds styling hooks as fallback values for --lwc tokens.
-- `enforce-sds-to-slds-hooks`: Convert your existing --sds styling hooks to --slds styling hooks. See lightningdesignsystem.com for more info.
-- `enforce-component-hook-naming-convention`: Replace component styling hooks that use a deprecated naming convention.
+- `no-sldshook-fallback-for-lwctoken`: Identifies instances where --slds styling hooks are provided as fallback values for --lwc tokens.
+- `enforce-sds-to-slds-hooks`: Identifies Salesforce Design System (SDS) styling hooks that must be replaced with the suggested SLDS 2 styling hooks. For more information, see lightningdesignsystem.com.
+- `enforce-component-hook-naming-convention`: Identifies --slds-c component-level styling hooks that use a deprecated naming convention.
 - `no-deprecated-slds-classes`: Please replace the deprecated classes with a modern equivalent.
-- `reduce-annotations`: Remove your annotations and update your code.
+- `reduce-annotations`: Identifies annotations that must be removed from the code.
 
 ## License
 
