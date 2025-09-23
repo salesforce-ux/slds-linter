@@ -48,13 +48,16 @@ By default, the latest version of the plugin supports legacy and flat config sys
 
 ## Supported Rules
 
+### HTML/Component Rules
+
 - `enforce-bem-usage`: Identifies instances that use the double-dash (--) syntax for block-element-modifier (BEM) in classes.
-- `no-deprecated-classes-slds2`: Identifies classes that aren’t available in SLDS 2.
+- `no-deprecated-classes-slds2`: Identifies classes that aren't available in SLDS 2.
 - `modal-close-button-issue`: Identifies instances where the CSS classes or component attributes for the modal close button must be changed to follow the modal component blueprint.
-- `no-hardcoded-values-slds1`: Replace static values with SLDS 1 design tokens. For more information, look up design tokens on lightningdesignsystem.com.
+
+### CSS Rules
+
 - `no-hardcoded-values-slds2`: Replace static values with SLDS 2 styling hooks. For more information, look up design tokens on lightningdesignsystem.com.
 - `no-slds-class-overrides`: Create new custom CSS classes instead of overriding SLDS selectors.
-- `no-deprecated-tokens-slds1`: Update outdated design tokens to SLDS 2 styling hooks with similar values. For more information, see Styling Hooks on lightningdesignsystem.com.
 - `no-slds-var-without-fallback`: Add fallback values to SLDS styling hooks. The fallback values are used in Salesforce environments where styling hooks are unavailable.
 - `no-slds-namespace-for-custom-hooks`: To differentiate custom styling hooks from SLDS styling hooks, create custom styling hooks in your namespace.
 - `no-slds-private-var`: Some SLDS styling hooks are private and reserved only for internal Salesforce use. Private SLDS styling hooks have prefixes --_slds- and --slds-s-.
@@ -62,7 +65,6 @@ By default, the latest version of the plugin supports legacy and flat config sys
 - `no-sldshook-fallback-for-lwctoken`: Avoid using --slds styling hooks as fallback values for --lwc tokens.
 - `enforce-sds-to-slds-hooks`: Convert your existing --sds styling hooks to --slds styling hooks. See lightningdesignsystem.com for more info.
 - `enforce-component-hook-naming-convention`: Replace component styling hooks that use a deprecated naming convention.
-- `lwc-token-to-slds-hook`: Replace the deprecated --lwc tokens with the latest --slds tokens. See lightningdesignsystem.com for more info.
 - `no-deprecated-slds-classes`: Please replace the deprecated classes with a modern equivalent.
 - `reduce-annotations`: Remove your annotations and update your code.
 
