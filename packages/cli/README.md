@@ -2,14 +2,16 @@
 
 ## Overview
 
-SLDS Linter is an installable npm package that analyzes your code against Salesforce Lightning Design System 2 (SLDS 2) rules and offers suggestions to better align your code with SLDS 2 guidelines. SLDS Linter can also apply the suggestions in bulk across your repository and automatically fix your code. 
+SLDS Linter is an installable npm package that analyzes your code against Salesforce Lightning Design System 2 (SLDS 2) rules and offers suggestions to better align your code with SLDS 2 guidelines. SLDS Linter can also apply the suggestions in bulk across your repository and automatically fix your code.
+
+For detailed information about SLDS Linter, see the [SLDS Linter developer guide](https://developer.salesforce.com/docs/platform/slds-linter/overview).
 
 ## Features
 
-SLDS Linter is a custom-built linting solution based on open source [ESLint](https://eslint.org/) with CSS support. It supports linting for both types of Lightning components. 
+SLDS Linter is a custom-built linting solution based on open-source [ESLint](https://eslint.org/) projects. It supports linting for both types of Lightning components. 
 
-- Lightning web component *.html markup and Cascading Style Sheet (CSS) files
-- Aura component *.cmp markup and CSS files
+- Lightning web components: HTML and Cascading Style Sheet (CSS) files
+- Aura components: Component (CMP) and CSS files
 
 Run SLDS Linter in a terminal window or in Visual Studio (VS) Code. We recommend running in VS Code.
 
@@ -67,7 +69,7 @@ In your project root directory, follow these instructions.
 5. Open the generated `.sarif` report file.
 6. Make a note of how many components SLDS Linter has identified that you must update.
 7. (Optional) To automatically fix validation errors in bulk, run the `lint` command with the `fix` option, `npx @salesforce-ux/slds-linter lint --fix`.
-8. (Optional) To emit the configuration files used by `slds-linter`, run `npx @salesforce-ux/slds-linter emit` in your component source directory. Note that this command defaults to current working directory. These configuration files are discovered by your VS Code ESLint extension to display squiggly lines in CSS and HTML files when opened in your code editor.  
+8. (Optional) To emit the configuration files used by `slds-linter`, run `npx @salesforce-ux/slds-linter emit` in your component source directory. Note that this command defaults to current working directory. These configuration files are discovered by your VS Code ESLint extension to display squiggly lines in HTML, CSS and CMP files when opened in your code editor.  
 
 
 ### Troubleshoot SARIF Viewer Navigation
@@ -102,9 +104,9 @@ To view help for these options, add `--help` to each command. For example, run `
 
 ## Extensions
 
-To enhance your linting and error analysis experience, we recommend that you install these VS Code extensions. These extensions significantly improve your development workflow and make it easier to navigate and address linting issues.
+To enhance your linting and error analysis experience, we recommend that you install these VS Code extensions. This extension significantly improves your development workflow and makes it easier to navigate and address linting issues.
 
-- *[ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)*:  Essential for JavaScript, TypeScript, HTML, CMP, and CSS linting. It checks your code and highlights any violations of the ESLint rules with squiggly lines to show you what to fix.
+- *[ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)*:  Essential for JavaScript, TypeScript, HTML, CMP, and CSS linting. It checks your code and highlights any violations of the ESLint rules with squiggly lines.
 
 ## Best Practices
 
