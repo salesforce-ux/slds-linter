@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/eslint-plugin-slds",
-  "version": "0.5.3",
+  "version": "1.0.1",
   "main": "build/index.js",
   "exports": {
     ".": {
