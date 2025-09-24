@@ -1,8 +1,13 @@
-import { findAttr, isAttributesEmpty } from "./utils/node";
+import { Rule } from 'eslint';
+import { findAttr, isAttributesEmpty } from "../utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
+import ruleMessages from '../config/rule-messages.yml';
+import enforceBemUsageCss from './v9/enforce-bem-usage';
+
 const bemMapping = metadata.bemNaming;
 const deprecatedClasses = metadata.deprecatedClasses;
-
+const ruleConfig = ruleMessages['enforce-bem-usage'];
+const { type, description, url, messages } = ruleConfig;
 /**
  * Checks if a given className or its BEM mapped equivalent is deprecated.
  * 
@@ -16,28 +21,7 @@ const isDeprecatedClass = (className : string) => {
   return (deprecatedClasses.includes(className) || deprecatedClasses.includes(bemMapping[className]))
 }
 
-export = {
-  meta: {
-    type: "problem", // The rule type
-    docs: {
-      category: "Stylistic Issues",
-      recommended: true,
-      description: "Replace BEM double-dash syntax in class names with single underscore syntax.",
-      url : "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-bem-usage"
-    },
-    fixable: "code", // This rule can be fixed automatically
-    schema: [
-      {
-        type: "object",
-        properties: {
-          pattern: { type: "string" }, // Regex pattern for BEM
-          flags: { type: "string" }, // Regex flags
-        },
-        additionalProperties: false,
-      },
-    ],
-  },
-
+const enforceBemUsageHtml = {
   create(context) {  
 
     function check(node) {
@@ -68,11 +52,11 @@ export = {
             context.report({
               node,
               loc: { start: startLoc, end: endLoc },
+              messageId: 'bemDoubleDash',
               data: {
                 actual: className,
                 newValue
               },
-              message: "{{actual}} has been retired. Update it to the new name {{newValue}}.",
               fix(fixer) {
                 if (newValue) {
                   const newClassValue = classAttr.value.value.replace(
@@ -97,3 +81,42 @@ export = {
     };
   },
 };
+
+
+
+// Create a hybrid rule that works for both HTML and CSS
+const enforceBemUsage = {
+  meta: {
+    type,
+    docs: {
+      recommended: true,
+      description,
+      url
+    },
+    fixable: "code",
+    messages
+  },
+
+  create(context) {
+    const filename = context.filename || context.getFilename();
+    
+    // Check if we're in a CSS context
+    if (filename.endsWith('.css') || filename.endsWith('.scss')) {
+      // Try to detect if we have CSS support
+      // In ESLint v9 with @eslint/css, we should have CSS AST support
+      try {
+        // Use CSS implementation (ESLint v9 with @eslint/css)
+        return enforceBemUsageCss.create(context);
+      } catch (error) {
+        // If CSS implementation fails, likely ESLint v8 without CSS support
+        // Return empty visitor to avoid errors
+        return {};
+      }
+    } else {
+      // Use HTML implementation (compatible with both ESLint v8 and v9)
+      return enforceBemUsageHtml.create(context);
+    }
+  },
+};
+
+export = enforceBemUsage;

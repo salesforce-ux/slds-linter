@@ -11,13 +11,15 @@
     "./config": {
       "import": "./eslint.config.mjs",
       "require": "./eslint.config.mjs"
-    }
+    },
+    "./rule-messages.yml": "./src/config/rule-messages.yml"
   },
   "files": [
     "build/**",
     "README.md",
     "RULES.md",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "src/config/rule-messages.yml"
   ],
   "engines": {
     "node": ">=18.18.0"
@@ -37,9 +39,12 @@
   "license": "ISC",
   "description": "ESLint plugin provides custom linting rules specifically built for Salesforce Lightning Design System 2 (SLDS 2 beta)",
   "dependencies": {
+    "@eslint/css": "^0.9.0",
+    "@eslint/css-tree": "^3.6.5",
     "@html-eslint/eslint-plugin": "^0.34.0",
     "@html-eslint/parser": "^0.34.0",
-    "@salesforce-ux/sds-metadata": "^0.3.3"
+    "@salesforce-ux/sds-metadata": "^0.3.3",
+    "chroma-js": "^3.1.2"
   },
   "peerDependencies": {
     "eslint": "^8.0.0 || ^9.0.0"
@@ -50,10 +55,13 @@
     }
   },
   "devDependencies": {
+    "@types/chroma-js": "^2.4.4",
     "@types/eslint": "^8.56.0",
     "@types/jest": "^29.5.14",
+    "@types/node": "^20.11.19",
     "jest": "^29.7.0",
-    "ts-jest": "^29.2.5"
+    "ts-jest": "^29.2.5",
+    "yaml": "^2.8.1"
   },
   "repository": {
     "type": "git",

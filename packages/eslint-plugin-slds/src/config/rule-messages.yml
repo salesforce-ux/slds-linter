@@ -1,0 +1,143 @@
+# ESLint Rule Messages - Complete Configuration
+# This file contains all rule metadata: descriptions, documentation URLs, user-facing messages etc.
+
+# =============================================================================
+# CSS Rules (ESLint v9 with @eslint/css)
+# =============================================================================
+
+no-slds-class-overrides:
+  description: "Create new custom CSS classes instead of overriding SLDS selectors"
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides"
+  type: "problem"
+  messages:
+    sldsClassOverride: "Overriding .{{className}} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button."
+
+no-deprecated-slds-classes:
+  description: "Please replace the deprecated classes with a modern equivalent"
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-slds-classes"
+  type: "problem"
+  messages:
+    deprecatedClass: "The class {{className}} is deprecated and not available in SLDS2. Please update to a supported class."
+
+no-deprecated-tokens-slds1:
+  description: "Update outdated design tokens to SLDS 2 styling hooks with similar values. For more information, see Styling Hooks on lightningdesignsystem.com."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-tokens-slds1"
+  type: "problem"
+  messages:
+    deprecatedToken: "Consider removing {{oldValue}} or replacing it with {{newValue}}. Set the fallback to {{oldValue}}. For more info, see Styling Hooks on lightningdesignsystem.com."
+    noReplacement: "Update outdated design tokens to SLDS 2 styling hooks with similar values. For more information, see Styling Hooks on lightningdesignsystem.com."
+
+enforce-sds-to-slds-hooks:
+  description: "Convert your existing --sds styling hooks to --slds styling hooks. See lightningdesignsystem.com for more info."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-sds-to-slds-hooks"
+  type: "problem"
+  messages:
+    replaceSdsWithSlds: "Replace {{oldValue}} with {{suggestedMatch}} styling hook."
+  
+# =============================================================================
+# HTML/Component Rules (ESLint v8 & v9)
+# =============================================================================
+
+enforce-bem-usage:
+  description: "Replace BEM double-dash syntax in class names with single underscore syntax"
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-bem-usage"
+  type: "problem"
+  messages:
+    bemDoubleDash: "{{actual}} has been retired. Update it to the new name {{newValue}}."
+    fixBemNaming: "Update to correct BEM naming convention"
+
+modal-close-button-issue:
+  description: "Update component attributes or CSS classes for the modal close button to comply with the modal component blueprint"
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#modal-close-button-issue"
+  type: "problem"
+  messages:
+    modalCloseButtonIssue: "Update component attributes or CSS classes for the modal close button to comply with the modal component blueprint."
+    removeClass: "Remove the slds-button_icon-inverse class from the modal close button in components that use the SLDS modal blueprint."
+    changeVariant: "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>."
+    removeVariant: "Remove the variant attribute from the <lightning-icon> component inside the <button> element."
+    ensureButtonClasses: "Add or move slds-button and slds-button_icon to the class attribute of the <button> element or <lightning-button-icon> component."
+    ensureSizeAttribute: "To size icons properly, set the size attribute ‌to large in the <lightning-icon> and <lightning-button-icon> components."
+
+no-deprecated-classes-slds2:
+  description: "Replace classes that aren't available with SLDS 2 classes"
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-classes-slds2"
+  type: "problem"
+  messages:
+    deprecatedClass: "The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information."
+    updateToModernClass: "Replace deprecated class with modern equivalent"
+    checkDocumentation: "See lightningdesignsystem.com for SLDS 2 class alternatives"
+
+lwc-token-to-slds-hook:
+  description: "Replace the deprecated --lwc tokens with the latest --slds tokens. See lightningdesignsystem.com for more info."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#lwc-token-to-slds-hook"
+  type: "problem"
+  messages:
+    errorWithReplacement: "The '{{oldValue}}' design token is deprecated. Replace it with '{{newValue}}'. For more info, see Global Styling Hooks on lightningdesignsystem.com."
+    errorWithStyleHooks: "The '{{oldValue}}' design token is deprecated. Replace it with the SLDS 2 '{{newValue}}' styling hook and set the fallback to '{{oldValue}}'. For more info, see Global Styling Hooks on lightningdesignsystem.com."
+    errorWithNoRecommendation: "The '{{oldValue}}' design token is deprecated. For more info, see the New Global Styling Hook Guidance on lightningdesignsystem.com."
+
+no-sldshook-fallback-for-lwctoken:
+  description: "Avoid using --slds styling hooks as fallback values for --lwc tokens."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-sldshook-fallback-for-lwctoken"
+  type: "problem"
+  messages:
+    unsupportedFallback: "Remove the {{sldsToken}} styling hook that is used as a fallback value for {{lwcToken}}."
+
+no-unsupported-hooks-slds2:
+  description: "Identifies styling hooks that aren't present in SLDS 2. They must be replaced with styling hooks that have a similar effect, or they must be removed."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-unsupported-hooks-slds2"
+  type: "problem"
+  messages:
+    deprecated: "The {{token}} styling hook isn't present in SLDS 2 and there's no equivalent replacement. Remove it or replace it with a styling hook with a similar effect."
+
+no-slds-var-without-fallback:
+  description: "Add fallback values to SLDS styling hooks. The fallback values are used in Salesforce environments where styling hooks are unavailable."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-var-without-fallback"
+  type: "problem"
+  messages:
+    varWithoutFallback: "Your code uses the {{cssVar}} styling hook without a fallback value. Styling hooks are unavailable in some Salesforce environments. To render your component correctly in all environments, add this fallback value: var({{cssVar}}, {{recommendation}}). To make this fallback value brand-aware, use a branded design token instead of a static value. See Design Tokens on v1.lightningdesignsystem.com."
+
+no-slds-namespace-for-custom-hooks:
+  description: "To differentiate custom styling hooks from SLDS styling hooks, create custom styling hooks in your namespace."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-namespace-for-custom-hooks"
+  type: "problem"
+  messages:
+    customHookNamespace: "Using the --slds namespace for {{token}} isn't supported. Create the custom styling hook in your namespace. Example: --myapp-{{tokenWithoutNamespace}}"
+
+no-slds-private-var:
+  description: "Some SLDS styling hooks are private and reserved only for internal Salesforce use. Private SLDS styling hooks have prefixes --_slds- and --slds-s-. For more information, look up private CSS in lightningdesignsystem.com."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-private-var"
+  type: "problem"
+  messages:
+    privateVar: "This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector {{prop}}. For more information, look up private CSS in lightningdesignsystem.com."
+
+enforce-component-hook-naming-convention:
+  description: "Replace component styling hooks that use a deprecated naming convention."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#enforce-component-hook-naming-convention"
+  type: "problem"
+  messages:
+    replace: "Replace the deprecated {{oldValue}} component styling hook with {{suggestedMatch}}."
+
+no-hardcoded-values-slds1:
+  description: "Replace static values with SLDS 1 design tokens. For more information, look up design tokens on lightningdesignsystem.com."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-hardcoded-value"
+  type: "suggestion"
+  messages:
+    hardcodedValue: "Replace the {{oldValue}} static value with an SLDS 1 styling hook: {{newValue}}."
+    noReplacement: "There's no replacement styling hook for the {{oldValue}} static value. Remove the static value."
+
+no-hardcoded-values-slds2:
+  description: "Replace static values with SLDS 2 styling hooks. For more information, look up design tokens on lightningdesignsystem.com."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-hardcoded-value"
+  type: "suggestion"
+  messages:
+    hardcodedValue: "Consider replacing the {{oldValue}} static value with an SLDS 2 styling hook that has a similar value: {{newValue}}."
+    noReplacement: "There's no replacement styling hook for the {{oldValue}} static value. Remove the static value."
+
+reduce-annotations:
+  description: "Remove your annotations and update your code."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#reduce-annotations"
+  type: "problem"
+  messages:
+    removeAnnotation: "Remove this annotation and update the code to SLDS best practices. For help, file an issue at https://github.com/salesforce-ux/slds-linter/"
+

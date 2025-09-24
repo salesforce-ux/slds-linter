@@ -23,8 +23,36 @@ describe('Unified plugin export', () => {
 
   it('should export a flat (v9+) config', () => {
     expect(plugin.configs['flat/recommended']).toBeDefined();
-    const flatConfig = plugin.configs['flat/recommended'][0];
-    expect(flatConfig.plugins['@salesforce-ux/slds']).toBe(plugin);
-    expect(flatConfig.rules['@salesforce-ux/slds/enforce-bem-usage']).toBe('error');
+    expect(plugin.configs['flat/recommended']).toHaveLength(2);
+    
+    // Test CSS config (first element)
+    const cssConfig = plugin.configs['flat/recommended'][0];
+    expect(cssConfig.plugins['@salesforce-ux/slds']).toBe(plugin);
+    expect(cssConfig.files).toContain('**/*.{css,scss}');
+    expect(cssConfig.rules['@salesforce-ux/slds/no-slds-class-overrides']).toBe('warn');
+    
+    // Test HTML config (second element)  
+    const htmlConfig = plugin.configs['flat/recommended'][1];
+    expect(htmlConfig.plugins['@salesforce-ux/slds']).toBe(plugin);
+    expect(htmlConfig.files).toContain('**/*.html');
+    expect(htmlConfig.rules['@salesforce-ux/slds/enforce-bem-usage']).toBe('error');
+  });
+
+  it('should export separate flat CSS and HTML configs', () => {
+    // Test flat/recommended-css config
+    expect(plugin.configs['flat/recommended-css']).toBeDefined();
+    expect(plugin.configs['flat/recommended-css']).toHaveLength(1);
+    const cssConfig = plugin.configs['flat/recommended-css'][0];
+    expect(cssConfig.plugins['@salesforce-ux/slds']).toBe(plugin);
+    expect(cssConfig.files).toContain('**/*.{css,scss}');
+    expect(cssConfig.rules['@salesforce-ux/slds/no-slds-class-overrides']).toBe('warn');
+
+    // Test flat/recommended-html config
+    expect(plugin.configs['flat/recommended-html']).toBeDefined();
+    expect(plugin.configs['flat/recommended-html']).toHaveLength(1);
+    const htmlConfig = plugin.configs['flat/recommended-html'][0];
+    expect(htmlConfig.plugins['@salesforce-ux/slds']).toBe(plugin);
+    expect(htmlConfig.files).toContain('**/*.html');
+    expect(htmlConfig.rules['@salesforce-ux/slds/enforce-bem-usage']).toBe('error');
   });
 }); 
