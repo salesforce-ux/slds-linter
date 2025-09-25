@@ -228,7 +228,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
         width: calc(100% - var(--lwc-nubbinTriangleOffset)); 
       }`,
       output: `.example { 
-        width: calc(100% - -0.1875rem); 
+        width: calc(100% - calc(var(--slds-g-sizing-base) * -0.1875)); 
       }`,
       filename: 'test.css',
       errors: [{
@@ -259,7 +259,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
     // Multiple occurrences of the same LWC token in a single property (similar to Stylelint test)
     {
       code: `.test { padding: var(--lwc-nubbinTriangleOffset) var(--lwc-nubbinTriangleOffset) var(--lwc-nubbinTriangleOffset) var(--lwc-nubbinTriangleOffset); }`,
-      output: `.test { padding: -0.1875rem -0.1875rem -0.1875rem -0.1875rem; }`,
+      output: `.test { padding: calc(var(--slds-g-sizing-base) * -0.1875) calc(var(--slds-g-sizing-base) * -0.1875) calc(var(--slds-g-sizing-base) * -0.1875) calc(var(--slds-g-sizing-base) * -0.1875); }`,
       filename: 'test.css',
       errors: [
         { messageId: 'errorWithReplacement', type: 'Identifier' },
