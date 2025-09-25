@@ -128,7 +128,7 @@ no-hardcoded-values-slds1:
 
 no-hardcoded-values-slds2:
   description: "Replace static values with SLDS 2 styling hooks. For more information, look up design tokens on lightningdesignsystem.com."
-  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-hardcoded-value"
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-hardcoded-values-slds2"
   type: "suggestion"
   messages:
     hardcodedValue: "Consider replacing the {{oldValue}} static value with an SLDS 2 styling hook that has a similar value: {{newValue}}."

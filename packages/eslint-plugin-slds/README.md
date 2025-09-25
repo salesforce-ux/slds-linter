@@ -67,6 +67,7 @@ By default, the latest version of the plugin supports legacy and flat config sys
 - `enforce-component-hook-naming-convention`: Identifies --slds-c component-level styling hooks that use a deprecated naming convention.
 - `no-deprecated-slds-classes`: Please replace the deprecated classes with a modern equivalent.
 - `reduce-annotations`: Identifies annotations that must be removed from the code.
+- `lwc-token-to-slds-hook`: Identifies the deprecated --lwc tokens that must be replaced with the latest --slds tokens. For more information, see lightningdesignsystem.com.
 
 ## License
 
