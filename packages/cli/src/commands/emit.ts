@@ -10,47 +10,66 @@ import path from "path";
 import { writeFile, readFile } from 'fs/promises';
 
 /**
- * Load rules from ESLint plugin based on extends config
+ * Reusable plugin loader utility
  */
-async function loadRuleConfigs(extendsConfig: string) {
-  try {
-    const sldsPlugin = await import('@salesforce-ux/eslint-plugin-slds');
-    const plugin = sldsPlugin.default || sldsPlugin;
-    const pluginWithConfigs = plugin as any;
-    
-    if (extendsConfig.includes('recommended')) {
-      const configToExtract = pluginWithConfigs.configs?.['flat/recommended'] || pluginWithConfigs.configs?.['recommended'];
-      
-      if (Array.isArray(configToExtract)) {
-        let allRules = {};
-        configToExtract.forEach((config: any) => {
-          if (config.rules) Object.assign(allRules, config.rules);
-        });
-        return Object.keys(allRules).length > 0 ? allRules : null;
-      } else if (configToExtract?.rules) {
-        return configToExtract.rules;
-      }
-    }
-  } catch (error) {
-    // Silently fail
+async function loadSldsPlugin() {
+  const sldsPlugin = await import('@salesforce-ux/eslint-plugin-slds');
+  return (sldsPlugin.default || sldsPlugin) as any;
+}
+
+/**
+ * Reusable rules extractor
+ */
+function extractRulesFromConfig(configToExtract: any): Record<string, string> | null {
+  if (Array.isArray(configToExtract)) {
+    const allRules = {};
+    configToExtract.forEach((config: any) => {
+      if (config.rules) Object.assign(allRules, config.rules);
+    });
+    return Object.keys(allRules).length > 0 ? allRules : null;
+  } else if (configToExtract?.rules) {
+    return configToExtract.rules;
   }
   return null;
 }
 
 /**
- * Generate enhanced ESLint config with dynamic rules injection
+ * Load rules from ESLint plugin for "@salesforce-ux/slds/recommended" config
+ */
+async function loadRuleConfigs() {
+  try {
+    const plugin = await loadSldsPlugin();
+    const configToExtract = plugin.configs?.['flat/recommended'] || plugin.configs?.['recommended'];
+    return extractRulesFromConfig(configToExtract);
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Reusable config formatter utility
+ */
+function formatRulesForConfig(rules: Record<string, string>): string {
+  return JSON.stringify(rules, null, 4).replace(/\n/g, '\n    ');
+}
+
+/**
+ * Generate enhanced ESLint config targeted for eslint.config.mjs structure
  */
 async function generateEnhancedESLintConfig(sourceConfigPath: string): Promise<string> {
   const config = await readFile(sourceConfigPath, 'utf8');
-  const extendsMatch = config.match(/extends:\s*\[(.*?)\]/s);
-  const rules = extendsMatch ? await loadRuleConfigs(extendsMatch[1]) : null;
+  const rules = await loadRuleConfigs();
   
-  return rules 
-    ? config.replace(
-        /(extends:\s*\[.*?\])/s,
-        `$1,\n    rules: ${JSON.stringify(rules, null, 6).replace(/\n/g, '\n    ')}`
-      )
-    : config;
+  if (rules) {
+    const formattedRules = formatRulesForConfig(rules);
+    return config.replace(
+      /extends:\s*\["@salesforce-ux\/slds\/recommended"\]/,
+      `extends: ["@salesforce-ux/slds/recommended"],
+    rules: ${formattedRules}`
+    );
+  }
+  
+  return config;
 }
 
 export function registerEmitCommand(program: Command): void {
@@ -73,7 +92,7 @@ export function registerEmitCommand(program: Command): void {
         
         await writeFile(destESLintConfigPath, enhancedConfig, 'utf8');
         
-        Logger.success(chalk.green(`ESLint configuration created at:\n${destPath}\n`));
+        Logger.success(chalk.green(`ESLint configuration created at:\n${destESLintConfigPath}\n`));
         Logger.info(chalk.cyan("Rules are dynamically loaded based on extends configuration."));
       } catch (error: any) {
         Logger.error(
