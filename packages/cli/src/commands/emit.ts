@@ -8,29 +8,18 @@ import {
 } from "../services/config.resolver";
 import path from "path";
 import { writeFile, readFile } from 'fs/promises';
-
-/**
- * Reusable plugin loader utility
- */
-async function loadSldsPlugin() {
-  const sldsPlugin = await import('@salesforce-ux/eslint-plugin-slds');
-  return (sldsPlugin.default || sldsPlugin) as any;
-}
+import sldsPlugin from '@salesforce-ux/eslint-plugin-slds';
 
 /**
  * Reusable rules extractor
  */
 function extractRulesFromConfig(configToExtract: any): Record<string, string> | null {
-  if (Array.isArray(configToExtract)) {
-    const allRules = {};
-    configToExtract.forEach((config: any) => {
-      if (config.rules) Object.assign(allRules, config.rules);
-    });
-    return Object.keys(allRules).length > 0 ? allRules : null;
-  } else if (configToExtract?.rules) {
-    return configToExtract.rules;
-  }
-  return null;
+  configToExtract = Array.isArray(configToExtract) ? configToExtract : [configToExtract];
+  const allRules = {};
+  configToExtract.forEach((config: any) => {
+    if (config.rules) Object.assign(allRules, config.rules);
+  });
+  return Object.keys(allRules).length > 0 ? allRules : null;
 }
 
 /**
@@ -38,7 +27,7 @@ function extractRulesFromConfig(configToExtract: any): Record<string, string> | 
  */
 async function loadRuleConfigs() {
   try {
-    const plugin = await loadSldsPlugin();
+    const plugin = sldsPlugin as any;
     const configToExtract = plugin.configs?.['flat/recommended'] || plugin.configs?.['recommended'];
     return extractRulesFromConfig(configToExtract);
   } catch (error) {
