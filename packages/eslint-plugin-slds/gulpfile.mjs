@@ -6,7 +6,7 @@ import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 import { parse } from 'yaml';
 import { readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { resolve, dirname, basename } from 'path';
 
 /**
  * esbuild plugin to handle YAML imports
@@ -15,12 +15,13 @@ const yamlPlugin = {
   name: 'yaml',
   setup(build) {
     build.onResolve({ filter: /\.ya?ml$/ }, args => ({
-      path: resolve(dirname(args.importer), args.path),
+      path: basename(resolve(dirname(args.importer), args.path)),
       namespace: 'yaml-file',
-      external: false  // Mark as internal to bundle into output
+      external: false,  // Mark as internal to bundle into output
+      pluginData: { originalPath: resolve(dirname(args.importer), args.path) }
     }));
     build.onLoad({ filter: /.*/, namespace: 'yaml-file' }, args => ({
-      contents: `module.exports = ${JSON.stringify(parse(readFileSync(args.path, 'utf8')), null, 2)};`,
+      contents: `module.exports = ${JSON.stringify(parse(readFileSync(args.pluginData.originalPath, 'utf8')), null, 2)};`,
       loader: 'js',
     }));
   },
