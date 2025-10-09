@@ -46,6 +46,60 @@ function getRecommendation(lwcToken: string) {
   return { hasRecommendation, recommendation, replacementCategory };
 }
 
+/**
+ * Extract LWC variable information from var() function nodes
+ * Returns the LWC token name and any existing fallback value
+ */
+function extractLwcVariableWithFallback(node: any, sourceCode: any): { lwcToken: string; fallbackValue: string | null } | null {
+  if (!node || node.type !== 'Function' || node.name !== 'var') {
+    return null;
+  }
+
+  if (!node.children) {
+    return null;
+  }
+
+  // Convert children to array and get the first child (variable name)
+  const childrenArray = Array.from(node.children);
+  if (childrenArray.length === 0) {
+    return null;
+  }
+  
+  const firstChild = childrenArray[0] as any;
+  if (!firstChild || firstChild.type !== 'Identifier') {
+    return null;
+  }
+
+  const variableName = firstChild.name;
+  if (!variableName || !variableName.startsWith('--lwc-')) {
+    return null;
+  }
+
+  // Check if there's a fallback (comma separator)
+  const commaIndex = childrenArray.findIndex((child: any) => 
+    child.type === 'Operator' && child.value === ','
+  );
+
+  let fallbackValue: string | null = null;
+  if (commaIndex !== -1 && commaIndex + 1 < childrenArray.length) {
+    // Get the exact text from the source code for the fallback part
+    const fallbackStartNode = childrenArray[commaIndex + 1] as any;
+    const fallbackEndNode = childrenArray[childrenArray.length - 1] as any;
+    
+    if (fallbackStartNode.loc && fallbackEndNode.loc) {
+      const startOffset = fallbackStartNode.loc.start.offset;
+      const endOffset = fallbackEndNode.loc.end.offset;
+      const fullText = sourceCode.getText();
+      fallbackValue = fullText.substring(startOffset, endOffset).trim();
+    }
+  }
+
+  return {
+    lwcToken: variableName,
+    fallbackValue
+  };
+}
+
 function getReportMessage(cssVar: string, replacementCategory: ReplacementCategory, recommendation: string | string[]): { messageId: string, data: any } {
   if (!recommendation) {
     // Found a deprecated token but don't have any alternate recommendation then just report user to follow docs
@@ -105,8 +159,17 @@ export default {
             if (textAtPosition === oldValue) {
               return fixer.replaceTextRange([propertyStart, propertyEnd], suggestedMatch);
             }
+          } else if (node.type === "Function" && node.name === "var") {
+            // For var() function replacements, replace the entire function call
+            const sourceCode = context.sourceCode;
+            const fullText = sourceCode.getText();
+            const nodeOffset = node.loc.start.offset;
+            const nodeEnd = node.loc.end.offset;
+            
+            // Replace the entire var() function
+            return fixer.replaceTextRange([nodeOffset, nodeEnd], suggestedMatch);
           } else {
-            // For var() function replacements, we need to replace the entire function call
+            // For Identifier nodes inside var() functions, we need to replace the entire function call
             const sourceCode = context.sourceCode;
             const fullText = sourceCode.getText();
             
@@ -159,30 +222,37 @@ export default {
       },
 
       // LWC tokens inside var() functions: var(--lwc-*)
-      "Function[name='var'] Identifier[name=/^--lwc-/]"(node) {
-        const tokenName = node.name;
-        
-        if (shouldIgnoreDetection(tokenName)) {
+      "Function[name='var']"(node) {
+        const lwcVarInfo = extractLwcVariableWithFallback(node, context.sourceCode);
+        if (!lwcVarInfo) {
           return;
         }
 
-        const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(tokenName);
-        const { messageId, data } = getReportMessage(tokenName, replacementCategory, recommendation);
+        const { lwcToken, fallbackValue } = lwcVarInfo;
+        
+        if (shouldIgnoreDetection(lwcToken)) {
+          return;
+        }
+
+        const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(lwcToken);
+        const { messageId, data } = getReportMessage(lwcToken, replacementCategory, recommendation);
         
         let suggestedMatch: string | null = null;
         
         if (hasRecommendation) {
           if (replacementCategory === ReplacementCategory.SLDS_TOKEN) {
-            // Create the replacement in the format: var(--slds-token, var(--lwc-token))
-            // This matches the Stylelint rule's behavior for SLDS tokens
-            const originalVarCall = `var(${tokenName})`;
+            // Create the replacement in the format: var(--slds-token, var(--lwc-token, fallback))
+            // This preserves any existing fallback value
+            const originalVarCall = fallbackValue 
+              ? `var(${lwcToken}, ${fallbackValue})`
+              : `var(${lwcToken})`;
             suggestedMatch = `var(${recommendation}, ${originalVarCall})`;
           } else if (replacementCategory === ReplacementCategory.RAW_VALUE) {
             suggestedMatch = recommendation as string;
           }
         }
 
-        reportAndFix(node, tokenName, suggestedMatch, messageId, data);
+        reportAndFix(node, lwcToken, suggestedMatch, messageId, data);
       },
     };
   },
