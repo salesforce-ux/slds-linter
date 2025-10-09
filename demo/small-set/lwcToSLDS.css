@@ -65,3 +65,9 @@
 .test-class {
     padding: var(--lwc-spacingXxSmall) var(--lwc-spacingXxSmall) var(--lwc-spacingXxSmall) var(--lwc-spacingMedium);
 }
+
+.test-class-with-fallback {
+    background: var(--lwc-pageHeaderColorBackground,rgb(243, 242, 242));
+    border-radius: var(--lwc-borderRadiusMedium,0.25rem);
+    margin-bottom: var(--lwc-varSpacingVerticalMedium,1rem);
+}
