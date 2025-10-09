@@ -51,51 +51,40 @@ function getRecommendation(lwcToken: string) {
  * Returns the LWC token name and any existing fallback value
  */
 function extractLwcVariableWithFallback(node: any, sourceCode: any): { lwcToken: string; fallbackValue: string | null } | null {
-  if (!node || node.type !== 'Function' || node.name !== 'var') {
+  // Early validation - must be a var() function with children
+  if (!node?.children || node.type !== 'Function' || node.name !== 'var') {
     return null;
   }
 
-  if (!node.children) {
-    return null;
-  }
-
-  // Convert children to array and get the first child (variable name)
-  const childrenArray = Array.from(node.children);
-  if (childrenArray.length === 0) {
-    return null;
-  }
+  const children = Array.from(node.children);
+  const firstChild = children[0] as any;
   
-  const firstChild = childrenArray[0] as any;
-  if (!firstChild || firstChild.type !== 'Identifier') {
+  // Validate first child is an LWC token identifier
+  if (!firstChild?.name?.startsWith('--lwc-') || firstChild.type !== 'Identifier') {
     return null;
   }
 
-  const variableName = firstChild.name;
-  if (!variableName || !variableName.startsWith('--lwc-')) {
-    return null;
-  }
-
-  // Check if there's a fallback (comma separator)
-  const commaIndex = childrenArray.findIndex((child: any) => 
+  // Check for fallback (comma separator)
+  const commaIndex = children.findIndex((child: any) => 
     child.type === 'Operator' && child.value === ','
   );
 
+  // Extract fallback value if present
   let fallbackValue: string | null = null;
-  if (commaIndex !== -1 && commaIndex + 1 < childrenArray.length) {
-    // Get the exact text from the source code for the fallback part
-    const fallbackStartNode = childrenArray[commaIndex + 1] as any;
-    const fallbackEndNode = childrenArray[childrenArray.length - 1] as any;
+  if (commaIndex !== -1 && commaIndex + 1 < children.length) {
+    const fallbackStart = children[commaIndex + 1] as any;
+    const fallbackEnd = children[children.length - 1] as any;
     
-    if (fallbackStartNode.loc && fallbackEndNode.loc) {
-      const startOffset = fallbackStartNode.loc.start.offset;
-      const endOffset = fallbackEndNode.loc.end.offset;
+    if (fallbackStart?.loc && fallbackEnd?.loc) {
       const fullText = sourceCode.getText();
-      fallbackValue = fullText.substring(startOffset, endOffset).trim();
+      fallbackValue = fullText
+        .substring(fallbackStart.loc.start.offset, fallbackEnd.loc.end.offset)
+        .trim();
     }
   }
 
   return {
-    lwcToken: variableName,
+    lwcToken: firstChild.name,
     fallbackValue
   };
 }
