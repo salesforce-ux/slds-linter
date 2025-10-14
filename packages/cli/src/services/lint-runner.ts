@@ -22,7 +22,7 @@ export class LintRunner {
         'eslint.worker.js'
       );
 
-      // Process custom config
+      // Process custom config (only rewrites if dependencies not installed)
       const configPath = await ConfigLoader.processConfig(options.configPath);
       
       const workerConfig: WorkerConfig = {

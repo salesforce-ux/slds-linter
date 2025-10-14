@@ -6,26 +6,52 @@ import { Logger } from '../utils/logger';
 
 /**
  * Config Loader - Simple import rewriter for custom configs
- * Rewrites plugin and eslint imports to use CLI's bundled versions
+ * Only rewrites imports if dependencies aren't already installed
  */
 export class ConfigLoader {
   /**
-   * Process custom .mjs config to use bundled dependencies
+   * Check if package is installed in user's workspace
    */
-  static async processConfig(configPath: string): Promise<string> {
+  private static isPackageInstalled(packageName: string, fromPath: string): boolean {
+    try {
+      const require = createRequire(fromPath);
+      require.resolve(packageName);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Process custom .mjs config - only rewrite if dependencies not installed
+   */
+  static async processConfig(configPath: string | undefined): Promise<string | undefined> {
     if (!configPath?.endsWith('.mjs')) {
       return configPath;
     }
 
     try {
+      // Check if dependencies already installed in user's workspace
+      const userConfigUrl = `file://${configPath}`;
+      const pluginInstalled = this.isPackageInstalled('@salesforce-ux/eslint-plugin-slds', userConfigUrl);
+      const eslintInstalled = this.isPackageInstalled('eslint', userConfigUrl);
+      
+      if (pluginInstalled && eslintInstalled) {
+        Logger.debug('Dependencies already installed, using config as-is');
+        return configPath;
+      }
+
+      // Dependencies not installed - rewrite to use CLI's bundled versions
+      Logger.debug('Dependencies not installed, rewriting imports');
+      
       const configContent = await readFile(configPath, 'utf-8');
       const require = createRequire(import.meta.url);
       
-      // Get bundled paths
+      // Get CLI's bundled paths
       const pluginPath = require.resolve('@salesforce-ux/eslint-plugin-slds');
       const eslintConfigPath = require.resolve('eslint/config');
       
-      // Rewrite imports to use bundled versions
+      // Rewrite imports
       const rewritten = configContent
         .replace(
           /import\s+(\w+)\s+from\s+['"]@salesforce-ux\/eslint-plugin-slds['"]/g,
