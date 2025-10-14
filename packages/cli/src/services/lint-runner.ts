@@ -22,11 +22,11 @@ export class LintRunner {
         'eslint.worker.js'
       );
 
-      // Setup bundled dependencies so user configs can import the plugin
-      ConfigLoader.setupBundledDependencies();
+      // Process custom config
+      const configPath = await ConfigLoader.processConfig(options.configPath);
       
       const workerConfig: WorkerConfig = {
-        configPath: options.configPath,
+        configPath,
         fix: options.fix
       };
 
