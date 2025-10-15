@@ -1,11 +1,11 @@
 .wrapper {
   background: white;
-  box-shadow: var(--slds-s-button-shadow-focus, var(--lwc-shadowButtonFocus, t(shadowButtonFocus)));
+  box-shadow: t(shadowButtonFocus);
 }
 
 .wrapper {
-  outline: var(--slds-g-sizing-border-1, 1px) solid red;
-  outline-width: var(--slds-g-sizing-border-1, 1px);
+  outline: 1px solid red;
+  outline-width: 1px;
   outline-color: red;
 }
 
@@ -14,8 +14,8 @@
 }
 
 .wrapper {
-  padding: var(--slds-g-spacing-1, 4px) var(--slds-g-spacing-1, 4px) 2px var(--slds-g-spacing-1, 4px);
-  margin: var(--slds-g-spacing-1, 4px) var(--slds-g-spacing-1, 4px) 2px var(--slds-g-spacing-1, 4px);
+  padding: 4px 4px 2px 4px;
+  margin: 4px 4px 2px 4px;
 }
 
 .wrapper {
@@ -27,29 +27,29 @@
 }
 
 .wrapper {
-  --slds-s-link-shadow-focus: 0 0 0 2px var(--slds-g-color-surface-1, #ffffff), 0 0 0 3px var(--slds-g-color-brand-base-40);
+  --slds-s-link-shadow-focus: 0 0 0 2px var(--slds-g-color-surface-1), 0 0 0 3px var(--slds-g-color-brand-base-40);
 }
 
 
  .wrapper {
-  top: var(--slds-g-spacing-1, 0.25rem);
-  margin-bottom: var(--slds-g-spacing-3, 12px);
-  padding-left: var(--slds-g-spacing-3, 12px);
-  padding-right: var(--slds-g-spacing-3, 12px);
-  padding-top: var(--slds-g-spacing-3, 12px);
-  padding-bottom: var(--slds-g-spacing-3, 12px);
-  margin-left: var(--slds-g-spacing-3, 12px);
-  margin-right: var(--slds-g-spacing-3, 12px);
-  margin-top: var(--slds-g-spacing-3, 12px);
-  margin-bottom: var(--slds-g-spacing-3, 12px);
-  border-left-width: var(--slds-g-sizing-4, 12px);
-  border-right-width: var(--slds-g-sizing-4, 12px);
-  border-top-width: var(--slds-g-sizing-4, 12px);
-  border-bottom-width: var(--slds-g-sizing-4, 12px);
-  border-inline-start-width: var(--slds-g-sizing-4, 12px);
-  border-inline-end-width: var(--slds-g-sizing-4, 12px);
-  border-block-start-width: var(--slds-g-sizing-4, 12px);
-  border-block-end-width: var(--slds-g-sizing-4, 12px);
+  top: .25rem;
+  margin-bottom: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  margin-left: 12px;
+  margin-right: 12px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  border-left-width: 12px;
+  border-right-width: 12px;
+  border-top-width: 12px;
+  border-bottom-width: 12px;
+  border-inline-start-width: 12px;
+  border-inline-end-width: 12px;
+  border-block-start-width: 12px;
+  border-block-end-width: 12px;
   border-left-color: #001639;
   border-right-color: #001639;
   border-top-color: #001639;
@@ -58,23 +58,23 @@
   border-inline-end-color: #001639;
   border-block-start-color: #001639;
   border-block-end-color: #001639;
-  margin: 0 var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-2, 0.5rem) 0;
-  padding: var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-2, 0.5rem);
-  border-radius: var(--slds-g-radius-border-circle, 100%);
-  border-top-left-radius: var(--slds-g-radius-border-circle, 100%);
-  border-top-right-radius: var(--slds-g-radius-border-circle, 100%);
-  border-bottom-right-radius: var(--slds-g-radius-border-circle, 100%);
-  border-bottom-left-radius: var(--slds-g-radius-border-circle, 100%);
-  border-start-start-radius: var(--slds-g-radius-border-circle, 100%);
-  border-start-end-radius: var(--slds-g-radius-border-circle, 100%);
-  border-end-start-radius: var(--slds-g-radius-border-circle, 100%);
-  border-end-end-radius: var(--slds-g-radius-border-circle, 100%);
-  height: var(--slds-g-sizing-7, 24px);
-  width: var(--slds-g-sizing-7, 24px);
-  min-width: var(--slds-g-sizing-7, 24px);
-  max-width: var(--slds-g-sizing-7, 24px);
-  min-height: var(--slds-g-sizing-7, 24px);
-  max-height: var(--slds-g-sizing-7, 24px);  
-  width: var(--slds-g-sizing-13, 10rem);   
+  margin: 0 .5rem .5rem 0;
+  padding: 1rem .5rem;
+  border-radius: 100%;
+  border-top-left-radius: 100%;
+  border-top-right-radius: 100%;
+  border-bottom-right-radius: 100%;
+  border-bottom-left-radius: 100%;
+  border-start-start-radius: 100%;
+  border-start-end-radius: 100%;
+  border-end-start-radius: 100%;
+  border-end-end-radius: 100%;
+  height: 24px;
+  width: 24px;
+  min-width: 24px;
+  max-width: 24px;
+  min-height: 24px;
+  max-height: 24px;  
+  width: 10rem;   
   width: 2px;
  }
