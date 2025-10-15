@@ -44,6 +44,11 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       code: `.example { color: var(--sds-c-button-color-background); }`,
       filename: 'test.css',
     },
+    // Valid shared SLDS hooks (private/undocumented but legitimate)
+    {
+      code: `.example { box-shadow: var(--slds-s-button-shadow-focus, var(--lwc-shadowButtonFocus)); }`,
+      filename: 'test.css',
+    },
     // Other custom namespaces should be allowed
     {
       code: `.example { --custom-color: red; color: var(--custom-color); }`,
