@@ -1278,7 +1278,7 @@ __metadata:
     "@eslint/css-tree": "npm:^3.6.5"
     "@html-eslint/eslint-plugin": "npm:^0.34.0"
     "@html-eslint/parser": "npm:^0.34.0"
-    "@salesforce-ux/sds-metadata": "npm:^0.4.0"
+    "@salesforce-ux/sds-metadata": "npm:^1.1.0"
     "@types/chroma-js": "npm:^2.4.4"
     "@types/eslint": "npm:^8.56.0"
     "@types/jest": "npm:^29.5.14"
@@ -1295,10 +1295,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/sds-metadata@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "@salesforce-ux/sds-metadata@npm:0.4.0"
-  checksum: 10c0/0aeb608dce1edecfefa4e77df779cea149a1d7576ddaa5d25b08c25da6d0c9ce8d59311c4608da9d6ea13de2cb629ac138679c7bb64b3b541c1432f9cb328b0a
+"@salesforce-ux/sds-metadata@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@salesforce-ux/sds-metadata@npm:1.1.0"
+  checksum: 10c0/34ee8d0c0df8bacc7410fe4adc12aa46f715ec0105f514b67f28fb297d5566571f8a8aefc260a36e227a7046fc4c7edb2e13a230f4332e3ef646bf76c20c77a5
   languageName: node
   linkType: hard
 
