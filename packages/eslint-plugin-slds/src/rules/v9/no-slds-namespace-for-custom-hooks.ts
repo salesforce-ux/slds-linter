@@ -67,33 +67,30 @@ export default {
             if (!shouldIgnoreDetection(tokenName)) {
               const tokenWithoutNamespace = tokenName.replace('--slds-', '').replace('--sds-', '');
               
-              const report: any = {
-                node,
-                messageId: 'customHookNamespace',
-                data: { 
-                  token: tokenName,
-                  tokenWithoutNamespace
-                }
-              };
-
-              // Calculate exact position within the value using positionInfo if available
-              if (positionInfo?.start && positionInfo?.end && node.value.loc) {
-                const valueLoc = node.value.loc;
-                // positionInfo positions are 1-based and relative to value text
-                // valueLoc positions are absolute in the source
-                report.loc = {
-                  start: {
-                    line: valueLoc.start.line + positionInfo.start.line - 1,
-                    column: valueLoc.start.column + positionInfo.start.column - 1
+              // Use exact position if available, otherwise report on declaration node
+              if (positionInfo.start && positionInfo.end && node.value.loc) {
+                context.report({
+                  node,
+                  loc: {
+                    start: {
+                      line: node.value.loc.start.line + positionInfo.start.line - 1,
+                      column: node.value.loc.start.column + positionInfo.start.column - 1
+                    },
+                    end: {
+                      line: node.value.loc.start.line + positionInfo.end.line - 1,
+                      column: node.value.loc.start.column + positionInfo.end.column - 1
+                    }
                   },
-                  end: {
-                    line: valueLoc.start.line + positionInfo.end.line - 1,
-                    column: valueLoc.start.column + positionInfo.end.column - 1
-                  }
-                };
+                  messageId: 'customHookNamespace',
+                  data: { token: tokenName, tokenWithoutNamespace }
+                });
+              } else {
+                context.report({
+                  node,
+                  messageId: 'customHookNamespace',
+                  data: { token: tokenName, tokenWithoutNamespace }
+                });
               }
-              
-              context.report(report);
             }
           });
         }
