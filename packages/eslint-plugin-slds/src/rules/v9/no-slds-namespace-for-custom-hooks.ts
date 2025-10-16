@@ -1,6 +1,8 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages.yml';
+import { forEachNamespacedVariable, type CssVariableInfo } from '../../utils/css-utils';
+import type { PositionInfo } from '../../utils/hardcoded-shared-utils';
 
 const ruleConfig = ruleMessages['no-slds-namespace-for-custom-hooks'];
 const { type, description, url, messages } = ruleConfig;
@@ -35,40 +37,66 @@ export default {
   },
   
   create(context) {
-    function reportViolation(node, token: string) {
-      const tokenWithoutNamespace = token.replace('--slds-', '').replace('--sds-', '');
-      
-      context.report({
-        node,
-        messageId: 'customHookNamespace',
-        data: { 
-          token,
-          tokenWithoutNamespace
-        }
-      });
-    }
-
     return {
-      // CSS custom property declarations: --slds-* and --sds-* properties
-      "Declaration[property=/^--s(lds|ds)-/]"(node) {
+      "Declaration"(node) {
+        // Check 1: Property name (left-side) for custom properties using reserved namespaces
         const property = node.property;
-        
-        if (shouldIgnoreDetection(property)) {
-          return;
+        if (property && 
+            (property.startsWith('--slds-') || property.startsWith('--sds-')) &&
+            !shouldIgnoreDetection(property)) {
+          const tokenWithoutNamespace = property.replace('--slds-', '').replace('--sds-', '');
+          
+          // Report at the property location (before the colon)
+          context.report({
+            node,
+            loc: node.loc, // Use full declaration loc which includes the property
+            messageId: 'customHookNamespace',
+            data: { 
+              token: property,
+              tokenWithoutNamespace
+            }
+          });
         }
-        
-        reportViolation(node, property);
-      },
 
-      // SLDS/SDS tokens inside var() functions: var(--slds-*) or var(--sds-*)
-      "Function[name='var'] Identifier[name=/^--s(lds|ds)-/]"(node) {
-        const tokenName = node.name;
-        
-        if (shouldIgnoreDetection(tokenName)) {
-          return;
+        // Check 2: Property value (right-side) - Use AST parsing to detect var() functions
+        const valueText = context.sourceCode.getText(node.value);
+        if (valueText) {
+          forEachNamespacedVariable(valueText, (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => {
+            const { name: tokenName } = variableInfo;
+            
+            if (!shouldIgnoreDetection(tokenName)) {
+              const tokenWithoutNamespace = tokenName.replace('--slds-', '').replace('--sds-', '');
+              
+              const report: any = {
+                node,
+                messageId: 'customHookNamespace',
+                data: { 
+                  token: tokenName,
+                  tokenWithoutNamespace
+                }
+              };
+
+              // Calculate exact position within the value using positionInfo if available
+              if (positionInfo?.start && positionInfo?.end && node.value.loc) {
+                const valueLoc = node.value.loc;
+                // positionInfo positions are 1-based and relative to value text
+                // valueLoc positions are absolute in the source
+                report.loc = {
+                  start: {
+                    line: valueLoc.start.line + positionInfo.start.line - 1,
+                    column: valueLoc.start.column + positionInfo.start.column - 1
+                  },
+                  end: {
+                    line: valueLoc.start.line + positionInfo.end.line - 1,
+                    column: valueLoc.start.column + positionInfo.end.column - 1
+                  }
+                };
+              }
+              
+              context.report(report);
+            }
+          });
         }
-        
-        reportViolation(node, tokenName);
       },
     };
   },

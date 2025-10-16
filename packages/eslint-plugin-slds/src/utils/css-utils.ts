@@ -27,10 +27,15 @@ export interface CssVariableInfo {
 }
 
 /**
- * Extract CSS variable information from var() function nodes
- * Used specifically for SLDS variable fallback detection
+ * Generic CSS variable extractor that can be customized for different use cases
+ * @param node - AST node to extract from
+ * @param filter - Function to validate and extract variable information
+ * @returns Extracted variable info or null
  */
-function extractSldsVariable(node: any): CssVariableInfo | null {
+function extractCssVariable<T>(
+  node: any,
+  filter: (variableName: string, childrenArray: any[]) => T | null
+): T | null {
   if (!node || node.type !== 'Function' || node.name !== 'var') {
     return null;
   }
@@ -51,19 +56,11 @@ function extractSldsVariable(node: any): CssVariableInfo | null {
   }
 
   const variableName = firstChild.name;
-  if (!variableName || !variableName.startsWith('--slds-')) {
+  if (!variableName) {
     return null;
   }
 
-  // Check if there's a fallback (comma separator)
-  const hasFallback = childrenArray.some((child: any) => 
-    child.type === 'Operator' && child.value === ','
-  );
-
-  return {
-    name: variableName,
-    hasFallback
-  };
+  return filter(variableName, childrenArray);
 }
 
 /**
@@ -74,7 +71,40 @@ export function forEachSldsVariable(
   valueText: string,
   callback: (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => void
 ): void {
-  forEachValue(valueText, extractSldsVariable, () => false, callback);
+  const extractor = (node: any) => extractCssVariable(node, (variableName, childrenArray) => {
+    if (!variableName.startsWith('--slds-')) {
+      return null;
+    }
+
+    // Check if there's a fallback (comma separator)
+    const hasFallback = childrenArray.some((child: any) => 
+      child.type === 'Operator' && child.value === ','
+    );
+
+    return { name: variableName, hasFallback };
+  });
+
+  forEachValue(valueText, extractor, () => false, callback);
+}
+
+/**
+ * Specialized CSS variable traversal for SLDS/SDS namespace detection
+ * Finds var(--slds-*) or var(--sds-*) functions in CSS values
+ * Note: hasFallback is set to false as it's unused for namespace validation
+ */
+export function forEachNamespacedVariable(
+  valueText: string,
+  callback: (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => void
+): void {
+  const extractor = (node: any) => extractCssVariable(node, (variableName) => {
+    // Check for SLDS or SDS namespace
+    if (variableName.startsWith('--slds-') || variableName.startsWith('--sds-')) {
+      return { name: variableName, hasFallback: false }; // hasFallback unused, but required by interface
+    }
+    return null;
+  });
+
+  forEachValue(valueText, extractor, () => false, callback);
 }
 
 /**
