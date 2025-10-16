@@ -1,6 +1,6 @@
 .wrapper {
   background: white;
-  box-shadow: t(shadowButtonFocus);
+  --slds-c-accordion-section-color-background: var(--slds-c-accordion-section-color-background);
 }
 
 .wrapper {
