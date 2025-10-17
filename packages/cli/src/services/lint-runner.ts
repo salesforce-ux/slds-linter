@@ -3,6 +3,7 @@ import { BatchProcessor, BatchResult } from './batch-processor';
 import { WorkerConfig, WorkerResult, LintResult, LintRunnerOptions } from '../types';
 import { Logger } from '../utils/logger';
 import { resolveDirName } from '../utils/nodeVersionUtil';
+import { ConfigLoader } from './config-loader';
 
 
 export class LintRunner {
@@ -21,8 +22,11 @@ export class LintRunner {
         'eslint.worker.js'
       );
 
+      // Process custom config (only rewrites if dependencies not installed)
+      const configPath = await ConfigLoader.processConfig(options.configPath);
+      
       const workerConfig: WorkerConfig = {
-        configPath: options.configPath,
+        configPath,
         fix: options.fix
       };
 

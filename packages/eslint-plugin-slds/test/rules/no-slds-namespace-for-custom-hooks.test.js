@@ -44,6 +44,24 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       code: `.example { color: var(--sds-c-button-color-background); }`,
       filename: 'test.css',
     },
+    // Valid shared SLDS hooks (private/undocumented but legitimate)
+    {
+      code: `.example { box-shadow: var(--slds-s-button-shadow-focus, var(--lwc-shadowButtonFocus)); }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.example { --slds-s-button-shadow-focus: 0 0 0 4px blue; }`,
+      filename: 'test.css',
+    },
+    // Test limitation fix: var() in declaration values should be detected
+    {
+      code: `.example { --slds-c-button-color-background: var(--slds-s-button-shadow-focus); }`,
+      filename: 'test.css',
+    },
+    {
+      code: `.example { --slds-g-color-brand-base-100: var(--slds-g-color-neutral-base-100); }`,
+      filename: 'test.css',
+    },
     // Other custom namespaces should be allowed
     {
       code: `.example { --custom-color: red; color: var(--custom-color); }`,
@@ -79,7 +97,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Identifier',
+        type: 'Declaration',
         data: {
           token: '--slds-custom-color',
           tokenWithoutNamespace: 'custom-color'
@@ -109,7 +127,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Identifier',
+        type: 'Declaration',
         data: {
           token: '--sds-my-background',
           tokenWithoutNamespace: 'my-background'
@@ -145,7 +163,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Identifier',
+          type: 'Declaration',
           data: {
             token: '--slds-custom-color',
             tokenWithoutNamespace: 'custom-color'
@@ -175,7 +193,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Identifier',
+          type: 'Declaration',
           data: {
             token: '--slds-my-custom-bg',
             tokenWithoutNamespace: 'my-custom-bg'
@@ -191,7 +209,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Identifier',
+        type: 'Declaration',
         data: {
           token: '--slds-hover-color',
           tokenWithoutNamespace: 'hover-color'
@@ -208,7 +226,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Identifier',
+        type: 'Declaration',
         data: {
           token: '--slds-my-offset',
           tokenWithoutNamespace: 'my-offset'
@@ -216,7 +234,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       }]
     },
 
-    // Multiple occurrences of the same custom hook
+    // Multiple occurrences of the same custom hook - report each occurrence
     {
       code: `.test { padding: var(--slds-spacing) var(--slds-spacing) var(--slds-spacing) var(--slds-spacing); }`,
       output: null, // This rule doesn't provide auto-fix
@@ -224,7 +242,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       errors: [
         {
           messageId: 'customHookNamespace',
-          type: 'Identifier',
+          type: 'Declaration',
           data: {
             token: '--slds-spacing',
             tokenWithoutNamespace: 'spacing'
@@ -232,7 +250,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Identifier',
+          type: 'Declaration',
           data: {
             token: '--slds-spacing',
             tokenWithoutNamespace: 'spacing'
@@ -240,7 +258,7 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Identifier',
+          type: 'Declaration',
           data: {
             token: '--slds-spacing',
             tokenWithoutNamespace: 'spacing'
@@ -248,10 +266,50 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Identifier',
+          type: 'Declaration',
           data: {
             token: '--slds-spacing',
             tokenWithoutNamespace: 'spacing'
+          }
+        }
+      ]
+    },
+
+    // Test limitation fix: Custom hooks in declaration values ARE detected
+    {
+      code: `.example { --slds-c-button-color-background: var(--slds-my-custom-color); }`,
+      output: null,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'customHookNamespace',
+        type: 'Declaration',
+        data: {
+          token: '--slds-my-custom-color',
+          tokenWithoutNamespace: 'my-custom-color'
+        }
+      }]
+    },
+
+    // Multiple custom hooks in declaration value
+    {
+      code: `.example { background: var(--slds-custom-one) var(--slds-custom-two); }`,
+      output: null,
+      filename: 'test.css',
+      errors: [
+        {
+          messageId: 'customHookNamespace',
+          type: 'Declaration',
+          data: {
+            token: '--slds-custom-one',
+            tokenWithoutNamespace: 'custom-one'
+          }
+        },
+        {
+          messageId: 'customHookNamespace',
+          type: 'Declaration',
+          data: {
+            token: '--slds-custom-two',
+            tokenWithoutNamespace: 'custom-two'
           }
         }
       ]
