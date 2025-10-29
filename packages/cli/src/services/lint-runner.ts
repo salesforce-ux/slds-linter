@@ -11,7 +11,6 @@ export class LintRunner {
    */
   static async runLinting(
     fileBatches: string[][],
-    workerType: 'component',
     options: LintRunnerOptions = {}
   ): Promise<LintResult[]> {
     try {
@@ -56,22 +55,11 @@ export class LintRunner {
       }
 
       for (const result of batch.results as WorkerResult[]) {
-        if (result.error) {
-          Logger.warning(`File processing failed: ${result.file} - ${result.error}`);
+        if (result.error || !result.lintResult) {
+          Logger.warning(`File processing failed: ${result.filePath} - ${result.error}`);
           continue;
         }
-
-        results.push({
-          filePath: result.file,
-          errors: result.errors?.map(e => ({
-            ...e,
-            severity: 2
-          })) || [],
-          warnings: result.warnings?.map(w => ({
-            ...w,
-            severity: 1
-          })) || []
-        });
+        results.push(result.lintResult);
       }
     }
 

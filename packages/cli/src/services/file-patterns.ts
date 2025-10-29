@@ -1,4 +1,4 @@
-import { FilePattern } from './file-scanner';
+import { FilePattern } from '../types';
 
 export const StyleFilePatterns: FilePattern = {
   extensions:['css', 'scss', 'less','sass'],
