@@ -1,3 +1,5 @@
+import type { ESLint, Linter } from 'eslint';
+
 export interface BaseConfig {
   directory?: string;
   files?: string[];
@@ -37,20 +39,11 @@ export interface LintRunnerOptions {
   timeoutMs?: number;
 }
 
-export interface LintResultEntry {
-  line: number;
-  column: number;
-  endColumn: number;
-  message: string;
-  ruleId: string;
-  severity: number;
-}
 
-export interface LintResult {
-  filePath: string;
-  errors: Array<LintResultEntry>;
-  warnings: Array<LintResultEntry>;
-}
+export type LintResultEntry = Linter.LintMessage;
+
+
+export type LintResult = ESLint.LintResult;
 
 export type ExitCode = 0 | 1 | 2;
 
@@ -59,23 +52,10 @@ export interface WorkerConfig {
   fix?: boolean;
 }
 
-export interface WorkerResult {
-  file: string;
-  error?: string;
-  warnings?: Array<{
-    line: number;
-    column: number;
-    endColumn: number;
-    message: string;
-    ruleId: string;
-  }>;
-  errors?: Array<{
-    line: number;
-    column: number;
-    endColumn: number;
-    message: string;
-    ruleId: string;
-  }>;
+export interface WorkerResult{
+  filePath: string;
+  lintResult?: LintResult;
+  error?: string;  
 } 
 
 export interface SarifResultEntry {
@@ -87,4 +67,27 @@ export interface SarifResultEntry {
   startColumn?: number;
   endLine?: number;
   endColumn?: number;
+}
+
+export interface LintResultSummary {
+  totalErrors: number;
+  totalWarnings: number;
+  fixableErrors: number;
+  fixableWarnings: number;
+}
+
+export interface FilePattern {
+  extensions:string[];
+  exclude?: string[];
+}
+
+export interface ScanOptions {
+  patterns: FilePattern;
+  batchSize?: number;
+  gitignore?: boolean;
+}
+
+export interface ScanResult {
+  filesCount: number;
+  batches: string[][];
 }
