@@ -83,7 +83,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'errorWithStyleHooks',
-        type: 'Identifier',
+        type: 'Function',
         data: {
           oldValue: '--lwc-brandDark',
           newValue: '--slds-g-color-accent-dark-1'
@@ -98,7 +98,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'errorWithReplacement',
-        type: 'Identifier',
+        type: 'Function',
         data: {
           oldValue: '--lwc-brandPrimaryTransparent',
           newValue: 'transparent'
@@ -113,7 +113,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'errorWithReplacement',
-        type: 'Identifier',
+        type: 'Function',
         data: {
           oldValue: '--lwc-cardBodyPadding',
           newValue: '0 var(--slds-g-spacing-4)'
@@ -128,7 +128,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'errorWithReplacement',
-        type: 'Identifier',
+        type: 'Function',
         data: {
           oldValue: '--lwc-brandPrimaryTransparent10',
           newValue: 'color-mix(in oklab, var(--slds-g-color-accent-1), transparent 90%)'
@@ -143,7 +143,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'errorWithStyleHooks',
-        type: 'Identifier',
+        type: 'Function',
         data: {
           oldValue: '--lwc-colorBackgroundLight',
           newValue: '\n1. --slds-g-color-surface-1\n2. --slds-g-color-surface-container-1'
@@ -158,7 +158,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'errorWithNoRecommendation',
-        type: 'Identifier',
+        type: 'Function',
         data: {
           oldValue: '--lwc-brandBackgroundDark'
         }
@@ -179,11 +179,11 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       errors: [
         {
           messageId: 'errorWithStyleHooks',
-          type: 'Identifier'
+          type: 'Function'
         },
         {
           messageId: 'errorWithReplacement',
-          type: 'Identifier'
+          type: 'Function'
         }
       ]
     },
@@ -218,7 +218,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'errorWithStyleHooks',
-        type: 'Identifier'
+        type: 'Function'
       }]
     },
 
@@ -233,7 +233,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'errorWithReplacement',
-        type: 'Identifier'
+        type: 'Function'
       }]
     },
 
@@ -252,7 +252,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'errorWithStyleHooks',
-        type: 'Identifier'
+        type: 'Function'
       }]
     },
 
@@ -262,10 +262,10 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
       output: `.test { padding: calc(var(--slds-g-sizing-base) * -0.1875) calc(var(--slds-g-sizing-base) * -0.1875) calc(var(--slds-g-sizing-base) * -0.1875) calc(var(--slds-g-sizing-base) * -0.1875); }`,
       filename: 'test.css',
       errors: [
-        { messageId: 'errorWithReplacement', type: 'Identifier' },
-        { messageId: 'errorWithReplacement', type: 'Identifier' },
-        { messageId: 'errorWithReplacement', type: 'Identifier' },
-        { messageId: 'errorWithReplacement', type: 'Identifier' }
+        { messageId: 'errorWithReplacement', type: 'Function' },
+        { messageId: 'errorWithReplacement', type: 'Function' },
+        { messageId: 'errorWithReplacement', type: 'Function' },
+        { messageId: 'errorWithReplacement', type: 'Function' }
       ]
     }
   ]
