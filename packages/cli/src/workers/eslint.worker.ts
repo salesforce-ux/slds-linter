@@ -22,30 +22,15 @@ class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
       if (this.task.config.fix && fileResult.output) {
         await ESLint.outputFixes(results);
       }
+      
+      // Return raw ESLint result
       return {
-        file: filePath,
-        warnings: fileResult.messages
-          .filter(msg => msg.severity === 1)
-          .map(warning => ({
-            line: warning.line,
-            column: warning.column,
-            endColumn: warning.endColumn,
-            message: warning.message,
-            ruleId: warning.ruleId || 'unknown'
-          })),
-        errors: fileResult.messages
-          .filter(msg => msg.severity === 2)
-          .map(error => ({
-            line: error.line,
-            column: error.column,
-            endColumn: error.endColumn,
-            message: error.message,
-            ruleId: error.ruleId || 'unknown'
-          }))
+        filePath,
+        lintResult: fileResult
       };
     } catch (error: any) {
       return {
-        file: filePath,
+        filePath,
         error: error.message
       };
     }

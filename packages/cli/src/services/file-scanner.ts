@@ -1,19 +1,8 @@
-import { promises as fs } from "fs";
-import { Logger } from "../utils/logger";
-import {globby, isDynamicPattern} from 'globby';
-import {extname} from "path";
 import path from 'path';
-
-export interface FilePattern {
-  extensions:string[];
-  exclude?: string[];
-}
-
-export interface ScanOptions {
-  patterns: FilePattern;
-  batchSize?: number;
-  gitignore?: boolean;
-}
+import { promises as fs } from "fs";
+import {globby, isDynamicPattern} from 'globby';
+import { Logger } from "../utils/logger";
+import { ScanOptions, ScanResult } from "../types";
 
 export class FileScanner {
   private static DEFAULT_BATCH_SIZE = 100;
@@ -27,7 +16,7 @@ export class FileScanner {
   static async scanFiles(
     directory: string,
     options: ScanOptions
-  ): Promise<string[][]> {
+  ): Promise<ScanResult> {
     try {
       Logger.debug(`Scanning directory: ${directory}`);
 
@@ -76,7 +65,7 @@ export class FileScanner {
         absolute: true,
         gitignore: options.gitignore !== false
       }).then(matches => matches.filter(match => {
-        const fileExt = extname(match).substring(1);
+        const fileExt = path.extname(match).substring(1);
         return options.patterns.extensions.includes(fileExt);
       }));
 
@@ -90,7 +79,10 @@ export class FileScanner {
       Logger.debug(
         `Found ${validFiles.length} files, split into ${batches.length} batches`
       );
-      return batches;
+      return {
+        filesCount: validFiles.length,
+        batches
+      };
     } catch (error: any) {
       Logger.error(`Failed to scan files: ${error.message}`);
       throw error;

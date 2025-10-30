@@ -25,26 +25,32 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
     });
     
     // Scan directory for style files (CSS, SCSS, etc.)
-    const styleFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
+    const {filesCount: styleFilesCount, batches: styleFiles} = await FileScanner.scanFiles(normalizedConfig.directory, {
       patterns: StyleFilePatterns,
       batchSize: 100,
     });
     
     // Scan directory for component files (HTML, etc.)
-    const componentFiles = await FileScanner.scanFiles(normalizedConfig.directory, {
+    const {filesCount: componentFilesCount, batches: componentFiles} = await FileScanner.scanFiles(normalizedConfig.directory, {
       patterns: ComponentFilePatterns,
       batchSize: 100,
     });
     
+    if(styleFilesCount>0){
+      Logger.info(`Total style files: ${styleFilesCount}`);
+    }
+    if(componentFilesCount>0){
+      Logger.info(`Total component files: ${componentFilesCount}`);
+    }
+    
     const { fix, configEslint } = normalizedConfig;
     
     // Run ESLint on all files
-    const lintResults = await LintRunner.runLinting([...styleFiles, ...componentFiles], 'component', {
+    return await LintRunner.runLinting([...styleFiles, ...componentFiles], {
       fix,
       configPath: configEslint,
     });
     
-    return standardizeLintMessages(lintResults);
   } catch (error: any) {
     // Enhance error with context for better debugging
     const errorMessage = `Linting failed: ${error.message}`;
@@ -107,33 +113,5 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
   }
 }
 
-// Helper to standardize message field for all warnings and errors
-function standardizeLintMessages(results: LintResult[]): LintResult[] {
-  return results.map(result => ({
-    ...result,
-    errors: result.errors.map(entry => {
-      let msgObj;
-      try {
-        msgObj = JSON.parse(entry.message);
-        // If already an object, spread all properties into the entry
-        if (typeof msgObj === 'object' && 'message' in msgObj) {
-          return { ...entry, ...msgObj };
-        }
-      } catch {}
-      // Otherwise, wrap as { message }
-      return { ...entry, message: entry.message };
-    }),
-    warnings: result.warnings.map(entry => {
-      let msgObj;
-      try {
-        msgObj = JSON.parse(entry.message);
-        if (typeof msgObj === 'object' && 'message' in msgObj) {
-          return { ...entry, ...msgObj };
-        }
-      } catch {}
-      return { ...entry, message: entry.message };
-    })
-  }));
-}
 
 export type { LintResult, LintResultEntry, LintConfig, ReportConfig, ExitCode, WorkerResult, SarifResultEntry } from '../types'; 

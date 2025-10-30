@@ -45,21 +45,11 @@ export function registerLintCommand(program: Command): void {
         const lintResults = await lint(normalizedOptions);
 
         // Print detailed lint results only for files with issues
-        printLintResults(lintResults, normalizedOptions.editor);
+        const {totalErrors} = printLintResults(lintResults, normalizedOptions.editor);
 
-        // Calculate statistics
-        const errorCount = lintResults.reduce((sum, r) => sum + r.errors.length, 0);
-        const warningCount = lintResults.reduce((sum, r) => sum + r.warnings.length, 0);
-
-        // Final summary
-        Logger.info(
-          `\n${chalk.red(`${errorCount} error${errorCount !== 1 ? 's' : ''}`)}` +
-          `  ${chalk.yellow(`${warningCount} warning${warningCount !== 1 ? 's' : ''}`)}`
-        );
-        
         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
-        Logger.success(chalk.green(`\nLinting completed in ${elapsedTime} seconds.`));
-        process.exit(errorCount > 0 ? 1 : 0);
+        Logger.newLine().success(chalk.green(`Linting completed in ${elapsedTime} seconds.`));
+        process.exit(totalErrors > 0 ? 1 : 0);
       } catch (error: any) {
         Logger.error(chalk.red(`Failed to complete linting: ${error.message}`));
         process.exit(1);

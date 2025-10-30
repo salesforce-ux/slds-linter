@@ -1,5 +1,6 @@
 import path from 'path';
-import { FileScanner, ScanOptions } from '../src/services/file-scanner';
+import { ScanOptions } from '../src/types';
+import { FileScanner } from '../src/services/file-scanner';
 import { StyleFilePatterns } from '../src/services/file-patterns';
 import {mkdir, writeFile, rm} from "fs/promises";
 import { fileURLToPath } from 'url';
@@ -34,7 +35,7 @@ describe('FileScanner', () => {
       gitignore: false
     };
 
-    const batches = await FileScanner.scanFiles(testDir, options);
+    const { batches } = await FileScanner.scanFiles(testDir, options);
     
     expect(batches).toHaveLength(2);
     expect(batches[0]).toHaveLength(1);
@@ -52,7 +53,7 @@ describe('FileScanner', () => {
       gitignore: false
     };
 
-    const batches = await FileScanner.scanFiles(testDir, options);
+    const {batches} = await FileScanner.scanFiles(testDir, options);
     expect(batches).toHaveLength(0);
   });
 }); 

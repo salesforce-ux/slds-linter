@@ -12,8 +12,15 @@ import { jest } from '@jest/globals';
 // Create mock type-safe functions
 const mockLintResult: LintResult = {
   filePath: 'file1.css',
-  errors: [{ line: 1, column: 1, endColumn: 10, message: 'Test error', ruleId: 'test-rule', severity: 2 }],
-  warnings: []
+  //errors: [{ line: 1, column: 1, endColumn: 10, message: 'Test error', ruleId: 'test-rule', severity: 2 }],
+  messages: [{ line: 1, column: 1, endColumn: 10, message: 'Test error', ruleId: 'test-rule', severity: 2 }],
+  errorCount:1,
+  warningCount:0,
+  fixableErrorCount:0,
+  fixableWarningCount:0,
+  fatalErrorCount:0,
+  suppressedMessages:[],
+  usedDeprecatedRules:[]
 };
 
 // Use an alternative approach without generic typing that was causing issues

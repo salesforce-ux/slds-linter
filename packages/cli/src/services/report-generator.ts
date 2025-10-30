@@ -1,7 +1,7 @@
 import path from 'path';
 import fs, { writeFile } from 'fs/promises';
 import { mkConfig, generateCsv, asString } from 'export-to-csv';
-import { LintResult, LintResultEntry, SarifResultEntry } from '../types';
+import { LintResult } from '../types';
 import { SarifBuilder, SarifRunBuilder, SarifResultBuilder, SarifRuleBuilder } from 'node-sarif-builder';
 import { createWriteStream } from 'fs';
 import { JsonStreamStringify } from 'json-stream-stringify';
@@ -125,38 +125,21 @@ export class ReportGenerator {
   private static extractRules(results: LintResult[]): any[] {
     const rules = new Map();
 
-    for (const result of results) {
-      // Process errors
-      for (const error of result.errors) {
-        if (!rules.has(error.ruleId)) {
-          
-          rules.set(error.ruleId, {
-            id: replaceNamespaceinRules(error.ruleId),
+    results.forEach((result)=>{
+      result.messages.forEach((message)=>{
+        if (!rules.has(message.ruleId)) {
+          rules.set(message.ruleId, {
+            id: replaceNamespaceinRules(message.ruleId),
             shortDescription: {
-              text: getRuleDescription(replaceNamespaceinRules(error.ruleId))
+              text: getRuleDescription(replaceNamespaceinRules(message.ruleId))
             },
             properties: {
               category: 'Style'
             }
           });
         }
-      }
-
-      // Process warnings
-      for (const warning of result.warnings) {
-        if (!rules.has(warning.ruleId)) {          
-          rules.set(warning.ruleId, {
-            id: replaceNamespaceinRules(warning.ruleId),
-            shortDescription: {
-              text: getRuleDescription(replaceNamespaceinRules(warning.ruleId))
-            },
-            properties: {
-              category: 'Style'
-            }
-          });
-        }
-      }
-    }
+      });      
+    });
 
     return Array.from(rules.values());
   }
@@ -168,13 +151,8 @@ export class ReportGenerator {
     runBuilder: SarifRunBuilder,
     lintResult: LintResult
   ): void {
-    lintResult.errors.forEach(error => {
-      const resultBuilder = new SarifResultBuilder().initSimple(transformedResults(lintResult, error, 'error'));
-      runBuilder.addResult(resultBuilder);
-    });
-
-    lintResult.warnings.forEach(warning => {
-      const resultBuilder = new SarifResultBuilder().initSimple(transformedResults(lintResult, warning, 'warning'));
+    lintResult.messages.forEach((message)=>{
+      const resultBuilder = new SarifResultBuilder().initSimple(transformedResults(lintResult, message, 'error'));
       runBuilder.addResult(resultBuilder);
     });
   }
@@ -184,7 +162,7 @@ export class CsvReportGenerator {
   /**
    * Generate CSV report and write to file
    */
-  static async generate(results: any[]): Promise<string> {
+  static async generate(results: LintResult[]): Promise<string> {
     // Generate CSV string using the shared method
     const csvString = this.generateCsvString(results);
     
@@ -199,7 +177,7 @@ export class CsvReportGenerator {
   /**
    * Generate CSV string from lint results
    */
-  static generateCsvString(results: any[]): string {
+  static generateCsvString(results: LintResult[]): string {
     const csvData = this.convertResultsToCsvData(results);
     return asString(csvData);
   }
@@ -207,7 +185,7 @@ export class CsvReportGenerator {
   /**
    * Convert lint results to CSV-compatible data format
    */
-  private static convertResultsToCsvData(results: any[]): any {
+  private static convertResultsToCsvData(results: LintResult[]): any {
     const cwd = process.cwd();
     
     // Create CSV config inline instead of using a separate method
@@ -220,31 +198,22 @@ export class CsvReportGenerator {
       useKeysAsHeaders: true,
     });
 
-    const transformedResults = results.flatMap((result: { errors: any[]; filePath: string; warnings: any[]; }) =>
-      [
-        ...result.errors.map((error: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
+    const transformedResults = [];
+    results.forEach((result)=>{
+      result.messages.forEach((message)=>{
+        transformedResults.push({
           "File Path": path.relative(cwd, result.filePath),
-          "Message": parseText(error.message),
+          "Message": parseText(message.message),
           "Severity": 'error',
-          "Rule ID": replaceNamespaceinRules(error.ruleId || 'N/A'),
-          "Start Line": error.line,
-          "Start Column": error.column,
-          "End Line": error.endLine || error.line, // Default to start line if missing
-          "End Column": error.endColumn || error.column // Default to start column if missing
-        })),
-        ...result.warnings.map((warning: { message: any; ruleId: any; line: any; column: any; endLine: any; endColumn: any; }) => ({
-          "File Path": path.relative(cwd, result.filePath),
-          "Message": parseText(warning.message),
-          "Severity": 'warning',
-          "Rule ID": replaceNamespaceinRules(warning.ruleId || 'N/A'),
-          "Start Line": warning.line,
-          "Start Column": warning.column,
-          "End Line": warning.endLine || warning.line, // Default to start line if missing
-          "End Column": warning.endColumn || warning.column // Default to start column if missing
-        }))
-      ]
-    );
-
-    return generateCsv(csvConfig)(transformedResults);
+          "Rule ID": replaceNamespaceinRules(message.ruleId || 'N/A'),
+          "Start Line": message.line,
+          "Start Column": message.column,
+          "End Line": message.endLine || message.line, // Default to start line if missing
+          "End Column": message.endColumn || message.column // Default to start column if missing
+        });
+      });
+    });
+    
+    return generateCsv(csvConfig)(transformedResults);    
   }
 }
