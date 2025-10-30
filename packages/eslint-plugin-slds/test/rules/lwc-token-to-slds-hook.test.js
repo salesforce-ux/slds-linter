@@ -267,6 +267,196 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
         { messageId: 'errorWithReplacement', type: 'Function' },
         { messageId: 'errorWithReplacement', type: 'Function' }
       ]
+      },
+
+    // NEW: LWC tokens with fallback values - SLDS token replacement
+    {
+      code: `.lwcToSLDS {
+        background: var(--lwc-pageHeaderColorBackground, rgb(243, 242, 242));
+        border-radius: var(--lwc-borderRadiusMedium, 0.25rem);
+        margin-bottom: var(--lwc-varSpacingVerticalMedium, 1rem);
+      }`,
+      output: `.lwcToSLDS {
+        background: var(--slds-g-color-surface-container-2, var(--lwc-pageHeaderColorBackground, rgb(243, 242, 242)));
+        border-radius: var(--slds-g-radius-border-2, var(--lwc-borderRadiusMedium, 0.25rem));
+        margin-bottom: var(--slds-g-spacing-var-block-4, var(--lwc-varSpacingVerticalMedium, 1rem));
+      }`,
+      filename: 'test.css',
+      errors: [
+        {
+          messageId: 'errorWithStyleHooks',
+          type: 'Function',
+          data: {
+            oldValue: '--lwc-pageHeaderColorBackground',
+            newValue: '--slds-g-color-surface-container-2'
+          }
+        },
+        {
+          messageId: 'errorWithStyleHooks',
+          type: 'Function',
+          data: {
+            oldValue: '--lwc-borderRadiusMedium',
+            newValue: '--slds-g-radius-border-2'
+          }
+        },
+        {
+          messageId: 'errorWithStyleHooks',
+          type: 'Function',
+          data: {
+            oldValue: '--lwc-varSpacingVerticalMedium',
+            newValue: '--slds-g-spacing-var-block-4'
+          }
+        }
+      ]
+    },
+
+    // NEW: LWC token with fallback value - raw value replacement
+    {
+      code: `.example { color: var(--lwc-brandPrimaryTransparent, transparent); }`,
+      output: `.example { color: transparent; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'errorWithReplacement',
+        type: 'Function',
+        data: {
+          oldValue: '--lwc-brandPrimaryTransparent',
+          newValue: 'transparent'
+        }
+      }]
+    },
+
+    // NEW: LWC token with complex fallback value (nested var function)
+    {
+      code: `.example { background: var(--lwc-brandDark, var(--custom-fallback, #333)); }`,
+      output: `.example { background: var(--slds-g-color-accent-dark-1, var(--lwc-brandDark, var(--custom-fallback, #333))); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'errorWithStyleHooks',
+        type: 'Function',
+        data: {
+          oldValue: '--lwc-brandDark',
+          newValue: '--slds-g-color-accent-dark-1'
+        }
+      }]
+    },
+
+    // NEW: LWC token with numeric fallback value
+    {
+      code: `.example { width: var(--lwc-nubbinTriangleOffset, -0.2rem); }`,
+      output: `.example { width: calc(var(--slds-g-sizing-base) * -0.1875); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'errorWithReplacement',
+        type: 'Function',
+        data: {
+          oldValue: '--lwc-nubbinTriangleOffset',
+          newValue: 'calc(var(--slds-g-sizing-base) * -0.1875)'
+        }
+      }]
+    },
+
+    // NEW: LWC token with string fallback value
+    {
+      code: `.example { font-family: var(--lwc-fontFamily, 'Arial, sans-serif'); }`,
+      output: `.example { font-family: var(--slds-g-font-family-base, var(--lwc-fontFamily, 'Arial, sans-serif')); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'errorWithStyleHooks',
+        type: 'Function',
+        data: {
+          oldValue: '--lwc-fontFamily',
+          newValue: '--slds-g-font-family-base'
+        }
+      }]
+    },
+
+    // NEW: Mixed LWC tokens with and without fallbacks
+    {
+      code: `.example { 
+        color: var(--lwc-brandDark);
+        background: var(--lwc-brandPrimaryTransparent, transparent);
+        border: var(--lwc-borderWidthThin, 1px) solid;
+      }`,
+      output: `.example { 
+        color: var(--slds-g-color-accent-dark-1, var(--lwc-brandDark));
+        background: transparent;
+        border: var(--slds-g-sizing-border-1, var(--lwc-borderWidthThin, 1px)) solid;
+      }`,
+      filename: 'test.css',
+      errors: [
+        {
+          messageId: 'errorWithStyleHooks',
+          type: 'Function',
+          data: {
+            oldValue: '--lwc-brandDark',
+            newValue: '--slds-g-color-accent-dark-1'
+          }
+        },
+        {
+          messageId: 'errorWithReplacement',
+          type: 'Function',
+          data: {
+            oldValue: '--lwc-brandPrimaryTransparent',
+            newValue: 'transparent'
+          }
+        },
+        {
+          messageId: 'errorWithStyleHooks',
+          type: 'Function',
+          data: {
+            oldValue: '--lwc-borderWidthThin',
+            newValue: '--slds-g-sizing-border-1'
+          }
+        }
+      ]
+    },
+
+    // NEW: LWC token with fallback in calc() function (using existing token)
+    {
+      code: `.example { 
+        width: calc(100% - var(--lwc-nubbinTriangleOffset, -0.2rem)); 
+      }`,
+      output: `.example { 
+        width: calc(100% - calc(var(--slds-g-sizing-base) * -0.1875)); 
+      }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'errorWithReplacement',
+        type: 'Function',
+        data: {
+          oldValue: '--lwc-nubbinTriangleOffset',
+          newValue: 'calc(var(--slds-g-sizing-base) * -0.1875)'
+        }
+      }]
+    },
+
+    // NEW: LWC token with array recommendations and fallback (no auto-fix)
+    {
+      code: `.example { background: var(--lwc-colorBackgroundLight, #f3f2f2); }`,
+      output: null, // No auto-fix for array recommendations
+      filename: 'test.css',
+      errors: [{
+        messageId: 'errorWithStyleHooks',
+        type: 'Function',
+        data: {
+          oldValue: '--lwc-colorBackgroundLight',
+          newValue: '\n1. --slds-g-color-surface-1\n2. --slds-g-color-surface-container-1'
+        }
+      }]
+    },
+
+    // NEW: LWC token with no recommendation and fallback (no auto-fix)
+    {
+      code: `.example { background: var(--lwc-brandBackgroundDark, #000); }`,
+      output: null, // No auto-fix when no recommendation
+      filename: 'test.css',
+      errors: [{
+        messageId: 'errorWithNoRecommendation',
+        type: 'Function',
+        data: {
+          oldValue: '--lwc-brandBackgroundDark'
+        }
+      }]
     }
   ]
 });
