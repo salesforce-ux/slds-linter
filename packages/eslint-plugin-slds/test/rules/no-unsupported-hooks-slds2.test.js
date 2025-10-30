@@ -49,13 +49,13 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
   invalid: [
     // Deprecated component hooks - Declaration (left-side)
     {
-      code: `.div-modal-cls { --slds-c-breadcrumbs-spacing-inline-start: 1rem; }`,
+      code: `.div-modal-cls { --slds-c-breadcrumbs-spacing-inlinestart: 1rem; }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecated',
         type: 'Declaration',
         data: {
-          token: '--slds-c-breadcrumbs-spacing-inline-start'
+          token: '--slds-c-breadcrumbs-spacing-inlinestart'
         }
       }]
     },
@@ -217,7 +217,7 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
     {
       code: `.accordion {
         --slds-c-accordion-heading-text-color: #333;
-        --slds-c-accordion-section-spacing-block-end: 1rem;
+        --slds-c-accordion-section-spacing-blockend: 1rem;
         color: var(--slds-c-accordion-heading-text-color);
       }`,
       filename: 'test.css',
@@ -233,7 +233,7 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
           messageId: 'deprecated',
           type: 'Declaration',
           data: {
-            token: '--slds-c-accordion-section-spacing-block-end'
+            token: '--slds-c-accordion-section-spacing-blockend'
           }
         },
         {
@@ -249,9 +249,9 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
     // Alert component deprecated hooks
     {
       code: `.alert-container {
-        --slds-c-alert-spacing-inline-start: 1rem;
-        --slds-c-alert-spacing-block-end: 2rem;
-        padding-left: var(--slds-c-alert-spacing-inline-start);
+        --slds-c-alert-spacing-inlinestart: 1rem;
+        --slds-c-alert-spacing-blockend: 2rem;
+        padding-left: var(--slds-c-alert-spacing-inlinestart);
       }`,
       filename: 'test.css',
       errors: [
@@ -259,21 +259,21 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
           messageId: 'deprecated',
           type: 'Declaration',
           data: {
-            token: '--slds-c-alert-spacing-inline-start'
+            token: '--slds-c-alert-spacing-inlinestart'
           }
         },
         {
           messageId: 'deprecated',
           type: 'Declaration',
           data: {
-            token: '--slds-c-alert-spacing-block-end'
+            token: '--slds-c-alert-spacing-blockend'
           }
         },
         {
           messageId: 'deprecated',
           type: 'Identifier',
           data: {
-            token: '--slds-c-alert-spacing-inline-start'
+            token: '--slds-c-alert-spacing-inlinestart'
           }
         }
       ]
@@ -282,9 +282,9 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
     // Button component deprecated hooks
     {
       code: `.button-group {
-        --slds-c-button-spacing-inline-end: 0.5rem;
-        --slds-c-button-spacing-block-start: 1rem;
-        margin-right: var(--slds-c-button-spacing-inline-end);
+        --slds-c-button-spacing-inlineend: 0.5rem;
+        --slds-c-button-spacing-blockstart: 1rem;
+        margin-right: var(--slds-c-button-spacing-inlineend);
       }`,
       filename: 'test.css',
       errors: [
@@ -292,21 +292,21 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
           messageId: 'deprecated',
           type: 'Declaration',
           data: {
-            token: '--slds-c-button-spacing-inline-end'
+            token: '--slds-c-button-spacing-inlineend'
           }
         },
         {
           messageId: 'deprecated',
           type: 'Declaration',
           data: {
-            token: '--slds-c-button-spacing-block-start'
+            token: '--slds-c-button-spacing-blockstart'
           }
         },
         {
           messageId: 'deprecated',
           type: 'Identifier',
           data: {
-            token: '--slds-c-button-spacing-inline-end'
+            token: '--slds-c-button-spacing-inlineend'
           }
         }
       ]
@@ -315,9 +315,9 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
     // Toast component deprecated hooks
     {
       code: `.toast-notification {
-        --slds-c-toast-sizing-min-width: 320px;
-        --slds-c-toast-spacing-block-start: 1rem;
-        min-width: var(--slds-c-toast-sizing-min-width);
+        --slds-c-toast-sizing-width-min: 320px;
+        --slds-c-toast-spacing-blockstart: 1rem;
+        min-width: var(--slds-c-toast-sizing-width-min);
       }`,
       filename: 'test.css',
       errors: [
@@ -325,21 +325,21 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
           messageId: 'deprecated',
           type: 'Declaration',
           data: {
-            token: '--slds-c-toast-sizing-min-width'
+            token: '--slds-c-toast-sizing-width-min'
           }
         },
         {
           messageId: 'deprecated',
           type: 'Declaration',
           data: {
-            token: '--slds-c-toast-spacing-block-start'
+            token: '--slds-c-toast-spacing-blockstart'
           }
         },
         {
           messageId: 'deprecated',
           type: 'Identifier',
           data: {
-            token: '--slds-c-toast-sizing-min-width'
+            token: '--slds-c-toast-sizing-width-min'
           }
         }
       ]
@@ -347,13 +347,13 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
 
     // Complex CSS selector with deprecated hook
     {
-      code: `.container .modal-container:hover { padding-top: var(--slds-c-modal-header-spacing-block-start); }`,
+      code: `.container .modal-container:hover { padding-top: var(--slds-c-modal-header-spacing-blockstart); }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecated',
         type: 'Identifier',
         data: {
-          token: '--slds-c-modal-header-spacing-block-start'
+          token: '--slds-c-modal-header-spacing-blockstart'
         }
       }]
     },
@@ -361,14 +361,14 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
     // Deprecated hook in calc() function
     {
       code: `.example { 
-        width: calc(100% - var(--slds-c-pill-container-spacing-inline-start)); 
+        width: calc(100% - var(--slds-c-pill-container-spacing-inlinestart)); 
       }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecated',
         type: 'Identifier',
         data: {
-          token: '--slds-c-pill-container-spacing-inline-start'
+          token: '--slds-c-pill-container-spacing-inlinestart'
         }
       }]
     }

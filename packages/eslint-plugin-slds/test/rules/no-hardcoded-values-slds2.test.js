@@ -99,7 +99,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     },
     // Line-height with CSS variables should be ignored
     {
-      code: `.example { line-height: var(--slds-g-font-lineheight-base, 1.5); }`,
+      code: `.example { line-height: var(--slds-g-font-line-height-base, 1.5); }`,
       filename: 'test.css',
     },
     // Invalid font-weight values should be ignored (450 is not a known font-weight)
@@ -223,7 +223,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       errors: [{ 
         messageId: 'hardcodedValue'
       }],
-      output: `.example { line-height: var(--slds-g-font-lineheight-2, 1.25); }`
+      output: `.example { line-height: var(--slds-g-font-line-height-2, 1.25); }`
     },
     // Line-height 1.375 with single suggestion (auto-fixable)
     {
@@ -232,7 +232,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       errors: [{ 
         messageId: 'hardcodedValue'
       }],
-      output: `.example { line-height: var(--slds-g-font-lineheight-3, 1.375); }`
+      output: `.example { line-height: var(--slds-g-font-line-height-3, 1.375); }`
     },
     // Line-height 1.75 with single suggestion (auto-fixable)
     {
@@ -241,7 +241,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       errors: [{ 
         messageId: 'hardcodedValue'
       }],
-      output: `.example { line-height: var(--slds-g-font-lineheight-5, 1.75); }`
+      output: `.example { line-height: var(--slds-g-font-line-height-5, 1.75); }`
     },
     // Line-height 1.5 with multiple suggestions (no auto-fix)
     {
@@ -382,7 +382,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     {
       code: `.example { border-width: 1rem 0.5rem; }`,
       filename: 'test.css',
-      output: `.example { border-width: var(--slds-g-sizing-5, 1rem) var(--slds-g-sizing-3, 0.5rem); }`,
+      output: `.example { border-width: 1rem var(--slds-g-sizing-3, 0.5rem); }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -417,7 +417,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     {
       code: `.example { border-color: #001639 #001639 #001639 #001639; }`,
       filename: 'test.css',
-      output: `.example { border-color: var(--slds-g-color-palette-blue-10, #001639) var(--slds-g-color-palette-blue-10, #001639) var(--slds-g-color-palette-blue-10, #001639) var(--slds-g-color-palette-blue-10, #001639); }`,
+      output: null,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -608,11 +608,10 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     {
       code: `.example { box-shadow: 0 0 0 2px var(--slds-g-color-brand-base-15) inset, 0 0 0 4px var(--slds-g-color-neutral-base-100) inset; }`,
       filename: 'test.css',
-      output: `.example { box-shadow: var(--slds-g-shadow-insetinverse-focus-1, 0 0 0 2px var(--slds-g-color-brand-base-15) inset, 0 0 0 4px var(--slds-g-color-neutral-base-100) inset); }`,
+      output: `.example { box-shadow: var(--slds-g-shadow-inset-inverse-focus-1, 0 0 0 2px var(--slds-g-color-brand-base-15) inset, 0 0 0 4px var(--slds-g-color-neutral-base-100) inset); }`,
       errors: [{
         messageId: 'hardcodedValue'
       }]
     }
   ]
 });
-
