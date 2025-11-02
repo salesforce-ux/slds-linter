@@ -20,7 +20,6 @@ import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-
 
 
 import htmlParser from "@html-eslint/parser";
-import cssPlugin from "@eslint/css";
 
 // Import rule configurations based on persona
 import ruleConfigs from '../eslint.rules.json';
@@ -59,12 +58,10 @@ const cssConfigArray = [
   {
     files: ["**/*.{css,scss}"],
     language: "css/css",
-    ...cssPlugin.configs.recommended,
     languageOptions: {
       tolerant: true  // Allow recoverable parsing errors for SCSS syntax
     },
     plugins: {
-      css: cssPlugin,
       "@salesforce-ux/slds": plugin
     },
     rules: ruleConfigs.css,

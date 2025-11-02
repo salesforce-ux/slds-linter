@@ -52,8 +52,8 @@ async function generateEnhancedESLintConfig(sourceConfigPath: string): Promise<s
   if (rules) {
     const formattedRules = formatRulesForConfig(rules);
     return config.replace(
-      /extends:\s*\["@salesforce-ux\/slds\/recommended"\]/,
-      `extends: ["@salesforce-ux/slds/recommended"],
+      /(extends:\s*\[[^\]]*"@salesforce-ux\/slds\/recommended"[^\]]*\])/,
+      `$1,
     rules: ${formattedRules}`
     );
   }
