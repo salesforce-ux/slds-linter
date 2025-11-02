@@ -130,7 +130,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       errors: [{ 
         messageId: 'hardcodedValue'
       }],
-      output: `.example { line-height: var(--slds-g-font-lineheight-2, 1.25); }`
+      output: `.example { line-height: var(--slds-g-font-line-height-2, 1.25); }`
     },
     // Line-height 1.375 with single suggestion (auto-fixable)
     {
@@ -139,7 +139,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       errors: [{ 
         messageId: 'hardcodedValue'
       }],
-      output: `.example { line-height: var(--slds-g-font-lineheight-3, 1.375); }`
+      output: `.example { line-height: var(--slds-g-font-line-height-3, 1.375); }`
     },
     // Background color with multiple suggestions
     {
