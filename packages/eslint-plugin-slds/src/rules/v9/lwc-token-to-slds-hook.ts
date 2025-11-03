@@ -1,7 +1,8 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages.yml';
-import { formatSuggestionHooks } from '../../utils/css-utils';
+import { formatSuggestionHooks, forEachLwcVariable, type CssVariableInfo } from '../../utils/css-utils';
+import type { PositionInfo } from '../../utils/hardcoded-shared-utils';
 
 const ruleConfig = ruleMessages['lwc-token-to-slds-hook'];
 const { type, description, url, messages } = ruleConfig;
@@ -44,49 +45,6 @@ function getRecommendation(lwcToken: string) {
   const replacementCategory = categorizeReplacement(recommendation);
   const hasRecommendation = oldValue in lwcToSlds && replacementCategory !== ReplacementCategory.EMPTY;
   return { hasRecommendation, recommendation, replacementCategory };
-}
-
-/**
- * Extract LWC variable information from var() function nodes
- * Returns the LWC token name and any existing fallback value
- */
-function extractLwcVariableWithFallback(node: any, sourceCode: any): { lwcToken: string; fallbackValue: string | null } | null {
-  // Early validation - must be a var() function with children
-  if (!node?.children || node.type !== 'Function' || node.name !== 'var') {
-    return null;
-  }
-
-  const children = Array.from(node.children);
-  const firstChild = children[0] as any;
-  
-  // Validate first child is an LWC token identifier
-  if (!firstChild?.name?.startsWith('--lwc-') || firstChild.type !== 'Identifier') {
-    return null;
-  }
-
-  // Check for fallback (comma separator)
-  const commaIndex = children.findIndex((child: any) => 
-    child.type === 'Operator' && child.value === ','
-  );
-
-  // Extract fallback value if present
-  let fallbackValue: string | null = null;
-  if (commaIndex !== -1 && commaIndex + 1 < children.length) {
-    const fallbackStart = children[commaIndex + 1] as any;
-    const fallbackEnd = children[children.length - 1] as any;
-    
-    if (fallbackStart?.loc && fallbackEnd?.loc) {
-      const fullText = sourceCode.getText();
-      fallbackValue = fullText
-        .substring(fallbackStart.loc.start.offset, fallbackEnd.loc.end.offset)
-        .trim();
-    }
-  }
-
-  return {
-    lwcToken: firstChild.name,
-    fallbackValue
-  };
 }
 
 function getReportMessage(cssVar: string, replacementCategory: ReplacementCategory, recommendation: string | string[]): { messageId: string, data: any } {
@@ -191,57 +149,90 @@ export default {
     }
 
     return {
-      // CSS custom property declarations: --lwc-* properties
-      "Declaration[property=/^--lwc-/]"(node) {
+      // CSS custom property declarations: Check both property name and value
+      "Declaration"(node) {
+        // Check 1: Property name (left-side) for custom properties using --lwc- prefix
         const property = node.property;
-        
-        if (shouldIgnoreDetection(property)) {
-          return;
-        }
-
-        const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(property);
-        const { messageId, data } = getReportMessage(property, replacementCategory, recommendation);
-        
-        // Only provide auto-fix for SLDS token replacements
-        const suggestedMatch = (hasRecommendation && replacementCategory === ReplacementCategory.SLDS_TOKEN) 
-          ? recommendation as string 
-          : null;
-        
-        reportAndFix(node, property, suggestedMatch, messageId, data);
-      },
-
-      // LWC tokens inside var() functions: var(--lwc-*)
-      "Function[name='var']"(node) {
-        const lwcVarInfo = extractLwcVariableWithFallback(node, context.sourceCode);
-        if (!lwcVarInfo) {
-          return;
-        }
-
-        const { lwcToken, fallbackValue } = lwcVarInfo;
-        
-        if (shouldIgnoreDetection(lwcToken)) {
-          return;
-        }
-
-        const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(lwcToken);
-        const { messageId, data } = getReportMessage(lwcToken, replacementCategory, recommendation);
-        
-        let suggestedMatch: string | null = null;
-        
-        if (hasRecommendation) {
-          if (replacementCategory === ReplacementCategory.SLDS_TOKEN) {
-            // Create the replacement in the format: var(--slds-token, var(--lwc-token, fallback))
-            // This preserves any existing fallback value
-            const originalVarCall = fallbackValue 
-              ? `var(${lwcToken}, ${fallbackValue})`
-              : `var(${lwcToken})`;
-            suggestedMatch = `var(${recommendation}, ${originalVarCall})`;
-          } else if (replacementCategory === ReplacementCategory.RAW_VALUE) {
-            suggestedMatch = recommendation as string;
+        if (property && property.startsWith('--lwc-')) {
+          if (!shouldIgnoreDetection(property)) {
+            const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(property);
+            const { messageId, data } = getReportMessage(property, replacementCategory, recommendation);
+            
+            // Only provide auto-fix for SLDS token replacements
+            const suggestedMatch = (hasRecommendation && replacementCategory === ReplacementCategory.SLDS_TOKEN) 
+              ? recommendation as string 
+              : null;
+            
+            reportAndFix(node, property, suggestedMatch, messageId, data);
           }
         }
 
-        reportAndFix(node, lwcToken, suggestedMatch, messageId, data);
+        // Check 2: Property value (right-side) - Use AST parsing to detect var(--lwc-*) functions
+        const valueText = context.sourceCode.getText(node.value);
+        if (valueText) {
+          forEachLwcVariable(valueText, (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => {
+            const { name: lwcToken, hasFallback } = variableInfo;
+            
+            if (shouldIgnoreDetection(lwcToken)) {
+              return;
+            }
+
+            const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(lwcToken);
+            const { messageId, data } = getReportMessage(lwcToken, replacementCategory, recommendation);
+            
+            let suggestedMatch: string | null = null;
+            
+            if (hasRecommendation) {
+              if (replacementCategory === ReplacementCategory.SLDS_TOKEN) {
+                // Extract fallback value from the original var() call if present
+                // Use position info to get the full var() call text
+                let fallbackValue: string | null = null;
+                if (hasFallback && positionInfo.start && positionInfo.end && positionInfo.start.offset !== undefined && positionInfo.end.offset !== undefined) {
+                  const varCallText = valueText.substring(positionInfo.start.offset, positionInfo.end.offset);
+                  // Find the comma after the token name and extract everything after it (before the closing paren)
+                  const commaIndex = varCallText.indexOf(',');
+                  if (commaIndex !== -1) {
+                    // Extract from after comma to before closing paren
+                    fallbackValue = varCallText.substring(commaIndex + 1, varCallText.length - 1).trim();
+                  }
+                }
+                
+                // Create the replacement in the format: var(--slds-token, var(--lwc-token, fallback))
+                // This preserves any existing fallback value
+                const originalVarCall = fallbackValue 
+                  ? `var(${lwcToken}, ${fallbackValue})`
+                  : `var(${lwcToken})`;
+                suggestedMatch = `var(${recommendation}, ${originalVarCall})`;
+              } else if (replacementCategory === ReplacementCategory.RAW_VALUE) {
+                suggestedMatch = recommendation as string;
+              }
+            }
+
+            // Use position info from AST parsing to report and fix
+            const valueStartOffset = node.value.loc.start.offset;
+            const varStartOffset = valueStartOffset + (positionInfo.start?.offset || 0);
+            const varEndOffset = valueStartOffset + (positionInfo.end?.offset || valueText.length);
+            
+            context.report({
+              node,
+              loc: positionInfo.start && positionInfo.end && node.value.loc ? {
+                start: {
+                  line: node.value.loc.start.line + positionInfo.start.line - 1,
+                  column: node.value.loc.start.column + positionInfo.start.column - 1
+                },
+                end: {
+                  line: node.value.loc.start.line + positionInfo.end.line - 1,
+                  column: node.value.loc.start.column + positionInfo.end.column - 1
+                }
+              } : node.value.loc,
+              messageId,
+              data,
+              fix: suggestedMatch ? (fixer) => {
+                return fixer.replaceTextRange([varStartOffset, varEndOffset], suggestedMatch);
+              } : undefined
+            });
+          });
+        }
       },
     };
   },

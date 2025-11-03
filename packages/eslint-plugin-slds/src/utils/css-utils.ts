@@ -108,6 +108,30 @@ export function forEachNamespacedVariable(
 }
 
 /**
+ * Specialized CSS variable traversal for LWC variables
+ * Finds var(--lwc-*) functions in CSS values and reports their fallback status
+ */
+export function forEachLwcVariable(
+  valueText: string,
+  callback: (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => void
+): void {
+  const extractor = (node: any) => extractCssVariable(node, (variableName, childrenArray) => {
+    if (!variableName.startsWith('--lwc-')) {
+      return null;
+    }
+
+    // Check if there's a fallback (comma separator)
+    const hasFallback = childrenArray.some((child: any) => 
+      child.type === 'Operator' && child.value === ','
+    );
+
+    return { name: variableName, hasFallback };
+  });
+
+  forEachValue(valueText, extractor, () => false, callback);
+}
+
+/**
  * Format multiple hook suggestions for better readability
  * @param hooks - Array of hook names to format
  * @returns Formatted string with hooks
