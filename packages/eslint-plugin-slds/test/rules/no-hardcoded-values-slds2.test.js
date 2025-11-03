@@ -449,6 +449,16 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }]
       // Another complex box-shadow with exact hook match should be auto-fixed
     },
+    // Box-shadow with var() functions in shadow values (should not nest)
+    {
+      code: `.test-cls2 { box-shadow: 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15); }`,
+      filename: 'test.css',
+      output: `.test-cls2 { box-shadow: var(--slds-g-shadow-outset-focus-1, 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15)); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Box-shadow containing var() calls should be wrapped once, not nested
+    },
     // Font-weight tests
     // Font-weight 400 (normal) with single suggestion
     {
