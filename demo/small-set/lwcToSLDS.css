@@ -74,4 +74,5 @@
 
 .icon {
     --slds-c-icon-color-foreground-default: var(--lwc-brandAccessible);
+    --slds-c-icon-color-foreground-default: var(--lwc-brandDark) var(--lwc-brandDark);
 }
