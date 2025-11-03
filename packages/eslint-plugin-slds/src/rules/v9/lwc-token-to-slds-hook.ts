@@ -85,66 +85,22 @@ export default {
   },
   
   create(context) {
-    function reportAndFix(node, oldValue, suggestedMatch, messageId, data) {
-      let fixFunction = null;
-      
-      // Only provide fix if we have a concrete suggestion
-      if (suggestedMatch) {
-        fixFunction = (fixer) => {
-          // For Declaration nodes, use the offset from loc info
-          if (node.type === "Declaration") {
-            const sourceCode = context.sourceCode;
-            const fullText = sourceCode.getText();
-            const nodeOffset = node.loc.start.offset;
-            
-            // The property name appears at the start of the Declaration
-            const propertyStart = nodeOffset;
-            const propertyEnd = propertyStart + oldValue.length;
-            
-            // Verify we're replacing the right text
-            const textAtPosition = fullText.substring(propertyStart, propertyEnd);
-            if (textAtPosition === oldValue) {
-              return fixer.replaceTextRange([propertyStart, propertyEnd], suggestedMatch);
-            }
-          } else if (node.type === "Function" && node.name === "var") {
-            // For var() function replacements, replace the entire function call
-            const sourceCode = context.sourceCode;
-            const fullText = sourceCode.getText();
-            const nodeOffset = node.loc.start.offset;
-            const nodeEnd = node.loc.end.offset;
-            
-            // Replace the entire var() function
-            return fixer.replaceTextRange([nodeOffset, nodeEnd], suggestedMatch);
-          } else {
-            // For Identifier nodes inside var() functions, we need to replace the entire function call
-            const sourceCode = context.sourceCode;
-            const fullText = sourceCode.getText();
-            
-            // Find the var() function call that contains this identifier
-            const varFunctionCall = `var(${oldValue})`;
-            const nodeOffset = node.loc.start.offset;
-            
-            // Search backwards to find the 'var(' part
-            const searchStart = Math.max(0, nodeOffset - 4); // 'var('.length = 4
-            const searchEnd = nodeOffset + oldValue.length + 1; // +1 for closing ')'
-            const searchArea = fullText.substring(searchStart, searchEnd);
-            
-            const functionCallIndex = searchArea.indexOf(varFunctionCall);
-            if (functionCallIndex !== -1) {
-              const actualStart = searchStart + functionCallIndex;
-              const actualEnd = actualStart + varFunctionCall.length;
-              return fixer.replaceTextRange([actualStart, actualEnd], suggestedMatch);
-            }
-          }
-          return null;
-        };
-      }
-
+    function reportAndFix(
+      node: any,
+      suggestedMatch: string | null,
+      messageId: string,
+      data: any,
+      fixRange?: [number, number],
+      loc?: any
+    ) {
       context.report({
         node,
+        loc: loc || node.loc,
         messageId,
         data,
-        fix: fixFunction
+        fix: suggestedMatch && fixRange ? (fixer) => {
+          return fixer.replaceTextRange(fixRange, suggestedMatch);
+        } : undefined
       });
     }
 
@@ -163,11 +119,18 @@ export default {
               ? recommendation as string 
               : null;
             
-            reportAndFix(node, property, suggestedMatch, messageId, data);
+            // Calculate fix range for property name
+            const propertyStart = node.loc.start.offset;
+            const propertyEnd = propertyStart + property.length;
+            
+            reportAndFix(node, suggestedMatch, messageId, data, [propertyStart, propertyEnd]);
           }
         }
 
         // Check 2: Property value (right-side) - Use AST parsing to detect var(--lwc-*) functions
+        // Note: We use forEachLwcVariable instead of Function[name='var'] handler because
+        // ESLint treats custom property values (e.g., --custom-prop: var(--lwc-token)) as raw strings
+        // rather than parsing them into Function nodes. This AST-based approach handles both cases.
         const valueText = context.sourceCode.getText(node.value);
         if (valueText) {
           forEachLwcVariable(valueText, (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => {
@@ -208,29 +171,24 @@ export default {
               }
             }
 
-            // Use position info from AST parsing to report and fix
+            // Calculate fix range and location using position info from AST parsing
             const valueStartOffset = node.value.loc.start.offset;
             const varStartOffset = valueStartOffset + (positionInfo.start?.offset || 0);
             const varEndOffset = valueStartOffset + (positionInfo.end?.offset || valueText.length);
             
-            context.report({
-              node,
-              loc: positionInfo.start && positionInfo.end && node.value.loc ? {
-                start: {
-                  line: node.value.loc.start.line + positionInfo.start.line - 1,
-                  column: node.value.loc.start.column + positionInfo.start.column - 1
-                },
-                end: {
-                  line: node.value.loc.start.line + positionInfo.end.line - 1,
-                  column: node.value.loc.start.column + positionInfo.end.column - 1
-                }
-              } : node.value.loc,
-              messageId,
-              data,
-              fix: suggestedMatch ? (fixer) => {
-                return fixer.replaceTextRange([varStartOffset, varEndOffset], suggestedMatch);
-              } : undefined
-            });
+            // Calculate precise location if position info is available
+            const preciseLoc = positionInfo.start && positionInfo.end && node.value.loc ? {
+              start: {
+                line: node.value.loc.start.line + positionInfo.start.line - 1,
+                column: node.value.loc.start.column + positionInfo.start.column - 1
+              },
+              end: {
+                line: node.value.loc.start.line + positionInfo.end.line - 1,
+                column: node.value.loc.start.column + positionInfo.end.column - 1
+              }
+            } : node.value.loc;
+            
+            reportAndFix(node, suggestedMatch, messageId, data, [varStartOffset, varEndOffset], preciseLoc);
           });
         }
       },
