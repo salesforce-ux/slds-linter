@@ -1270,7 +1270,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salesforce-ux/eslint-plugin-slds@npm:1.0.3, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
+"@salesforce-ux/eslint-plugin-slds@npm:1.0.4, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds"
   dependencies:
@@ -1306,7 +1306,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/slds-linter@workspace:packages/cli"
   dependencies:
-    "@salesforce-ux/eslint-plugin-slds": "npm:1.0.3"
+    "@salesforce-ux/eslint-plugin-slds": "npm:1.0.4"
     "@types/jest": "npm:^29.5.14"
     "@typescript-eslint/eslint-plugin": "npm:^8.36.0"
     "@typescript-eslint/parser": "npm:^8.36.0"
