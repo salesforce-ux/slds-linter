@@ -1,7 +1,8 @@
 import { readFile, writeFile } from 'fs/promises';
 import { createRequire } from 'module';
-import { join } from 'path';
-import { tmpdir } from 'os';
+import { join, resolve } from 'path';
+import { tmpdir, platform } from 'os';
+import { pathToFileURL } from 'url';
 import { Logger } from '../utils/logger';
 
 /**
@@ -31,35 +32,53 @@ export class ConfigLoader {
     }
 
     try {
+      // Resolve to absolute path first
+      const absolutePath = resolve(configPath);
+      
+      // Skip special processing for bundled configs (part of CLI package)
+      if (absolutePath.includes('eslint-plugin-slds') && absolutePath.includes('eslint.config.mjs')) {
+        Logger.debug('Using bundled config as-is');
+        return absolutePath;
+      }
+      
       // Check if dependencies already installed in user's workspace
-      const userConfigUrl = `file://${configPath}`;
+      const userConfigUrl = pathToFileURL(absolutePath).href;
       const pluginInstalled = this.isPackageInstalled('@salesforce-ux/eslint-plugin-slds', userConfigUrl);
       const eslintInstalled = this.isPackageInstalled('eslint', userConfigUrl);
       
       if (pluginInstalled && eslintInstalled) {
         Logger.debug('Dependencies already installed, using config as-is');
-        return configPath;
+        // On Windows, convert to file:// URL directly
+        return platform() === 'win32' ? userConfigUrl : absolutePath;
       }
 
       // Dependencies not installed - rewrite to use CLI's bundled versions
       Logger.debug('Dependencies not installed, rewriting imports');
       
-      const configContent = await readFile(configPath, 'utf-8');
+      const configContent = await readFile(absolutePath, 'utf-8');
       const require = createRequire(import.meta.url);
       
       // Get CLI's bundled paths
       const pluginPath = require.resolve('@salesforce-ux/eslint-plugin-slds');
       const eslintConfigPath = require.resolve('eslint/config');
       
+      // On Windows, convert to file:// URLs for ESM
+      const pluginImport = platform() === 'win32' 
+        ? pathToFileURL(pluginPath).href 
+        : pluginPath;
+      const eslintConfigImport = platform() === 'win32'
+        ? pathToFileURL(eslintConfigPath).href
+        : eslintConfigPath;
+      
       // Rewrite imports
       const rewritten = configContent
         .replace(
           /import\s+(\w+)\s+from\s+['"]@salesforce-ux\/eslint-plugin-slds['"]/g,
-          `import $1 from '${pluginPath}'`
+          `import $1 from '${pluginImport}'`
         )
         .replace(
           /import\s+({[^}]+})\s+from\s+['"]eslint\/config['"]/g,
-          `import $1 from '${eslintConfigPath}'`
+          `import $1 from '${eslintConfigImport}'`
         );
       
       // Write temp config
@@ -67,7 +86,8 @@ export class ConfigLoader {
       await writeFile(tempPath, rewritten, 'utf-8');
       
       Logger.debug(`Rewritten config: ${tempPath}`);
-      return tempPath;
+      // On Windows, convert temp path to file:// URL
+      return platform() === 'win32' ? pathToFileURL(tempPath).href : tempPath;
       
     } catch (error: any) {
       Logger.error(`Config processing failed: ${error.message}`);

@@ -99,7 +99,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     },
     // Line-height with CSS variables should be ignored
     {
-      code: `.example { line-height: var(--slds-g-font-lineheight-base, 1.5); }`,
+      code: `.example { line-height: var(--slds-g-font-line-height-base, 1.5); }`,
       filename: 'test.css',
     },
     // Invalid font-weight values should be ignored (450 is not a known font-weight)
@@ -614,4 +614,3 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     }
   ]
 });
-

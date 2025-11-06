@@ -231,6 +231,7 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
         color: var(--slds-c-accordion-heading-text-color);
       }`,
       filename: 'test.css',
+
       errors: [
         {
           messageId: 'deprecated',

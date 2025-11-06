@@ -374,4 +374,3 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     }
   ]
 });
-

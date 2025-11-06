@@ -267,7 +267,7 @@ ruleTester.run('lwc-token-to-slds-hook', rule, {
         { messageId: 'errorWithReplacement', type: 'Declaration' },
         { messageId: 'errorWithReplacement', type: 'Declaration' }
       ]
-    },
+      },
 
     // NEW: LWC tokens with fallback values - SLDS token replacement
     {
