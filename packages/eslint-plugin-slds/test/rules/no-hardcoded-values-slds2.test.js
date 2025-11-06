@@ -302,7 +302,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { border: #0000ff var(--fallback-width, 2px) solid; }`,
       filename: 'test.css',
       errors: [{
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }]
       // Should detect #0000ff but ignore var() content
     },
