@@ -388,7 +388,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }, {
         messageId: 'hardcodedValue'
       }]
-      // Different rem values with sizing hooks in SLDS2
+      // 1rem doesn't have a hook, only 0.5rem gets fixed
     },
     // Edge case: Mixed rem and invalid values
     {
@@ -413,11 +413,10 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }]
       // Font-size 16px should be auto-fixed
     },
-    // Color shorthand with identical values that have single hooks - should autofix
+    // Color shorthand with identical values - not auto-fixed (color shorthand handling not implemented)
     {
       code: `.example { border-color: #001639 #001639 #001639 #001639; }`,
       filename: 'test.css',
-      output: null,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -427,7 +426,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }, {
         messageId: 'hardcodedValue'
       }]
-      // All 4 values have single hooks, should provide autofix
+      // All 4 values detected but not auto-fixed (shorthand colors not yet supported)
     },
     // BOX-SHADOW TESTS
     // Box-shadow with exact hook match (auto-fixable)

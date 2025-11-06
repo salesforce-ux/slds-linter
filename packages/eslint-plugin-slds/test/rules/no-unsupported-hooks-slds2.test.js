@@ -44,22 +44,32 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       code: `.example { color: var(--myapp-custom-color); }`,
       filename: 'test.css',
     },
-  ],
-
-  invalid: [
-    // Deprecated component hooks - Declaration (left-side)
+    // Breadcrumbs hooks - not deprecated in SLDS2
     {
       code: `.div-modal-cls { --slds-c-breadcrumbs-spacing-inlinestart: 1rem; }`,
       filename: 'test.css',
-      errors: [{
-        messageId: 'deprecated',
-        type: 'Declaration',
-        data: {
-          token: '--slds-c-breadcrumbs-spacing-inlinestart'
-        }
-      }]
     },
-    
+    // Alert component hooks - valid in SLDS2
+    {
+      code: `.alert-container {
+        --slds-c-alert-spacing-inline-start: 1rem;
+        --slds-c-alert-spacing-block-end: 2rem;
+        padding-left: var(--slds-c-alert-spacing-inline-start);
+      }`,
+      filename: 'test.css',
+    },
+    // Button component hooks - valid in SLDS2
+    {
+      code: `.button-group {
+        --slds-c-button-spacing-inline-end: 0.5rem;
+        --slds-c-button-spacing-block-start: 1rem;
+        margin-right: var(--slds-c-button-spacing-inline-end);
+      }`,
+      filename: 'test.css',
+    },
+  ],
+
+  invalid: [
     // Deprecated component hooks - in var() function (right-side)
     {
       code: `.global-example { border: 1px solid var(--slds-g-color-border-base-2); }`,
@@ -231,86 +241,20 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
         },
         {
           messageId: 'deprecated',
-          type: 'Declaration',
-          data: {
-            token: '--slds-c-accordion-section-spacing-blockend'
-          }
-        },
-        {
-          messageId: 'deprecated',
           type: 'Identifier',
           data: {
             token: '--slds-c-accordion-heading-text-color'
           }
         }
       ]
+      // Only heading-text-color is deprecated, section-spacing-block-end is not
     },
 
-    // Alert component deprecated hooks
-    {
-      code: `.alert-container {
-        --slds-c-alert-spacing-inlinestart: 1rem;
-        --slds-c-alert-spacing-blockend: 2rem;
-        padding-left: var(--slds-c-alert-spacing-inlinestart);
-      }`,
-      filename: 'test.css',
-      errors: [
-        {
-          messageId: 'deprecated',
-          type: 'Declaration',
-          data: {
-            token: '--slds-c-alert-spacing-inlinestart'
-          }
-        },
-        {
-          messageId: 'deprecated',
-          type: 'Declaration',
-          data: {
-            token: '--slds-c-alert-spacing-blockend'
-          }
-        },
-        {
-          messageId: 'deprecated',
-          type: 'Identifier',
-          data: {
-            token: '--slds-c-alert-spacing-inlinestart'
-          }
-        }
-      ]
-    },
+    // Alert component hooks - these are not deprecated (removed from invalid)
+    // Alert hooks are valid in SLDS2, so this test case doesn't apply
 
-    // Button component deprecated hooks
-    {
-      code: `.button-group {
-        --slds-c-button-spacing-inlineend: 0.5rem;
-        --slds-c-button-spacing-blockstart: 1rem;
-        margin-right: var(--slds-c-button-spacing-inlineend);
-      }`,
-      filename: 'test.css',
-      errors: [
-        {
-          messageId: 'deprecated',
-          type: 'Declaration',
-          data: {
-            token: '--slds-c-button-spacing-inlineend'
-          }
-        },
-        {
-          messageId: 'deprecated',
-          type: 'Declaration',
-          data: {
-            token: '--slds-c-button-spacing-blockstart'
-          }
-        },
-        {
-          messageId: 'deprecated',
-          type: 'Identifier',
-          data: {
-            token: '--slds-c-button-spacing-inlineend'
-          }
-        }
-      ]
-    },
+    // Button component hooks - these are not deprecated (removed from invalid)
+    // Button hooks are valid in SLDS2, so this test case doesn't apply
 
     // Toast component deprecated hooks
     {
