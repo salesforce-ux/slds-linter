@@ -4,16 +4,20 @@ import chroma from 'chroma-js';
 import { generate } from '@eslint/css-tree';
 import { isCssColorFunction } from './css-functions';
 
-const LAB_THRESHOLD = 25; // Adjust this to set how strict the matching should be
+const DELTA_E_THRESHOLD = 25;
 
 const isHardCodedColor = (color: string): boolean => {
+  // Do not treat CSS variables as hard-coded colors
+  if (/^\s*var\(/i.test(color)) {
+    return false;
+  }
   const colorRegex =
     /\b(rgb|rgba)\((\s*\d{1,3}\s*,\s*){2,3}\s*(0|1|0?\.\d+)\s*\)|#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})\b|[a-zA-Z]+/g;
   return colorRegex.test(color);
 };
 
 const isHexCode = (color: string): boolean => {
-  const hexPattern = /^#(?:[0-9a-fA-F]{3}){1,2}$/; // Pattern for #RGB or #RRGGBB
+  const hexPattern = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/; // #RGB, #RGBA, #RRGGBB, #RRGGBBAA
   return hexPattern.test(color);
 };
 
@@ -40,33 +44,31 @@ const findClosestColorHook = (
     [];
   const closestHooksWithAllProperty: { name: string; distance: number }[] =
     [];
-  const labColor = chroma(color).lab();
+  
 
   Object.entries(supportedColors).forEach(([sldsValue, data]) => {
-    if (sldsValue && isHexCode(sldsValue)) {
+    if (sldsValue && isValidColor(sldsValue)) {
       const hooks = data as ValueToStylingHookEntry[]; // Get the hooks for the sldsValue
 
       hooks.forEach((hook) => {
-        const labSupportedColor = chroma(sldsValue).lab();
-        const distance = (JSON.stringify(labColor) === JSON.stringify(labSupportedColor)) ? 0
-            : chroma.distance(chroma.lab(...labColor), chroma.lab(...labSupportedColor), "lab");
+        const distance = chroma.deltaE(color, sldsValue);
         // Check if the hook has the same property
         if (hook.properties.includes(cssProperty)) {
           // Add to same property hooks if within threshold
-          if (distance <= LAB_THRESHOLD) {
+          if (distance <= DELTA_E_THRESHOLD) {
             closestHooksWithSameProperty.push({ name: hook.name, distance });
           }
         } 
         // Check for the universal selector
         else if ( hook.properties.includes("*") ){
           // Add to same property hooks if within threshold
-          if (distance <= LAB_THRESHOLD) {
+          if (distance <= DELTA_E_THRESHOLD) {
             closestHooksWithAllProperty.push({ name: hook.name, distance });
           }
         }
         else {
           // Add to different property hooks if within threshold
-          if (distance <= LAB_THRESHOLD) {
+          if (distance <= DELTA_E_THRESHOLD) {
             closestHooksWithoutSameProperty.push({ name: hook.name, distance });
           }
         }

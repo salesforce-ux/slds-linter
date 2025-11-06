@@ -219,7 +219,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       errors: [{
         messageId: 'noReplacement'
       }, {
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }]
       // Both 2px dimension and #0000ff color should be flagged
     },

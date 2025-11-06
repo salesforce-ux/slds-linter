@@ -15,6 +15,8 @@
     "postinstall": "husky install",
     "preinstall": "./scripts/validate-setup.sh",
     "test": "yarn workspaces foreach -At --jobs 1 run test",
+    "test:plugin": "yarn workspace @salesforce-ux/eslint-plugin-slds test --silent",
+    "test:plugin:watch": "yarn workspace @salesforce-ux/eslint-plugin-slds test -- --watch",
     "build": "yarn workspaces foreach -At  --jobs 1 run build",
     "release": "node scripts/release.js",
     "coverage": "yarn test --coverage && yarn gen:coverage-summary",
