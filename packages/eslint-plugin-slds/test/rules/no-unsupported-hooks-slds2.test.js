@@ -46,7 +46,7 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
     },
     // Breadcrumbs hooks - not deprecated in SLDS2
     {
-      code: `.div-modal-cls { --slds-c-breadcrumbs-spacing-inlinestart: 1rem; }`,
+      code: `.div-modal-cls { --slds-c-breadcrumbs-spacing-inline-start: 1rem; }`,
       filename: 'test.css',
     },
     // Alert component hooks - valid in SLDS2
@@ -227,10 +227,11 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
     {
       code: `.accordion {
         --slds-c-accordion-heading-text-color: #333;
-        --slds-c-accordion-section-spacing-blockend: 1rem;
+        --slds-c-accordion-section-spacing-block-end: 1rem;
         color: var(--slds-c-accordion-heading-text-color);
       }`,
       filename: 'test.css',
+
       errors: [
         {
           messageId: 'deprecated',
