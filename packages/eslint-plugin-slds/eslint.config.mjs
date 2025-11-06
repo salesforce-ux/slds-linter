@@ -12,7 +12,7 @@ export default defineConfig([
       "@salesforce-ux/slds": slds,
       css: cssPlugin
     },
-    extends: ["@salesforce-ux/slds/recommended", "css/recommended"]
+    extends: ["@salesforce-ux/slds/recommended"]
     //defineConfig() helper helps which config to use internally.
   },
 ]);
