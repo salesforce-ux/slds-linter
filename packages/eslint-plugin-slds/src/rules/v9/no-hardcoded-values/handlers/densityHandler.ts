@@ -71,7 +71,8 @@ function createDimensionReplacement(
       end,
       replacement: `var(${closestHooks[0]}, ${rawValue})`,
       displayValue: closestHooks[0],
-      hasHook: true
+      hasHook: true,
+      isNumeric: true
     };
   } else if (closestHooks.length > 1) {
     // Multiple hooks - still has hooks, but no auto-fix
@@ -80,7 +81,8 @@ function createDimensionReplacement(
       end,
       replacement: rawValue,
       displayValue: formatSuggestionHooks(closestHooks),
-      hasHook: true
+      hasHook: true,
+      isNumeric: true
     };
   } else {
     // No hook or multiple hooks - keep original value
@@ -89,7 +91,8 @@ function createDimensionReplacement(
       end,
       replacement: rawValue,
       displayValue: rawValue,
-      hasHook: false
+      hasHook: false,
+      isNumeric: true
     };
   }
 }
