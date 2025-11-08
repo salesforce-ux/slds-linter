@@ -1,5 +1,5 @@
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
-import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
+import { resolveDensityPropertyToMatch } from '../../../../utils/property-matcher';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
@@ -81,8 +81,8 @@ function createFontReplacement(
   // Font-specific property resolution
   // Font-weight: unitless known font-weight values, otherwise font-size
   const propToMatch = (!fontValue.unit && isKnownFontWeight(fontValue.number)) 
-    ? resolvePropertyToMatch('font-weight')
-    : resolvePropertyToMatch('font-size');
+    ? resolveDensityPropertyToMatch('font-weight')
+    : resolveDensityPropertyToMatch('font-size');
 
   const closestHooks = getStylingHooksForDensityValue(fontValue, context.valueToStylinghook, propToMatch);
 

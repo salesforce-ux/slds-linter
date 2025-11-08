@@ -360,9 +360,9 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       errors: [{
         messageId: 'hardcodedValue'
       }, {
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }]
-      // Should detect both 1px (has hook) and red color (no hook available)
+      // Should detect both 1px (has hook) and red color (mapped to border-color, has hooks)
     },
 
     // ADVANCED EXAMPLES - SLDS2 specific shorthand auto-fix

@@ -1,5 +1,5 @@
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
-import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
+import { resolveDensityPropertyToMatch } from '../../../../utils/property-matcher';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
@@ -57,7 +57,7 @@ function createDimensionReplacement(
     ? `${parsedDimension.number}${parsedDimension.unit}`
     : parsedDimension.number.toString();
 
-  const propToMatch = resolvePropertyToMatch(cssProperty);
+  const propToMatch = resolveDensityPropertyToMatch(cssProperty);
   const closestHooks = getStylingHooksForDensityValue(parsedDimension, context.valueToStylinghook, propToMatch);
 
   // Use position information directly from CSS tree (already 0-based offsets)

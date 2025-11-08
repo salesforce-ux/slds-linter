@@ -1,5 +1,5 @@
 import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
-import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
+import { resolveColorPropertyToMatch } from '../../../../utils/property-matcher';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
@@ -64,7 +64,7 @@ function createColorReplacement(
   const originalValue = originalValueText ? originalValueText.substring(start, end) : colorValue;
 
   // Otherwise, find closest hooks from metadata
-  const propToMatch = resolvePropertyToMatch(cssProperty);
+  const propToMatch = resolveColorPropertyToMatch(cssProperty);
   let closestHooks = findClosestColorHook(hexValue, context.valueToStylinghook, propToMatch);
 
   let replacement = originalValue;
