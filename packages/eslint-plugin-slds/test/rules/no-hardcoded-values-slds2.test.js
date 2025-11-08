@@ -302,9 +302,9 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { border: #0000ff var(--fallback-width, 2px) solid; }`,
       filename: 'test.css',
       errors: [{
-        messageId: 'hardcodedValue'
+        messageId: 'noReplacement'
       }]
-      // Should detect #0000ff but ignore var() content
+      // Should detect #0000ff but no hook available for this color
     },
     // Line-height with no styling hook available
     {
@@ -360,9 +360,9 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       errors: [{
         messageId: 'hardcodedValue'
       }, {
-        messageId: 'hardcodedValue'
+        messageId: 'noReplacement'
       }]
-      // Should detect both #ffffff color (has hook) and 1px (no hook in SLDS2)
+      // Should detect both 1px (has hook) and red color (no hook available)
     },
 
     // ADVANCED EXAMPLES - SLDS2 specific shorthand auto-fix

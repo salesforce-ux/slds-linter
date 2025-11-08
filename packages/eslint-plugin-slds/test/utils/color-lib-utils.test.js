@@ -1,128 +1,28 @@
 const {
   findClosestColorHook,
   convertToHex,
-  isHexCode,
-  isHardCodedColor,
   isValidColor,
   extractColorValue,
-  isSemanticHook,
-  isPaletteHook,
-  sortBasedOnCategoryAndProperty,
 } = require('../../build/utils/color-lib-utils');
 
 // Minimal shape for ValueToStylingHooksMapping used by findClosestColorHook
 const supportedColors = {
   '#ff0000': [
-    { name: '--slds-text-color', properties: ['color'] },
-    { name: '--slds-universal-color', properties: ['*'] },
+    { name: '--slds-text-color', properties: ['color'], group: 'theme' },
+    { name: '--slds-universal-color', properties: ['*'], group: 'reference' },
   ],
   '#00ff00': [
-    { name: '--slds-bg-color', properties: ['background-color'] },
+    { name: '--slds-bg-color', properties: ['background-color'], group: 'surface' },
   ],
   '#0000ff': [
-    { name: '--slds-border-color', properties: ['border-color'] },
+    { name: '--slds-border-color', properties: ['border-color'], group: 'borders' },
+  ],
+  '#ff0101': [
+    { name: '--slds-close-red', properties: ['color'], group: 'theme' },
   ],
 };
 
 describe('color-lib-utils', () => {
-  describe('isHexCode', () => {
-    it('detects valid hex codes', () => {
-      expect(isHexCode('#fff')).toBe(true);
-      expect(isHexCode('#ff00ff')).toBe(true);
-    });
-
-  describe('isSemanticHook and isPaletteHook', () => {
-    it('detects semantic hooks', () => {
-      expect(isSemanticHook('--slds-surface-container')).toBe(true);
-      expect(isSemanticHook('--slds-g-color-surface-1')).toBe(true);
-      expect(isSemanticHook('--slds-g-color-accent-1')).toBe(true);
-      expect(isSemanticHook('--slds-g-color-error-1')).toBe(true);
-      expect(isSemanticHook('--slds-g-color-warning-1')).toBe(true);
-      expect(isSemanticHook('--slds-g-color-info-1')).toBe(true);
-      expect(isSemanticHook('--slds-g-color-success-1')).toBe(true);
-      expect(isSemanticHook('--slds-g-color-disabled-1')).toBe(true);
-    });
-
-    it('detects palette hooks', () => {
-      expect(isPaletteHook('--slds-g-color-palette-neutral-100')).toBe(true);
-      expect(isPaletteHook('--slds-g-color-palette-brand-50')).toBe(true);
-    });
-
-    it('does not misclassify system hooks as semantic/palette - all these are system hooks', () => {
-      expect(isSemanticHook('--slds-g-color-border-base-1')).toBe(false);
-      expect(isPaletteHook('--slds-g-color-border-base-1')).toBe(false);
-    });
-  });
-
-  describe('sortBasedOnCategoryAndProperty', () => {
-    it('orders semantic first, then system, then palette; each by distance; returns top 5', () => {
-      const hooks = [
-        { name: '--slds-g-color-border-base-1', distance: 2 }, // system
-        { name: '--slds-g-color-palette-brand-50', distance: 1 }, // palette
-        { name: '--slds-g-color-surface-1', distance: 5 }, // semantic
-        { name: '--slds-g-color-surface-2', distance: 1 }, // semantic
-        { name: '--slds-g-color-palette-neutral-100', distance: 0.5 }, // palette
-        { name: '--slds-g-color-border-base-2', distance: 1 }, // system
-        { name: '--slds-g-color-accent-1', distance: 3 }, // semantic
-      ];
-
-      const result = sortBasedOnCategoryAndProperty(hooks, 'color');
-      // Expect first group: semantic sorted by distance: surface-2 (1), accent-1 (3), surface-1 (5)
-      expect(result.slice(0, 3)).toEqual([
-        '--slds-g-color-surface-2',
-        '--slds-g-color-accent-1',
-        '--slds-g-color-surface-1',
-      ]);
-      // Then system by distance
-      expect(result[3]).toBe('--slds-g-color-border-base-2');
-      // Still system due to top-5 slice and category priority
-      expect(result[4]).toBe('--slds-g-color-border-base-1');
-      // Only top 5 returned
-      expect(result.length).toBe(5);
-    });
-
-    it('is stable within same rank by distance comparison', () => {
-      const hooks = [
-        { name: '--slds-g-color-surface-3', distance: 2 },
-        { name: '--slds-g-color-surface-1', distance: 1 },
-        { name: '--slds-g-color-surface-2', distance: 1 },
-      ];
-      const result = sortBasedOnCategoryAndProperty(hooks, 'color');
-      // distance ties keep original relative order among ties due to stable sort behavior of V8
-      // Expected first two are the two distance 1 entries in input order
-      expect(result[0]).toBe('--slds-g-color-surface-1');
-      expect(result[1]).toBe('--slds-g-color-surface-2');
-      expect(result[2]).toBe('--slds-g-color-surface-3');
-    });
-  });
-
-    it('rejects non-hex strings', () => {
-      expect(isHexCode('red')).toBe(false);
-      expect(isHexCode('rgb(0,0,0)')).toBe(false);
-    });
-
-    it('is case-insensitive and exact-length', () => {
-      expect(isHexCode('#FFAA00')).toBe(true);
-      expect(isHexCode('#ffaa0')).toBe(false);
-    });
-  });
-
-  describe('isHardCodedColor', () => {
-    it('matches rgb/rgba, hex, and named colors', () => {
-      expect(isHardCodedColor('rgb(255, 0, 0)')).toBe(true);
-      expect(isHardCodedColor('#0f0')).toBe(true);
-      expect(isHardCodedColor('red')).toBe(true);
-    });
-
-    it('does not match variables or non-color strings', () => {
-      expect(isHardCodedColor('var(--slds-color-brand)')).toBe(false);
-      expect(isHardCodedColor('inherit')).toBe(true);
-    });
-
-    it('ignores CSS variables even with spacing and case', () => {
-      expect(isHardCodedColor('VaR   (  --token  )')).toBe(false);
-    });
-  });
 
   describe('convertToHex', () => {
     it('converts named colors to hex', () => {
@@ -192,26 +92,55 @@ describe('color-lib-utils', () => {
     });
   });
 
-  describe('findClosestColorHook (Delta E)', () => {
-    it('prefers exact matches for the same property (distance 0)', () => {
+  describe('findClosestColorHook', () => {
+    it('returns hooks ordered by group priority for color property', () => {
       const result = findClosestColorHook('#ff0000', supportedColors, 'color');
+      // For color property, order is: surface, theme, feedback, reference
+      // #ff0000 matches theme group (--slds-text-color) with distance 0
       expect(result[0]).toBe('--slds-text-color');
+      expect(result).toContain('--slds-text-color');
     });
 
     it('finds close colors within threshold for the requested property', () => {
       const result = findClosestColorHook('#ff0101', supportedColors, 'color');
+      // Should find both --slds-text-color and --slds-close-red (both theme group, close to input)
+      expect(result.length).toBeGreaterThan(0);
       expect(result).toContain('--slds-text-color');
     });
 
-    it('returns empty when no close colors within threshold', () => {
+    it('returns empty array when no close colors within threshold', () => {
       const result = findClosestColorHook('#abcdef', supportedColors, 'color');
       expect(result).toEqual([]);
     });
 
-    it('does not suggest wildcard-only hook if same-property exists and matches better', () => {
+    it('respects property matching - only returns hooks for matching properties', () => {
+      const result = findClosestColorHook('#00ff00', supportedColors, 'background-color');
+      // Should find --slds-bg-color which has background-color property
+      expect(result).toContain('--slds-bg-color');
+    });
+
+    it('includes wildcard (*) property hooks for any CSS property', () => {
       const result = findClosestColorHook('#ff0000', supportedColors, 'color');
-      expect(result[0]).toBe('--slds-text-color');
-      // universal can still appear later depending on sort, but first should be exact-property semantic
+      // --slds-universal-color has '*' property, should be included
+      expect(result).toContain('--slds-universal-color');
+    });
+
+    it('orders by group priority based on CSS property type', () => {
+      const result = findClosestColorHook('#0000ff', supportedColors, 'border-color');
+      // For border-color, borders group should be prioritized
+      expect(result[0]).toBe('--slds-border-color');
+    });
+
+    it('limits results to 5 hooks maximum', () => {
+      const manyColors = {
+        '#ff0000': Array.from({ length: 10 }, (_, i) => ({
+          name: `--slds-hook-${i}`,
+          properties: ['color'],
+          group: 'theme',
+        })),
+      };
+      const result = findClosestColorHook('#ff0000', manyColors, 'color');
+      expect(result.length).toBeLessThanOrEqual(5);
     });
   });
 });

@@ -1278,7 +1278,7 @@ __metadata:
     "@eslint/css-tree": "npm:^3.6.5"
     "@html-eslint/eslint-plugin": "npm:^0.34.0"
     "@html-eslint/parser": "npm:^0.34.0"
-    "@salesforce-ux/sds-metadata": "npm:^1.1.0"
+    "@salesforce-ux/sds-metadata": "npm:^1.2.0"
     "@types/chroma-js": "npm:^2.4.4"
     "@types/eslint": "npm:^8.56.0"
     "@types/jest": "npm:^29.5.14"
@@ -1295,10 +1295,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/sds-metadata@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@salesforce-ux/sds-metadata@npm:1.1.0"
-  checksum: 10c0/34ee8d0c0df8bacc7410fe4adc12aa46f715ec0105f514b67f28fb297d5566571f8a8aefc260a36e227a7046fc4c7edb2e13a230f4332e3ef646bf76c20c77a5
+"@salesforce-ux/sds-metadata@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@salesforce-ux/sds-metadata@npm:1.2.0"
+  checksum: 10c0/d0543652f987c23eb23c636a05edadbe381abaf81826af607b0bacbc2c7d36fd78f474eae635815a9bac29467ac272f061283fa804f4ee23c9d74fefe44b053a
   languageName: node
   linkType: hard
 
@@ -7053,11 +7053,11 @@ __metadata:
 
 "typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>":
   version: 5.9.2
-  resolution: "typescript@patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"
+  resolution: "typescript@patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=b45daf"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/34d2a8e23eb8e0d1875072064d5e1d9c102e0bdce56a10a25c0b917b8aa9001a9cf5c225df12497e99da107dc379360bc138163c66b55b95f5b105b50578067e
+  checksum: 10c0/66fc07779427a7c3fa97da0cf2e62595eaff2cea4594d45497d294bfa7cb514d164f0b6ce7a5121652cf44c0822af74e29ee579c771c405e002d1f23cf06bfde
   languageName: node
   linkType: hard
 
