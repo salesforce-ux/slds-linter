@@ -53,7 +53,7 @@ describe('FileScanner', () => {
       gitignore: false
     };
 
-    const {batches} = await FileScanner.scanFiles(testDir, options);
+    const { batches } = await FileScanner.scanFiles(testDir, options);
     expect(batches).toHaveLength(0);
   });
 }); 

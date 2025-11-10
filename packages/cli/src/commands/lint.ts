@@ -45,7 +45,7 @@ export function registerLintCommand(program: Command): void {
         const lintResults = await lint(normalizedOptions);
 
         // Print detailed lint results only for files with issues
-        const {totalErrors} = printLintResults(lintResults, normalizedOptions.editor);
+        const { totalErrors } = printLintResults(lintResults, normalizedOptions.editor);
 
         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
         Logger.newLine().success(chalk.green(`Linting completed in ${elapsedTime} seconds.`));
