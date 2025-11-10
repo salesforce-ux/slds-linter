@@ -304,7 +304,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       errors: [{
         messageId: 'noReplacement'
       }]
-      // Should detect #0000ff but ignore var() content
+      // Should detect #0000ff but no hook available for this color
     },
     // Line-height with no styling hook available
     {
@@ -362,7 +362,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }, {
         messageId: 'hardcodedValue'
       }]
-      // Should detect both #ffffff color (has hook) and 1px (no hook in SLDS2)
+      // Should detect both 1px (has hook) and red color (mapped to border-color, has hooks)
     },
 
     // ADVANCED EXAMPLES - SLDS2 specific shorthand auto-fix

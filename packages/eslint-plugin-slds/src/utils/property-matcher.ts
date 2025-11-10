@@ -118,9 +118,9 @@ export function toSelector(properties: string[]): string {
   return selectorParts.join(', ');
 }
 
-export function resolvePropertyToMatch(cssProperty:string){
+export function resolveDensityPropertyToMatch(cssProperty:string){
   const propertyToMatch = cssProperty.toLowerCase();
-  if(propertyToMatch === 'outline' || propertyToMatch === 'outline-width' || isBorderWidthProperty(propertyToMatch)){
+  if(isOutlineWidthProperty(propertyToMatch) || isBorderWidthProperty(propertyToMatch)){
     return 'border-width';
   } else if(isMarginProperty(propertyToMatch)){
     return 'margin';
@@ -134,10 +134,22 @@ export function resolvePropertyToMatch(cssProperty:string){
   } else if(isInsetProperty(propertyToMatch)){
     // Stylinghooks includes only top/left/right/bottom as property to match, for all other insets we need to match top
     return 'top';
-  } else if(cssProperty === 'background' || cssProperty === 'background-color'){
+  }
+  return propertyToMatch;
+}
+
+export function resolveColorPropertyToMatch(cssProperty:string){
+  const propertyToMatch = cssProperty.toLowerCase();
+  if(propertyToMatch === 'outline' || propertyToMatch === 'outline-color'){
+    return 'border-color';
+  } else if(propertyToMatch === 'background' || propertyToMatch === 'background-color'){
     return 'background-color';
-  } else if(cssProperty === 'outline' || cssProperty === 'outline-color' || isBorderColorProperty(cssProperty)){
+  } else if(isBorderColorProperty(propertyToMatch)){
     return 'border-color';
   }
   return propertyToMatch;
+}
+
+export function isOutlineWidthProperty(propertyToMatch:string){
+  return propertyToMatch === 'outline' || propertyToMatch === 'outline-width';
 }

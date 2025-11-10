@@ -14,6 +14,7 @@ export interface ReplacementInfo {
   replacement: string;        // Full CSS var: var(--hook, fallback)
   displayValue: string;       // Just the hook: --hook
   hasHook: boolean;
+  isNumeric?: boolean;        // Whether this is a numeric (dimension) value
 }
 
 /**
@@ -73,9 +74,23 @@ export function handleShorthandAutoFix(
   const hasAnyHooks = sortedReplacements.some(r => r.hasHook);
   const canAutoFix = hasAnyHooks;
 
+  // Get rule options
+  const reportNumericValue = context.options?.reportNumericValue || 'always';
+
   // Report each individual value
-  sortedReplacements.forEach(({ start, end, replacement, displayValue, hasHook }) => {
+  sortedReplacements.forEach(({ start, end, replacement, displayValue, hasHook, isNumeric }) => {
     const originalValue = valueText.substring(start, end);
+    
+    // Check if we should skip reporting based on reportNumericValue option
+    if (isNumeric) {
+      if (reportNumericValue === 'never') {
+        return; // Skip reporting numeric values
+      }
+      if (reportNumericValue === 'hasReplacement' && !hasHook) {
+        return; // Skip reporting numeric values without replacements
+      }
+    }
+    
     const valueStartColumn = declarationNode.value.loc.start.column;
     const valueColumn = valueStartColumn + start;
     

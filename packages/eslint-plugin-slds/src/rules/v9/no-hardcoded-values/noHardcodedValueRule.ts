@@ -8,7 +8,8 @@ import {
 } from './handlers/index';
 import { colorProperties, densificationProperties, fontProperties, toSelector } from '../../../utils/property-matcher';
 import { isRuleEnabled } from '../../../utils/rule-utils';
-import type { RuleConfig, HandlerContext } from '../../../types';
+import type { RuleConfig, HandlerContext, RuleOptions } from '../../../types';
+import { ruleOptionsSchema } from './ruleOptionsSchema';
 
 
 
@@ -32,6 +33,7 @@ export function defineNoHardcodedValueRule(config: RuleConfig & { ruleName?: str
       },
       fixable: 'code',
       messages,
+      schema: ruleOptionsSchema
     },
     
     create(context) {
@@ -40,11 +42,20 @@ export function defineNoHardcodedValueRule(config: RuleConfig & { ruleName?: str
         return {};
       }
 
+      // Parse options from context
+      const options: RuleOptions = context.options[0] || {};
+      const ruleOptions: RuleOptions = {
+        reportNumericValue: options.reportNumericValue || 'always',
+        customMapping: options.customMapping || {},
+        preferPaletteHook: options.preferPaletteHook || false
+      };
+
       // Create handler context
       const handlerContext: HandlerContext = {
         valueToStylinghook: config.valueToStylinghook,
         context,
-        sourceCode: context.sourceCode
+        sourceCode: context.sourceCode,
+        options: ruleOptions
       };
       
       const colorOnlySelector = toSelector(colorProperties);

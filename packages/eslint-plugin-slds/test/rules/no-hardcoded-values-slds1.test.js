@@ -221,7 +221,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       }, {
         messageId: 'noReplacement'
       }]
-      // Both 2px dimension and #0000ff color should be flagged
+      // Both 2px dimension and #0000ff color should be flagged (no hooks available)
     },
     // Mixed value with color and CSS variable - review comment case
     {

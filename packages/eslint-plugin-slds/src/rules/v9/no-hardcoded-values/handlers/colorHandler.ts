@@ -1,6 +1,7 @@
 import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
-import { resolvePropertyToMatch } from '../../../../utils/property-matcher';
+import { resolveColorPropertyToMatch } from '../../../../utils/property-matcher';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
+import { getCustomMapping } from '../../../../utils/custom-mapping-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
 // Import shared utilities for common logic
@@ -10,6 +11,7 @@ import {
   type ReplacementInfo,
   type PositionInfo
 } from '../../../../utils/hardcoded-shared-utils';
+
 
 /**
  * Handle color declarations using CSS tree parsing
@@ -35,9 +37,6 @@ export const handleColorDeclaration: DeclarationHandler = (node: any, context: H
 };
 
 
-
-
-
 /**
  * Create color replacement info for shorthand auto-fix
  * Returns replacement data or null if no valid replacement
@@ -58,9 +57,6 @@ function createColorReplacement(
     return null;
   }
 
-  const propToMatch = resolvePropertyToMatch(cssProperty);
-  const closestHooks = findClosestColorHook(hexValue, context.valueToStylinghook, propToMatch);
-
   // Use position information directly from CSS tree (already 0-based offsets)
   const start = positionInfo.start.offset;
   const end = positionInfo.end.offset;
@@ -68,30 +64,46 @@ function createColorReplacement(
   // Extract the original value from the CSS text to preserve spacing
   const originalValue = originalValueText ? originalValueText.substring(start, end) : colorValue;
 
-  if (closestHooks.length === 1) {
-    // Has a single hook replacement - should provide autofix
-    return {
-      start,
-      end,
-      replacement: `var(${closestHooks[0]}, ${colorValue})`,
-      displayValue: closestHooks[0],
-      hasHook: true
-    };
-  } else if (closestHooks.length > 1) {
+  // Check custom mapping first
+  const customHook = getCustomMapping(cssProperty, colorValue, context.options?.customMapping);
+  let closestHooks: string[] = [];
+  
+  if (customHook) {
+    // Use custom mapping if available
+    closestHooks = [customHook];
+  } else {
+    // Otherwise, find closest hooks from metadata
+    const propToMatch = resolveColorPropertyToMatch(cssProperty);
+    closestHooks = findClosestColorHook(hexValue, context.valueToStylinghook, propToMatch);
+  }
+
+  let replacement = originalValue;
+  let paletteHook = null;
+  // Apply preferPaletteHook filter if enabled
+  if (context.options?.preferPaletteHook && closestHooks.length > 1) {
+    paletteHook = closestHooks.filter(hook => hook.includes('-palette-'))[0];
+  }
+  if(paletteHook){
+    replacement = `var(${paletteHook}, ${colorValue})`;
+  } else if(closestHooks.length === 1){
+    replacement = `var(${closestHooks[0]}, ${colorValue})`;
+  }
+
+  if (closestHooks.length > 0) {
     // Multiple hooks - format them for better readability
     return {
       start,
       end,
-      replacement: originalValue,  // Use original value to preserve spacing
+      replacement,  // Use original value to preserve spacing
       displayValue: formatSuggestionHooks(closestHooks),
-      hasHook: true
+      hasHook: true      
     };
   } else {
     // No hooks - keep original value
     return {
       start,
       end,
-      replacement: originalValue,  // Use original value to preserve spacing
+      replacement,  // Use original value to preserve spacing
       displayValue: originalValue,
       hasHook: false
     };
