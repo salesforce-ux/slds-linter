@@ -41,6 +41,7 @@
 
 .test-cls2 {
   box-shadow: 0px 0px 4.5px 0px #00000014, 0px 4.2px 4.5px 0px #00000017, 0px -1px 1.44px 0px #00000008;
+  box-shadow: 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15);
 }
 
 /* For text truncation with ellipsis
