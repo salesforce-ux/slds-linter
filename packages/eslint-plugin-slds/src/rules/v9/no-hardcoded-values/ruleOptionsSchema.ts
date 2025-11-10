@@ -35,4 +35,4 @@ export const ruleOptionsSchema = [
     },
     additionalProperties: false
   }
-] as const;
+]

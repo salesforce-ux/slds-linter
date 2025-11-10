@@ -1,6 +1,7 @@
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
 import { resolveDensityPropertyToMatch } from '../../../../utils/property-matcher';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
+import { getCustomMapping } from '../../../../utils/custom-mapping-utils';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
@@ -57,8 +58,18 @@ function createDimensionReplacement(
     ? `${parsedDimension.number}${parsedDimension.unit}`
     : parsedDimension.number.toString();
 
-  const propToMatch = resolveDensityPropertyToMatch(cssProperty);
-  const closestHooks = getStylingHooksForDensityValue(parsedDimension, context.valueToStylinghook, propToMatch);
+  // Check custom mapping first
+  const customHook = getCustomMapping(cssProperty, rawValue, context.options?.customMapping);
+  let closestHooks: string[] = [];
+  
+  if (customHook) {
+    // Use custom mapping if available
+    closestHooks = [customHook];
+  } else {
+    // Otherwise, find hooks from metadata
+    const propToMatch = resolveDensityPropertyToMatch(cssProperty);
+    closestHooks = getStylingHooksForDensityValue(parsedDimension, context.valueToStylinghook, propToMatch);
+  }
 
   // Use position information directly from CSS tree (already 0-based offsets)
   const start = positionInfo.start.offset;

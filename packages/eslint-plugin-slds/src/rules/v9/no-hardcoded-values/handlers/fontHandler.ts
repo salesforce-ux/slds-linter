@@ -1,6 +1,7 @@
 import { getStylingHooksForDensityValue } from '../../../../utils/styling-hook-utils';
 import { resolveDensityPropertyToMatch } from '../../../../utils/property-matcher';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
+import { getCustomMapping } from '../../../../utils/custom-mapping-utils';
 import type { ParsedUnitValue } from '../../../../utils/value-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
@@ -78,13 +79,22 @@ function createFontReplacement(
     ? `${fontValue.number}${fontValue.unit}`
     : fontValue.number.toString();
 
-  // Font-specific property resolution
-  // Font-weight: unitless known font-weight values, otherwise font-size
+  // Determine the actual CSS property for custom mapping
   const propToMatch = (!fontValue.unit && isKnownFontWeight(fontValue.number)) 
-    ? resolveDensityPropertyToMatch('font-weight')
-    : resolveDensityPropertyToMatch('font-size');
+    ? 'font-weight'
+    : 'font-size';
 
-  const closestHooks = getStylingHooksForDensityValue(fontValue, context.valueToStylinghook, propToMatch);
+  // Check custom mapping first
+  const customHook = getCustomMapping(propToMatch, rawValue, context.options?.customMapping);
+  let closestHooks: string[] = [];
+  
+  if (customHook) {
+    // Use custom mapping if available
+    closestHooks = [customHook];
+  } else {
+    // Otherwise, find hooks from metadata
+    closestHooks = getStylingHooksForDensityValue(fontValue, context.valueToStylinghook, propToMatch);
+  }
 
   // Use position information directly from CSS tree (already 0-based offsets)
   const start = positionInfo.start.offset;

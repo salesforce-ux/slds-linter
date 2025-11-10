@@ -1,6 +1,7 @@
 import { findClosestColorHook, convertToHex, isValidColor } from '../../../../utils/color-lib-utils';
 import { resolveColorPropertyToMatch } from '../../../../utils/property-matcher';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
+import { getCustomMapping } from '../../../../utils/custom-mapping-utils';
 import type { HandlerContext, DeclarationHandler } from '../../../../types';
 
 // Import shared utilities for common logic
@@ -63,9 +64,18 @@ function createColorReplacement(
   // Extract the original value from the CSS text to preserve spacing
   const originalValue = originalValueText ? originalValueText.substring(start, end) : colorValue;
 
-  // Otherwise, find closest hooks from metadata
-  const propToMatch = resolveColorPropertyToMatch(cssProperty);
-  let closestHooks = findClosestColorHook(hexValue, context.valueToStylinghook, propToMatch);
+  // Check custom mapping first
+  const customHook = getCustomMapping(cssProperty, colorValue, context.options?.customMapping);
+  let closestHooks: string[] = [];
+  
+  if (customHook) {
+    // Use custom mapping if available
+    closestHooks = [customHook];
+  } else {
+    // Otherwise, find closest hooks from metadata
+    const propToMatch = resolveColorPropertyToMatch(cssProperty);
+    closestHooks = findClosestColorHook(hexValue, context.valueToStylinghook, propToMatch);
+  }
 
   let replacement = originalValue;
   let paletteHook = null;
