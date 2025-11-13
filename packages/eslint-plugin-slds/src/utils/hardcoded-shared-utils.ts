@@ -73,6 +73,22 @@ export function handleShorthandAutoFix(
   const hasAnyHooks = sortedReplacements.some(r => r.hasHook);
   const canAutoFix = hasAnyHooks;
 
+  // Pre-compute the new value to avoid recomputing it in each fix callback
+  // This prevents circular fixes by ensuring each fix callback uses a stable value
+  const computedNewValue = canAutoFix ? (() => {
+    let newValue = valueText;
+    // Apply replacements from right to left to maintain string positions
+    for (let i = sortedReplacements.length - 1; i >= 0; i--) {
+      const { start: rStart, end: rEnd, replacement: rReplacement } = sortedReplacements[i];
+      newValue = newValue.substring(0, rStart) + rReplacement + newValue.substring(rEnd);
+    }
+    return newValue;
+  })() : null;
+
+  // Track if fix has been assigned to avoid redundant fix assignments
+  // Since the fix fixes all values at once, we only need to assign it once
+  let fixAssigned = false;
+
   // Report each individual value
   sortedReplacements.forEach(({ start, end, replacement, displayValue, hasHook }) => {
     const originalValue = valueText.substring(start, end);
@@ -97,20 +113,10 @@ export function handleShorthandAutoFix(
     };
 
     if (hasHook) {
-      // Create auto-fix for the entire shorthand value
-      const fix = canAutoFix ? (fixer: any) => {
-        // Reconstruct the entire value with all replacements
-        let newValue = valueText;
-        
-        // Apply replacements from right to left to maintain string positions
-        for (let i = sortedReplacements.length - 1; i >= 0; i--) {
-          const { start: rStart, end: rEnd, replacement: rReplacement } = sortedReplacements[i];
-          newValue = newValue.substring(0, rStart) + rReplacement + newValue.substring(rEnd);
-        }
-        
-        return fixer.replaceText(declarationNode.value, newValue);
-      } : undefined;
-
+      // Assign fix only to the first report with a hook
+      // Since the fix fixes all values at once, we only need one fix assignment
+      // Subsequent reports still highlight errors but don't need the fix
+      // Create fix callback inline to avoid ESLint detecting it as circular
       context.context.report({
         node: reportNode,
         messageId: 'hardcodedValue',
@@ -118,8 +124,12 @@ export function handleShorthandAutoFix(
           oldValue: originalValue,
           newValue: displayValue
         },
-        fix
+        fix: fixAssigned ? undefined : (fixer: any) => {
+          if (computedNewValue === null) return undefined;
+          return fixer.replaceText(declarationNode.value, computedNewValue);
+        }
       });
+      fixAssigned = true;
     } else {
       // No hook available
       context.context.report({
