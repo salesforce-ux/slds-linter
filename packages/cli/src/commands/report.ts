@@ -1,11 +1,11 @@
 import { Command, Option } from 'commander';
 import path from 'path';
 import ora from 'ora';
-import chalk from 'chalk';
 import fs from 'fs';
 import { CliOptions } from '../types';
 import { normalizeAndValidatePath, normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
+import { Colors } from '../utils/colors';
 import { DEFAULT_ESLINT_CONFIG_PATH } from '../services/config.resolver';
 import { report, lint } from '../executor';
 
@@ -30,7 +30,7 @@ export function registerReportCommand(program: Command): void {
           normalizedOptions.directory = normalizeDirectoryPath(directory);
         } else if(options.directory){
           // If -d, --directory option is passed, prompt deprecation warning
-          Logger.newLine().warning(chalk.yellow(
+          Logger.newLine().warning(Colors.warning(
             `WARNING: --directory, -d option is deprecated. Supply as argument instead.
             Example: npx @salesforce-ux/slds-linter report ${options.directory}`
           ));

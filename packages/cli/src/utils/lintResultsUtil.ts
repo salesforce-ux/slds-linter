@@ -1,9 +1,9 @@
 // src/utils/lintResultsUtil.ts
 
-import chalk from 'chalk';
 import path from 'path';
 import { createClickableLineCol } from './editorLinkUtil';
 import { Logger } from '../utils/logger';
+import { Colors } from './colors';
 import { LintResult, LintResultEntry, SarifResultEntry, LintResultSummary } from '../types';
 
 /**
@@ -55,7 +55,7 @@ export function printLintResults(results: LintResult[], editor?: string): LintRe
     const relativeFile = path.relative(process.cwd(), absolutePath) || 'Unknown file';
     
     // Print file name with a preceding new line for spacing.
-    console.log(`\n${chalk.underline(relativeFile)}\n`);
+    console.log(`\n${Colors.info.underline(relativeFile)}\n`);
 
     // Prepare table data
     const tableData: string[][] = [];
@@ -79,10 +79,10 @@ export function printLintResults(results: LintResult[], editor?: string): LintRe
         ? createClickableLineCol(lineCol, absolutePath, msg.line, msg.column, editor)
         : lineCol;
       
-      const severityText = isError ? chalk.red('error') : chalk.yellow('warning');
+      const severityText = isError ? Colors.error('error') : Colors.warning('warning');
       // Replace newlines and multiple spaces to prevent layout issues
       const message = parseText(msg.message);
-      const ruleId = msg.ruleId ? chalk.dim(replaceNamespaceinRules(msg.ruleId)) : '';
+      const ruleId = msg.ruleId ? Colors.lowEmphasis(replaceNamespaceinRules(msg.ruleId)) : '';
       
       tableData.push([clickableLineCol, severityText, message, ruleId]);
     });
@@ -100,7 +100,7 @@ export function printLintResults(results: LintResult[], editor?: string): LintRe
   // Print summary
   const totalProblems = totalErrors + totalWarnings;
   if (totalProblems > 0) {
-    const chalkColorFn = totalErrors > 0 ? chalk.red.bold : chalk.yellow.bold;
+    const chalkColorFn = totalErrors > 0 ? Colors.errorBold : Colors.warningBold;
     console.log('');
     const problemsText  = `✖ ${totalProblems} problem${totalProblems !== 1 ? 's' : ''} (${totalErrors} error${totalErrors !== 1 ? 's' : ''}, ${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''})`
     console.log(chalkColorFn(problemsText));
