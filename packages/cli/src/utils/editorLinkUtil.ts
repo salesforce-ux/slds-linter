@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { Colors } from './colors';
 
 /**
  * Auto-detects the current editor based on environment variables and common patterns.
@@ -93,5 +93,5 @@ export function createClickableLineCol(
 ): string {
   const detectedEditor = editor || detectCurrentEditor();
   const link = getEditorLink(detectedEditor, absolutePath, line, column);
-  return `\u001b]8;;${link}\u0007${chalk.blueBright(lineCol)}\u001b]8;;\u0007`;
+  return `\u001b]8;;${link}\u0007${Colors.info(lineCol)}\u001b]8;;\u0007`;
 }

@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { Colors } from './colors';
 
 export class Logger {
   static newLine(){
@@ -6,24 +6,24 @@ export class Logger {
     return this;
   }
   static info(message: string): void {
-    console.log(chalk.blue('ℹ'), message);
+    console.log(Colors.info(`ℹ ${message}`));
   }
 
   static success(message: string): void {
-    console.log(chalk.green('✓'), message);
+    console.log(Colors.success('✓'), message);
   }
 
   static warning(message: string): void {
-    console.warn(chalk.yellow('⚠'), message);
+    console.warn(Colors.warning('⚠'), message);
   }
 
   static error(message: string): void {
-    console.error(chalk.red('✖'), message);
+    console.error(Colors.error('✖'), message);
   }
 
   static debug(message: string): void {
     if (process.env.DEBUG) {
-      console.debug(chalk.gray('🔍'), message);
+      console.debug(Colors.lowEmphasis('🔍'), message);
     }
   }
 } 

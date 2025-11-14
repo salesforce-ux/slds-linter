@@ -1,7 +1,7 @@
 import { Command } from "commander";
-import chalk from "chalk";
 import { CliOptions } from "../types";
 import { Logger } from "../utils/logger";
+import { Colors } from "../utils/colors";
 import { normalizeCliOptions } from '../utils/config-utils';
 import {
   DEFAULT_ESLINT_CONFIG_PATH,
@@ -71,7 +71,7 @@ export function registerEmitCommand(program: Command): void {
     )
     .action(async (options: CliOptions) => {
       try {
-        Logger.info(chalk.blue("Emitting configuration files..."));
+        Logger.info("Emitting configuration files...");
         const normalizedOptions = normalizeCliOptions(options, {
           configEslint: DEFAULT_ESLINT_CONFIG_PATH,
         });
@@ -81,11 +81,11 @@ export function registerEmitCommand(program: Command): void {
         
         await writeFile(destESLintConfigPath, enhancedConfig, 'utf8');
         
-        Logger.success(chalk.green(`ESLint configuration created at:\n${destESLintConfigPath}\n`));
-        Logger.info(chalk.cyan("Rules are dynamically loaded based on extends configuration."));
+        Logger.success(Colors.success(`ESLint configuration created at:\n${destESLintConfigPath}\n`));
+        Logger.info("Rules are dynamically loaded based on extends configuration.");
       } catch (error: any) {
         Logger.error(
-          chalk.red(`Failed to emit configuration: ${error.message}`)
+          Colors.error(`Failed to emit configuration: ${error.message}`)
         );
         process.exit(1);
       }
