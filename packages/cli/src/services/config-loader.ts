@@ -45,8 +45,9 @@ export class ConfigLoader {
       const userConfigUrl = pathToFileURL(absolutePath).href;
       const pluginInstalled = this.isPackageInstalled('@salesforce-ux/eslint-plugin-slds', userConfigUrl);
       const eslintInstalled = this.isPackageInstalled('eslint', userConfigUrl);
+      const cssPluginInstalled = this.isPackageInstalled('@eslint/css', userConfigUrl);
       
-      if (pluginInstalled && eslintInstalled) {
+      if (pluginInstalled && eslintInstalled && cssPluginInstalled) {
         Logger.debug('Dependencies already installed, using config as-is');
         // On Windows, convert to file:// URL directly
         return platform() === 'win32' ? userConfigUrl : absolutePath;
@@ -62,6 +63,12 @@ export class ConfigLoader {
       const pluginPath = require.resolve('@salesforce-ux/eslint-plugin-slds');
       const eslintConfigPath = require.resolve('eslint/config');
       
+      // Resolve @eslint/css and convert to ESM path for .mjs imports
+      // require.resolve returns CJS path, but we need ESM version
+      const cssCjsPath = require.resolve('@eslint/css');
+      const cssPackageDir = resolve(cssCjsPath, '../../..'); // dist/cjs/index.cjs -> package root
+      const cssPluginPath = join(cssPackageDir, 'dist/esm/index.js');
+      
       // On Windows, convert to file:// URLs for ESM
       const pluginImport = platform() === 'win32' 
         ? pathToFileURL(pluginPath).href 
@@ -69,6 +76,9 @@ export class ConfigLoader {
       const eslintConfigImport = platform() === 'win32'
         ? pathToFileURL(eslintConfigPath).href
         : eslintConfigPath;
+      const cssPluginImport = platform() === 'win32'
+        ? pathToFileURL(cssPluginPath).href
+        : cssPluginPath;
       
       // Rewrite imports
       const rewritten = configContent
@@ -79,6 +89,10 @@ export class ConfigLoader {
         .replace(
           /import\s+({[^}]+})\s+from\s+['"]eslint\/config['"]/g,
           `import $1 from '${eslintConfigImport}'`
+        )
+        .replace(
+          /import\s+(\w+)\s+from\s+['"]@eslint\/css['"]/g,
+          `import $1 from '${cssPluginImport}'`
         );
       
       // Write temp config
