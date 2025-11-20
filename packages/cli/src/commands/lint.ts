@@ -1,9 +1,9 @@
 import { Command, Option } from 'commander';
-import chalk from 'chalk';
 import { CliOptions } from '../types';
 import { printLintResults } from '../utils/lintResultsUtil';
 import { normalizeCliOptions, normalizeDirectoryPath } from '../utils/config-utils';
 import { Logger } from '../utils/logger';
+import { Colors } from '../utils/colors';
 import { DEFAULT_ESLINT_CONFIG_PATH } from '../services/config.resolver';
 import { lint } from '../executor';
 
@@ -25,7 +25,7 @@ export function registerLintCommand(program: Command): void {
     .action(async (directory:string, options: CliOptions) => {
       const startTime = Date.now();
       try {
-        Logger.info(chalk.blue('Starting lint process...'));
+        Logger.info('Starting lint process...');
         // Parse CLI options with appropriate defaults
         const normalizedOptions = normalizeCliOptions(options, {
           configEslint: DEFAULT_ESLINT_CONFIG_PATH,
@@ -35,7 +35,7 @@ export function registerLintCommand(program: Command): void {
           normalizedOptions.directory = normalizeDirectoryPath(directory);
         } else if(options.directory){
           // If  -d, --directory option is passed, prompt deprecation warning
-          Logger.newLine().warning(chalk.yellow(
+          Logger.newLine().warning(Colors.warning(
             `WARNING: --directory, -d option is deprecated. Supply as argument instead.
             Example: npx @salesforce-ux/slds-linter lint ${options.directory}`
           ));
@@ -45,23 +45,13 @@ export function registerLintCommand(program: Command): void {
         const lintResults = await lint(normalizedOptions);
 
         // Print detailed lint results only for files with issues
-        printLintResults(lintResults, normalizedOptions.editor);
+        const { totalErrors } = printLintResults(lintResults, normalizedOptions.editor);
 
-        // Calculate statistics
-        const errorCount = lintResults.reduce((sum, r) => sum + r.errors.length, 0);
-        const warningCount = lintResults.reduce((sum, r) => sum + r.warnings.length, 0);
-
-        // Final summary
-        Logger.info(
-          `\n${chalk.red(`${errorCount} error${errorCount !== 1 ? 's' : ''}`)}` +
-          `  ${chalk.yellow(`${warningCount} warning${warningCount !== 1 ? 's' : ''}`)}`
-        );
-        
         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
-        Logger.success(chalk.green(`\nLinting completed in ${elapsedTime} seconds.`));
-        process.exit(errorCount > 0 ? 1 : 0);
+        Logger.newLine().success(Colors.success(`Linting completed in ${elapsedTime} seconds.`));
+        process.exit(totalErrors > 0 ? 1 : 0);
       } catch (error: any) {
-        Logger.error(chalk.red(`Failed to complete linting: ${error.message}`));
+        Logger.error(Colors.error(`Failed to complete linting: ${error.message}`));
         process.exit(1);
       }
     });

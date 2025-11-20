@@ -4,10 +4,6 @@ import slds from "@salesforce-ux/eslint-plugin-slds";
 
 export default defineConfig([
   {
-    language: "css/css",
-    languageOptions: {
-      tolerant: true
-    },
     plugins: {
       "@salesforce-ux/slds": slds,
       css: cssPlugin
