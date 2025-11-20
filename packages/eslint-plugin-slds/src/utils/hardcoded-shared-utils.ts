@@ -69,13 +69,23 @@ export function handleShorthandAutoFix(
 ) {
   // Sort replacements by position for proper reconstruction
   const sortedReplacements = replacements.sort((a, b) => a.start - b.start);
-  
-  // Check if we can apply auto-fix (at least one value has a hook)
-  const hasAnyHooks = sortedReplacements.some(r => r.hasHook);
-  const canAutoFix = hasAnyHooks;
 
   // Get rule options
   const reportNumericValue = context.options?.reportNumericValue || 'always';
+
+  const fixCallback = (fixer: any) => {
+      // Reconstruct the entire value with all replacements
+      let newValue = valueText;
+
+      while(sortedReplacements.length){
+        const { start: rStart, end: rEnd, replacement: rReplacement } = sortedReplacements.pop();
+        newValue = newValue.substring(0, rStart) + rReplacement + newValue.substring(rEnd);
+      }
+
+      if(newValue !== valueText){
+        return fixer.replaceText(declarationNode.value, newValue);
+      }
+    }
 
   // Report each individual value
   sortedReplacements.forEach(({ start, end, replacement, displayValue, hasHook, isNumeric }) => {
@@ -93,6 +103,7 @@ export function handleShorthandAutoFix(
     
     const valueStartColumn = declarationNode.value.loc.start.column;
     const valueColumn = valueStartColumn + start;
+    const canAutoFix = originalValue !== replacement;
     
     // Create precise error location for this value
     const { loc: { start: locStart, end: locEnd } } = declarationNode.value;
@@ -113,18 +124,7 @@ export function handleShorthandAutoFix(
 
     if (hasHook) {
       // Create auto-fix for the entire shorthand value
-      const fix = canAutoFix ? (fixer: any) => {
-        // Reconstruct the entire value with all replacements
-        let newValue = valueText;
-        
-        // Apply replacements from right to left to maintain string positions
-        for (let i = sortedReplacements.length - 1; i >= 0; i--) {
-          const { start: rStart, end: rEnd, replacement: rReplacement } = sortedReplacements[i];
-          newValue = newValue.substring(0, rStart) + rReplacement + newValue.substring(rEnd);
-        }
-        
-        return fixer.replaceText(declarationNode.value, newValue);
-      } : undefined;
+      const fix = canAutoFix ? fixCallback : undefined;
 
       context.context.report({
         node: reportNode,
