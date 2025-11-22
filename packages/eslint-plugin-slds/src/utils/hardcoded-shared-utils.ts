@@ -67,23 +67,22 @@ export function handleShorthandAutoFix(
   valueText: string,
   replacements: ReplacementInfo[]
 ) {
+  if(!replacements || replacements.length === 0){
+    return;
+  }
   // Sort replacements by position for proper reconstruction
-  const sortedReplacements = replacements.sort((a, b) => a.start - b.start);
+  const sortedReplacements = replacements.sort((a,b)=> b.start-a.start);
 
   // Get rule options
   const reportNumericValue = context.options?.reportNumericValue || 'always';
 
-  const fixCallback = (fixer: any) => {
+  const fixCallback = (start:number, originalValue:string, replacement:string) => {
       // Reconstruct the entire value with all replacements
-      let newValue = valueText;
-
-      while(sortedReplacements.length){
-        const { start: rStart, end: rEnd, replacement: rReplacement } = sortedReplacements.pop();
-        newValue = newValue.substring(0, rStart) + rReplacement + newValue.substring(rEnd);
-      }
-
-      if(newValue !== valueText){
-        return fixer.replaceText(declarationNode.value, newValue);
+      const fixRangeStart = start - 1;
+      const fixRangeEnd = fixRangeStart + originalValue.length;
+      
+      return (fixer:any)=>{
+        return fixer.replaceTextRange([fixRangeStart, fixRangeEnd], replacement);
       }
     }
 
@@ -101,8 +100,9 @@ export function handleShorthandAutoFix(
       }
     }
     
-    const valueStartColumn = declarationNode.value.loc.start.column;
-    const valueColumn = valueStartColumn + start;
+    
+    const valueColumnStart = declarationNode.value.loc.start.column + start;
+    const valueColumnEnd = valueColumnStart + originalValue.length;
     const canAutoFix = originalValue !== replacement;
     
     // Create precise error location for this value
@@ -113,18 +113,18 @@ export function handleShorthandAutoFix(
         ...declarationNode.value.loc,
         start: {
           ...locStart,
-          column: valueColumn
+          column: valueColumnStart
         },
         end: {
           ...locEnd,
-          column: valueColumn + originalValue.length
+          column: valueColumnEnd
         }
       }
     };
 
     if (hasHook) {
       // Create auto-fix for the entire shorthand value
-      const fix = canAutoFix ? fixCallback : undefined;
+      const fix = canAutoFix ? fixCallback(valueColumnStart, originalValue, replacement) : undefined;
 
       context.context.report({
         node: reportNode,
