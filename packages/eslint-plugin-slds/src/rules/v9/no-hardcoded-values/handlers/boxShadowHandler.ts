@@ -2,6 +2,7 @@ import type { HandlerContext, DeclarationHandler } from '../../../../types';
 import type { ValueToStylingHooksMapping } from '@salesforce-ux/sds-metadata';
 import { parseBoxShadowValue, isBoxShadowMatch, type BoxShadowValue } from '../../../../utils/boxShadowValueParser';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
+import { getCustomMapping } from '../../../../utils/custom-mapping-utils';
 
 // Import shared utilities for common logic
 import { 
@@ -33,42 +34,58 @@ function shadowValueToHookEntries(supportedStylinghooks: ValueToStylingHooksMapp
 }
 
 /**
+ * Report box-shadow violation with hooks and apply auto-fix
+ */
+function reportBoxShadowViolation(
+  node: any,
+  context: HandlerContext,
+  valueText: string,
+  hooks: string[]
+): void {
+  const positionInfo: PositionInfo = {
+    start: { offset: 0, line: 1, column: 1 },
+    end: { offset: valueText.length, line: 1, column: valueText.length + 1 }
+  };
+  
+  const replacement = createBoxShadowReplacement(
+    valueText,
+    hooks,
+    context,
+    positionInfo
+  );
+  
+  if (replacement) {
+    const replacements: ReplacementInfo[] = [replacement];
+    handleShorthandAutoFix(node, context, valueText, replacements);
+  }
+}
+
+/**
  * Handle box-shadow declarations using CSS tree parsing
  */
 export const handleBoxShadowDeclaration: DeclarationHandler = (node: any, context: HandlerContext) => {
   const cssProperty = node.property.toLowerCase();
   const valueText = context.sourceCode.getText(node.value);
   
+  // Check custom mapping first
+  const customHook = getCustomMapping(cssProperty, valueText, context.options?.customMapping);
+  if (customHook) {
+    reportBoxShadowViolation(node, context, valueText, [customHook]);
+    return;
+  }
+
   const shadowHooks = shadowValueToHookEntries(context.valueToStylinghook);
-  
   const parsedCssValue = toBoxShadowValue(valueText);
   if (!parsedCssValue) {
     return;
   }
 
-  // Look for matching hooks
+  // Look for matching hooks in metadata
   for (const [shadow, closestHooks] of shadowHooks) {
     const parsedValueHook = toBoxShadowValue(shadow);
     if (parsedValueHook && isBoxShadowMatch(parsedCssValue, parsedValueHook)) {
       if (closestHooks.length > 0) {
-        // Create position info for the entire box-shadow value
-        const positionInfo: PositionInfo = {
-          start: { offset: 0, line: 1, column: 1 },
-          end: { offset: valueText.length, line: 1, column: valueText.length + 1 }
-        };
-        
-        const replacement = createBoxShadowReplacement(
-          valueText,
-          closestHooks,
-          context,
-          positionInfo
-        );
-        
-        if (replacement) {
-          const replacements: ReplacementInfo[] = [replacement];
-          // Apply shorthand auto-fix when we have replacements to report
-          handleShorthandAutoFix(node, context, valueText, replacements);
-        }
+        reportBoxShadowViolation(node, context, valueText, closestHooks);
       }
       return;
     }

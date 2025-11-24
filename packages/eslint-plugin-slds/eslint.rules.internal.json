@@ -12,8 +12,24 @@
     "@salesforce-ux/slds/no-slds-namespace-for-custom-hooks": "warn",
     "@salesforce-ux/slds/enforce-component-hook-naming-convention": "error",
     "@salesforce-ux/slds/no-slds-private-var": "warn",
-    "@salesforce-ux/slds/no-hardcoded-values-slds1": "error",
-    "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn",
+    "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
+      "reportNumericValue": "hasReplacement",
+      "preferPaletteHook": true,
+      "customMapping":{
+        "--slds-g-font-line-height-4":{
+          "properties": ["line-height"],
+          "values": ["1.5"]
+        },
+        "--slds-g-sizing-5":{
+          "properties": ["width", "height", "max-width", "max-height", "border*" ],
+          "values": ["1rem", "16px"]
+        },
+        "--slds-g-sizing-content-1":{
+          "properties": ["width", "height", "max-width", "max-height", "border*" ],
+          "values": ["20ch"]
+        }
+      }
+    }],
     "@salesforce-ux/slds/reduce-annotations": "warn"
   },
   "html": {

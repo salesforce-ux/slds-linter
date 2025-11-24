@@ -48,7 +48,7 @@ export function registerLintCommand(program: Command): void {
         const { totalErrors } = printLintResults(lintResults, normalizedOptions.editor);
 
         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
-        Logger.newLine().success(Colors.success(`Linting completed in ${elapsedTime} seconds.`));
+        Logger.newLine().success(`Linting completed in ${elapsedTime} seconds.`);
         process.exit(totalErrors > 0 ? 1 : 0);
       } catch (error: any) {
         Logger.error(Colors.error(`Failed to complete linting: ${error.message}`));

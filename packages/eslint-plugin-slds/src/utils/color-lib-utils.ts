@@ -1,23 +1,18 @@
-//stylelint-sds/packages/stylelint-plugin-slds/src/utils/color-lib-utils.ts
 import { ValueToStylingHooksMapping, ValueToStylingHookEntry } from '@salesforce-ux/sds-metadata';
 import chroma from 'chroma-js';
 import { generate } from '@eslint/css-tree';
 import { isCssColorFunction } from './css-functions';
 
-const LAB_THRESHOLD = 25; // Adjust this to set how strict the matching should be
+/**
+ * Perceptual color difference threshold (Delta E, CIEDE2000 via chroma.deltaE).
+ * Lower values are stricter matches. Used to decide which hooks are "close enough".
+ */
+const DELTAE_THRESHOLD = 10;
 
-const isHardCodedColor = (color: string): boolean => {
-  const colorRegex =
-    /\b(rgb|rgba)\((\s*\d{1,3}\s*,\s*){2,3}\s*(0|1|0?\.\d+)\s*\)|#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})\b|[a-zA-Z]+/g;
-  return colorRegex.test(color);
-};
-
-const isHexCode = (color: string): boolean => {
-  const hexPattern = /^#(?:[0-9a-fA-F]{3}){1,2}$/; // Pattern for #RGB or #RRGGBB
-  return hexPattern.test(color);
-};
-
-// Convert a named color or hex code into a hex format using chroma-js
+/**
+ * Convert any valid CSS color (named, hex, rgb(a), hsl(a), etc.) to hex.
+ * Returns null if the value is not a valid color.
+ */
 const convertToHex = (color: string): string | null => {
   try {
     // Try converting the color using chroma-js, which handles both named and hex colors
@@ -28,88 +23,76 @@ const convertToHex = (color: string): string | null => {
   }
 };
 
-// Find the closest color hook using LAB distance
+const isHookPropertyMatch = (hook: ValueToStylingHookEntry, cssProperty: string): boolean => {
+  return hook.properties.includes(cssProperty) || hook.properties.includes("*");
+}
+
+function getOrderByCssProp(cssProperty: string): string[] {
+  if(cssProperty === 'color' || cssProperty === 'fill') {
+      return ["surface", "theme",  "feedback", "reference"];
+  } else if(cssProperty.match(/background/)){
+     return ["surface", "surface-inverse", "theme",  "feedback", "reference"];
+  } else if(cssProperty.match(/border/) || cssProperty.match(/outline/) || cssProperty.match(/stroke/)) {
+      return ["borders", "borders-inverse", "feedback", "theme", "reference"];
+  }
+  return ["surface", "surface-inverse", "borders", "borders-inverse", "theme",  "feedback", "reference"];
+}
+
+
+/**
+ * Given an input color and the metadata mapping of supported colors to hooks,
+ * suggest up to 5 styling hook names ordered by:
+ * 1) Category priority: semantic -> system -> palette
+ * 2) Perceptual distance (Delta E)
+ * Also prioritizes exact color matches (distance 0).
+ */
 const findClosestColorHook = (
   color: string,
   supportedColors:ValueToStylingHooksMapping,
   cssProperty: string
 ): string[] => {
-  const returnStylingHooks: string[] = [];
-  const closestHooksWithSameProperty: { name: string; distance: number }[] = [];
-  const closestHooksWithoutSameProperty: { name: string; distance: number }[] =
-    [];
-  const closestHooksWithAllProperty: { name: string; distance: number }[] =
-    [];
-  const labColor = chroma(color).lab();
-
+  const closestHooks: Array<{distance: number, group: string, name: string}> = [];
   Object.entries(supportedColors).forEach(([sldsValue, data]) => {
-    if (sldsValue && isHexCode(sldsValue)) {
+    if (sldsValue && isValidColor(sldsValue)) {
       const hooks = data as ValueToStylingHookEntry[]; // Get the hooks for the sldsValue
 
       hooks.forEach((hook) => {
-        const labSupportedColor = chroma(sldsValue).lab();
-        const distance = (JSON.stringify(labColor) === JSON.stringify(labSupportedColor)) ? 0
-            : chroma.distance(chroma.lab(...labColor), chroma.lab(...labSupportedColor), "lab");
-        // Check if the hook has the same property
-        if (hook.properties.includes(cssProperty)) {
+        // Exact match shortcut to avoid floating rounding noise
+        const distance = (sldsValue.toLowerCase() === color.toLowerCase())
+          ? 0
+          : chroma.deltaE(sldsValue, color);
+          
+        // Check if the hook has the same property or universal selector
+        if (isHookPropertyMatch(hook, cssProperty) && distance <= DELTAE_THRESHOLD) {
           // Add to same property hooks if within threshold
-          if (distance <= LAB_THRESHOLD) {
-            closestHooksWithSameProperty.push({ name: hook.name, distance });
-          }
-        } 
-        // Check for the universal selector
-        else if ( hook.properties.includes("*") ){
-          // Add to same property hooks if within threshold
-          if (distance <= LAB_THRESHOLD) {
-            closestHooksWithAllProperty.push({ name: hook.name, distance });
-          }
-        }
-        else {
-          // Add to different property hooks if within threshold
-          if (distance <= LAB_THRESHOLD) {
-            closestHooksWithoutSameProperty.push({ name: hook.name, distance });
-          }
+          closestHooks.push({ distance, group: hook.group, name: hook.name });
         }
       });
     }
   });
 
-// Group hooks by their priority
-const closesthookGroups = [
-  { hooks: closestHooksWithSameProperty, distance: 0 },
-  { hooks: closestHooksWithAllProperty, distance: 0 },
-  { hooks: closestHooksWithSameProperty, distance: Infinity },  // For hooks with distance > 0
-  { hooks: closestHooksWithAllProperty, distance: Infinity },
-  { hooks: closestHooksWithoutSameProperty, distance: Infinity },
-];
+  const hooksByGroupMap:Record<string, string[]> = closestHooks.sort((a, b) => a.distance - b.distance).reduce((acc, hook) => {
+    if (!acc[hook.group]) {
+      acc[hook.group] = [];
+    }
+    acc[hook.group].push(hook.name);
+    return acc;
+  }, {});
 
-for (const group of closesthookGroups) {
-  // Filter hooks based on the distance condition
-  const filteredHooks = group.hooks.filter(h => 
-    group.distance === 0 ? h.distance === 0 : h.distance > 0
-  );
-
-  if (returnStylingHooks.length < 1 && filteredHooks.length > 0) {
-    filteredHooks.sort((a, b) => a.distance - b.distance);
-    returnStylingHooks.push(...filteredHooks.slice(0, 5).map((h) => h.name));
-  }
-}
-
-
-  return Array.from(new Set(returnStylingHooks));
+  return getOrderByCssProp(cssProperty)
+    .map(group => hooksByGroupMap[group]||[])
+    .flat().slice(0, 5);
 };
 
 /**
- * This method is usefull to identify all possible css color values.
- *  - names colors
- *  - 6,8 digit hex
- *  - rgb and rgba
- *  - hsl and hsla
+ * Check if a value is any valid CSS color string (delegates to chroma-js).
  */
 const isValidColor = (val:string):boolean => chroma.valid(val);
 
 /**
- * Extract color value from CSS AST node
+ * Extract a color string from a CSS AST node produced by @eslint/css-tree.
+ * Supports Hash (#rrggbb), Identifier (named colors), and color Function nodes.
+ * Returns null if the extracted value is not a valid color.
  */
 const extractColorValue = (node: any): string | null => {
   let colorValue: string | null = null;
@@ -132,4 +115,4 @@ const extractColorValue = (node: any): string | null => {
   return colorValue && isValidColor(colorValue) ? colorValue : null;
 };
 
-export { findClosestColorHook, convertToHex, isHexCode, isHardCodedColor, isValidColor, extractColorValue };
+export { findClosestColorHook, convertToHex, isValidColor, extractColorValue };

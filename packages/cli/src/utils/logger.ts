@@ -2,7 +2,7 @@ import { Colors } from './colors';
 
 export class Logger {
   static newLine(){
-    console.log('\n');
+    console.log('');
     return this;
   }
   static info(message: string): void {
