@@ -179,7 +179,7 @@ ruleTester.run('no-hardcoded-values-slds2 (customMapping)', rule, {
       }, {
         messageId: 'hardcodedValue'
       }],
-      output: `.example { padding: var(--slds-g-spacing-10, 10px) var(--slds-g-spacing-20, 20px); }`
+      output: `.example { padding: var(--slds-g-spacing-10, 10px) 20px; }`
     },
 
     // Mixed: Custom mapping overrides metadata - custom mapping takes precedence

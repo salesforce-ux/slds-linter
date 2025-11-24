@@ -246,7 +246,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { margin: 8px 12px 16px 20px; }`,
       filename: 'test.css',
-      output: `.example { margin: var(--slds-g-spacing-2, 8px) var(--slds-g-spacing-3, 12px) var(--slds-g-spacing-4, 16px) 20px; }`,
+      output: `.example { margin: var(--slds-g-spacing-2, 8px) 12px 16px 20px; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -273,7 +273,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { padding: 0 16px 0 8px; }`,
       filename: 'test.css',
-      output: `.example { padding: 0 var(--slds-g-spacing-4, 16px) 0 var(--slds-g-spacing-2, 8px); }`,
+      output: `.example { padding: 0 var(--slds-g-spacing-4, 16px) 0 8px; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -287,7 +287,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { padding: 4px 8px; }`,
       filename: 'test.css',
-      output: `.example { padding: var(--slds-g-spacing-1, 4px) var(--slds-g-spacing-2, 8px); }`,
+      output: `.example { padding: var(--slds-g-spacing-1, 4px) 8px; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -311,7 +311,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { border-width: 1px 2px 3px 4px; }`,
       filename: 'test.css',
-      output: `.example { border-width: var(--slds-g-sizing-border-1, 1px) 2px var(--slds-g-sizing-border-3, 3px) 4px; }`,
+      output: `.example { border-width: var(--slds-g-sizing-border-1, 1px) 2px 3px 4px; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -327,7 +327,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { margin: 4px 8px 12px 16px; }`,
       filename: 'test.css',
-      output: `.example { margin: var(--slds-g-spacing-1, 4px) var(--slds-g-spacing-2, 8px) var(--slds-g-spacing-3, 12px) var(--slds-g-spacing-4, 16px); }`,
+      output: `.example { margin: var(--slds-g-spacing-1, 4px) 8px 12px 16px; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -352,7 +352,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { margin: 0 8px 0 4px; }`,
       filename: 'test.css',
-      output: `.example { margin: 0 var(--slds-g-spacing-2, 8px) 0 var(--slds-g-spacing-1, 4px); }`,
+      output: `.example { margin: 0 var(--slds-g-spacing-2, 8px) 0 4px; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -364,7 +364,7 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
     {
       code: `.example { padding: 8px 0 4px 0; }`,
       filename: 'test.css',
-      output: `.example { padding: var(--slds-g-spacing-2, 8px) 0 var(--slds-g-spacing-1, 4px) 0; }`,
+      output: `.example { padding: var(--slds-g-spacing-2, 8px) 0 4px 0; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {

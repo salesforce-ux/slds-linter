@@ -78,11 +78,14 @@ export function handleShorthandAutoFix(
 
   const fixCallback = (start:number, originalValue:string, replacement:string) => {
       // Reconstruct the entire value with all replacements
-      const fixRangeStart = start - 1;
-      const fixRangeEnd = fixRangeStart + originalValue.length;
-      
-      return (fixer:any)=>{
-        return fixer.replaceTextRange([fixRangeStart, fixRangeEnd], replacement);
+      let newValue = valueText;
+
+      newValue = newValue.substring(0, start) + replacement + newValue.substring(start+originalValue.length);
+
+      if(newValue !== valueText){
+        return (fixer:any)=>{
+          return fixer.replaceText(declarationNode.value, newValue);
+        }
       }
     }
 
@@ -124,7 +127,7 @@ export function handleShorthandAutoFix(
 
     if (hasHook) {
       // Create auto-fix for the entire shorthand value
-      const fix = canAutoFix ? fixCallback(valueColumnStart, originalValue, replacement) : undefined;
+      const fix = canAutoFix ? fixCallback(start, originalValue, replacement) : undefined;
 
       context.context.report({
         node: reportNode,
