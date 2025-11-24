@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# Pre-commit hook script to check lint errors/warnings and compare with last commit
+
+set -e
+
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+STATS_FILE="$PROJECT_ROOT/.git/lint-stats.json"
+
+# Function to extract errors and warnings from lint output
+extract_counts() {
+  local output="$1"
+  local errors=$(echo "$output" | grep -oE '[0-9]+ errors' | grep -oE '[0-9]+' || echo "0")
+  local warnings=$(echo "$output" | grep -oE '[0-9]+ warnings' | grep -oE '[0-9]+' || echo "0")
+  echo "$errors $warnings"
+}
+
+# Function to read last commit stats
+read_last_stats() {
+  if [ -f "$STATS_FILE" ]; then
+    cat "$STATS_FILE"
+  else
+    echo "{}"
+  fi
+}
+
+# Function to write stats
+write_stats() {
+  local errors=$1
+  local warnings=$2
+  echo "{\"errors\": $errors, \"warnings\": $warnings, \"commit\": \"$(git rev-parse HEAD 2>/dev/null || echo 'none')\"}" > "$STATS_FILE"
+}
+
+# Function to prompt user
+prompt_user() {
+  local current_errors=$1
+  local current_warnings=$2
+  local last_errors=$3
+  local last_warnings=$4
+  
+  echo ""
+  echo "⚠️  Lint count mismatch detected!"
+  echo "   Last commit: $last_errors errors, $last_warnings warnings"
+  echo "   Current:     $current_errors errors, $current_warnings warnings"
+  echo ""
+  
+  # Check if running in non-interactive mode (CI)
+  if [ ! -t 0 ]; then
+    echo "⚠️  Running in non-interactive mode. Skipping prompt and allowing commit."
+    return 0
+  fi
+  
+  read -p "Continue with commit? (y/N): " -n 1 -r
+  echo ""
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Commit aborted."
+    exit 1
+  fi
+}
+
+cd "$PROJECT_ROOT"
+
+echo "🔨 Running build..."
+if ! yarn build > /tmp/build-output.log 2>&1; then
+  echo "❌ Build failed!"
+  cat /tmp/build-output.log
+  exit 1
+fi
+
+echo "🔍 Running linter on demo/small-set..."
+LINT_OUTPUT=$(npx slds-linter lint demo/small-set 2>&1 || true)
+LINT_EXIT_CODE=$?
+
+# Extract counts from output
+read -r CURRENT_ERRORS CURRENT_WARNINGS <<< "$(extract_counts "$LINT_OUTPUT")"
+
+# Display the lint output (show last few lines to see summary)
+echo "$LINT_OUTPUT" | tail -20
+
+# Validate that we extracted counts successfully
+if [ -z "$CURRENT_ERRORS" ] || [ -z "$CURRENT_WARNINGS" ]; then
+  echo "❌ Failed to extract error/warning counts from lint output!"
+  echo "Full output:"
+  echo "$LINT_OUTPUT"
+  exit 1
+fi
+
+# Read last commit stats
+LAST_STATS=$(read_last_stats)
+LAST_ERRORS=$(echo "$LAST_STATS" | grep -oE '"errors":\s*[0-9]+' | grep -oE '[0-9]+' || echo "")
+LAST_WARNINGS=$(echo "$LAST_STATS" | grep -oE '"warnings":\s*[0-9]+' | grep -oE '[0-9]+' || echo "")
+
+# Validate extracted stats
+if [ -n "$LAST_ERRORS" ] && [ -n "$LAST_WARNINGS" ]; then
+  # Verify they are numeric
+  if ! [[ "$LAST_ERRORS" =~ ^[0-9]+$ ]] || ! [[ "$LAST_WARNINGS" =~ ^[0-9]+$ ]]; then
+    echo "⚠️  Invalid stats file format. Resetting stats."
+    LAST_ERRORS=""
+    LAST_WARNINGS=""
+  fi
+fi
+
+# If we have last commit stats, compare
+if [ -n "$LAST_ERRORS" ] && [ -n "$LAST_WARNINGS" ]; then
+  if [ "$CURRENT_ERRORS" != "$LAST_ERRORS" ] || [ "$CURRENT_WARNINGS" != "$LAST_WARNINGS" ]; then
+    prompt_user "$CURRENT_ERRORS" "$CURRENT_WARNINGS" "$LAST_ERRORS" "$LAST_WARNINGS"
+  else
+    echo "✅ Lint counts match last commit ($CURRENT_ERRORS errors, $CURRENT_WARNINGS warnings)"
+  fi
+else
+  echo "ℹ️  No previous lint stats found. Saving current counts..."
+fi
+
+# Save current stats for next commit
+write_stats "$CURRENT_ERRORS" "$CURRENT_WARNINGS"
+
+echo "✅ Pre-commit checks passed!"
+
