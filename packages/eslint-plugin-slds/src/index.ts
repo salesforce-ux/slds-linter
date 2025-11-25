@@ -25,10 +25,7 @@ import cssPlugin from "@eslint/css";
 // Import rule configurations based on persona
 import ruleConfigs from '../eslint.rules.json';
 
-// Get CSS plugin's recommended config for self-sufficiency
-// Handle both ESM default export and CJS export patterns
-const cssPluginDefault = (cssPlugin as any).default || cssPlugin;
-const cssRecommendedConfig = cssPluginDefault.configs?.recommended || {};
+const cssRecommendedConfig = cssPlugin.configs.recommended;
 
 const rules = {
   "enforce-bem-usage": enforceBemUsage,
@@ -79,16 +76,6 @@ const baseCssConfigWithPlugin = {
 
 // CSS config array built from base config (self-sufficient with CSS plugin)
 const cssConfigArray = [baseCssConfigWithPlugin];
-
-// CSS config with CSS recommended rules included (self-sufficient)
-const cssConfigWithRecommended = {
-  ...baseCssConfigWithPlugin,
-  // Merge CSS recommended rules with SLDS rules (SLDS rules take precedence)
-  rules: {
-    ...(cssRecommendedConfig.rules || {}),
-    ...ruleConfigs.css
-  }
-};
 
 // CSS config with only CSS plugin recommended rules (no SLDS rules)
 const cssConfigWithCssPluginOnly = {
