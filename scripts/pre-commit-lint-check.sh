@@ -72,6 +72,23 @@ prompt_user() {
 
 cd "$PROJECT_ROOT"
 
+# Check for bypass flag in commit message
+# Note: In pre-commit hook, we check the last commit message (for amended commits)
+# or the commit message file if it exists (for commits with -m flag)
+if git log -1 --pretty=%B 2>/dev/null | grep -q '\[skip-lint-check\]'; then
+  echo "⏭️  Skipping lint check (commit message flag detected)"
+  exit 0
+fi
+
+# Also check commit message file if it exists (for commits being created with -m flag)
+COMMIT_MSG_FILE="$PROJECT_ROOT/.git/COMMIT_EDITMSG"
+if [ -f "$COMMIT_MSG_FILE" ]; then
+  if grep -q '\[skip-lint-check\]' "$COMMIT_MSG_FILE" 2>/dev/null; then
+    echo "⏭️  Skipping lint check (commit message flag detected)"
+    exit 0
+  fi
+fi
+
 echo "📦 Installing dependencies..."
 if ! yarn > /tmp/yarn-output.log 2>&1; then
   echo "❌ Dependency installation failed!"
