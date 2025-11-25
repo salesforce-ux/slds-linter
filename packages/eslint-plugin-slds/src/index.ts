@@ -64,8 +64,8 @@ const baseCssConfigWithPlugin = {
     tolerant: true  // Allow recoverable parsing errors for SCSS syntax
   },
   plugins: {
+    css: cssPlugin,
     "@salesforce-ux/slds": plugin,
-    css: cssPlugin  // Include CSS plugin so users don't need to add it manually
   },
   rules: ruleConfigs.css,
   settings: {
@@ -76,15 +76,6 @@ const baseCssConfigWithPlugin = {
 
 // CSS config array built from base config (self-sufficient with CSS plugin)
 const cssConfigArray = [baseCssConfigWithPlugin];
-
-// CSS config with only CSS plugin recommended rules (no SLDS rules)
-const cssConfigWithCssPluginOnly = {
-  ...baseCssConfigWithPlugin,
-  // Only CSS recommended rules, no SLDS rules
-  rules: {
-    ...(cssRecommendedConfig.rules || {})
-  }
-};
 
 const htmlConfigArray = [
   // HTML/Component config
@@ -107,8 +98,6 @@ Object.assign(plugin.configs, {
   "flat/recommended-css": cssConfigArray,
   "flat/recommended-html": htmlConfigArray,
   "flat/recommended": [...cssConfigArray, ...htmlConfigArray],
-  // CSS config with only CSS plugin recommended rules (no SLDS rules)
-  "flat/recommended-css-cssplugin": [cssConfigWithCssPluginOnly],
   // legacy config for ESLint v8-
   recommended: {
     plugins: ["@salesforce-ux/slds"],
@@ -121,4 +110,11 @@ Object.assign(plugin.configs, {
   }
 });
 
+function sldsCssPlugin() {
+  return {
+    ...baseCssConfigWithPlugin.plugins,
+  }
+}
+
 module.exports = plugin;
+module.exports.sldsCssPlugin = sldsCssPlugin;
