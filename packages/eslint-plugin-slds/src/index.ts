@@ -25,8 +25,6 @@ import cssPlugin from "@eslint/css";
 // Import rule configurations based on persona
 import ruleConfigs from '../eslint.rules.json';
 
-const cssRecommendedConfig = cssPlugin.configs.recommended;
-
 const rules = {
   "enforce-bem-usage": enforceBemUsage,
   "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
