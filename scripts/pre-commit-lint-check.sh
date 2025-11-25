@@ -43,21 +43,41 @@ prompt_user() {
   echo "   Current:     $current_errors errors, $current_warnings warnings"
   echo ""
   
-  # Check if running in non-interactive mode (CI)
-  if [ ! -t 0 ]; then
-    echo "⚠️  Running in non-interactive mode. Skipping prompt and allowing commit."
+  # Check if running in CI environment (non-interactive)
+  if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ] || [ -n "$GITLAB_CI" ] || [ -n "$JENKINS_URL" ]; then
+    echo "⚠️  Running in CI environment. Skipping prompt and allowing commit."
     return 0
   fi
   
-  read -p "Continue with commit? (y/N): " -n 1 -r
-  echo ""
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Commit aborted."
-    exit 1
+  # In git hooks, use /dev/tty for user input (works even when stdin is not a TTY)
+  if [ -c /dev/tty ]; then
+    echo -n "Continue with commit? (y/N): " > /dev/tty
+    read -r REPLY < /dev/tty
+    echo "" > /dev/tty
+    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+      echo "Commit aborted."
+      exit 1
+    fi
+  else
+    # Fallback: try stdin if /dev/tty is not available
+    echo -n "Continue with commit? (y/N): "
+    read -r REPLY
+    echo ""
+    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+      echo "Commit aborted."
+      exit 1
+    fi
   fi
 }
 
 cd "$PROJECT_ROOT"
+
+echo "📦 Installing dependencies..."
+if ! yarn > /tmp/yarn-output.log 2>&1; then
+  echo "❌ Dependency installation failed!"
+  cat /tmp/yarn-output.log
+  exit 1
+fi
 
 echo "🔨 Running build..."
 if ! yarn build > /tmp/build-output.log 2>&1; then
@@ -67,14 +87,18 @@ if ! yarn build > /tmp/build-output.log 2>&1; then
 fi
 
 echo "🔍 Running linter on demo/small-set..."
+# Run lint and capture output, suppress detailed logs
 LINT_OUTPUT=$(npx slds-linter lint demo/small-set 2>&1 || true)
 LINT_EXIT_CODE=$?
 
 # Extract counts from output
 read -r CURRENT_ERRORS CURRENT_WARNINGS <<< "$(extract_counts "$LINT_OUTPUT")"
 
-# Display the lint output (show last few lines to see summary)
-echo "$LINT_OUTPUT" | tail -20
+# Only display the summary line (errors and warnings count)
+SUMMARY_LINE=$(echo "$LINT_OUTPUT" | grep -E "[0-9]+ errors.*[0-9]+ warnings" || echo "")
+if [ -n "$SUMMARY_LINE" ]; then
+  echo "$SUMMARY_LINE"
+fi
 
 # Validate that we extracted counts successfully
 if [ -z "$CURRENT_ERRORS" ] || [ -z "$CURRENT_WARNINGS" ]; then
