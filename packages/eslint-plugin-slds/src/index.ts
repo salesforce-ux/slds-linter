@@ -20,9 +20,15 @@ import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-
 
 
 import htmlParser from "@html-eslint/parser";
+import cssPlugin from "@eslint/css";
 
 // Import rule configurations based on persona
 import ruleConfigs from '../eslint.rules.json';
+
+// Get CSS plugin's recommended config for self-sufficiency
+// Handle both ESM default export and CJS export patterns
+const cssPluginDefault = (cssPlugin as any).default || cssPlugin;
+const cssRecommendedConfig = cssPluginDefault.configs?.recommended || {};
 
 const rules = {
   "enforce-bem-usage": enforceBemUsage,
@@ -53,24 +59,45 @@ const plugin = {
   configs: {}
 };
 
-const cssConfigArray = [
-  // CSS config - Standard CSS files
-  {
-    files: ["**/*.{css,scss}"],
-    language: "css/css",
-    languageOptions: {
-      tolerant: true  // Allow recoverable parsing errors for SCSS syntax
-    },
-    plugins: {
-      "@salesforce-ux/slds": plugin
-    },
-    rules: ruleConfigs.css,
-    settings: {
-      // Pass rules configuration to context for runtime access
-      sldsRules: { ...ruleConfigs.css }
-    }
+// Base CSS config with CSS plugin included (required for SLDS plugin to work independently)
+const baseCssConfigWithPlugin = {
+  files: ["**/*.{css,scss}"],
+  language: "css/css",
+  languageOptions: {
+    tolerant: true  // Allow recoverable parsing errors for SCSS syntax
+  },
+  plugins: {
+    "@salesforce-ux/slds": plugin,
+    css: cssPlugin  // Include CSS plugin so users don't need to add it manually
+  },
+  rules: ruleConfigs.css,
+  settings: {
+    // Pass rules configuration to context for runtime access
+    sldsRules: { ...ruleConfigs.css }
   }
-];
+};
+
+// CSS config array built from base config (self-sufficient with CSS plugin)
+const cssConfigArray = [baseCssConfigWithPlugin];
+
+// CSS config with CSS recommended rules included (self-sufficient)
+const cssConfigWithRecommended = {
+  ...baseCssConfigWithPlugin,
+  // Merge CSS recommended rules with SLDS rules (SLDS rules take precedence)
+  rules: {
+    ...(cssRecommendedConfig.rules || {}),
+    ...ruleConfigs.css
+  }
+};
+
+// CSS config with only CSS plugin recommended rules (no SLDS rules)
+const cssConfigWithCssPluginOnly = {
+  ...baseCssConfigWithPlugin,
+  // Only CSS recommended rules, no SLDS rules
+  rules: {
+    ...(cssRecommendedConfig.rules || {})
+  }
+};
 
 const htmlConfigArray = [
   // HTML/Component config
@@ -93,6 +120,8 @@ Object.assign(plugin.configs, {
   "flat/recommended-css": cssConfigArray,
   "flat/recommended-html": htmlConfigArray,
   "flat/recommended": [...cssConfigArray, ...htmlConfigArray],
+  // CSS config with only CSS plugin recommended rules (no SLDS rules)
+  "flat/recommended-css-cssplugin": [cssConfigWithCssPluginOnly],
   // legacy config for ESLint v8-
   recommended: {
     plugins: ["@salesforce-ux/slds"],
