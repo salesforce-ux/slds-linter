@@ -6,8 +6,8 @@ export default defineConfig([
     plugins: {
       "@salesforce-ux/slds": slds
     },
-    //@salesforce-ux/slds/flat/recommended-css-cssplugin: CSS config with only CSS plugin recommended rules (no SLDS rules)
-    extends: ["@salesforce-ux/slds/recommended"]
+    //@salesforce-ux/slds/flat/recommended-css-cssplugin: CSS config with only @eslint/css recommended rules (no SLDS rules)
+    extends: ["@salesforce-ux/slds/recommended", "@salesforce-ux/slds/flat/recommended-css-cssplugin"]
     //defineConfig() helper helps which config to use internally.
   },
 ]);
