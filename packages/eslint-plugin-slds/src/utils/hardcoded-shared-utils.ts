@@ -14,6 +14,7 @@ export interface ReplacementInfo {
   replacement: string;        // Full CSS var: var(--hook, fallback)
   displayValue: string;       // Just the hook: --hook
   hasHook: boolean;
+  isNumeric?: boolean;        // Whether this is a numeric (dimension) value
 }
 
 /**
@@ -66,18 +67,46 @@ export function handleShorthandAutoFix(
   valueText: string,
   replacements: ReplacementInfo[]
 ) {
+  if(!replacements || replacements.length === 0){
+    return;
+  }
   // Sort replacements by position for proper reconstruction
-  const sortedReplacements = replacements.sort((a, b) => a.start - b.start);
-  
-  // Check if we can apply auto-fix (at least one value has a hook)
-  const hasAnyHooks = sortedReplacements.some(r => r.hasHook);
-  const canAutoFix = hasAnyHooks;
+  const sortedReplacements = replacements.sort((a,b)=> b.start-a.start);
+
+  // Get rule options
+  const reportNumericValue = context.options?.reportNumericValue || 'always';
+
+  const fixCallback = (start:number, originalValue:string, replacement:string) => {
+      // Reconstruct the entire value with all replacements
+      let newValue = valueText;
+
+      newValue = newValue.substring(0, start) + replacement + newValue.substring(start+originalValue.length);
+
+      if(newValue !== valueText){
+        return (fixer:any)=>{
+          return fixer.replaceText(declarationNode.value, newValue);
+        }
+      }
+    }
 
   // Report each individual value
-  sortedReplacements.forEach(({ start, end, replacement, displayValue, hasHook }) => {
+  sortedReplacements.forEach(({ start, end, replacement, displayValue, hasHook, isNumeric }) => {
     const originalValue = valueText.substring(start, end);
-    const valueStartColumn = declarationNode.value.loc.start.column;
-    const valueColumn = valueStartColumn + start;
+    
+    // Check if we should skip reporting based on reportNumericValue option
+    if (isNumeric) {
+      if (reportNumericValue === 'never') {
+        return; // Skip reporting numeric values
+      }
+      if (reportNumericValue === 'hasReplacement' && !hasHook) {
+        return; // Skip reporting numeric values without replacements
+      }
+    }
+    
+    
+    const valueColumnStart = declarationNode.value.loc.start.column + start;
+    const valueColumnEnd = valueColumnStart + originalValue.length;
+    const canAutoFix = originalValue !== replacement;
     
     // Create precise error location for this value
     const { loc: { start: locStart, end: locEnd } } = declarationNode.value;
@@ -87,29 +116,18 @@ export function handleShorthandAutoFix(
         ...declarationNode.value.loc,
         start: {
           ...locStart,
-          column: valueColumn
+          column: valueColumnStart
         },
         end: {
           ...locEnd,
-          column: valueColumn + originalValue.length
+          column: valueColumnEnd
         }
       }
     };
 
     if (hasHook) {
       // Create auto-fix for the entire shorthand value
-      const fix = canAutoFix ? (fixer: any) => {
-        // Reconstruct the entire value with all replacements
-        let newValue = valueText;
-        
-        // Apply replacements from right to left to maintain string positions
-        for (let i = sortedReplacements.length - 1; i >= 0; i--) {
-          const { start: rStart, end: rEnd, replacement: rReplacement } = sortedReplacements[i];
-          newValue = newValue.substring(0, rStart) + rReplacement + newValue.substring(rEnd);
-        }
-        
-        return fixer.replaceText(declarationNode.value, newValue);
-      } : undefined;
+      const fix = canAutoFix ? fixCallback(start, originalValue, replacement) : undefined;
 
       context.context.report({
         node: reportNode,
