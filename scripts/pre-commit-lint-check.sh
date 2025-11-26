@@ -9,9 +9,20 @@ STATS_FILE="$PROJECT_ROOT/.git/lint-stats.json"
 # Function to extract errors and warnings from lint output
 extract_counts() {
   local output="$1"
-  local errors=$(echo "$output" | grep -oE '[0-9]+ errors' | grep -oE '[0-9]+' || echo "0")
-  local warnings=$(echo "$output" | grep -oE '[0-9]+ warnings' | grep -oE '[0-9]+' || echo "0")
-  echo "$errors $warnings"
+  # Extract from the summary line that contains "SLDS Violations" to avoid matching fixable counts
+  # The summary line format is: "✖ 587 SLDS Violations (105 errors, 482 warnings)"
+  local summary_line=$(echo "$output" | grep -E "SLDS Violations.*\([0-9]+ errors.*[0-9]+ warnings\)" | head -1)
+  if [ -n "$summary_line" ]; then
+    local errors=$(echo "$summary_line" | grep -oE '[0-9]+ errors' | head -1 | grep -oE '[0-9]+' || echo "0")
+    local warnings=$(echo "$summary_line" | grep -oE '[0-9]+ warnings' | head -1 | grep -oE '[0-9]+' || echo "0")
+    echo "$errors $warnings"
+  else
+    # Fallback to original method if summary line format changes
+    # Use head -1 to only get the first match (from summary, not fixable line)
+    local errors=$(echo "$output" | grep -oE '[0-9]+ errors' | head -1 | grep -oE '[0-9]+' || echo "0")
+    local warnings=$(echo "$output" | grep -oE '[0-9]+ warnings' | head -1 | grep -oE '[0-9]+' || echo "0")
+    echo "$errors $warnings"
+  fi
 }
 
 # Function to read last commit stats
@@ -105,14 +116,16 @@ fi
 
 echo "🔍 Running linter on demo/small-set..."
 # Run lint and capture output, suppress detailed logs
-LINT_OUTPUT=$(npx slds-linter lint demo/small-set 2>&1 || true)
+# Use the local build directly to ensure we're testing the freshly built code
+LINT_OUTPUT=$(node "$PROJECT_ROOT/packages/cli/build/index.js" lint demo/small-set 2>&1 || true)
 LINT_EXIT_CODE=$?
 
 # Extract counts from output
 read -r CURRENT_ERRORS CURRENT_WARNINGS <<< "$(extract_counts "$LINT_OUTPUT")"
 
 # Only display the summary line (errors and warnings count)
-SUMMARY_LINE=$(echo "$LINT_OUTPUT" | grep -E "[0-9]+ errors.*[0-9]+ warnings" || echo "")
+# Match the same pattern we use for extraction to ensure consistency
+SUMMARY_LINE=$(echo "$LINT_OUTPUT" | grep -E "SLDS Violations.*\([0-9]+ errors.*[0-9]+ warnings\)" | head -1 || echo "")
 if [ -n "$SUMMARY_LINE" ]; then
   echo "$SUMMARY_LINE"
 fi
