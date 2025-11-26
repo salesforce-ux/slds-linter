@@ -48,6 +48,8 @@ module.exports = defineConfig([
 
 To use the ESLint plugin with other plugins, add the `sldsCssPlugin()` helper function to the `eslint.config.mjs` configuration file. The `sldsCssPlugin()` function returns an object that contains the configurations for the ESLint plugin. This makes it easy to combine the ESLint plugin with other plugins while maintaining all the required dependencies.
 
+For example, to use the ESLint plugin with the CSS plugin, add the CSS plugin configuration to the object containing the ESLint plugin configuration.
+
 ```javascript
 // eslint.config.mjs
 import { defineConfig } from 'eslint/config';
