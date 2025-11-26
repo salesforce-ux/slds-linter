@@ -46,7 +46,7 @@ module.exports = defineConfig([
 
 #### Using with Other Plugins
 
-To combine SLDS plugin with other plugins (such as `@eslint/css`), use the `sldsCssPlugin()` helper function:
+To use the ESLint plugin with other plugins, add the `sldsCssPlugin()` helper function to the `eslint.config.mjs` configuration file. The `sldsCssPlugin()` function returns an object that contains the configurations for the ESLint plugin. This makes it easy to combine the ESLint plugin with other plugins while maintaining all the required dependencies.
 
 ```javascript
 // eslint.config.mjs
@@ -66,8 +66,6 @@ export default defineConfig([
   }
 ]);
 ```
-
-The `sldsCssPlugin()` function returns an object containing both the CSS plugin and SLDS plugin configurations, making it easy to combine with other plugins while maintaining all required dependencies.
 
 ## Migrate to the Latest Version
 
