@@ -27,6 +27,8 @@ module.exports = {
 
 ### ESLint v9+ (Flat Config)
 
+#### Basic Configuration
+
 ```javascript
 // eslint.config.js
 const { defineConfig } = require('eslint/config');
@@ -41,6 +43,31 @@ module.exports = defineConfig([
   }
 ]);
 ```
+
+#### Using with Other Plugins
+
+To combine SLDS plugin with other plugins (such as `@eslint/css`), use the `sldsCssPlugin()` helper function:
+
+```javascript
+// eslint.config.mjs
+import { defineConfig } from 'eslint/config';
+import css from '@eslint/css';
+import { sldsCssPlugin } from '@salesforce-ux/eslint-plugin-slds';
+
+export default defineConfig([
+  {
+    files: ['**/*.css'],
+    language: 'css/css',
+    plugins: {
+      css: css,
+      ...sldsCssPlugin()
+    },
+    extends: ['@salesforce-ux/slds/recommended', 'css/recommended']
+  }
+]);
+```
+
+The `sldsCssPlugin()` function returns an object containing both the CSS plugin and SLDS plugin configurations, making it easy to combine with other plugins while maintaining all required dependencies.
 
 ## Migrate to the Latest Version
 
