@@ -1,14 +1,11 @@
 import { defineConfig } from "eslint/config";
-import cssPlugin from "@eslint/css";
-import slds from "@salesforce-ux/eslint-plugin-slds";
+import { sldsCssPlugin } from "@salesforce-ux/eslint-plugin-slds";
 
 export default defineConfig([
   {
     plugins: {
-      "@salesforce-ux/slds": slds,
-      css: cssPlugin
+      ...sldsCssPlugin()
     },
     extends: ["@salesforce-ux/slds/recommended"]
-    //defineConfig() helper helps which config to use internally.
   },
 ]);
