@@ -6,7 +6,7 @@ import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 import { parse } from 'yaml';
 import { readFileSync, writeFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { resolve, dirname, basename } from 'path';
 import { createRequire } from 'module';
 import { globby } from 'globby';
 
@@ -16,26 +16,29 @@ const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE !== 'release';
 
 /**
  * esbuild plugin to handle YAML imports - inlines YAML content into each file
- * With bundle: false, this creates a virtual module that gets inlined at each import site
+ * Security: Uses basename to avoid exposing absolute file paths in build output
  */
 const yamlPlugin = {
   name: 'yaml',
   setup(build) {
     build.onResolve({ filter: /\.ya?ml$/ }, args => {
-      // Resolve the absolute path to the YAML file
+      // Resolve the absolute path to the YAML file for reading
       const resolvedPath = args.path.startsWith('.') 
         ? resolve(dirname(args.importer), args.path)
         : require.resolve(args.path, { paths: [dirname(args.importer)] });
       
       return {
-        path: resolvedPath,
+        // Use basename to prevent exposing absolute paths in build output
+        path: basename(resolvedPath),
         namespace: 'yaml-inline',
+        // Store absolute path in pluginData for onLoad
+        pluginData: { absolutePath: resolvedPath }
       };
     });
     
     build.onLoad({ filter: /.*/, namespace: 'yaml-inline' }, args => {
-      // Load and parse YAML, return as inline JS module
-      const yamlContent = readFileSync(args.path, 'utf8');
+      // Load and parse YAML from the absolute path stored in pluginData
+      const yamlContent = readFileSync(args.pluginData.absolutePath, 'utf8');
       const yamlData = parse(yamlContent);
       
       return {
