@@ -5,9 +5,10 @@ import { task } from "gulp-execa";
 import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 import { parse } from 'yaml';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { createRequire } from 'module';
+import { globby } from 'globby';
 
 const require = createRequire(import.meta.url);
 
@@ -47,7 +48,7 @@ function cleanDirs(){
 }
 
  /**
-  * Compile typescript files with version injection
+  * Compile typescript files - generates individual JS files (not bundled)
   * */
 const compileTs = async () => {
   const isInternal = process.env.TARGET_PERSONA === 'internal';
@@ -72,10 +73,14 @@ const compileTs = async () => {
     );
   }
   
+  // Get all TypeScript files to compile individually
+  const entryPoints = await globby(['./src/**/*.ts']);
+  
   await esbuild.build({
-    entryPoints: ["./src/index.ts"],
-    bundle: true,
-    outfile: "build/index.js",
+    entryPoints,
+    bundle: false,  // Don't bundle - generate individual files
+    outdir: "build",
+    outbase: "src",  // Preserve directory structure
     platform: "node",
     format: "cjs",
     packages: 'external',
@@ -85,6 +90,17 @@ const compileTs = async () => {
     },
     plugins
   });
+  
+  // Generate the YAML as a JS module in build/config/ without .js extension
+  // so require("../config/rule-messages.yml") works
+  const yamlContent = readFileSync('./src/config/rule-messages.yml', 'utf8');
+  const yamlData = parse(yamlContent);
+  const jsContent = `module.exports = ${JSON.stringify(yamlData, null, 2)};`;
+  
+  await import('fs/promises').then(fs => 
+    fs.mkdir('./build/config', { recursive: true })
+      .then(() => fs.writeFile('./build/config/rule-messages.yml', jsContent))
+  );
 };
 
 /**
