@@ -109,6 +109,7 @@ const compileTs = async () => {
     entryPoints: ["./src/**/*.ts"],
     bundle: true,  // Bundle to inline YAML, but externalize everything else
     outdir: "build",
+    outbase: "src",
     platform: "node",
     format: "cjs",
     sourcemap: process.env.NODE_ENV !== 'production',
