@@ -5,14 +5,11 @@ import { task } from "gulp-execa";
 import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 import { parse } from 'yaml';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { resolve, dirname, basename } from 'path';
 import { createRequire } from 'module';
-import { globby } from 'globby';
 
 const require = createRequire(import.meta.url);
-
-const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE !== 'release';
 
 /**
  * esbuild plugin to handle YAML imports - inlines YAML content into each file
@@ -107,17 +104,14 @@ const compileTs = async () => {
   
   plugins.push(externalPlugin);
   
-  // Get all TypeScript files to compile individually
-  const entryPoints = await globby(['./src/**/*.ts']);
   
   await esbuild.build({
-    entryPoints,
+    entryPoints: ["./src/**/*.ts"],
     bundle: true,  // Bundle to inline YAML, but externalize everything else
     outdir: "build",
-    outbase: "src",
     platform: "node",
     format: "cjs",
-    sourcemap: ENABLE_SOURCE_MAPS,
+    sourcemap: process.env.NODE_ENV !== 'production',
     define: {
       'process.env.PLUGIN_VERSION': `"${pkg.version}"`
     },
