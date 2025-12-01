@@ -1,12 +1,17 @@
 import * as esbuild from 'esbuild';
-import { series, src, dest } from 'gulp';
-import { rimraf} from 'rimraf'
-import {task} from "gulp-execa";
+import { series } from 'gulp';
+import { rimraf } from 'rimraf';
+import { task } from "gulp-execa";
 import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 import { parse } from 'yaml';
 import { readFileSync } from 'fs';
-import { resolve, dirname, basename } from 'path';
+import { resolve, dirname } from 'path';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+
+const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE !== 'release';
 
 /**
  * esbuild plugin to handle YAML imports
@@ -14,14 +19,20 @@ import { resolve, dirname, basename } from 'path';
 const yamlPlugin = {
   name: 'yaml',
   setup(build) {
-    build.onResolve({ filter: /\.ya?ml$/ }, args => ({
-      path: basename(resolve(dirname(args.importer), args.path)),
-      namespace: 'yaml-file',
-      external: false,  // Mark as internal to bundle into output
-      pluginData: { originalPath: resolve(dirname(args.importer), args.path) }
-    }));
+    build.onResolve({ filter: /\.ya?ml$/ }, args => {
+      // Handle package imports vs relative imports
+      const resolvedPath = args.path.startsWith('.') 
+        ? resolve(dirname(args.importer), args.path)
+        : require.resolve(args.path, { paths: [dirname(args.importer)] });
+      
+      return {
+        path: resolvedPath,
+        namespace: 'yaml-file',
+        external: false  // Mark as internal to bundle into output
+      };
+    });
     build.onLoad({ filter: /.*/, namespace: 'yaml-file' }, args => ({
-      contents: `module.exports = ${JSON.stringify(parse(readFileSync(args.pluginData.originalPath, 'utf8')), null, 2)};`,
+      contents: `module.exports = ${JSON.stringify(parse(readFileSync(args.path, 'utf8')), null, 2)};`,
       loader: 'js',
     }));
   },
@@ -62,13 +73,13 @@ const compileTs = async () => {
   }
   
   await esbuild.build({
-    entryPoints: ["./src/**/*.ts"],
+    entryPoints: ["./src/index.ts"],
     bundle: true,
-    outdir: "build",
+    outfile: "build/index.js",
     platform: "node",
     format: "cjs",
     packages: 'external',
-    sourcemap: process.env.NODE_ENV !== 'production',
+    sourcemap: ENABLE_SOURCE_MAPS,
     define: {
       'process.env.PLUGIN_VERSION': `"${pkg.version}"`
     },
