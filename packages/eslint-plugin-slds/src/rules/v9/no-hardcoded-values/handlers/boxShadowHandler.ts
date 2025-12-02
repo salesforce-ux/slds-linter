@@ -41,6 +41,12 @@ export const handleBoxShadowDeclaration: DeclarationHandler = (node: any, contex
   
   const shadowHooks = shadowValueToHookEntries(context.valueToStylinghook);
   
+  // Check if value is already wrapped with var() - if so, skip to prevent nested wrapping
+  if (valueText.trim().startsWith('var(')) {
+    // Value is already wrapped, don't process it again to avoid nested var() calls
+    return;
+  }
+  
   const parsedCssValue = toBoxShadowValue(valueText);
   if (!parsedCssValue) {
     return;
@@ -79,6 +85,22 @@ export const handleBoxShadowDeclaration: DeclarationHandler = (node: any, contex
 
 
 /**
+ * Check if a CSS value is already wrapped with a specific hook to prevent duplicate wrapping
+ * Returns true if the value matches pattern: var(hook, ...)
+ */
+function isAlreadyWrappedWithHook(value: string, hook: string): boolean {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith('var(')) {
+    return false;
+  }
+  
+  // Escape special regex characters in hook name and create pattern
+  const escapedHook = hook.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(`^var\\(\\s*${escapedHook}\\s*,`);
+  return pattern.test(trimmed);
+}
+
+/**
  * Create box-shadow replacement info for shorthand auto-fix
  * Only called when hooks are available (hooks.length > 0)
  * Returns replacement data or null if invalid position info
@@ -98,12 +120,25 @@ function createBoxShadowReplacement(
   const end = positionInfo.end.offset;
 
   if (hooks.length === 1) {
+    const hook = hooks[0];
+    
+    // Prevent nested var() calls when ESLint re-runs after applying a fix
+    if (isAlreadyWrappedWithHook(originalValue, hook)) {
+      return {
+        start,
+        end,
+        replacement: originalValue,
+        displayValue: hook,
+        hasHook: true
+      };
+    }
+    
     // Has a single hook replacement - should provide autofix
     return {
       start,
       end,
-      replacement: `var(${hooks[0]}, ${originalValue})`,
-      displayValue: hooks[0],
+      replacement: `var(${hook}, ${originalValue})`,
+      displayValue: hook,
       hasHook: true
     };
   } else {
