@@ -5,12 +5,6 @@ import { task } from "gulp-execa";
 import { rimraf } from 'rimraf';
 import eslintPackage from "eslint/package.json" with {type:"json"};
 import pkg from "./package.json" with {type:"json"};
-import { parse } from 'yaml';
-import { readFileSync } from 'fs';
-import { resolve, dirname, basename } from 'path';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
 
 const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE!=='release';
 
