@@ -5,7 +5,8 @@
   "type": "module",
   "workspaces": [
     "packages/eslint-plugin-slds",
-    "packages/cli"
+    "packages/cli",
+    "packages/context-extractor"
   ],
   "packageManager": "yarn@4.2.2",
   "engines": {

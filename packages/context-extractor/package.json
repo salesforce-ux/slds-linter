@@ -1,0 +1,31 @@
+{
+    "name": "@salesforce-ux/context-extractor",
+    "version": "1.0.8-internal",
+    "private": true,
+    "type": "module",
+    "description": "SLDS Context Extractor by scanning core repo",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\"",
+        "build": "gulp build",
+        "dev": "gulp dev"
+    },
+    "keywords": [
+        "context-extractor"
+    ],
+    "engines": {
+        "node": ">=18.18.0"
+    },
+    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/salesforce-ux/slds-linter.git"
+    },
+    "bugs": {
+        "url": "https://github.com/salesforce-ux/slds-linter/issues"
+    },
+    "homepage": "https://github.com/salesforce-ux/slds-linter/tree/main/packages/cli#slds-linter",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org"
+    }
+}
