@@ -5,62 +5,27 @@ import { task } from "gulp-execa";
 import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 import { parse } from 'yaml';
-import { readFileSync } from 'fs';
-import { resolve, dirname, basename } from 'path';
-import { createRequire } from 'module';
+import { readFileSync, mkdirSync, writeFileSync } from 'fs';
 
-const require = createRequire(import.meta.url);
+const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE !== 'release';
 
-/**
- * esbuild plugin to handle YAML imports - inlines YAML content into each file
- * Security: Uses basename to avoid exposing absolute file paths in build output
- */
-const yamlPlugin = {
-  name: 'yaml',
-  setup(build) {
-    build.onResolve({ filter: /\.ya?ml$/ }, args => {
-      // Resolve the absolute path to the YAML file for reading
-      const resolvedPath = args.path.startsWith('.') 
-        ? resolve(dirname(args.importer), args.path)
-        : require.resolve(args.path, { paths: [dirname(args.importer)] });
-      
-      return {
-        // Use basename to prevent exposing absolute paths in build output
-        path: basename(resolvedPath),
-        namespace: 'yaml-inline',
-        // Store absolute path in pluginData for onLoad
-        pluginData: { absolutePath: resolvedPath }
-      };
-    });
-    
-    build.onLoad({ filter: /.*/, namespace: 'yaml-inline' }, args => {
-      // Load and parse YAML from the absolute path stored in pluginData
-      const yamlContent = readFileSync(args.pluginData.absolutePath, 'utf8');
-      const yamlData = parse(yamlContent);
-      
-      return {
-        contents: `export default ${JSON.stringify(yamlData, null, 2)};`,
-        loader: 'js',
-      };
-    });
-  },
-};
-
-/**
- * Clean all generated folder
- * @returns
- */
 function cleanDirs(){
     return rimraf(['build']);
 }
 
- /**
-  * Compile typescript files - generates individual JS files with YAML inlined
-  * */
+/**
+ * Generate rule-messages.js from YAML (single source of truth)
+ */
+const generateConfigFiles = async () => {
+  const yamlData = parse(readFileSync('./src/config/rule-messages.yml', 'utf8'));
+  mkdirSync('./build/config', { recursive: true });
+  writeFileSync('./build/config/rule-messages.js', 
+    `module.exports = ${JSON.stringify(yamlData, null, 2)};\n`);
+};
+
 const compileTs = async () => {
   const isInternal = process.env.TARGET_PERSONA === 'internal';
-  
-  const plugins = [yamlPlugin];
+  const plugins = [];
   
   if (isInternal) {
     plugins.push(
@@ -80,39 +45,41 @@ const compileTs = async () => {
     );
   }
   
-  // Plugin to mark non-YAML imports as external (don't bundle them)
+  // Rewrite YAML imports to generated config file
+  const yamlRewritePlugin = {
+    name: 'yaml-rewrite',
+    setup(build) {
+      build.onResolve({ filter: /rule-messages\.ya?ml$/ }, args => {
+        const match = args.importer.match(/\/src\/(.*)\/[^/]+\.ts$/);
+        const depth = match ? match[1].split('/').length : 0;
+        return { path: (depth ? '../'.repeat(depth) : './') + 'config/rule-messages.js', external: true };
+      });
+    },
+  };
+  
+  // Mark non-YAML imports as external
   const externalPlugin = {
     name: 'external',
     setup(build) {
-      // Mark all non-entry-point imports as external except YAML files
       build.onResolve({ filter: /.*/ }, args => {
-        // Skip if it's an entry point (no importer)
-        if (!args.importer) {
-          return null;
-        }
-        
-        // Let yamlPlugin handle YAML files
-        if (args.path.match(/\.ya?ml$/)) {
-          return null;
-        }
-        
-        // Mark everything else as external
+        if (!args.importer) return null;
+        if (args.path.match(/\.ya?ml$/)) return null; // Let yamlRewritePlugin handle
         return { path: args.path, external: true };
       });
     },
   };
   
-  plugins.push(externalPlugin);
-  
+  plugins.push(yamlRewritePlugin, externalPlugin);
   
   await esbuild.build({
     entryPoints: ["./src/**/*.ts"],
-    bundle: true,  // Bundle to inline YAML, but externalize everything else
+    bundle: true,
     outdir: "build",
     outbase: "src",
     platform: "node",
     format: "cjs",
-    sourcemap: process.env.NODE_ENV !== 'production',
+    packages: 'external',
+    sourcemap: ENABLE_SOURCE_MAPS,
     define: {
       'process.env.PLUGIN_VERSION': `"${pkg.version}"`
     },
@@ -120,12 +87,8 @@ const compileTs = async () => {
   });
 };
 
-/**
- * ESBuild by default won't generate definition file. There are multiple ways 
- * to generate definition files. But we are relying on tsc for now
- */
 const generateDefinitions = task('tsc --project tsconfig.json');
 
-export const build = series(cleanDirs, compileTs, generateDefinitions);
+export const build = series(cleanDirs, generateConfigFiles, compileTs, generateDefinitions);
 
 export default task('gulp --tasks');

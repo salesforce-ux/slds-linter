@@ -15,36 +15,6 @@ const require = createRequire(import.meta.url);
 const ENABLE_SOURCE_MAPS = process.env.CLI_BUILD_MODE!=='release';
 
 /**
- * esbuild plugin to handle YAML imports
- * Security: Uses basename to avoid exposing absolute file paths in build output
- */
-const yamlPlugin = {
-  name: 'yaml',
-  setup(build) {
-    build.onResolve({ filter: /\.ya?ml$/ }, args => {
-      // Handle package imports vs relative imports
-      const resolvedPath = args.path.startsWith('.') 
-        ? resolve(dirname(args.importer), args.path)
-        : require.resolve(args.path, { paths: [dirname(args.importer)] });
-      
-      return {
-        // Use basename to prevent exposing absolute paths in build output
-        path: basename(resolvedPath),
-        namespace: 'yaml-file',
-        external: false,  // Mark as internal to bundle into output
-        // Store absolute path in pluginData for onLoad
-        pluginData: { absolutePath: resolvedPath }
-      };
-    });
-    build.onLoad({ filter: /.*/, namespace: 'yaml-file' }, args => ({
-      // Load YAML from the absolute path stored in pluginData
-      contents: `export default ${JSON.stringify(parse(readFileSync(args.pluginData.absolutePath, 'utf8')), null, 2)};`,
-      loader: 'js',
-    }));
-  },
-};
-
-/**
  * Clean all generated folder
  * @returns 
  */
@@ -70,7 +40,6 @@ const compileTs = async ()=>{
       'process.env.CLI_DESCRIPTION': `"${pkg.description}"`
     },
     plugins:[
-      yamlPlugin,
       esbuildPluginFilePathExtensions({
         esmExtension:"js"
       })
