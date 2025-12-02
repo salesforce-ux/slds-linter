@@ -5,17 +5,10 @@
   "exports": {
     ".": {
       "types": "./build/index.d.ts",
-      "import": "./build/index.js",
-      "require": "./build/index.js"
+      "default": "./build/index.js"
     },
-    "./config": {
-      "import": "./eslint.config.mjs",
-      "require": "./eslint.config.mjs"
-    },
-    "./rule-messages": {
-      "require": "./build/config/rule-messages.js",
-      "import": "./build/config/rule-messages.js"
-    }
+    "./config": "./eslint.config.mjs",
+    "./rule-messages": "./build/config/rule-messages.js"
   },
   "files": [
     "build/**",
