@@ -807,7 +807,7 @@ These options work independently:
 Run linter to see current violations:
 
 ```bash
-npx eslint-slds lint path/to/css
+npx @salesforce-ux/slds-linter@internal lint path/to/css
 ```
 
 Note:
@@ -846,7 +846,7 @@ Based on your findings:
 Update your ESLint config:
 
 ```javascript
-// .eslintrc.js or eslint.config.js
+// eslint.config.mjs
 {
   "rules": {
     "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
@@ -862,7 +862,7 @@ Update your ESLint config:
 ## Step 4: Run Auto-fix
 
 ```bash
-npx eslint-slds lint path/to/css --fix
+npx @salesforce-ux/slds-linter@internal lint path/to/css --fix --config-eslint eslint.config.mjs
 ```
 
 ---

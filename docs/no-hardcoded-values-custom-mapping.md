@@ -515,12 +515,12 @@ Tests cover:
 1. **Identify Common Hardcoded Values**
    ```bash
    # Run linter to see violations
-   npx eslint-slds lint path/to/css
+   npx @salesforce-ux/slds-linter@internal lint path/to/css
    ```
 
 2. **Create Custom Mapping Configuration**
    ```javascript
-   // .eslintrc.js or eslint.config.js
+   // eslint.config.mjs
    {
      "rules": {
        "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
@@ -534,7 +534,7 @@ Tests cover:
 
 3. **Run Linter with Auto-fix**
    ```bash
-   npx eslint-slds lint path/to/css --fix
+   npx @salesforce-ux/slds-linter@internal lint path/to/css --fix --config-eslint eslint.config.mjs
    ```
 
 4. **Verify Results**
