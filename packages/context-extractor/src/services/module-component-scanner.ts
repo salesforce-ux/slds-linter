@@ -54,14 +54,15 @@ function classifyFile(relativeFilePathFromComponent: string):
   return null;
 }
 
-const PATTERN = "**/{components,modules}/**/*.{cmp,html,css}";
+const CSS_PATTERN = "**/{components,modules}/**/*.css";
 
 export async function scanComponentBundles(rootDir: string): Promise<ModuleBundleMap> {
   const normalizedRoot = normalizePath(rootDir);
 
   const spinner = Logger.spinner(`Scanning for component bundles in: ${normalizedRoot}`);
 
-  const matches = await globby(PATTERN, {
+  // First, find all CSS files under components/modules
+  const cssMatches = await globby(CSS_PATTERN, {
     cwd: normalizedRoot,
     onlyFiles: true,
     absolute: false,
@@ -71,11 +72,12 @@ export async function scanComponentBundles(rootDir: string): Promise<ModuleBundl
 
   spinner.stop(true);
 
-  Logger.info(`Found ${matches.length} candidate files to evaluate for bundles`);
+  Logger.info(`Found ${cssMatches.length} CSS files to evaluate for bundles`);
 
   const results: ModuleBundleMap = {};
+  const processedComponents = new Set<string>();
 
-  for (const rawRelativePath of matches) {
+  for (const rawRelativePath of cssMatches) {
     const relativePath = toPosix(rawRelativePath);
     const segments = relativePath.split("/").filter(Boolean);
 
@@ -115,16 +117,6 @@ export async function scanComponentBundles(rootDir: string): Promise<ModuleBundl
     const componentFolderSegments = segments.slice(0, componentRootIndex + 3);
     const componentFolderPathFromRoot = componentFolderSegments.join("/");
 
-    const filePathFromComponent = segments
-      .slice(componentRootIndex + 3)
-      .join("/");
-
-    const kind = classifyFile(filePathFromComponent);
-
-    if (!kind) {
-      continue;
-    }
-
     if (!results[moduleDir]) {
       results[moduleDir] = [];
     }
@@ -153,7 +145,37 @@ export async function scanComponentBundles(rootDir: string): Promise<ModuleBundl
       );
     }
 
-    bundle[kind].push(filePathFromComponent);
+    if (processedComponents.has(componentFolderPathFromRoot)) {
+      continue;
+    }
+    processedComponents.add(componentFolderPathFromRoot);
+
+    // Find all relevant files for this component within its folder
+    const componentFiles = await globby(
+      [
+        `${componentName}.css`,
+        `${componentName}.html`,
+        `${componentName}.cmp`,
+        `${componentName}.js`,
+        `${componentName}.ts`,
+      ],
+      {
+        cwd: path.join(normalizedRoot, componentFolderPathFromRoot),
+        onlyFiles: true,
+        absolute: false,
+        gitignore: true,
+        dot: true,
+      }
+    );
+
+    for (const relFromComponent of componentFiles) {
+      const relPosix = toPosix(relFromComponent);
+      const kind = classifyFile(relPosix);
+      if (!kind) {
+        continue;
+      }
+      bundle[kind].push(relPosix);
+    }
   }
 
   const moduleCount = Object.keys(results).length;

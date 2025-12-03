@@ -30,6 +30,7 @@ export class Logger {
   static spinner(message: string) {
     const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
     let i = 0;
+    const start = Date.now();
 
     process.stdout.write(Colors.info(`${frames[i]} ${message}`));
 
@@ -41,8 +42,10 @@ export class Logger {
     return {
       stop(success: boolean = true) {
         clearInterval(interval);
+        const elapsedMs = Date.now() - start;
+        const seconds = (elapsedMs / 1000).toFixed(1);
         const symbol = success ? Colors.success('✓') : Colors.error('✖');
-        process.stdout.write(`\r${symbol} ${message}\n`);
+        process.stdout.write(`\r${symbol} ${message} (${seconds}s)\n`);
       },
     };
   }
