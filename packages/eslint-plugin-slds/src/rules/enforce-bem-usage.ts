@@ -1,7 +1,7 @@
 import { Rule } from 'eslint';
 import { findAttr, isAttributesEmpty } from "../utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
-import ruleMessages from '../config/rule-messages.yml';
+import ruleMessages from '../config/rule-messages';
 import enforceBemUsageCss from './v9/enforce-bem-usage';
 
 const bemMapping = metadata.bemNaming;

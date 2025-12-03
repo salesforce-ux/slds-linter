@@ -1,5 +1,5 @@
 import { resolvePath } from '../utils/nodeVersionUtil';
-import ruleMessages from '@salesforce-ux/eslint-plugin-slds/rule-messages.yml';
+import ruleMessages from '@salesforce-ux/eslint-plugin-slds/rule-messages';
 
 export const DEFAULT_ESLINT_CONFIG_PATH = resolvePath('@salesforce-ux/eslint-plugin-slds/config', import.meta);
 export const ESLINT_VERSION = process.env.ESLINT_VERSION;

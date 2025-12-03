@@ -1,7 +1,7 @@
 import { Rule } from 'eslint';
 import { findAttr, isAttributesEmpty } from "../utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
-import ruleMessages from '../config/rule-messages.yml';
+import ruleMessages from '../config/rule-messages';
 
 const deprecatedClasses = metadata.deprecatedClasses;
 const ruleConfig = ruleMessages['no-deprecated-classes-slds2'];
