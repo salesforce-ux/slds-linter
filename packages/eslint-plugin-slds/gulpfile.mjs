@@ -27,13 +27,27 @@ const yamlPlugin = {
   },
 };
 
+/**
+ * esbuild plugin to externalize local imports (prevents bundling rule-messages into each rule)
+ */
+const externalPlugin = {
+  name: 'external',
+  setup(build) {
+    build.onResolve({ filter: /.*/ }, args => {
+      if (!args.importer) return null; // Entry points
+      if (args.path.match(/\.ya?ml$/)) return null; // Let yamlPlugin handle
+      return { path: args.path, external: true };
+    });
+  },
+};
+
 function cleanDirs(){
     return rimraf(['build']);
 }
 
 const compileTs = async () => {
   const isInternal = process.env.TARGET_PERSONA === 'internal';
-  const plugins = [yamlPlugin];
+  const plugins = [yamlPlugin, externalPlugin];
   
   if (isInternal) {
     plugins.push(
