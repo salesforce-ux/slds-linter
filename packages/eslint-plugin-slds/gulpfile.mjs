@@ -5,38 +5,25 @@ import { task } from "gulp-execa";
 import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 import { parse } from 'yaml';
-import { readFileSync, mkdirSync, writeFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { readFileSync } from 'fs';
+import { resolve, dirname, basename } from 'path';
 
 /**
  * esbuild plugin to handle YAML imports
- * Generates a shared config file and rewrites imports to reference it
  */
 const yamlPlugin = {
   name: 'yaml',
   setup(build) {
-    let configGenerated = false;
-    
-    build.onResolve({ filter: /\.ya?ml$/ }, args => {
-      const originalPath = resolve(dirname(args.importer), args.path);
-      
-      // Generate shared config file once
-      if (!configGenerated) {
-        mkdirSync('./build/config', { recursive: true });
-        writeFileSync('./build/config/rule-messages.js',
-          `module.exports = ${JSON.stringify(parse(readFileSync(originalPath, 'utf8')), null, 2)};\n`);
-        configGenerated = true;
-      }
-      
-      // Calculate relative path from importer to config/rule-messages.js
-      const match = args.importer.match(/\/src\/(.*)\/[^/]+\.ts$/);
-      const depth = match ? match[1].split('/').length : 0;
-      
-      return {
-        path: (depth ? '../'.repeat(depth) : './') + 'config/rule-messages.js',
-        external: true
-      };
-    });
+    build.onResolve({ filter: /\.ya?ml$/ }, args => ({
+      path: basename(resolve(dirname(args.importer), args.path)),
+      namespace: 'yaml-file',
+      external: false,
+      pluginData: { originalPath: resolve(dirname(args.importer), args.path) }
+    }));
+    build.onLoad({ filter: /.*/, namespace: 'yaml-file' }, args => ({
+      contents: `module.exports = ${JSON.stringify(parse(readFileSync(args.pluginData.originalPath, 'utf8')), null, 2)};`,
+      loader: 'js',
+    }));
   },
 };
 
@@ -65,20 +52,6 @@ const compileTs = async () => {
       })
     );
   }
-  
-  // Mark non-YAML imports as external
-  const externalPlugin = {
-    name: 'external',
-    setup(build) {
-      build.onResolve({ filter: /.*/ }, args => {
-        if (!args.importer) return null;
-        if (args.path.match(/\.ya?ml$/)) return null; // Let yamlPlugin handle
-        return { path: args.path, external: true };
-      });
-    },
-  };
-  
-  plugins.push(externalPlugin);
   
   await esbuild.build({
     entryPoints: ["./src/**/*.ts"],

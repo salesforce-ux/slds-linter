@@ -1,6 +1,6 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
-import ruleMessages from '../../config/rule-messages.yml';
+import ruleMessages from '../../config/rule-messages';
 import { forEachSldsVariable, type CssVariableInfo } from '../../utils/css-utils';
 import type { PositionInfo } from '../../utils/hardcoded-shared-utils';
 
