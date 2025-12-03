@@ -28,7 +28,7 @@ const yamlPlugin = {
 };
 
 /**
- * esbuild plugin to externalize local imports (prevents bundling rule-messages into each rule)
+ * esbuild plugin to externalize local imports
  */
 const externalPlugin = {
   name: 'external',
