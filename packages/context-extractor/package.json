@@ -4,11 +4,12 @@
     "private": true,
     "type": "module",
     "description": "SLDS Context Extractor by scanning core repo",
-    "main": "index.js",
+    "main": "build/index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\"",
         "build": "gulp build",
-        "dev": "gulp dev"
+        "dev": "gulp dev",
+        "extract:context": "node build/index.js ../../../core-public/core"
     },
     "keywords": [
         "context-extractor"

@@ -1,0 +1,3 @@
+interface ExtractContextOptions {
+    corePath: string;    
+}

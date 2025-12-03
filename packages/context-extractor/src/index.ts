@@ -1,7 +1,16 @@
-export default function extractContext(){
-    console.log("Extracting context");
+import path from "path";
+
+function normalizePath(p: string){
+    return path.resolve(process.cwd(), p);
 }
 
-if(import.meta.url === process.argv[1]){
-    extractContext();
+export default function extractContext(options: ExtractContextOptions){
+    const corePath = normalizePath(options.corePath);
+    console.log("Extracting context", corePath);
+}
+
+if(import.meta.url === `file://${process.argv[1]}`){
+    extractContext({
+        corePath: process.argv[2]
+    });
 }
