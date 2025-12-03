@@ -1,12 +1,21 @@
 import path from "path";
+import { scanComponentBundles } from "./services/module-component-scanner";
+import { writeFileSync } from "fs";
 
 function normalizePath(p: string){
     return path.resolve(process.cwd(), p);
 }
 
-export default function extractContext(options: ExtractContextOptions){
+async function extractBundles(corePath: string){
+    console.log("Extracting bundles", corePath);
+    const bundles = await scanComponentBundles(corePath);
+    writeFileSync(normalizePath('./bundles.json'), JSON.stringify(bundles, null, 2));
+}
+
+
+export default async function extractContext(options: ExtractContextOptions){
     const corePath = normalizePath(options.corePath);
-    console.log("Extracting context", corePath);
+    await extractBundles(corePath);
 }
 
 if(import.meta.url === `file://${process.argv[1]}`){

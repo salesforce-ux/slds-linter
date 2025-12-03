@@ -11,6 +11,10 @@
         "dev": "gulp dev",
         "extract:context": "node build/index.js ../../../core-public/core"
     },
+    "dependencies": {
+        "globby": "^14.1.0",
+        "chalk": "^4.1.2"
+    },
     "keywords": [
         "context-extractor"
     ],
