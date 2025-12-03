@@ -1,10 +1,8 @@
-import path from "path";
+
 import { scanComponentBundles } from "./services/module-component-scanner";
 import { writeFileSync } from "fs";
+import { normalizePath } from "./utils/path-utils";
 
-function normalizePath(p: string){
-    return path.resolve(process.cwd(), p);
-}
 
 async function extractBundles(corePath: string){
     console.log("Extracting bundles", corePath);

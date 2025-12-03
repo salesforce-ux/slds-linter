@@ -1,5 +1,7 @@
 import path from "path";
 import { globby } from "globby";
+import { Logger } from "../utils/logger";
+import { normalizePath } from "../utils/path-utils";
 
 export type MarkupExtension = "cmp" | "app" | "html";
 export type ScriptExtension = "js" | "ts";
@@ -52,18 +54,24 @@ function classifyFile(relativeFilePathFromComponent: string):
   return null;
 }
 
+const PATTERN = "**/{components,modules}/**/*.{cmp,html,css}";
+
 export async function scanComponentBundles(rootDir: string): Promise<ModuleBundleMap> {
-  const normalizedRoot = path.resolve(process.cwd(), rootDir);
+  const normalizedRoot = normalizePath(rootDir);
 
-  const pattern = "**/{components,modules}/**/*.{cmp,html,css}";
+  const spinner = Logger.spinner(`Scanning for component bundles in: ${normalizedRoot}`);
 
-  const matches = await globby(pattern, {
+  const matches = await globby(PATTERN, {
     cwd: normalizedRoot,
     onlyFiles: true,
     absolute: false,
     gitignore: true,
     dot: true,
   });
+
+  spinner.stop(true);
+
+  Logger.info(`Found ${matches.length} candidate files to evaluate for bundles`);
 
   const results: ModuleBundleMap = {};
 
@@ -77,6 +85,10 @@ export async function scanComponentBundles(rootDir: string): Promise<ModuleBundl
     }
 
     const moduleDir = segments[0];
+
+    if (!results[moduleDir]) {
+      Logger.debug(`Discovered new module directory: ${moduleDir}`);
+    }
 
     const componentRootIndex = segments.findIndex((segment) =>
       COMPONENT_ROOT_DIR_NAMES.includes(segment)
@@ -136,10 +148,21 @@ export async function scanComponentBundles(rootDir: string): Promise<ModuleBundl
         script: [],
       };
       results[moduleDir].push(bundle);
+      Logger.debug(
+        `Created bundle: module=${moduleDir}, namespace=${namespace}, component=${componentName}`
+      );
     }
 
     bundle[kind].push(filePathFromComponent);
   }
+
+  const moduleCount = Object.keys(results).length;
+  Logger.info(
+    `Completed bundle scan. Modules: ${moduleCount}, Components: ${Object.values(results).reduce(
+      (acc, bundles) => acc + bundles.length,
+      0
+    )}`
+  );
 
   return results;
 }
