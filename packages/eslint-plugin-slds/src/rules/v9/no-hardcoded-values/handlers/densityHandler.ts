@@ -54,8 +54,8 @@ function createDimensionReplacement(
   }
 
   const rawValue = parsedDimension.unit 
-    ? `${parsedDimension.number}${parsedDimension.unit}`
-    : parsedDimension.number.toString();
+    ? `${parsedDimension.value}${parsedDimension.unit}`
+    : parsedDimension.value.toString();
 
   const propToMatch = resolvePropertyToMatch(cssProperty);
   const closestHooks = getStylingHooksForDensityValue(parsedDimension, context.valueToStylinghook, propToMatch);

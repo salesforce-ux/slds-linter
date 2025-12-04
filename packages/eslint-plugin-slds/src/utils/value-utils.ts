@@ -42,24 +42,24 @@ export const ALLOWED_UNITS = ['px', 'em', 'rem', '%', 'ch'];
 
 export type ParsedUnitValue = {
   unit: 'px' | 'rem' | '%' | 'em' | 'ch' | null;
-  number: number;
+  value: number | string;  // string for keyword values like 'bold', 'normal'
 } | null;
 
-export function parseUnitValue(value: string): ParsedUnitValue {
-  if (!value) return null;
+export function parseUnitValue(valueStr: string): ParsedUnitValue {
+  if (!valueStr) return null;
   
   // Create regex pattern from allowed units
   const unitsPattern = ALLOWED_UNITS.join('|');
   const regex = new RegExp(`^(-?\\d*\\.?\\d+)(${unitsPattern})?$`);
-  const match = value.match(regex);
+  const match = valueStr.match(regex);
   if (!match) return null;
   
-  const number = parseFloat(match[1]);
+  const numValue = parseFloat(match[1]);
   const unit = match[2] ? (match[2] as 'px' | 'rem' | '%' | 'em' | 'ch') : null; // Keep unitless values as null
   
-  if (isNaN(number)) return null;
+  if (isNaN(numValue)) return null;
   
-  return { number, unit };
+  return { value: numValue, unit };
 }
 
 export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem' | '%' | 'em' | 'ch' | null): ParsedUnitValue {
@@ -68,7 +68,7 @@ export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem' |
       if (!isNaN(floatValue)) {
         return {
           unit: 'rem',
-          number: parseFloat(floatValue.toFixed(4))
+          value: parseFloat(floatValue.toFixed(4))
         }
       }
     } else if (unitType === 'rem') {
@@ -76,7 +76,7 @@ export function toAlternateUnitValue(numberVal: number, unitType: 'px' | 'rem' |
       if (!isNaN(intValue)) {
         return {
           unit: 'px',
-          number: intValue
+          value: intValue
         }
       }
     }
