@@ -1,4 +1,5 @@
 import path from "path";
+import { promises as fs } from "fs";
 import { globby } from "globby";
 import { Logger } from "../utils/logger";
 import { normalizePath } from "../utils/path-utils";
@@ -150,31 +151,26 @@ export async function scanComponentBundles(rootDir: string): Promise<ModuleBundl
     }
     processedComponents.add(componentFolderPathFromRoot);
 
-    // Find all relevant files for this component within its folder
-    const componentFiles = await globby(
-      [
-        `${componentName}.css`,
-        `${componentName}.html`,
-        `${componentName}.cmp`,
-        `${componentName}.js`,
-        `${componentName}.ts`,
-      ],
-      {
-        cwd: path.join(normalizedRoot, componentFolderPathFromRoot),
-        onlyFiles: true,
-        absolute: false,
-        gitignore: true,
-        dot: true,
-      }
-    );
+    // Find all relevant files for this component within its folder using fs
+    const componentFolderAbsolute = path.join(normalizedRoot, componentFolderPathFromRoot);
+    const entries = await fs.readdir(componentFolderAbsolute, { withFileTypes: true });
 
-    for (const relFromComponent of componentFiles) {
-      const relPosix = toPosix(relFromComponent);
-      const kind = classifyFile(relPosix);
+    for (const entry of entries) {
+      if (!entry.isFile()) {
+        continue;
+      }
+
+      const fileName = entry.name;
+      if (!fileName.startsWith(`${componentName}.`)) {
+        continue;
+      }
+
+      const relFromComponent = toPosix(fileName);
+      const kind = classifyFile(relFromComponent);
       if (!kind) {
         continue;
       }
-      bundle[kind].push(relPosix);
+      bundle[kind].push(relFromComponent);
     }
   }
 
