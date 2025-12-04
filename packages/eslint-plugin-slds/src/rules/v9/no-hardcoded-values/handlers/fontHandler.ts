@@ -45,10 +45,10 @@ function isValidFontValue(fontValue: ParsedUnitValue, cssProperty: string): bool
     return !!fontValue.unit;
   } else if (cssProperty === 'font-weight') {
     // Font-weight: must be unitless and a known font-weight value
-    return !fontValue.unit && isKnownFontWeight(fontValue.number);
+    return !fontValue.unit && isKnownFontWeight(fontValue.value);
   } else if (cssProperty === 'font') {
     // Font shorthand: determine validation based on value characteristics
-    if (!fontValue.unit && isKnownFontWeight(fontValue.number)) {
+    if (!fontValue.unit && isKnownFontWeight(fontValue.value)) {
       // This is a font-weight value
       return true;
     } else if (fontValue.unit) {
@@ -75,12 +75,12 @@ function createFontReplacement(
   }
 
   const rawValue = fontValue.unit 
-    ? `${fontValue.number}${fontValue.unit}`
-    : fontValue.number.toString();
+    ? `${fontValue.value}${fontValue.unit}`
+    : fontValue.value.toString();
 
   // Font-specific property resolution
   // Font-weight: unitless known font-weight values, otherwise font-size
-  const propToMatch = (!fontValue.unit && isKnownFontWeight(fontValue.number)) 
+  const propToMatch = (!fontValue.unit && isKnownFontWeight(fontValue.value)) 
     ? resolvePropertyToMatch('font-weight')
     : resolvePropertyToMatch('font-size');
 
