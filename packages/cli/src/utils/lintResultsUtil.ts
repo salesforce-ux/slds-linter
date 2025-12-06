@@ -100,15 +100,22 @@ export function printLintResults(results: LintResult[], editor?: string): LintRe
   // Print summary
   const totalProblems = totalErrors + totalWarnings;
   if (totalProblems > 0) {
-    const chalkColorFn = totalErrors > 0 ? Colors.errorBold : Colors.warningBold;
     console.log('');
-    const problemsText  = `✖ ${totalProblems} SLDS Violation${totalProblems !== 1 ? 's' : ''} (${totalErrors} error${totalErrors !== 1 ? 's' : ''}, ${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''})`
-    console.log(chalkColorFn(problemsText));
+    
+    const totalProblemsText = Colors.error(`✖ ${totalProblems} SLDS Violation${totalProblems !== 1 ? 's' : ''}`);
+    const totalErrorsText = Colors.error(`${totalErrors} error${totalErrors !== 1 ? 's' : ''}`);
+    const totalWarningText = Colors.warning(`${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''}`);
+
+    const problemsText  = `${totalProblemsText} (${totalErrorsText}, ${totalWarningText})`
+    console.log(problemsText);
     
     const fixableTotal = fixableErrors + fixableWarnings;
     if (fixableTotal > 0) {
-      const fixableText = `  ${fixableErrors} error${fixableErrors !== 1 ? 's' : ''} and ${fixableWarnings} warning${fixableWarnings !== 1 ? 's' : ''} potentially fixable with the \`--fix\` option.`;
-      console.log(chalkColorFn(fixableText));
+      const fixableErrorsText = Colors.error(`${fixableErrors} error${fixableErrors !== 1 ? 's' : ''}`);
+      const fixableWarningText = Colors.warning(`${fixableWarnings} warning${fixableWarnings !== 1 ? 's' : ''}`);
+
+      const fixableText = `  ${fixableErrorsText} and ${fixableWarningText} potentially fixable with the \`--fix\` option.`;
+      console.log(fixableText);
     }
   } else {
     Logger.newLine().success('No SLDS Violations found.');
