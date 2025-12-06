@@ -2,6 +2,7 @@
 import { scanComponentBundles } from "./services/module-component-scanner";
 import { writeFileSync } from "fs";
 import { normalizePath } from "./utils/path-utils";
+import type { ExtractContextOptions } from "./types";
 
 
 async function extractBundles(corePath: string){

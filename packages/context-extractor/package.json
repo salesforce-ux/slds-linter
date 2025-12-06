@@ -9,11 +9,15 @@
         "test": "echo \"Error: no test specified\"",
         "build": "gulp build",
         "dev": "gulp dev",
-        "extract:context": "node build/index.js ../../../core-public/core"
+        "extract:context": "DEBUG=1 node build/index.js ../../../core-public/core",
+        "audit:context": "DEBUG=1 node build/run-audit.js"
     },
     "dependencies": {
-        "globby": "^14.1.0",
-        "chalk": "^4.1.2"
+        "@eslint/css-tree": "^3.6.5",
+        "@salesforce-ux/sds-metadata": "^1.2.1",
+        "chalk": "^4.1.2",
+        "cheerio": "^1.1.2",
+        "globby": "^14.1.0"
     },
     "keywords": [
         "context-extractor"

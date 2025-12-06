@@ -3,22 +3,14 @@ import { promises as fs } from "fs";
 import { globby } from "globby";
 import { Logger } from "../utils/logger";
 import { normalizePath } from "../utils/path-utils";
-
-export type MarkupExtension = "cmp" | "app" | "html";
-export type ScriptExtension = "js" | "ts";
-export type StyleExtension = "css";
-
-export interface ComponentBundle {
-  componentName: string;
-  namespace: string;
-  path: string; // path to component folder relative to rootDir
-  module: string;
-  markup: string[]; // paths to markup files relative to component folder
-  styles: string[]; // paths to style files relative to component folder
-  script: string[]; // paths to script files relative to component folder
-}
-
-export type ModuleBundleMap = Record<string, ComponentBundle[]>;
+import type {
+  BundleFileKind,
+  ComponentBundle,
+  ModuleBundleMap,
+  MarkupExtension,
+  ScriptExtension,
+  StyleExtension,
+} from "../types";
 
 const MARKUP_EXTENSIONS: MarkupExtension[] = ["cmp", "html"];
 const SCRIPT_EXTENSIONS: ScriptExtension[] = ["js", "ts"];
@@ -36,9 +28,7 @@ function getExtension(filePath: string): string {
 }
 
 function classifyFile(relativeFilePathFromComponent: string):
-  | "markup"
-  | "script"
-  | "styles"
+  | BundleFileKind
   | null {
   const ext = getExtension(relativeFilePathFromComponent).toLowerCase();
 
@@ -136,9 +126,9 @@ export async function scanComponentBundles(rootDir: string): Promise<ModuleBundl
         namespace,
         path: componentFolderPathFromRoot,
         module: moduleDir,
-        markup: [],
-        styles: [],
-        script: [],
+        markup: null,
+        styles: null,
+        script: null,
       };
       results[moduleDir].push(bundle);
       Logger.debug(
@@ -170,7 +160,7 @@ export async function scanComponentBundles(rootDir: string): Promise<ModuleBundl
       if (!kind) {
         continue;
       }
-      bundle[kind].push(relFromComponent);
+      bundle[kind] = relFromComponent;
     }
   }
 
