@@ -2,6 +2,7 @@ import { parse, walk, generate } from '@eslint/css-tree';
 import { isValidColor } from './color-lib-utils';
 import { parseUnitValue } from './value-utils';
 import { isCssColorFunction, isCssMathFunction } from './css-functions';
+import { getVarToken } from './css-utils';
 
 export interface BoxShadowValue {
   offsetX?: string;
@@ -16,28 +17,6 @@ interface ShadowParts {
   lengthParts: string[];
   colorParts: string[];
   inset: boolean;
-}
-
-/**
- * Get the CSS variable token from a var() function node
- * e.g., var(--slds-g-color-brand-base-15) -> "--slds-g-color-brand-base-15"
- */
-function getVarToken(node: any): string {
-  if (node?.type !== 'Function' || node.name.toLowerCase() !== 'var') {
-    return '';
-  }
-  
-  // The first child of var() should be the custom property name
-  if (!node.children) return '';
-  
-  let token = '';
-  node.children.forEach((child: any) => {
-    if (child.type === 'Identifier' && child.name.startsWith('--')) {
-      token = child.name;
-    }
-  });
-  
-  return token;
 }
 
 /**
