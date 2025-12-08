@@ -47,10 +47,10 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
   ],
 
   invalid: [
-    // Basic deprecated token usage
+    // Basic deprecated token usage (no SLDS mapping - outputs var(--lwc-*))
     {
       code: `.example { color: token(account); }`,
-      output: `.example { color: var(--lwc-account, token(account)); }`,
+      output: `.example { color: var(--lwc-account); }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
@@ -58,10 +58,10 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       }]
     },
     
-    // Shorthand 't' function
+    // Shorthand 't' function (no SLDS mapping - outputs var(--lwc-*))
     {
       code: `.example { color: t(accountInfo); }`,
-      output: `.example { color: var(--lwc-accountInfo, t(accountInfo)); }`,
+      output: `.example { color: var(--lwc-accountInfo); }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
@@ -69,15 +69,15 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       }]
     },
 
-    // Multiple deprecated tokens in same declaration
+    // Multiple deprecated tokens in same declaration (no SLDS mapping)
     {
       code: `.example { 
         color: token(account); 
         background: token(accountInfo);
       }`,
       output: `.example { 
-        color: var(--lwc-account, token(account)); 
-        background: var(--lwc-accountInfo, token(accountInfo));
+        color: var(--lwc-account); 
+        background: var(--lwc-accountInfo);
       }`,
       filename: 'test.css',
       errors: [
@@ -92,14 +92,14 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       ]
     },
 
-    // Complex CSS with deprecated token
+    // Complex CSS with deprecated token (no SLDS mapping)
     {
       code: `.container .example:hover { 
         border: 1px solid token(account); 
         margin: 10px;
       }`,
       output: `.container .example:hover { 
-        border: 1px solid var(--lwc-account, token(account)); 
+        border: 1px solid var(--lwc-account); 
         margin: 10px;
       }`,
       filename: 'test.css',
@@ -109,13 +109,13 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       }]
     },
 
-    // Token in calc() function
+    // Token in calc() function (no SLDS mapping)
     {
       code: `.example { 
         width: calc(100% - token(account)); 
       }`,
       output: `.example { 
-        width: calc(100% - var(--lwc-account, token(account))); 
+        width: calc(100% - var(--lwc-account)); 
       }`,
       filename: 'test.css',
       errors: [{
@@ -124,14 +124,25 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       }]
     },
 
-    // Simple token call (no parameters)
+    // Token with SLDS mapping - outputs var(--slds-*, var(--lwc-*))
     {
       code: `.example { 
         color: token(brandPrimary); 
       }`,
       output: `.example { 
-        color: var(--lwc-brandPrimary, token(brandPrimary)); 
+        color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary)); 
       }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'deprecatedToken',
+        type: 'Identifier'
+      }]
+    },
+
+    // Shorthand 't' function with SLDS mapping
+    {
+      code: `.example { color: t(brandPrimary); }`,
+      output: `.example { color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary)); }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',

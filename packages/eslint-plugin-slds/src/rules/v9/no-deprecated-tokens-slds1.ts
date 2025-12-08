@@ -5,8 +5,9 @@ import ruleMessages from '../../config/rule-messages.yml';
 const ruleConfig = ruleMessages['no-deprecated-tokens-slds1'];
 const { type, description, url, messages } = ruleConfig;
 
-// Get token mapping from metadata (Aura tokens to LWC tokens)
-const tokenMapping = metadata.auraToLwcTokensMapping;
+// Get both mappings to chain Aura → LWC → SLDS
+const auraToLwc = metadata.auraToLwcTokensMapping;
+const lwcToSlds = metadata.lwcToSlds;
 
 export default {
   meta: {
@@ -25,18 +26,32 @@ export default {
      * Check if a token should be ignored (not in mapping or not LWC token)
      */
     function shouldIgnoreDetection(token: string): boolean {
-      return (!(token in tokenMapping) || !tokenMapping[token].startsWith('--lwc-'));
+      return !(token in auraToLwc) || !auraToLwc[token].startsWith('--lwc-');
     }
 
     /**
-     * Generate replacement suggestion for deprecated token
+     * Generate replacement - directly to SLDS with LWC fallback (removes t())
+     * Output format: var(--slds-*, var(--lwc-*)) or var(--lwc-*) if no SLDS mapping
      */
-    function generateReplacement(tokenName: string, originalFunctionCall: string): string | null {
-      if (shouldIgnoreDetection(tokenName)) {
+    function generateReplacement(tokenName: string): string | null {
+      const lwcToken = auraToLwc[tokenName];
+      if (!lwcToken || !lwcToken.startsWith('--lwc-')) {
         return null;
       }
-      const recommendation = tokenMapping[tokenName];
-      return `var(${recommendation}, ${originalFunctionCall})`;
+      
+      const sldsMapping = lwcToSlds[lwcToken];
+      
+      // If SLDS mapping exists and is a direct token replacement
+      if (sldsMapping && !sldsMapping.continueToUse) {
+        const sldsHook = sldsMapping.replacement;
+        if (typeof sldsHook === 'string' && sldsHook.startsWith('--slds-')) {
+          // Final format: var(--slds-*, var(--lwc-*))
+          return `var(${sldsHook}, var(${lwcToken}))`;
+        }
+      }
+      
+      // Fallback: just LWC token without t()
+      return `var(${lwcToken})`;
     }
 
     function handleTokenFunction(node, functionName) {
@@ -48,9 +63,9 @@ export default {
         return;
       }
 
-      // Create original function call - mirroring stylelint's approach
+      // Create original function call for error message
       const originalFunctionCall = `${functionName}(${tokenName})`;
-      const replacement = generateReplacement(tokenName, originalFunctionCall);
+      const replacement = generateReplacement(tokenName);
       
       if (replacement) {
         // Report with replacement suggestion
