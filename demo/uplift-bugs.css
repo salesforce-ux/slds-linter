@@ -8,6 +8,7 @@
   outline: 1px solid red;
   outline-width: 1px;
   outline-color: red;
+  box-shadow: 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15)
 }
 
 .wrapper {
