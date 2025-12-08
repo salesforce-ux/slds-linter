@@ -100,13 +100,6 @@ function extractShadowParts(ast: any): ShadowParts[] {
     currentShadow = null;
   };
 
-  // Helper to ensure current shadow exists
-  const ensureShadow = () => {
-    if (!currentShadow) {
-      currentShadow = { lengthParts: [], colorParts: [], inset: false };
-    }
-  };
-
   walk(ast, {
     enter(node: any) {
       // Handle comma separator - finalize current shadow and start new one
@@ -120,13 +113,15 @@ function extractShadowParts(ast: any): ShadowParts[] {
         return;
       }
 
+      // Ensure current shadow exists for all value nodes
+      currentShadow = currentShadow || { lengthParts: [], colorParts: [], inset: false };
+
       // Handle function nodes (var, calc, rgb, etc.)
       if (node.type === 'Function') {
-        ensureShadow();
         if (isColorValue(node)) {
-          currentShadow!.colorParts.push(generate(node));
+          currentShadow.colorParts.push(generate(node));
         } else if (isLengthValue(node)) {
-          currentShadow!.lengthParts.push(generate(node));
+          currentShadow.lengthParts.push(generate(node));
         }
         // Skip children - we've handled the entire function
         return this.skip;
@@ -134,22 +129,19 @@ function extractShadowParts(ast: any): ShadowParts[] {
 
       // Handle inset keyword
       if (isInsetKeyword(node)) {
-        ensureShadow();
-        currentShadow!.inset = true;
+        currentShadow.inset = true;
         return;
       }
 
       // Handle length values (Dimension, Number)
       if (isLengthValue(node)) {
-        ensureShadow();
-        currentShadow!.lengthParts.push(generate(node));
+        currentShadow.lengthParts.push(generate(node));
         return;
       }
 
       // Handle color values (Hash, Identifier)
       if (isColorValue(node)) {
-        ensureShadow();
-        currentShadow!.colorParts.push(generate(node));
+        currentShadow.colorParts.push(generate(node));
         return;
       }
     }
