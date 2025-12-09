@@ -42,7 +42,7 @@ export default {
       const sldsMapping = lwcToSlds[lwcToken];
       
       // If SLDS mapping exists and is a direct token replacement
-      if (sldsMapping && !sldsMapping.continueToUse) {
+      if (sldsMapping) {
         const sldsHook = sldsMapping.replacement;
         if (typeof sldsHook === 'string' && sldsHook.startsWith('--slds-')) {
           // Final format: var(--slds-*, var(--lwc-*))
