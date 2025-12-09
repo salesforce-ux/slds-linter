@@ -2,6 +2,7 @@ import { Worker } from 'worker_threads';
 import path from 'path';
 import os from "os";
 import { Logger } from '../utils/logger';
+import { ProgressHandler } from './progress-handler';
 
 const AVAILABLE_CPUS = os.cpus().length - 1;
 
@@ -48,6 +49,8 @@ export class BatchProcessor {
     const activeWorkers = new Set<Worker>();
     let currentBatchIndex = 0;
 
+    const progress = new ProgressHandler({ total: batches.length });
+
     try {
       while (currentBatchIndex < batches.length || activeWorkers.size > 0) {
         // Start new workers if we have capacity and batches remaining
@@ -69,6 +72,7 @@ export class BatchProcessor {
             .on('message', (result: BatchResult) => {
               results.push(result);
               activeWorkers.delete(worker);
+              progress.increment();
               Logger.debug(`Completed batch ${batchIndex} of ${batches.length}`);
             })
             .on('error', (error) => {
@@ -78,6 +82,7 @@ export class BatchProcessor {
                 results: []
               });
               activeWorkers.delete(worker);
+              progress.increment();
               Logger.error(`Worker error in batch ${batchIndex}: ${error.message}`);
             })
             .on('exit', (code) => {
@@ -92,8 +97,10 @@ export class BatchProcessor {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
+      progress.stop();
       return results;
     } catch (error: any) {
+      progress.stop();
       Logger.error(`Batch processing failed: ${error.message}`);
       throw error;
     } finally {
