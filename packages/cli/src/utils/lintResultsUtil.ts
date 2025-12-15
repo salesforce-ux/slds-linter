@@ -36,6 +36,53 @@ export function parseText(text: string): string {
 }
 
 /**
+ * Example output:
+ * "✖ 3 SLDS Violations (1 error, 2 warnings)"
+ * "⚠ 3 SLDS Violations (0 error, 3 warnings)"
+ * "✖ 3 SLDS Violations (3 errors, 0 warnings)"
+ */
+function printTotalViolationsSummary(totalErrors: number, totalWarnings: number) {
+  const totalProblems = totalErrors + totalWarnings;
+  if(!totalProblems){
+    return;
+  }
+  let totalProblemsText = `${totalProblems} SLDS Violation${totalProblems !== 1 ? 's' : ''}`;
+  if (totalErrors > 0) {
+    totalProblemsText = Colors.error(`✖ ${totalProblemsText}`);
+  } else {
+    totalProblemsText = Colors.warning(`⚠ ${totalProblemsText}`);
+  }
+
+  const totalBreakdown = [
+    Colors.error(`${totalErrors} error${totalErrors !== 1 ? 's' : ''}`),
+    Colors.warning(`${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''}`)
+  ];
+  console.log(`${totalProblemsText} (${totalBreakdown.join(', ')})`);
+}
+
+/**
+ * Example output:
+ * "  1 error and 2 warnings potentially fixable with the `--fix` option."
+ * "  3 errors potentially fixable with the `--fix` option."
+ * "  3 warnings potentially fixable with the `--fix` option."
+ */
+function printFixableViolationsSummary(fixableErrors: number, fixableWarnings: number) {
+  const fixableTotal = fixableErrors + fixableWarnings;
+  if (!fixableTotal) {
+    return;
+  }
+  const fixableBreakdown = [];
+  if (fixableErrors > 0) {
+    fixableBreakdown.push(Colors.error(`${fixableErrors} error${fixableErrors !== 1 ? 's' : ''}`));
+  }
+  if (fixableWarnings > 0) {
+    fixableBreakdown.push(Colors.warning(`${fixableWarnings} warning${fixableWarnings !== 1 ? 's' : ''}`));
+  }
+
+  console.log(`  ${fixableBreakdown.join(' and ')} potentially fixable with the \`--fix\` option.`);
+}
+
+/**
  * Prints detailed lint results for each file that has issues.
  *
  * @param results - Array of lint results.
@@ -97,28 +144,13 @@ export function printLintResults(results: LintResult[], editor?: string): LintRe
     }
   });
 
+  Logger.newLine();
   // Print summary
-  const totalProblems = totalErrors + totalWarnings;
-  if (totalProblems > 0) {
-    console.log('');
-    
-    const totalProblemsText = Colors.error(`✖ ${totalProblems} SLDS Violation${totalProblems !== 1 ? 's' : ''}`);
-    const totalErrorsText = Colors.error(`${totalErrors} error${totalErrors !== 1 ? 's' : ''}`);
-    const totalWarningText = Colors.warning(`${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''}`);
-
-    const problemsText  = `${totalProblemsText} (${totalErrorsText}, ${totalWarningText})`
-    console.log(problemsText);
-    
-    const fixableTotal = fixableErrors + fixableWarnings;
-    if (fixableTotal > 0) {
-      const fixableErrorsText = Colors.error(`${fixableErrors} error${fixableErrors !== 1 ? 's' : ''}`);
-      const fixableWarningText = Colors.warning(`${fixableWarnings} warning${fixableWarnings !== 1 ? 's' : ''}`);
-
-      const fixableText = `  ${fixableErrorsText} and ${fixableWarningText} potentially fixable with the \`--fix\` option.`;
-      console.log(fixableText);
-    }
+  if (totalErrors>0 || totalWarnings>0) {
+    printTotalViolationsSummary(totalErrors, totalWarnings);
+    printFixableViolationsSummary(fixableErrors, fixableWarnings);    
   } else {
-    Logger.newLine().success('No SLDS Violations found.');
+    Logger.success('No SLDS Violations found.');
   }
   return {totalErrors, totalWarnings, fixableErrors, fixableWarnings}
 }

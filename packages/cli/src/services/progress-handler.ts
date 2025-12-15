@@ -12,6 +12,12 @@ export class ProgressHandler {
 
   constructor(options: ProgressHandlerOptions) {
     const format = options.format || `Processing [{bar}] {percentage}% ({value}/{total})`;
+    const isCI = String(process.env.CI || '').toLowerCase() === 'true' || process.env.CI === '1';
+    const isTTY = Boolean(process.stdout.isTTY);
+
+    if(!isTTY || isCI) {
+      return;
+    }
     
     this.progressBar = new cliProgress.SingleBar({
       format,
