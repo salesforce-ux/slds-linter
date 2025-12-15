@@ -151,6 +151,12 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }`,
       filename: 'test.css',
     },
+    // Box-shadow already wrapped in SLDS shadow hook should be skipped
+    // This prevents recursive wrapping when ESLint applies fixes in a loop
+    {
+      code: `.example { box-shadow: var(--slds-g-shadow-outset-focus-1, 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15)); }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
@@ -603,7 +609,15 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         messageId: 'noReplacement'
       }]
     },
-    // Box-shadow with CSS variables now processed and matched to hook (previously skipped entirely)
+    // Box-shadow with var() color functions - should be detected and wrapped with shadow hook
+    {
+      code: `.example { box-shadow: 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15); }`,
+      filename: 'test.css',
+      output: `.example { box-shadow: var(--slds-g-shadow-outset-focus-1, 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15)); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+    },
     {
       code: `.example { box-shadow: 0 0 0 2px var(--slds-g-color-brand-base-15) inset, 0 0 0 4px var(--slds-g-color-neutral-base-100) inset; }`,
       filename: 'test.css',

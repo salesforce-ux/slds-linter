@@ -64,6 +64,17 @@ function extractCssVariable<T>(
 }
 
 /**
+ * Get the CSS variable token from a var() function node
+ * Extracts the custom property name from var(--custom-prop) -> "--custom-prop"
+ * @param node - CSS tree AST node (Function node expected)
+ * @returns The custom property name (e.g., "--slds-g-color-brand-base-15") or empty string
+ */
+export function getVarToken(node: any): string {
+  const result = extractCssVariable(node, (variableName) => variableName);
+  return result || '';
+}
+
+/**
  * Specialized CSS variable traversal for SLDS variables
  * Finds var(--slds-*) functions and reports their fallback status
  */
