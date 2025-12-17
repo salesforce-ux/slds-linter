@@ -124,13 +124,13 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       }]
     },
 
-    // Token with SLDS mapping - outputs var(--slds-*, var(--lwc-*))
+    // Token with SLDS mapping - outputs var(--slds-*, var(--lwc-*, fallback))
     {
       code: `.example { 
         color: token(brandPrimary); 
       }`,
       output: `.example { 
-        color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary)); 
+        color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary, #1b96ff)); 
       }`,
       filename: 'test.css',
       errors: [{
@@ -142,7 +142,7 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
     // Shorthand 't' function with SLDS mapping
     {
       code: `.example { color: t(brandPrimary); }`,
-      output: `.example { color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary)); }`,
+      output: `.example { color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary, #1b96ff)); }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
