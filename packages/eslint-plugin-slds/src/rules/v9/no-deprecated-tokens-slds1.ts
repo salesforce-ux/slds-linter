@@ -5,8 +5,32 @@ import ruleMessages from '../../config/rule-messages';
 const ruleConfig = ruleMessages['no-deprecated-tokens-slds1'];
 const { type, description, url, messages } = ruleConfig;
 
-// Get token mapping from metadata (Aura tokens to LWC tokens)
-const tokenMapping = metadata.auraToLwcTokensMapping;
+// Get both mappings to chain Aura → LWC → SLDS
+const auraToLwc = metadata.auraToLwcTokensMapping;
+const lwcToSlds = metadata.lwcToSlds;
+const globalStylingHooksMetadata = metadata.globalStylingHooksMetadata?.global || {};
+
+/**
+ * Get fallback value (numeric/color) for an SLDS hook from metadata.
+ * Handles two patterns in metadata:
+ * 1. Raw value: "#757575" → returns as-is
+ * 2. Nested var: "var(--lwc-*, var(--slds-*))" → looks up the inner SLDS hook's value
+ */
+function getSldsHookFallbackValue(sldsHook: string): string | null {
+  const value = globalStylingHooksMetadata[sldsHook]?.values?.slds;
+  if (!value) return null;
+  
+  // If raw value, return directly
+  if (!value.startsWith('var(')) return value;
+  
+  // Value is "var(--lwc-*, var(--slds-*))" - extract the inner --slds-* hook
+  const innerSldsHook = value.match(/(--slds-[\w-]+)/)?.[1];
+  if (innerSldsHook) {
+    return globalStylingHooksMetadata[innerSldsHook]?.values?.slds || null;
+  }
+  
+  return null;
+}
 
 export default {
   meta: {
@@ -25,18 +49,37 @@ export default {
      * Check if a token should be ignored (not in mapping or not LWC token)
      */
     function shouldIgnoreDetection(token: string): boolean {
-      return (!(token in tokenMapping) || !tokenMapping[token].startsWith('--lwc-'));
+      return !(token in auraToLwc) || !auraToLwc[token].startsWith('--lwc-');
     }
 
     /**
-     * Generate replacement suggestion for deprecated token
+     * Generate replacement - directly to SLDS with LWC fallback (removes t())
+     * Output format: var(--slds-*, var(--lwc-*, fallback)) or var(--lwc-*, fallback) if no SLDS mapping
      */
-    function generateReplacement(tokenName: string, originalFunctionCall: string): string | null {
-      if (shouldIgnoreDetection(tokenName)) {
+    function generateReplacement(tokenName: string): string | null {
+      const lwcToken = auraToLwc[tokenName];
+      if (!lwcToken || !lwcToken.startsWith('--lwc-')) {
         return null;
       }
-      const recommendation = tokenMapping[tokenName];
-      return `var(${recommendation}, ${originalFunctionCall})`;
+      
+      const sldsMapping = lwcToSlds[lwcToken];
+      
+      // If SLDS mapping exists and is a direct token replacement
+      if (sldsMapping) {
+        const sldsHook = sldsMapping.replacement;
+        if (typeof sldsHook === 'string' && sldsHook.startsWith('--slds-')) {
+          // Get fallback value from SLDS hook metadata
+          const fallbackValue = getSldsHookFallbackValue(sldsHook);
+          // Final format: var(--slds-*, var(--lwc-*, fallback)) or var(--slds-*, var(--lwc-*))
+          const lwcFallback = fallbackValue 
+            ? `var(${lwcToken}, ${fallbackValue})`
+            : `var(${lwcToken})`;
+          return `var(${sldsHook}, ${lwcFallback})`;
+        }
+      }
+      
+      // No SLDS mapping: just LWC token without t()
+      return `var(${lwcToken})`;
     }
 
     function handleTokenFunction(node, functionName) {
@@ -48,9 +91,9 @@ export default {
         return;
       }
 
-      // Create original function call - mirroring stylelint's approach
+      // Create original function call for error message
       const originalFunctionCall = `${functionName}(${tokenName})`;
-      const replacement = generateReplacement(tokenName, originalFunctionCall);
+      const replacement = generateReplacement(tokenName);
       
       if (replacement) {
         // Report with replacement suggestion

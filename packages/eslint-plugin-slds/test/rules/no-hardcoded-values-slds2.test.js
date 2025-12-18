@@ -151,6 +151,12 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }`,
       filename: 'test.css',
     },
+    // Box-shadow already wrapped in SLDS shadow hook should be skipped
+    // This prevents recursive wrapping when ESLint applies fixes in a loop
+    {
+      code: `.example { box-shadow: var(--slds-g-shadow-outset-focus-1, 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15)); }`,
+      filename: 'test.css',
+    },
   ],
   invalid: [
     // Hardcoded color with multiple suggestions
@@ -304,7 +310,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       errors: [{
         messageId: 'noReplacement'
       }]
-      // Should detect #0000ff but ignore var() content
+      // Should detect #0000ff but no hook available for this color
     },
     // Line-height with no styling hook available
     {
@@ -319,7 +325,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     {
       code: `.example { padding: 0 1rem 0.5rem 0; }`,
       filename: 'test.css',
-      output: `.example { padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-2, 0.5rem) 0; }`,
+      output: `.example { padding: 0 var(--slds-g-spacing-4, 1rem) 0.5rem 0; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -331,7 +337,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     {
       code: `.example { margin: 0.25rem 0.5rem 0.75rem 1rem; }`,
       filename: 'test.css',
-      output: `.example { margin: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem); }`,
+      output: `.example { margin: var(--slds-g-spacing-1, 0.25rem) 0.5rem 0.75rem 1rem; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -362,7 +368,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }, {
         messageId: 'hardcodedValue'
       }]
-      // Should detect both #ffffff color (has hook) and 1px (no hook in SLDS2)
+      // Should detect both 1px (has hook) and red color (mapped to border-color, has hooks)
     },
 
     // ADVANCED EXAMPLES - SLDS2 specific shorthand auto-fix
@@ -370,7 +376,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
     {
       code: `.example { padding: 0.25rem 0.75rem; }`,
       filename: 'test.css',
-      output: `.example { padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-3, 0.75rem); }`,
+      output: `.example { padding: var(--slds-g-spacing-1, 0.25rem) 0.75rem; }`,
       errors: [{
         messageId: 'hardcodedValue'
       }, {
@@ -496,7 +502,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         { messageId: 'hardcodedValue' }, // font-weight: 700
         { messageId: 'hardcodedValue' }  // font-size: 16px
       ],
-      output: `.example { font: var(--slds-g-font-weight-7, 700) var(--slds-g-font-scale-2, 16px) Arial; }`
+      output: `.example { font: var(--slds-g-font-weight-7, 700) 16px Arial; }`
     },
     // Font shorthand: keyword weight + size + family (bold now has hook)
     {
@@ -506,7 +512,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         { messageId: 'hardcodedValue' }, // font-weight: bold (has hook now)
         { messageId: 'hardcodedValue' }  // font-size: 1rem
       ],
-      output: `.example { font: var(--slds-g-font-weight-bold, bold) var(--slds-g-font-scale-2, 1rem) 'Helvetica Neue'; }`
+      output: `.example { font: var(--slds-g-font-weight-bold, bold) 1rem 'Helvetica Neue'; }`
     },
     // Font shorthand: size/line-height + family (line-height not parsed from shorthand yet)
     {
@@ -525,7 +531,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         { messageId: 'hardcodedValue' }, // font-weight: 400
         { messageId: 'hardcodedValue' }  // font-size: 14px (line-height parsing not implemented)
       ],
-      output: `.example { font: var(--slds-g-font-weight-4, 400) var(--slds-g-font-scale-1, 14px)/1.25 'Times New Roman'; }`
+      output: `.example { font: var(--slds-g-font-weight-4, 400) 14px/1.25 'Times New Roman'; }`
     },
     // Font shorthand: normal weight + percentage size (normal has hook, percentage doesn't)
     {
@@ -545,7 +551,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         { messageId: 'hardcodedValue' }, // font-weight: bold (has hook now)
         { messageId: 'hardcodedValue' } // font-size: 0.875rem (line-height parsing not implemented)
       ],
-      output: `.example { font: var(--slds-g-font-weight-bold, bold) var(--slds-g-font-scale-1, 0.875rem)/1.375 'Segoe UI', sans-serif; }`
+      output: `.example { font: var(--slds-g-font-weight-bold, bold) 0.875rem/1.375 'Segoe UI', sans-serif; }`
     },
 
     // Edge cases and mixed scenarios
@@ -567,7 +573,7 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         { messageId: 'hardcodedValue' }, // font-weight: 700
         { messageId: 'hardcodedValue' }  // font-size: 1rem (line-height parsing not implemented)
       ],
-      output: `.example { font: var(--slds-g-font-weight-7, 700) var(--slds-g-font-scale-2, 1rem)/1.5 Arial; }`
+      output: `.example { font: var(--slds-g-font-weight-7, 700) 1rem/1.5 Arial; }`
     },
 
     // NEW UNIT TESTS - CH and EM units
@@ -604,7 +610,15 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
         messageId: 'noReplacement'
       }]
     },
-    // Box-shadow with CSS variables now processed and matched to hook (previously skipped entirely)
+    // Box-shadow with var() color functions - should be detected and wrapped with shadow hook
+    {
+      code: `.example { box-shadow: 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15); }`,
+      filename: 'test.css',
+      output: `.example { box-shadow: var(--slds-g-shadow-outset-focus-1, 0 0 0 2px var(--slds-g-color-neutral-base-100), 0 0 0 4px var(--slds-g-color-brand-base-15)); }`,
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+    },
     {
       code: `.example { box-shadow: 0 0 0 2px var(--slds-g-color-brand-base-15) inset, 0 0 0 4px var(--slds-g-color-neutral-base-100) inset; }`,
       filename: 'test.css',

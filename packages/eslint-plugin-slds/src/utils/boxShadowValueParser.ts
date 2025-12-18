@@ -1,7 +1,8 @@
 import { parse, walk, generate } from '@eslint/css-tree';
 import { isValidColor } from './color-lib-utils';
-import { parseUnitValue, type ParsedUnitValue } from './value-utils';
-import { isCssColorFunction } from './css-functions';
+import { parseUnitValue } from './value-utils';
+import { isCssColorFunction, isCssMathFunction } from './css-functions';
+import { getVarToken } from './css-utils';
 
 export interface BoxShadowValue {
   offsetX?: string;
@@ -30,7 +31,13 @@ function isColorValue(node: any): boolean {
     case 'Identifier':
       return isValidColor(node.name);
     case 'Function':
-      return isCssColorFunction(node.name.toLowerCase());
+      // Check for color functions (rgb, rgba, hsl, hsla)
+      if (isCssColorFunction(node.name.toLowerCase())) {
+        return true;
+      }
+      // Check for SLDS color vars: var(--slds-g-color-*)
+      const varToken = getVarToken(node);
+      return !!varToken.match(/^--slds-g-color/);
     default:
       return false;
   }
@@ -50,6 +57,14 @@ function isLengthValue(node: any): boolean {
     case 'Number':
       // Zero values without units are valid lengths
       return Number(node.value) === 0;
+    case 'Function':
+      // Check for math functions (calc, min, max)
+      if (isCssMathFunction(node.name.toLowerCase())) {
+        return true;
+      }
+      // Check for SLDS spacing/sizing vars: var(--slds-g-spacing-*) or var(--slds-g-sizing-*)
+      const varToken = getVarToken(node);
+      return !!varToken.match(/^--slds-g-(spacing|sizing)/);
     default:
       return false;
   }
@@ -63,66 +78,99 @@ function isInsetKeyword(node: any): boolean {
 }
 
 /**
- * Extract shadow parts from CSS tree nodes
+ * Check if a node is a comma separator (used to separate multiple shadows)
  */
-function extractShadowParts(valueText: string): ShadowParts[] {
-  const shadows: ShadowParts[] = [];
-  let currentShadow: ShadowParts = {
-    lengthParts: [],
-    colorParts: [],
-    inset: false
-  };
+function isCommaSeparator(node: any): boolean {
+  return node?.type === 'Operator' && node.value === ',';
+}
 
-  try {
-    const ast = parse(valueText, { context: 'value' as const });
-    
-    walk(ast, {
-      enter(node: any) {
-        // Skip nested function content for now
-        if (node.type === 'Function') {
-          return this.skip;
-        }
-        
-        if (isInsetKeyword(node)) {
-          currentShadow.inset = true;
-        } else if (isLengthValue(node)) {
-          currentShadow.lengthParts.push(generate(node));
-        } else if (isColorValue(node)) {
-          currentShadow.colorParts.push(generate(node));
-        }
-      }
-    });
-    
-    // Add the current shadow if it has any content
-    if (currentShadow.lengthParts.length > 0 || currentShadow.colorParts.length > 0 || currentShadow.inset) {
+/**
+ * Extract shadow parts from CSS tree nodes
+ * Properly handles comma-separated multiple shadows and var() functions
+ */
+function extractShadowParts(ast: any): ShadowParts[] {
+  const shadows: ShadowParts[] = [];
+  let currentShadow: ShadowParts | null = null;
+
+  // Helper to finalize current shadow
+  const finalizeShadow = () => {
+    if (currentShadow && (currentShadow.lengthParts.length > 0 || currentShadow.colorParts.length > 0 || currentShadow.inset)) {
       shadows.push(currentShadow);
     }
-    
-  } catch (error) {
-    return [];
-  }
+    currentShadow = null;
+  };
+
+  walk(ast, {
+    enter(node: any) {
+      // Handle comma separator - finalize current shadow and start new one
+      if (isCommaSeparator(node)) {
+        finalizeShadow();
+        return;
+      }
+
+      // Skip whitespace
+      if (node.type === 'WhiteSpace') {
+        return;
+      }
+
+      // Ensure current shadow exists for all value nodes
+      currentShadow = currentShadow || { lengthParts: [], colorParts: [], inset: false };
+
+      // Handle function nodes (var, calc, rgb, etc.)
+      if (node.type === 'Function') {
+        if (isColorValue(node)) {
+          currentShadow.colorParts.push(generate(node));
+        } else if (isLengthValue(node)) {
+          currentShadow.lengthParts.push(generate(node));
+        }
+        // Skip children - we've handled the entire function
+        return this.skip;
+      }
+
+      // Handle inset keyword
+      if (isInsetKeyword(node)) {
+        currentShadow.inset = true;
+        return;
+      }
+
+      // Handle length values (Dimension, Number)
+      if (isLengthValue(node)) {
+        currentShadow.lengthParts.push(generate(node));
+        return;
+      }
+
+      // Handle color values (Hash, Identifier)
+      if (isColorValue(node)) {
+        currentShadow.colorParts.push(generate(node));
+        return;
+      }
+    }
+  });
+
+  // Finalize the last shadow
+  finalizeShadow();
 
   return shadows;
 }
 
 /**
  * Parse box-shadow value into structured format
- * Simplified version for ESLint v9 compatibility
+ * Uses CSS tree parser to properly handle comma-separated shadows and var() functions
  */
 export function parseBoxShadowValue(value: string): BoxShadowValue[] {
-  // Handle multiple shadows separated by commas
-  const shadowStrings = value.split(',').map(s => s.trim());
-  const allShadows: BoxShadowValue[] = [];
-  
-  for (const shadowString of shadowStrings) {
-    const shadows = extractShadowParts(shadowString);
-    
-    const parsedShadows = shadows.map((shadow) => {
+  try {
+    const ast = parse(value, { context: 'value' as const });
+    const shadowParts = extractShadowParts(ast);
+
+    return shadowParts.map((shadow) => {
       /**
-       * Box-shadow syntax:
-       * Two, three, or four <length> values:
-       * - offset-x offset-y [blur-radius] [spread-radius]
-       * Optionally: inset keyword and color value
+       * Box-shadow syntax :
+       * Two, three, or four <length> values.
+       *   If only two values are given, they are interpreted as <offset-x> and <offset-y> values.
+       *   If a third value is given, it is interpreted as a <blur-radius>.
+       *   If a fourth value is given, it is interpreted as a <spread-radius>.
+       * Optionally, the inset keyword.
+       * Optionally, a <color> value.
        */
       const shadowValue: BoxShadowValue = {};
       
@@ -141,16 +189,14 @@ export function parseBoxShadowValue(value: string): BoxShadowValue[] {
       
       // Add inset flag if present
       if (shadow.inset) {
-        shadowValue.inset = true;
+        shadowValue.inset = shadow.inset;
       }
       
       return shadowValue;
     });
-    
-    allShadows.push(...parsedShadows);
+  } catch (error) {
+    return [];
   }
-  
-  return allShadows;
 }
 
 /**

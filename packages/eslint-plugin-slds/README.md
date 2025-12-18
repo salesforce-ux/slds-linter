@@ -96,6 +96,68 @@ By default, the latest version of the plugin supports legacy and flat config sys
 - `reduce-annotations`: Identifies annotations that must be removed from the code.
 - `lwc-token-to-slds-hook`: Identifies the deprecated --lwc tokens that must be replaced with the latest --slds tokens. For more information, see lightningdesignsystem.com.
 
+## Closest Color Suggestion Logic
+
+This plugin suggests SLDS styling hooks that are perceptually closest to a given hardcoded color. The logic lives in `src/utils/color-lib-utils.ts` and is used by `no-hardcoded-values-slds2`.
+
+- **API surface**
+  - `findClosestColorHook(color, supportedColors, cssProperty): string[]`
+    Returns up to 5 hook names, ordered by category priority and perceptual distance.
+  - `isHardCodedColor(value): boolean`
+    Detects if a string likely represents a hardcoded color (excludes CSS `var(...)`).
+
+- **Perceptual metric**
+  - Uses `chroma.deltaE` (CIEDE2000) to compare the input color against known SLDS color values.
+  - A threshold (`DELTAE_THRESHOLD = 25`) controls how strict the matching is.
+  - Exact hex matches short-circuit to distance `0` to avoid float rounding differences.
+
+- **Category ordering**
+  - Hooks are ranked by category, then by distance (ascending):
+    1. Semantic hooks (e.g., surface, accent, error, success, etc.)
+    2. System hooks
+    3. Palette hooks
+  - Only the top 5 suggestions are returned.
+
+- **Property awareness**
+  - Suggestions consider the CSS property from rule context.
+  - Hooks declared for the same property (or `*`) are prioritized if within the distance threshold.
+
+- **CSS variables**
+  - Values using `var(...)` are not flagged as hardcoded colors and are excluded from matching.
+
+- **Semantic hook ordering by CSS property**
+  The sorter always applies the same category priority (semantic → system → palette). Within the semantic category, ordering is purely by perceptual distance for the current CSS property; there is no hardcoded sub-priority among semantic families (surface, accent, error, etc.). Property awareness comes from the metadata (`properties` on each hook).
+
+  - `color`
+    - Prefers semantic hooks that declare `properties: ['color']` (e.g., text/foreground-oriented tokens).
+    - If multiple semantic hooks are eligible, they are ordered by Delta E (closest first).
+    - If none are within threshold, the sorter may fall back to system, then palette.
+
+  - `background-color`
+    - Prefers semantic surface/role tokens that declare `['background-color']`.
+    - Among eligible semantic hooks, order is by Delta E.
+
+  - `border-color` (and `outline-color`)
+    - Prefers semantic or system hooks that declare `['border-color']` (or `['outline-color']`).
+    - If semantic hooks exist for borders, they are ranked before system; otherwise system hooks lead.
+    - Order within the chosen category is by Delta E.
+
+  - `box-shadow`
+    - For color components inside shadows, prefers hooks declaring `['box-shadow']` or universal `['*']`.
+    - Ordering within semantic remains by Delta E.
+
+  - Other properties
+    - If hook metadata specifies the current property, those hooks are preferred.
+    - Hooks with `['*']` (universal) are considered next.
+    - If still none within threshold, different-property hooks may be considered (still subject to category priority and Delta E).
+
+- **Example**
+  ```js
+  // Given a hex color and a CSS property like 'color'
+  const suggestions = findClosestColorHook('#ff0000', supportedColors, 'color');
+  // => ['--slds-...semantic-...', '--slds-...system-...', ...]
+  ```
+
 ## License
 
 ISC

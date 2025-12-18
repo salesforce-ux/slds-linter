@@ -1270,7 +1270,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salesforce-ux/eslint-plugin-slds@npm:1.0.7, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
+"@salesforce-ux/eslint-plugin-slds@npm:1.0.8-internal, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds"
   dependencies:
@@ -1278,7 +1278,7 @@ __metadata:
     "@eslint/css-tree": "npm:^3.6.5"
     "@html-eslint/eslint-plugin": "npm:^0.34.0"
     "@html-eslint/parser": "npm:^0.34.0"
-    "@salesforce-ux/sds-metadata": "npm:^1.1.0"
+    "@salesforce-ux/sds-metadata": "npm:^1.2.1"
     "@types/chroma-js": "npm:^2.4.4"
     "@types/eslint": "npm:^8.56.0"
     "@types/jest": "npm:^29.5.14"
@@ -1295,10 +1295,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/sds-metadata@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@salesforce-ux/sds-metadata@npm:1.1.0"
-  checksum: 10c0/34ee8d0c0df8bacc7410fe4adc12aa46f715ec0105f514b67f28fb297d5566571f8a8aefc260a36e227a7046fc4c7edb2e13a230f4332e3ef646bf76c20c77a5
+"@salesforce-ux/sds-metadata@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@salesforce-ux/sds-metadata@npm:1.2.1"
+  checksum: 10c0/526f5e3e95d711f7ed12d79c879064a589a64b2d3951fb80aaebb26bb260a3a212ae2be2f12a4fd9330919940ba79165783f94dfc3536600744be629567230ef
   languageName: node
   linkType: hard
 
@@ -1306,11 +1306,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/slds-linter@workspace:packages/cli"
   dependencies:
-    "@salesforce-ux/eslint-plugin-slds": "npm:1.0.7"
+    "@salesforce-ux/eslint-plugin-slds": "npm:1.0.8-internal"
+    "@types/cli-progress": "npm:^3"
     "@types/jest": "npm:^29.5.14"
     "@typescript-eslint/eslint-plugin": "npm:^8.36.0"
     "@typescript-eslint/parser": "npm:^8.36.0"
     chalk: "npm:^4.1.2"
+    cli-progress: "npm:^3.12.0"
     commander: "npm:^13.1.0"
     eslint: "npm:^9.0.0"
     export-to-csv: "npm:^1.4.0"
@@ -1447,6 +1449,15 @@ __metadata:
   version: 2.4.5
   resolution: "@types/chroma-js@npm:2.4.5"
   checksum: 10c0/2860bb40e29bc034464324c53291164d5a665edb6a3f7adff80ef968fe468f3484435a9b7a3735874e979bfd189d026989d9aa6743cb8a7ca0d99b64555904b3
+  languageName: node
+  linkType: hard
+
+"@types/cli-progress@npm:^3":
+  version: 3.11.6
+  resolution: "@types/cli-progress@npm:3.11.6"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/d9a2d60b8fc6ccef73368fa20a23d5b16506808a81ec65f7e8eedf58d236ebaf2ab46578936c000c8e39dde825cb48a3cf9195c8b410177efd5388bcf9d07370
   languageName: node
   linkType: hard
 
@@ -2347,6 +2358,15 @@ __metadata:
   dependencies:
     restore-cursor: "npm:^5.0.0"
   checksum: 10c0/7ec62f69b79f6734ab209a3e4dbdc8af7422d44d360a7cb1efa8a0887bbe466a6e625650c466fe4359aee44dbe2dc0b6994b583d40a05d0808a5cb193641d220
+  languageName: node
+  linkType: hard
+
+"cli-progress@npm:^3.12.0":
+  version: 3.12.0
+  resolution: "cli-progress@npm:3.12.0"
+  dependencies:
+    string-width: "npm:^4.2.3"
+  checksum: 10c0/f464cb19ebde2f3880620a2adfaeeefaec6cb15c8e610c8a659ca1047ee90d69f3bf2fdabbb1fe33ac408678e882e3e0eecdb84ab5df0edf930b269b8a72682d
   languageName: node
   linkType: hard
 
