@@ -217,11 +217,11 @@ ruleTester.run('no-hardcoded-values-slds1', rule, {
       code: `.example { border: 2px solid #0000ff; }`,
       filename: 'test.css',
       errors: [{
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }, {
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }]
-      // Both 2px dimension and #0000ff color should be flagged (no hooks available)
+      // Both 2px dimension and #0000ff color should be flagged
     },
     // Mixed value with color and CSS variable - review comment case
     {

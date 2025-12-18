@@ -32,11 +32,11 @@ const BORDER_RADIUS_REGEX = new RegExp(`^border(?:-${CORNER_VALUES})?-radius$`);
 const INSET_REGEX = new RegExp(`^inset(?:-${INSET_VALUES})?$`);
 
 export function isBorderColorProperty(cssProperty: string): boolean {
-  return BORDER_COLOR_REGEX.test(cssProperty);
+  return cssProperty === 'border' || BORDER_COLOR_REGEX.test(cssProperty);
 }
 
 export function isBorderWidthProperty(cssProperty: string): boolean {
-  return BORDER_WIDTH_REGEX.test(cssProperty);
+  return cssProperty === 'border' || BORDER_WIDTH_REGEX.test(cssProperty);
 }
 
 export function isMarginProperty(cssProperty: string): boolean {
