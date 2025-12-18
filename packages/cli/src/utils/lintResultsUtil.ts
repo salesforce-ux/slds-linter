@@ -43,9 +43,6 @@ export function parseText(text: string): string {
  */
 function printTotalViolationsSummary(totalErrors: number, totalWarnings: number) {
   const totalProblems = totalErrors + totalWarnings;
-  if(!totalProblems){
-    return;
-  }
   let totalProblemsText = `${totalProblems} SLDS Violation${totalProblems !== 1 ? 's' : ''}`;
   if (totalErrors > 0) {
     totalProblemsText = Colors.error(`✖ ${totalProblemsText}`);

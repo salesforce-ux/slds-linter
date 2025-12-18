@@ -145,5 +145,17 @@ describe('Editor Link Utilities', () => {
     });
   });
 
+  describe('createClickableLineCol', () => {
+    it('should create an ANSI hyperlink wrapper around the colored line:column', async () => {
+      process.env.EDITOR = '/usr/bin/code';
+      const { createClickableLineCol } = await import('../../src/utils/editorLinkUtil');
 
-}); 
+      const out = createClickableLineCol('10:5', '/path/to/file.css', 10, 5);
+
+      // OSC 8 hyperlink format: ESC ] 8 ; ; URL BEL ... ESC ] 8 ; ; BEL
+      expect(out).toContain('\u001b]8;;');
+      expect(out).toContain('vscode://file/');
+      expect(out).toContain('/path/to/file.css:10:5');
+    });
+  });
+});
