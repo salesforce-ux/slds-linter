@@ -1,4 +1,4 @@
-import { detectCurrentEditor, getEditorLink } from '../src/utils/editorLinkUtil';
+import { detectCurrentEditor, getEditorLink } from '../../src/utils/editorLinkUtil';
 
 describe('Editor Link Utilities', () => {
   const originalEnv = process.env;

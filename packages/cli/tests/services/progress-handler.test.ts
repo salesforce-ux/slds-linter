@@ -1,4 +1,4 @@
-import { ProgressHandler } from '../src/services/progress-handler';
+import { ProgressHandler } from '../../src/services/progress-handler';
 
 describe('ProgressHandler', () => {
   // Suppress console output during tests
