@@ -9,10 +9,10 @@
   ],
   "packageManager": "yarn@4.2.2",
   "engines": {
-    "node": ">=20.18.3"
+    "node": "24.x"
   },
   "scripts": {
-    "postinstall": "husky install",
+    "postinstall": "node -e \"try{require('child_process').execSync('husky install',{stdio:'inherit'})}catch(e){console.log('husky install skipped')}\"",
     "preinstall": "./scripts/validate-setup.sh",
     "test": "yarn workspaces foreach -At --jobs 1 run test",
     "build": "yarn workspaces foreach -At  --jobs 1 run build",
