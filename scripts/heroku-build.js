@@ -22,8 +22,7 @@ console.log('🔧 Running additional commands...');
 const additionalCommands = [
   'yarn test --coverage',
   'node ./packages/cli/build/index.js report "demo/**"',
-  'node scripts/sarif-to-html-report.js',
-  'cp -rf ./packages/stylelint-plugin-slds/coverage/lcov-report ./site/stylelint-plugin-coverage',
+  'node scripts/sarif-to-html-report.js',  
   'cp -rf ./packages/eslint-plugin-slds/coverage/lcov-report ./site/eslint-plugin-coverage',
   'cp -rf ./packages/cli/coverage/lcov-report ./site/cli-coverage'
 ];

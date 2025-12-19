@@ -1,8 +1,9 @@
 import { ESLint } from 'eslint';
+import { isMainThread } from 'worker_threads';
 import { BaseWorker } from './base.worker';
 import { WorkerConfig, WorkerResult } from '../types';
 
-class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
+export class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
   private eslint: ESLint;
 
   constructor() {
@@ -37,9 +38,10 @@ class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
   }
 }
 
-// Initialize and start the worker
-const worker = new ESLintWorker();
-worker.process().catch(error => {
-  console.error('Worker failed:', error);
-  process.exit(1);
-}); 
+if (!isMainThread) {
+  const worker = new ESLintWorker();
+  worker.process().catch(error => {
+    console.error('Worker failed:', error);
+    process.exit(1);
+  });
+}
