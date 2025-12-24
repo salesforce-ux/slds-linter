@@ -103,5 +103,34 @@ describe('custom-mapping-utils', () => {
       expect(hook1).toBe('--slds-g-color-surface-container-1');
       expect(hook2).toBe('--slds-g-color-surface-container-1');
     });
+
+    it('returns null when property pattern does not match (no wildcard match)', () => {
+      const customMappingWithWildcard = {
+        '--slds-g-color-custom': {
+          properties: ['background*'],
+          values: ['#fff']
+        }
+      };
+      const hook = getCustomMapping('color', '#fff', customMappingWithWildcard);
+      expect(hook).toBeNull();
+    });
+
+    it('returns null when property matches but value does not match', () => {
+      const hook = getCustomMapping('background-color', '#000', customMapping);
+      expect(hook).toBeNull();
+    });
+
+    it('handles property pattern that does not end with wildcard', () => {
+      const customMappingExact = {
+        '--slds-g-color-custom': {
+          properties: ['background'], // No wildcard
+          values: ['#fff']
+        }
+      };
+      const hook1 = getCustomMapping('background', '#fff', customMappingExact);
+      const hook2 = getCustomMapping('background-color', '#fff', customMappingExact);
+      expect(hook1).toBe('--slds-g-color-custom');
+      expect(hook2).toBeNull(); // Should not match because no wildcard
+    });
   });
 });

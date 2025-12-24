@@ -148,6 +148,17 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
         messageId: 'deprecatedToken',
         type: 'Identifier'
       }]
+    },
+
+    // Token with SLDS mapping but no fallback value (should still work)
+    {
+      code: `.example { color: token(brandPrimary); }`,
+      output: `.example { color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary, #1b96ff)); }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'deprecatedToken',
+        type: 'Identifier'
+      }]
     }
   ]
 });

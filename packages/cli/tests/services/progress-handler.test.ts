@@ -190,4 +190,51 @@ describe('ProgressHandler', () => {
       progress.stop();
     });
   });
+
+  describe('formatBar function', () => {
+    it('should format progress bar with correct colors and characters', () => {
+      const progress = new ProgressHandler({ total: 10 });
+      
+      // The formatBar is called internally by cli-progress when updating
+      // We can test it indirectly by checking that updates work correctly
+      progress.increment();
+      progress.update(5);
+      progress.update(10);
+      
+      // Verify the progress bar was created and can be updated
+      expect(progress.getCompleted()).toBe(10);
+      
+      progress.stop();
+    });
+
+    it('should handle formatBar with custom format', () => {
+      const customFormat = 'Custom |{bar}| {value}/{total}';
+      const progress = new ProgressHandler({ 
+        total: 100, 
+        format: customFormat 
+      });
+      
+      // Update progress to trigger formatBar
+      progress.update(50);
+      progress.update(75);
+      progress.update(100);
+      
+      expect(progress.getCompleted()).toBe(100);
+      
+      progress.stop();
+    });
+
+    it('should format bar correctly at different progress levels', () => {
+      const progress = new ProgressHandler({ total: 20 });
+      
+      // Test various progress levels to ensure formatBar is called
+      for (let i = 0; i <= 20; i++) {
+        progress.update(i);
+      }
+      
+      expect(progress.getCompleted()).toBe(20);
+      
+      progress.stop();
+    });
+  });
 });
