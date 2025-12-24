@@ -26,6 +26,9 @@ const jestConfig: JestConfigWithTsJest = {
     "json-summary"
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'yml', 'yaml'],
+  moduleNameMapper: {
+    '^@salesforce-ux/eslint-plugin-slds/rule-messages$': '<rootDir>/../eslint-plugin-slds/build/config/rule-messages.js',
+  },
   roots: ['<rootDir>'],
   testEnvironment: 'node',
   verbose: true,

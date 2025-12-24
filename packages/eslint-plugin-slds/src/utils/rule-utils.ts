@@ -16,12 +16,13 @@ export function isRuleEnabled(context: Rule.RuleContext, ruleName: string): bool
       
       if (Array.isArray(ruleConfig)) {
         return ruleConfig[0] === true;
-      } else if (ruleConfig !== undefined && ruleConfig !== null) {
-        return true;
       } else if (ruleConfig === false) {
         return false;
+      } else if (ruleConfig !== undefined && ruleConfig !== null) {
+        return true;
       }
     }
+    return false;
   } catch (error) {
     return false;
   }

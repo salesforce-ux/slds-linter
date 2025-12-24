@@ -55,4 +55,14 @@ describe('Unified plugin export', () => {
     expect(htmlConfig.files).toContain('**/*.html');
     expect(htmlConfig.rules['@salesforce-ux/slds/enforce-bem-usage']).toBe('error');
   });
+
+  it('should export sldsCssPlugin function', () => {
+    expect(plugin.sldsCssPlugin).toBeDefined();
+    expect(typeof plugin.sldsCssPlugin).toBe('function');
+    
+    const cssPlugins = plugin.sldsCssPlugin();
+    expect(cssPlugins).toBeDefined();
+    expect(cssPlugins.css).toBeDefined();
+    expect(cssPlugins['@salesforce-ux/slds']).toBe(plugin);
+  });
 }); 

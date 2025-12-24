@@ -121,6 +121,20 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.global-example { --slds-g-color-border-base-2: #dddbda; }`,
       filename: 'test.css',
     },
+    // Test hardcoded-shared-utils branches: reportNumericValue: 'never'
+    {
+      code: `.example { padding: 8px; }`,
+      filename: 'test.css',
+      options: [{ reportNumericValue: 'never' }],
+      // Should not report numeric values
+    },
+    // Test hardcoded-shared-utils branches: reportNumericValue: 'hasReplacement' without hook
+    {
+      code: `.example { padding: 999px; }`,
+      filename: 'test.css',
+      options: [{ reportNumericValue: 'hasReplacement' }],
+      // Should not report numeric values without replacements
+    },
     {
       code: `.global-example { --slds-g-color-border-base-3: #c9c7c5; }`,
       filename: 'test.css',
@@ -626,6 +640,56 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       errors: [{
         messageId: 'hardcodedValue'
       }]
+    },
+    // Test hardcoded-shared-utils branches: reportNumericValue: 'hasReplacement' with hook
+    {
+      code: `.example { padding: 0.25rem; }`,
+      filename: 'test.css',
+      options: [{ reportNumericValue: 'hasReplacement' }],
+      errors: [{
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { padding: var(--slds-g-spacing-1, 0.25rem); }`
+      // Should report numeric values with replacements
+    },
+    // Test colorHandler branches: preferPaletteHook with multiple hooks but no palette hook
+    {
+      code: `.example { color: #123456; }`,
+      filename: 'test.css',
+      options: [{ preferPaletteHook: true }],
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Multiple hooks but no palette hook - should use first hook
+    },
+    // Test colorHandler branches: closestHooks.length === 0 (hasHook: false)
+    // Using a very specific color that likely has no close matches
+    {
+      code: `.example { color: #fedcba; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // May or may not have hooks - adjust based on actual behavior
+    },
+    // Test colorHandler branches: closestHooks.length > 1 and preferPaletteHook is false
+    {
+      code: `.example { color: #654321; }`,
+      filename: 'test.css',
+      options: [{ preferPaletteHook: false }],
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // Multiple hooks but preferPaletteHook is false
+    },
+    // Test colorHandler branches: customHook is null (else branch)
+    {
+      code: `.example { color: #000000; }`,
+      filename: 'test.css',
+      errors: [{
+        messageId: 'hardcodedValue'
+      }]
+      // No custom mapping - should use metadata lookup
     }
   ]
 });

@@ -170,6 +170,21 @@ ruleTester.run("slds-modal-button-issue", rule, {
                 </button>
                 <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{heading}</h2>
             </header>`,
+    },
+    // Additional test cases for better coverage
+    // Test ensureButtonClasses message for lightning-button-icon without slds-button classes
+    {
+      code: `<lightning-button-icon variant="bare" class="slds-modal__close"></lightning-button-icon>`,
+      errors: [
+        { messageId: "ensureButtonClasses" }
+      ],
+      output: `<lightning-button-icon variant="bare" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>`,
+    },
+    // Test button with slds-button--icon-inverse (dash variant)
+    {
+      code: `<button class="slds-button slds-button_icon slds-modal__close slds-button--icon-inverse"></button>`,
+      errors: [{ messageId: "removeClass" }],
+      output: `<button class="slds-button slds-button_icon slds-modal__close"></button>`,
     }
 
   ],
