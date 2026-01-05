@@ -28,14 +28,13 @@ const yamlPlugin = {
 };
 
 /**
- * esbuild plugin to handle config JSON imports (eslint.rules*.json files)
+ * esbuild plugin to handle config JSON imports (eslint.rules.json and eslint.rules.internal.json)
  * This inlines the JSON content into the bundle instead of requiring external files
  */
 const configJsonPlugin = {
   name: 'json-inline',
   setup(build) {
-    // Only handle eslint.rules*.json files to avoid interfering with other JSON imports
-    build.onResolve({ filter: /eslint\.rules.*\.json$/ }, args => ({
+    build.onResolve({ filter: /eslint\.rules(\.internal)?\.json$/ }, args => ({
       path: basename(resolve(dirname(args.importer), args.path)),
       namespace: 'json-inline',
       external: false,  // Mark as internal to bundle into output
@@ -57,7 +56,7 @@ const externalPlugin = {
     build.onResolve({ filter: /.*/ }, args => {
       if (!args.importer) return null; // Entry points
       if (args.path.match(/\.ya?ml$/)) return null; // Let yamlPlugin handle
-      if (args.path.match(/eslint\.rules.*\.json$/)) return null; // Let configJsonPlugin handle
+      if (args.path.match(/eslint\.rules(\.internal)?\.json$/)) return null; // Let configJsonPlugin handle
       return { path: args.path, external: true };
     });
   },
