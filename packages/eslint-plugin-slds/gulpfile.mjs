@@ -28,6 +28,26 @@ const yamlPlugin = {
 };
 
 /**
+ * esbuild plugin to handle config JSON imports (eslint.rules.json and eslint.rules.internal.json)
+ * This inlines the JSON content into the bundle instead of requiring external files
+ */
+const configJsonPlugin = {
+  name: 'json-inline',
+  setup(build) {
+    build.onResolve({ filter: /eslint\.rules(\.internal)?\.json$/ }, args => ({
+      path: basename(resolve(dirname(args.importer), args.path)),
+      namespace: 'json-inline',
+      external: false,  // Mark as internal to bundle into output
+      pluginData: { originalPath: resolve(dirname(args.importer), args.path) }
+    }));
+    build.onLoad({ filter: /.*/, namespace: 'json-inline' }, args => ({
+      contents: `module.exports = ${readFileSync(args.pluginData.originalPath, 'utf8')};`,
+      loader: 'js',
+    }));
+  },
+};
+
+/**
  * esbuild plugin to externalize local imports
  */
 const externalPlugin = {
@@ -36,6 +56,7 @@ const externalPlugin = {
     build.onResolve({ filter: /.*/ }, args => {
       if (!args.importer) return null; // Entry points
       if (args.path.match(/\.ya?ml$/)) return null; // Let yamlPlugin handle
+      if (args.path.match(/eslint\.rules(\.internal)?\.json$/)) return null; // Let configJsonPlugin handle
       return { path: args.path, external: true };
     });
   },
@@ -47,7 +68,7 @@ function cleanDirs(){
 
 const compileTs = async () => {
   const isInternal = process.env.TARGET_PERSONA === 'internal';
-  const plugins = [yamlPlugin, externalPlugin];
+  const plugins = [yamlPlugin, configJsonPlugin, externalPlugin];
   
   if (isInternal) {
     plugins.push(
