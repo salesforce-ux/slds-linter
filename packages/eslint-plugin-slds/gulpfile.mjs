@@ -57,6 +57,7 @@ const externalPlugin = {
     build.onResolve({ filter: /.*/ }, args => {
       if (!args.importer) return null; // Entry points
       if (args.path.match(/\.ya?ml$/)) return null; // Let yamlPlugin handle
+      if (args.path.match(/eslint\.rules.*\.json$/)) return null; // Let configJsonPlugin handle
       return { path: args.path, external: true };
     });
   },
