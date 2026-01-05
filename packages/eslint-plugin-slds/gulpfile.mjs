@@ -28,7 +28,28 @@ const yamlPlugin = {
 };
 
 /**
- * esbuild plugin to externalize local imports
+ * esbuild plugin to handle config JSON imports (eslint.rules*.json files)
+ * This inlines the JSON content into the bundle instead of requiring external files
+ */
+const configJsonPlugin = {
+  name: 'json-inline',
+  setup(build) {
+    // Only handle eslint.rules*.json files to avoid interfering with other JSON imports
+    build.onResolve({ filter: /eslint\.rules.*\.json$/ }, args => ({
+      path: basename(resolve(dirname(args.importer), args.path)),
+      namespace: 'json-inline',
+      external: false,  // Mark as internal to bundle into output
+      pluginData: { originalPath: resolve(dirname(args.importer), args.path) }
+    }));
+    build.onLoad({ filter: /.*/, namespace: 'json-inline' }, args => ({
+      contents: `module.exports = ${readFileSync(args.pluginData.originalPath, 'utf8')};`,
+      loader: 'js',
+    }));
+  },
+};
+
+/**
+  * esbuild plugin to externalize local imports
  */
 const externalPlugin = {
   name: 'external',
@@ -47,7 +68,8 @@ function cleanDirs(){
 
 const compileTs = async () => {
   const isInternal = process.env.TARGET_PERSONA === 'internal';
-  const plugins = [yamlPlugin, externalPlugin];
+  
+  const plugins = [yamlPlugin, configJsonPlugin, externalPlugin];
   
   if (isInternal) {
     plugins.push(
