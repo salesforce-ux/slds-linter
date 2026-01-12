@@ -6,18 +6,18 @@
 # =============================================================================
 
 no-slds-class-overrides:
-  description: "Create new custom CSS classes instead of overriding SLDS selectors"
+  description: "Create new custom CSS classes instead of overriding SLDS selectors. For more information, see the Lightning Web Components Developer Guide."
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-class-overrides"
   type: "problem"
   messages:
-    sldsClassOverride: "Overriding .{{className}} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button."
+    sldsClassOverride: "Overriding {{className}} isn't supported. To differentiate SLDS and custom classes, create a CSS class in your namespace. Examples: myapp-input, myapp-button"
 
 no-deprecated-slds-classes:
-  description: "Please replace the deprecated classes with a modern equivalent"
+  description: "Replace classes that aren't available with SLDS 2 classes. See lightningdesignsystem.com for more info."
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-slds-classes"
   type: "problem"
   messages:
-    deprecatedClass: "The class {{className}} is deprecated and not available in SLDS2. Please update to a supported class."
+    deprecatedClass: "The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more info."
 
 no-deprecated-tokens-slds1:
   description: "Update outdated design tokens to SLDS 2 styling hooks with similar values. For more information, see Styling Hooks on lightningdesignsystem.com."
@@ -56,14 +56,14 @@ modal-close-button-issue:
     changeVariant: "Change the variant attribute value from bare-inverse to bare in <lightning-button-icon> or <lightning-icon>."
     removeVariant: "Remove the variant attribute from the <lightning-icon> component inside the <button> element."
     ensureButtonClasses: "Add or move slds-button and slds-button_icon to the class attribute of the <button> element or <lightning-button-icon> component."
-    ensureSizeAttribute: "To size icons properly, set the size attribute ‌to large in the <lightning-icon> and <lightning-button-icon> components."
+    ensureSizeAttribute: "To size icons properly, set the size attribute to large in the <lightning-icon> and <lightning-button-icon> components."
 
 no-deprecated-classes-slds2:
-  description: "Replace classes that aren't available with SLDS 2 classes"
+  description: "Replace classes that aren't available with SLDS 2 classes. See lightningdesignsystem.com for more info."
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-deprecated-classes-slds2"
   type: "problem"
   messages:
-    deprecatedClass: "The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more information."
+    deprecatedClass: "The class {{className}} isn't available in SLDS 2. Update it to a class supported in SLDS 2. See lightningdesignsystem.com for more info."
     updateToModernClass: "Replace deprecated class with modern equivalent"
     checkDocumentation: "See lightningdesignsystem.com for SLDS 2 class alternatives"
 
@@ -72,7 +72,7 @@ lwc-token-to-slds-hook:
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#lwc-token-to-slds-hook"
   type: "problem"
   messages:
-    errorWithReplacement: "The '{{oldValue}}' design token is deprecated. Replace it with '{{newValue}}'. For more info, see Global Styling Hooks on lightningdesignsystem.com."
+    errorWithReplacement: "The '{{oldValue}}' design token is deprecated. Replace it with the SLDS 2 '{{newValue}}' styling hook and set the fallback to '{{oldValue}}'. For more info, see Global Styling Hooks on lightningdesignsystem.com."
     errorWithStyleHooks: "The '{{oldValue}}' design token is deprecated. Replace it with the SLDS 2 '{{newValue}}' styling hook and set the fallback to '{{oldValue}}'. For more info, see Global Styling Hooks on lightningdesignsystem.com."
     errorWithNoRecommendation: "The '{{oldValue}}' design token is deprecated. For more info, see the New Global Styling Hook Guidance on lightningdesignsystem.com."
 
@@ -84,11 +84,11 @@ no-sldshook-fallback-for-lwctoken:
     unsupportedFallback: "Remove the {{sldsToken}} styling hook that is used as a fallback value for {{lwcToken}}."
 
 no-unsupported-hooks-slds2:
-  description: "Identifies styling hooks that aren't present in SLDS 2. They must be replaced with styling hooks that have a similar effect, or they must be removed."
+  description: "Replace deprecated --slds styling hooks. See lightningdesignsystem.com for more info."
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-unsupported-hooks-slds2"
   type: "problem"
   messages:
-    deprecated: "The {{token}} styling hook isn't present in SLDS 2 and there's no equivalent replacement. Remove it or replace it with a styling hook with a similar effect."
+    deprecated: "The '{{token}}' styling hook isn't present in SLDS 2 and there's no equivalent replacement. Remove it or replace it with a styling hook with a similar effect."
 
 no-slds-var-without-fallback:
   description: "Add fallback values to SLDS styling hooks. The fallback values are used in Salesforce environments where styling hooks are unavailable."
@@ -109,7 +109,7 @@ no-slds-private-var:
   url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-private-var"
   type: "problem"
   messages:
-    privateVar: "This styling hook is reserved for internal Salesforce use. Remove the --_slds- or –slds-s private variable within selector {{prop}}. For more information, look up private CSS in lightningdesignsystem.com."
+    privateVar: "This styling hook is reserved for internal Salesforce use. Remove the --_slds- or --slds-s private variable within selector {{prop}}. For more information, look up private CSS in lightningdesignsystem.com."
 
 enforce-component-hook-naming-convention:
   description: "Replace component styling hooks that use a deprecated naming convention."
@@ -140,4 +140,3 @@ reduce-annotations:
   type: "problem"
   messages:
     removeAnnotation: "Remove this annotation and update the code to SLDS best practices. For help, file an issue at https://github.com/salesforce-ux/slds-linter/"
-
