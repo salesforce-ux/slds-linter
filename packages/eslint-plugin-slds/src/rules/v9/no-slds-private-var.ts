@@ -1,5 +1,5 @@
 import { Rule } from 'eslint';
-import ruleMessages from '../../config/rule-messages.yml';
+import ruleMessages from '../../config/rule-messages';
 
 const ruleConfig = ruleMessages['no-slds-private-var'];
 const { type, description, url, messages } = ruleConfig;

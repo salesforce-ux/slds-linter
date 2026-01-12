@@ -308,9 +308,9 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       code: `.example { border: #0000ff var(--fallback-width, 2px) solid; }`,
       filename: 'test.css',
       errors: [{
-        messageId: 'noReplacement'
+        messageId: 'hardcodedValue'
       }]
-      // Should detect #0000ff but no hook available for this color
+      // Should detect #0000ff
     },
     // Line-height with no styling hook available
     {
@@ -483,13 +483,14 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       }],
       output: `.example { font-weight: var(--slds-g-font-weight-4, 400); }`
     },
-    // Font-weight keyword 'bold' - no hook available
+    // Font-weight keyword 'bold' with single suggestion
     {
       code: `.example { font-weight: bold; }`,
       filename: 'test.css',
       errors: [{ 
-        messageId: 'noReplacement'
-      }]
+        messageId: 'hardcodedValue'
+      }],
+      output: `.example { font-weight: var(--slds-g-font-weight-bold, bold); }`
     },
 
     // Font shorthand tests
@@ -503,15 +504,15 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       ],
       output: `.example { font: var(--slds-g-font-weight-7, 700) 16px Arial; }`
     },
-    // Font shorthand: keyword weight + size + family (bold has no hook, but font-size does)
+    // Font shorthand: keyword weight + size + family (bold now has hook)
     {
       code: `.example { font: bold 1rem 'Helvetica Neue'; }`,
       filename: 'test.css',
       errors: [
-        { messageId: 'noReplacement' }, // font-weight: bold (no hook available)
+        { messageId: 'hardcodedValue' }, // font-weight: bold (has hook now)
         { messageId: 'hardcodedValue' }  // font-size: 1rem
       ],
-      output: `.example { font: bold var(--slds-g-font-scale-2, 1rem) 'Helvetica Neue'; }`
+      output: `.example { font: var(--slds-g-font-weight-bold, bold) 1rem 'Helvetica Neue'; }`
     },
     // Font shorthand: size/line-height + family (line-height not parsed from shorthand yet)
     {
@@ -542,15 +543,15 @@ ruleTester.run('no-hardcoded-values-slds2', rule, {
       ],
       output: `.example { font: var(--slds-g-font-weight-4, 400) 120% Georgia; }`
     },
-    // Font shorthand: complex with multiple values (bold has no hook, font-size does)
+    // Font shorthand: complex with multiple values (bold now has hook)
     {
       code: `.example { font: bold 0.875rem/1.375 'Segoe UI', sans-serif; }`,
       filename: 'test.css',
       errors: [
-        { messageId: 'noReplacement' }, // font-weight: bold (no hook available)
+        { messageId: 'hardcodedValue' }, // font-weight: bold (has hook now)
         { messageId: 'hardcodedValue' } // font-size: 0.875rem (line-height parsing not implemented)
       ],
-      output: `.example { font: bold var(--slds-g-font-scale-1, 0.875rem)/1.375 'Segoe UI', sans-serif; }`
+      output: `.example { font: var(--slds-g-font-weight-bold, bold) 0.875rem/1.375 'Segoe UI', sans-serif; }`
     },
 
     // Edge cases and mixed scenarios

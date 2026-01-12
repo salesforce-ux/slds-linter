@@ -5,7 +5,14 @@ function isValueMatch(valueToMatch: ParsedUnitValue, sldsValue: ParsedUnitValue)
   if (!valueToMatch || !sldsValue) {
     return false;
   }
-  return valueToMatch.unit == sldsValue.unit && valueToMatch.number === sldsValue.number;
+  return valueToMatch.unit == sldsValue.unit && valueToMatch.value === sldsValue.value;
+}
+
+/**
+ * Check if a parsed value is a keyword (string) rather than a numeric value
+ */
+function isKeywordValue(parsedValue: ParsedUnitValue): parsedValue is { value: string; unit: null } {
+  return parsedValue !== null && typeof parsedValue.value === 'string';
 }
 
 /**
@@ -19,11 +26,27 @@ export function getStylingHooksForDensityValue(
 ): string[] {
   if (!parsedValue) return [];
   
-  const alternateValue = toAlternateUnitValue(parsedValue.number, parsedValue.unit);
-  const matchedHooks = [];
+  const matchedHooks: string[] = [];
+
+  // Handle keyword values (e.g., 'bold', 'normal') with direct string match
+  if (isKeywordValue(parsedValue)) {
+    const keywordLower = parsedValue.value.toLowerCase();
+    for (const [sldsValue, hooks] of Object.entries(supportedStylinghooks)) {
+      if (sldsValue.toLowerCase() === keywordLower) {
+        hooks
+          .filter((hook: ValueToStylingHookEntry) => hook.properties.includes(cssProperty))
+          .forEach((hook) => matchedHooks.push(hook.name));
+      }
+    }
+    return matchedHooks;
+  }
+
+  // Handle numeric values with unit conversion
+  const alternateValue = typeof parsedValue.value === 'number' 
+    ? toAlternateUnitValue(parsedValue.value, parsedValue.unit)
+    : null;
 
   for (const [sldsValue, hooks] of Object.entries(supportedStylinghooks)) {
-    // parsing SLDS metadata values
     const parsedSldsValue = parseUnitValue(sldsValue);
     if (isValueMatch(parsedValue, parsedSldsValue) || (alternateValue && isValueMatch(alternateValue, parsedSldsValue))) {
       hooks

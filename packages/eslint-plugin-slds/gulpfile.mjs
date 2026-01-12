@@ -1,7 +1,7 @@
 import * as esbuild from 'esbuild';
-import { series, src, dest } from 'gulp';
-import { rimraf} from 'rimraf'
-import {task} from "gulp-execa";
+import { series } from 'gulp';
+import { rimraf } from 'rimraf';
+import { task } from "gulp-execa";
 import pkg from "./package.json" with {type:"json"};
 import { conditionalReplacePlugin } from 'esbuild-plugin-conditional-replace';
 import { parse } from 'yaml';
@@ -17,7 +17,7 @@ const yamlPlugin = {
     build.onResolve({ filter: /\.ya?ml$/ }, args => ({
       path: basename(resolve(dirname(args.importer), args.path)),
       namespace: 'yaml-file',
-      external: false,  // Mark as internal to bundle into output
+      external: false,
       pluginData: { originalPath: resolve(dirname(args.importer), args.path) }
     }));
     build.onLoad({ filter: /.*/, namespace: 'yaml-file' }, args => ({
@@ -28,20 +28,47 @@ const yamlPlugin = {
 };
 
 /**
- * Clean all generated folder
- * @returns
+ * esbuild plugin to handle config JSON imports (eslint.rules.json and eslint.rules.internal.json)
+ * This inlines the JSON content into the bundle instead of requiring external files
  */
+const configJsonPlugin = {
+  name: 'json-inline',
+  setup(build) {
+    build.onResolve({ filter: /eslint\.rules(\.internal)?\.json$/ }, args => ({
+      path: basename(resolve(dirname(args.importer), args.path)),
+      namespace: 'json-inline',
+      external: false,  // Mark as internal to bundle into output
+      pluginData: { originalPath: resolve(dirname(args.importer), args.path) }
+    }));
+    build.onLoad({ filter: /.*/, namespace: 'json-inline' }, args => ({
+      contents: `module.exports = ${readFileSync(args.pluginData.originalPath, 'utf8')};`,
+      loader: 'js',
+    }));
+  },
+};
+
+/**
+ * esbuild plugin to externalize local imports
+ */
+const externalPlugin = {
+  name: 'external',
+  setup(build) {
+    build.onResolve({ filter: /.*/ }, args => {
+      if (!args.importer) return null; // Entry points
+      if (args.path.match(/\.ya?ml$/)) return null; // Let yamlPlugin handle
+      if (args.path.match(/eslint\.rules(\.internal)?\.json$/)) return null; // Let configJsonPlugin handle
+      return { path: args.path, external: true };
+    });
+  },
+};
+
 function cleanDirs(){
     return rimraf(['build']);
 }
 
- /**
-  * Compile typescript files with version injection
-  * */
 const compileTs = async () => {
   const isInternal = process.env.TARGET_PERSONA === 'internal';
-  
-  const plugins = [yamlPlugin];
+  const plugins = [yamlPlugin, configJsonPlugin, externalPlugin];
   
   if (isInternal) {
     plugins.push(
@@ -65,6 +92,7 @@ const compileTs = async () => {
     entryPoints: ["./src/**/*.ts"],
     bundle: true,
     outdir: "build",
+    outbase: "src",
     platform: "node",
     format: "cjs",
     packages: 'external',
@@ -76,10 +104,6 @@ const compileTs = async () => {
   });
 };
 
-/**
- * ESBuild by default won't generate definition file. There are multiple ways 
- * to generate definition files. But we are relying on tsc for now
- */
 const generateDefinitions = task('tsc --project tsconfig.json');
 
 export const build = series(cleanDirs, compileTs, generateDefinitions);

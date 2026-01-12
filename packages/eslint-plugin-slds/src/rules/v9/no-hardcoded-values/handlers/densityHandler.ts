@@ -55,8 +55,8 @@ function createDimensionReplacement(
   }
 
   const rawValue = parsedDimension.unit 
-    ? `${parsedDimension.number}${parsedDimension.unit}`
-    : parsedDimension.number.toString();
+    ? `${parsedDimension.value}${parsedDimension.unit}`
+    : parsedDimension.value.toString();
 
   // Check custom mapping first
   const customHook = getCustomMapping(cssProperty, rawValue, context.options?.customMapping);

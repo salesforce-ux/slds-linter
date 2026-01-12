@@ -223,7 +223,7 @@ function extractDimensionValue(valueNode: any, cssProperty?: string): ParsedUnit
       if (!ALLOWED_UNITS.includes(unit)) return null; // Support only allowed units
       
       return {
-        number: numValue,
+        value: numValue,
         unit: unit as 'px' | 'rem' | '%' | 'em' | 'ch'
       };
       
@@ -233,7 +233,7 @@ function extractDimensionValue(valueNode: any, cssProperty?: string): ParsedUnit
       if (numberValue === 0) return null; // Skip zero values
       
       return {
-        number: numberValue,
+        value: numberValue,
         unit: null
       };
       
@@ -243,7 +243,7 @@ function extractDimensionValue(valueNode: any, cssProperty?: string): ParsedUnit
       if (percentValue === 0) return null; // Skip zero values
       
       return {
-        number: percentValue,
+        value: percentValue,
         unit: '%'
       };
       
@@ -300,7 +300,7 @@ function extractFontValue(node: any): ParsedUnitValue | null {
       if (!ALLOWED_UNITS.includes(unit)) return null;
       
       return {
-        number: numValue,
+        value: numValue,
         unit: unit as 'px' | 'rem' | '%' | 'em' | 'ch'
       };
       
@@ -317,7 +317,7 @@ function extractFontValue(node: any): ParsedUnitValue | null {
       }
       
       return {
-        number: numberValue,
+        value: numberValue,
         unit: null
       };
       
@@ -332,12 +332,12 @@ function extractFontValue(node: any): ParsedUnitValue | null {
       
       // Convert known keywords to numeric values
       if (namedValue === 'normal') {
-        return { number: 400, unit: null };
+        return { value: 400, unit: null };
       }
       
       // For other keywords (bolder, lighter), we can't determine exact numeric value
       // but we know they're valid font-weight values
-      return { number: namedValue, unit: null };
+      return { value: namedValue, unit: null };
       
     case 'Percentage':
       // Percentage values for font-size
@@ -345,7 +345,7 @@ function extractFontValue(node: any): ParsedUnitValue | null {
       if (percentValue === 0) return null; // Skip zero values
       
       return {
-        number: percentValue,
+        value: percentValue,
         unit: '%'
       };
       

@@ -2,6 +2,7 @@
   background: white;
   --slds-c-accordion-section-color-background: var(--slds-c-accordion-section-color-background);
   box-shadow: t(shadowButtonFocus);
+  font-weight: bold;
 }
 
 .wrapper {

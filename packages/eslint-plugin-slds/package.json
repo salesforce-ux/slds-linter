@@ -1,25 +1,20 @@
 {
   "name": "@salesforce-ux/eslint-plugin-slds",
-  "version": "1.0.8-internal",
+  "version": "1.1.0",
   "main": "build/index.js",
   "exports": {
     ".": {
       "types": "./build/index.d.ts",
-      "import": "./build/index.js",
-      "require": "./build/index.js"
+      "default": "./build/index.js"
     },
-    "./config": {
-      "import": "./eslint.config.mjs",
-      "require": "./eslint.config.mjs"
-    },
-    "./rule-messages.yml": "./src/config/rule-messages.yml"
+    "./config": "./eslint.config.mjs",
+    "./rule-messages": "./build/config/rule-messages.js"
   },
   "files": [
     "build/**",
     "README.md",
     "RULES.md",
-    "eslint.config.mjs",
-    "src/config/rule-messages.yml"
+    "eslint.config.mjs"
   ],
   "engines": {
     "node": ">=18.18.0"
