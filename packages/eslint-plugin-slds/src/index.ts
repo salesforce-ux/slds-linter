@@ -4,7 +4,6 @@ import enforceBemUsage from './rules/enforce-bem-usage';
 import noDeprecatedClassesSlds2 from './rules/no-deprecated-classes-slds2';
 import modalCloseButtonIssue from './rules/modal-close-button-issue';
 import noSldsClassOverrides from './rules/v9/no-slds-class-overrides';
-import noDeprecatedSldsClasses from './rules/v9/no-deprecated-slds-classes';
 import noDeprecatedTokensSlds1 from './rules/v9/no-deprecated-tokens-slds1';
 import lwcTokenToSldsHook from './rules/v9/lwc-token-to-slds-hook';
 import enforceSdsToSldsHooks from './rules/v9/enforce-sds-to-slds-hooks';
@@ -30,7 +29,6 @@ const rules = {
   "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
   "modal-close-button-issue": modalCloseButtonIssue,
   "no-slds-class-overrides": noSldsClassOverrides,
-  "no-deprecated-slds-classes": noDeprecatedSldsClasses,
   "no-deprecated-tokens-slds1": noDeprecatedTokensSlds1,
   "lwc-token-to-slds-hook": lwcTokenToSldsHook,
   "enforce-sds-to-slds-hooks": enforceSdsToSldsHooks,
