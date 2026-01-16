@@ -11,3 +11,6 @@ if git diff --cached --name-only --diff-filter=ACMR | grep -q '^packages/.*\.ts$
 else
   echo "Skipping coverage update as there are no staged TypeScript files changed in the packages directory"
 fi
+
+# Run build and lint check, compare with last commit
+./scripts/pre-commit-lint-check.sh
