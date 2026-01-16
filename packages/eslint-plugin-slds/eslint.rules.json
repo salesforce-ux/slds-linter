@@ -1,7 +1,7 @@
 {
   "css": {
     "@salesforce-ux/slds/no-slds-class-overrides": "warn",
-    "@salesforce-ux/slds/no-deprecated-slds-classes": "warn",
+    "@salesforce-ux/slds/no-deprecated-classes-slds2": "warn",
     "@salesforce-ux/slds/lwc-token-to-slds-hook": "error",
     "@salesforce-ux/slds/enforce-sds-to-slds-hooks": "warn",
     "@salesforce-ux/slds/no-sldshook-fallback-for-lwctoken": "warn",
