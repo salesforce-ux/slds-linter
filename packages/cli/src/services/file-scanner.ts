@@ -5,7 +5,7 @@ import { Logger } from "../utils/logger";
 import { ScanOptions, ScanResult } from "../types";
 
 export class FileScanner {
-  private static DEFAULT_BATCH_SIZE = 100;
+  static DEFAULT_BATCH_SIZE = 100;
 
   /**
    * Scans directory for files matching the given patterns
@@ -110,7 +110,7 @@ export class FileScanner {
   /**
    * Splits array of files into batches
    */
-  private static createBatches(files: string[], batchSize: number): string[][] {
+  static createBatches(files: string[], batchSize: number): string[][] {
     const batches: string[][] = [];
     for (let i = 0; i < files.length; i += batchSize) {
       batches.push(files.slice(i, i + batchSize));

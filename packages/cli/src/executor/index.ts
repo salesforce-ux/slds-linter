@@ -113,5 +113,43 @@ export async function report(config: ReportConfig, results?: LintResult[]): Prom
   }
 }
 
+/**
+ * This function supports user to supply array of files to be linted
+ * 
+ * @param files Array of file paths to be linted
+ * @param config Linting configuration options
+ * @returns Promise resolving to an array of lint results
+ * @throws Error if linting fails or if any file is not found
+ */
+export async function lintFiles(files: string[], config: LintConfig): Promise<LintResult[]> {
+  try {
+    Logger.debug('Starting linting with Node API');
+    // Normalize configuration to ensure all required fields have values
+    const normalizedConfig = normalizeCliOptions(config, {
+      configEslint: DEFAULT_ESLINT_CONFIG_PATH,
+    });
+
+    const batches = FileScanner.createBatches(files, FileScanner.DEFAULT_BATCH_SIZE);
+    Logger.debug(
+      `Found ${files.length} files, split into ${batches.length} batches`
+    );
+    
+    // Run ESLint on all files
+    const results = await LintRunner.runLinting(batches, {
+      fix: normalizedConfig.fix,
+      configPath: normalizedConfig.configEslint,
+      // when linting files, use the directory of the files as the working directory
+      cwd: normalizedConfig.directory
+    });
+
+    return results;
+  } catch (error: any) {
+    // Enhance error with context for better debugging
+    const errorMessage = `Linting failed: ${error.message}`;
+    Logger.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+}
+
 
 export type { LintResult, LintResultEntry, LintConfig, ReportConfig, ExitCode, WorkerResult, SarifResultEntry } from '../types'; 

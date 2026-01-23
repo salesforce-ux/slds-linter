@@ -26,7 +26,8 @@ export class LintRunner {
       
       const workerConfig: WorkerConfig = {
         configPath,
-        fix: options.fix
+        fix: options.fix,
+        cwd: options.cwd
       };
 
       const results = await BatchProcessor.processBatches(

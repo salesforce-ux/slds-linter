@@ -56,7 +56,9 @@ describe('lintResultsUtil', () => {
           { severity: 2, message: 'no-loc', line: undefined, column: undefined }
         ]
       } as any
-    ], 'vscode');
+    ], {
+      editor: 'vscode'
+    });
 
     expect(summary.totalErrors).toBe(2);
     expect(summary.totalWarnings).toBe(1);

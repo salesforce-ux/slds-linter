@@ -8,10 +8,16 @@ export class ESLintWorker extends BaseWorker<WorkerConfig, WorkerResult> {
 
   constructor() {
     super();
-    this.eslint = new ESLint({
+
+    const linterOptions:ESLint.Options = {
       overrideConfigFile: this.task.config.configPath,
-      fix: this.task.config.fix
-    });
+      fix: this.task.config.fix,
+    };
+    if("cwd" in this.task.config){
+      linterOptions.cwd = this.task.config.cwd;
+    }
+
+    this.eslint = new ESLint(linterOptions);
   }
 
   protected async processFile(filePath: string): Promise<WorkerResult> {

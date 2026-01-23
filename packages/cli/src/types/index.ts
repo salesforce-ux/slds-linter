@@ -32,13 +32,6 @@ export interface ReportConfig extends BaseConfig {
   format?: 'sarif' | 'csv';
 }
 
-export interface LintRunnerOptions {
-  fix?: boolean;
-  configPath?: string;
-  maxWorkers?: number;
-  timeoutMs?: number;
-}
-
 
 export type LintResultEntry = Linter.LintMessage;
 
@@ -50,6 +43,12 @@ export type ExitCode = 0 | 1 | 2;
 export interface WorkerConfig {
   configPath?: string;
   fix?: boolean;
+  cwd?: string;
+}
+
+export interface LintRunnerOptions extends WorkerConfig {
+  maxWorkers?: number;
+  timeoutMs?: number;
 }
 
 export interface WorkerResult{
@@ -90,4 +89,9 @@ export interface ScanOptions {
 export interface ScanResult {
   filesCount: number;
   batches: string[][];
+}
+
+export interface PrintOptions {
+  editor?: string;
+  cwd?: string;
 }
