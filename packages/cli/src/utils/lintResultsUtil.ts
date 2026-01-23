@@ -4,7 +4,7 @@ import path from 'path';
 import { createClickableLineCol } from './editorLinkUtil';
 import { Logger } from '../utils/logger';
 import { Colors } from './colors';
-import { LintResult, LintResultEntry, SarifResultEntry, LintResultSummary } from '../types';
+import { LintResult, LintResultEntry, SarifResultEntry, LintResultSummary, PrintOptions } from '../types';
 
 /**
  * 
@@ -85,7 +85,7 @@ function printFixableViolationsSummary(fixableErrors: number, fixableWarnings: n
  * @param results - Array of lint results.
  * @param editor - The chosen editor for clickable links (e.g., "vscode", "atom", "sublime"). If not provided, will auto-detect.
  */
-export function printLintResults(results: LintResult[], editor?: string): LintResultSummary {
+export function printLintResults(results: LintResult[], options?: PrintOptions): LintResultSummary {
   let totalErrors = 0;
   let totalWarnings = 0;
   let fixableErrors = 0;
@@ -96,7 +96,7 @@ export function printLintResults(results: LintResult[], editor?: string): LintRe
     if (!result.messages || result.messages.length === 0) return;
 
     const absolutePath = result.filePath || '';
-    const relativeFile = path.relative(process.cwd(), absolutePath) || 'Unknown file';
+    const relativeFile = path.relative(options?.cwd || process.cwd(), absolutePath) || 'Unknown file';
     
     // Print file name with a preceding new line for spacing.
     console.log(`\n${Colors.info.underline(relativeFile)}\n`);
@@ -120,7 +120,7 @@ export function printLintResults(results: LintResult[], editor?: string): LintRe
       // Create clickable line:column link
       const lineCol = msg.line && msg.column ? `${msg.line}:${msg.column}` : '-';
       const clickableLineCol = msg.line && msg.column 
-        ? createClickableLineCol(lineCol, absolutePath, msg.line, msg.column, editor)
+        ? createClickableLineCol(lineCol, absolutePath, msg.line, msg.column, options?.editor)
         : lineCol;
       
       const severityText = isError ? Colors.error('error') : Colors.warning('warning');
