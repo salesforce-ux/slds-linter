@@ -6,7 +6,7 @@ import { SarifBuilder, SarifRunBuilder, SarifResultBuilder, SarifRuleBuilder } f
 import { createWriteStream } from 'fs';
 import { JsonStreamStringify } from 'json-stream-stringify';
 import { getRuleDescription } from './config.resolver';
-import { parseText, replaceNamespaceinRules, transformedResults } from '../utils/lintResultsUtil';
+import { parseText, replaceNamespaceinRules, toCSVRow, toSarifResult } from '../utils/lintResultsUtil';
 import { Readable } from 'stream';
 import { processArtifacts } from './artifact-processor';
 
@@ -147,12 +147,12 @@ export class ReportGenerator {
   /**
    * Add lint results to SARIF report
    */
-  private static addResultsToSarif(
+  private static addResultsToSarif( 
     runBuilder: SarifRunBuilder,
     lintResult: LintResult
   ): void {
     lintResult.messages.forEach((message)=>{
-      const resultBuilder = new SarifResultBuilder().initSimple(transformedResults(lintResult, message, 'error'));
+      const resultBuilder = new SarifResultBuilder().initSimple(toSarifResult(lintResult, message));
       runBuilder.addResult(resultBuilder);
     });
   }
@@ -185,8 +185,7 @@ export class CsvReportGenerator {
   /**
    * Convert lint results to CSV-compatible data format
    */
-  private static convertResultsToCsvData(results: LintResult[]): any {
-    const cwd = process.cwd();
+  private static convertResultsToCsvData(results: LintResult[]): any {    
     
     // Create CSV config inline instead of using a separate method
     const csvConfig = mkConfig({
@@ -201,16 +200,7 @@ export class CsvReportGenerator {
     const transformedResults = [];
     results.forEach((result)=>{
       result.messages.forEach((message)=>{
-        transformedResults.push({
-          "File Path": path.relative(cwd, result.filePath),
-          "Message": parseText(message.message),
-          "Severity": 'error',
-          "Rule ID": replaceNamespaceinRules(message.ruleId || 'N/A'),
-          "Start Line": message.line,
-          "Start Column": message.column,
-          "End Line": message.endLine || message.line, // Default to start line if missing
-          "End Column": message.endColumn || message.column // Default to start column if missing
-        });
+        transformedResults.push(toCSVRow(result, message));
       });
     });
     

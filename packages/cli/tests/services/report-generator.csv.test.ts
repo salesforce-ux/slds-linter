@@ -15,7 +15,8 @@ describe('CsvReportGenerator', () => {
     await jest.unstable_mockModule('../../src/utils/lintResultsUtil', () => ({
       parseText: (s: string) => s,
       replaceNamespaceinRules: (s: string) => s,
-      transformedResults: () => ({}),
+      toSarifResult: () => ({}),
+      toCSVRow: () => ({})
     }));
 
     const { CsvReportGenerator } = await import('../../src/services/report-generator');
@@ -49,7 +50,8 @@ describe('CsvReportGenerator', () => {
     await jest.unstable_mockModule('../../src/utils/lintResultsUtil', () => ({
       parseText: (s: string) => s,
       replaceNamespaceinRules: (s: string) => s,
-      transformedResults: () => ({}),
+      toSarifResult: () => ({}),
+      toCSVRow: () => ({}),
     }));
 
     const { CsvReportGenerator } = await import('../../src/services/report-generator');
@@ -66,33 +68,5 @@ describe('CsvReportGenerator', () => {
     expect(outPath).toContain('slds-linter-report.csv');
     expect(writeFile).toHaveBeenCalled();
   });
-
-  it('falls back to N/A when ruleId is missing', async () => {
-    await jest.unstable_mockModule('export-to-csv', () => ({
-      mkConfig: () => ({ mocked: true }),
-      generateCsv: () => (rows: any[]) => rows,
-      asString: (data: any) => `csv:${Array.isArray(data) ? data.length : 0}`,
-    }));
-
-    const replaceNamespaceinRules = jest.fn((s: string) => s);
-    await jest.unstable_mockModule('../../src/utils/lintResultsUtil', () => ({
-      parseText: (s: string) => s,
-      replaceNamespaceinRules,
-      transformedResults: () => ({}),
-    }));
-
-    const { CsvReportGenerator } = await import('../../src/services/report-generator');
-
-    const csv = CsvReportGenerator.generateCsvString([
-      {
-        filePath: '/abs/a.css',
-        messages: [
-          { message: 'hello', line: 1, column: 2 }
-        ]
-      } as any
-    ]);
-
-    expect(csv).toBe('csv:1');
-    expect(replaceNamespaceinRules).toHaveBeenCalledWith('N/A');
-  });
+  
 });

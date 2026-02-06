@@ -95,3 +95,14 @@ export interface PrintOptions {
   editor?: string;
   cwd?: string;
 }
+
+export interface CsvRowEntry{
+    "File Path": string,
+    "Message": string,
+    "Severity": string,
+    "Rule ID": string,
+    "Start Line": number,
+    "Start Column": number,
+    "End Line": number,
+    "End Column": number
+}

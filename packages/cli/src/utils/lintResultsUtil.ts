@@ -4,7 +4,7 @@ import path from 'path';
 import { createClickableLineCol } from './editorLinkUtil';
 import { Logger } from '../utils/logger';
 import { Colors } from './colors';
-import { LintResult, LintResultEntry, SarifResultEntry, LintResultSummary, PrintOptions } from '../types';
+import { LintResult, LintResultEntry, SarifResultEntry, LintResultSummary, PrintOptions, CsvRowEntry } from '../types';
 
 /**
  * 
@@ -12,9 +12,7 @@ import { LintResult, LintResultEntry, SarifResultEntry, LintResultSummary, Print
  * @returns updated Rule id without the namespace @salesforce-ux
  */
 export function replaceNamespaceinRules(id: string) {
-  return id.includes("@salesforce-ux/")
-    ? id.replace("@salesforce-ux/", "")
-    : id;
+  return id?.replace("@salesforce-ux/", "") ?? 'N/A';
 }
 /**
  * 
@@ -152,15 +150,32 @@ export function printLintResults(results: LintResult[], options?: PrintOptions):
   return {totalErrors, totalWarnings, fixableErrors, fixableWarnings}
 }
 
-export function transformedResults(lintResult: LintResult, entry: LintResultEntry, level: 'error' | 'warning'): SarifResultEntry {
+function getLevel(severity: number): string {
+  return severity === 2 ? 'error' : 'warning';
+}
+
+export function toSarifResult(lintResult: LintResult, entry: LintResultEntry): SarifResultEntry {
   return {
     ruleId: replaceNamespaceinRules(entry.ruleId),
-    level,
+    level: getLevel(entry.severity),
     messageText: parseText(entry.message),
     fileUri: path.relative(process.cwd(), lintResult.filePath),
     startLine: entry.line,
     startColumn: entry.column,
-    endLine: entry.line,
-    endColumn: entry.endColumn
+    endLine: entry.endLine || entry.line,
+    endColumn: entry.endColumn || entry.column
+  }
+}
+
+export function toCSVRow(lintResult: LintResult, entry: LintResultEntry): CsvRowEntry{
+  return {
+    "File Path": path.relative(process.cwd(), lintResult.filePath),
+    "Message": parseText(entry.message),
+    "Severity": getLevel(entry.severity),
+    "Rule ID": replaceNamespaceinRules(entry.ruleId),
+    "Start Line": entry.line,
+    "Start Column": entry.column,
+    "End Line": entry.endLine || entry.line,
+    "End Column": entry.endColumn || entry.column
   }
 }

@@ -18,6 +18,11 @@ describe('lintResultsUtil', () => {
     expect(mod.replaceNamespaceinRules('slds/r1')).toBe('slds/r1');
   });
 
+  it('replaceNamespaceinRules falls back to N/A when id is undefined', async () => {
+    const mod = await import('../../src/utils/lintResultsUtil');
+    expect(mod.replaceNamespaceinRules(undefined as any)).toBe('N/A');
+  });
+
   it('parseText parses JSON and ensures trailing period', async () => {
     const mod = await import('../../src/utils/lintResultsUtil');
 
@@ -166,30 +171,58 @@ describe('lintResultsUtil', () => {
     expect(summary.fixableWarnings).toBe(0);
   });
 
-  it('transformedResults maps fields correctly', async () => {
+  it('toSarifResult maps fields correctly', async () => {
     const mod = await import('../../src/utils/lintResultsUtil');
 
-    const out = mod.transformedResults(
+    const out = mod.toSarifResult(
       { filePath: '/abs/a.css' } as any,
-      { ruleId: 'slds/r1', message: 'm', line: 1, column: 2, endColumn: 3 } as any,
-      'error'
+      { ruleId: 'slds/r1', message: 'm', line: 1, column: 2, endColumn: 3, severity: 2 } as any
     );
 
     expect(out.level).toBe('error');
     expect(out.ruleId).toBe('slds/r1');
     expect(out.startLine).toBe(1);
     expect(out.startColumn).toBe(2);
-    expect(out.endColumn).toBe(3);
+    expect(out.endColumn).toBe(3);    
   });
 
-  it('transformedResults keeps endColumn undefined when missing', async () => {
+  it('toSarifResult keeps endColumn when missing', async () => {
     const mod = await import('../../src/utils/lintResultsUtil');
-    const out = mod.transformedResults(
+    const out = mod.toSarifResult(
       { filePath: '/abs/a.css' } as any,
-      { ruleId: 'slds/r1', message: 'm', line: 1, column: 2 } as any,
-      'warning'
+      { ruleId: 'slds/r1', message: 'm', line: 1, column: 2, severity: 1 } as any,
     );
     expect(out.level).toBe('warning');
-    expect(out.endColumn).toBeUndefined();
+    expect(out.endColumn).toBe(2);
   });
+
+  it('toCSVRow maps fields correctly', async()=>{
+    const mod = await import('../../src/utils/lintResultsUtil');
+
+    const out = mod.toCSVRow(
+      { filePath: '/abs/a.css' } as any,
+      { ruleId: 'slds/r1', message: 'm', line: 1, column: 2, endColumn: 3, severity: 2 } as any
+    );
+
+    expect(out['Rule ID']).toBe('slds/r1');
+    expect(out['Start Line']).toBe(1);
+    expect(out['Start Column']).toBe(2);
+    expect(out['End Column']).toBe(3);
+    expect(out['Severity']).toBe('error');
+  })
+
+  it('toCSVRow keeps endColumn when missing', async()=>{
+    const mod = await import('../../src/utils/lintResultsUtil');
+
+    const out = mod.toCSVRow(
+      { filePath: '/abs/a.css' } as any,
+      { ruleId: 'slds/r1', message: 'm', line: 1, column: 2, severity: 1 } as any
+    );
+
+    expect(out['Rule ID']).toBe('slds/r1');
+    expect(out['Start Line']).toBe(1);
+    expect(out['Start Column']).toBe(2);
+    expect(out['End Column']).toBe(2);
+    expect(out['Severity']).toBe('warning');
+  })
 });
