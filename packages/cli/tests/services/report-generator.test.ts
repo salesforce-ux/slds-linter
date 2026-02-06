@@ -114,7 +114,8 @@ describe('ReportGenerator', () => {
     await jest.unstable_mockModule('../../src/utils/lintResultsUtil', () => ({
       parseText: (s: string) => s,
       replaceNamespaceinRules: (s: string) => s,
-      transformedResults: () => ({})
+      toSarifResult: () => ({}),
+      toCSVRow: () => ({})
     }));
 
     const { ReportGenerator } = await import('../../src/services/report-generator');
@@ -162,7 +163,8 @@ describe('ReportGenerator', () => {
     await jest.unstable_mockModule('../../src/utils/lintResultsUtil', () => ({
       parseText: (s: string) => s,
       replaceNamespaceinRules: (s: string) => s,
-      transformedResults: () => ({})
+      toSarifResult: () => ({}),
+      toCSVRow: () => ({})
     }));
 
     const { ReportGenerator } = await import('../../src/services/report-generator');
@@ -197,7 +199,8 @@ describe('ReportGenerator', () => {
     await jest.unstable_mockModule('../../src/utils/lintResultsUtil', () => ({
       parseText: (s: string) => s,
       replaceNamespaceinRules: (s: string) => s,
-      transformedResults: () => ({})
+      toSarifResult: () => ({}),
+      toCSVRow: () => ({})
     }));
 
     const { ReportGenerator } = await import('../../src/services/report-generator');
