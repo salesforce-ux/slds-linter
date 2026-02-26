@@ -14,13 +14,14 @@ export function isRuleEnabled(context: Rule.RuleContext, ruleName: string): bool
     if (ruleName in rules) {
       const ruleConfig = rules[ruleName];
       
-      if (Array.isArray(ruleConfig)) {
-        return ruleConfig[0] === true;
-      } else if (ruleConfig !== undefined && ruleConfig !== null) {
-        return true;
-      } else if (ruleConfig === false) {
+      // Extract severity: first element if array, otherwise the value itself
+      const severity = Array.isArray(ruleConfig) ? ruleConfig[0] : ruleConfig;
+
+      // ESLint rule severities: "off"/0 = disabled, "warn"/1 = enabled, "error"/2 = enabled
+      if (severity === "off" || severity === 0 || severity === false) {
         return false;
       }
+      return true;
     }
   } catch (error) {
     return false;

@@ -15,8 +15,28 @@ const ruleTester = new RuleTester({
   language: 'css/css',
 });
 
+// Verify deprecation metadata
+describe('no-deprecated-slds-classes deprecation metadata', () => {
+  it('should have deprecated metadata', () => {
+    expect(rule.meta.deprecated).toBeDefined();
+    expect(rule.meta.deprecated.message).toContain('no-deprecated-classes-slds2');
+    expect(rule.meta.deprecated.replacedBy).toHaveLength(1);
+    expect(rule.meta.deprecated.replacedBy[0].rule.name).toBe('no-deprecated-classes-slds2');
+  });
+});
+
 ruleTester.run('no-deprecated-slds-classes', rule, {
   valid: [
+    // Should skip reporting when the replacement rule (no-deprecated-classes-slds2) is also enabled
+    {
+      code: `.slds-has-icon_left-right { border: 0; }`,
+      filename: 'test.css',
+      settings: {
+        sldsRules: {
+          '@salesforce-ux/slds/no-deprecated-classes-slds2': 'warn',
+        },
+      },
+    },
     {
       code: `.my-custom-class { color: red; }`,
       filename: 'test.css',
