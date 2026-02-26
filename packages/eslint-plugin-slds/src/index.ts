@@ -17,6 +17,7 @@ import reduceAnnotations from './rules/v9/reduce-annotations';
 import noSldsPrivateVar from './rules/v9/no-slds-private-var';
 import noHardcodedValuesSlds1 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds1';
 import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds2';
+import noSldsVarOnWrongProperty from './rules/v9/no-slds-var-on-wrong-property';
 
 
 import htmlParser from "@html-eslint/parser";
@@ -42,7 +43,8 @@ const rules = {
   "no-slds-private-var": noSldsPrivateVar,
   "no-hardcoded-values-slds1": noHardcodedValuesSlds1,
   "no-hardcoded-values-slds2": noHardcodedValuesSlds2,
-  "reduce-annotations": reduceAnnotations
+  "reduce-annotations": reduceAnnotations,
+  "no-slds-var-on-wrong-property": noSldsVarOnWrongProperty
 };
 
 const plugin = {
