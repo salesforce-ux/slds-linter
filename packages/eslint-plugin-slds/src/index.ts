@@ -1,6 +1,7 @@
 // Unified ESLint plugin config for both v8 (legacy) and v9+ (flat)
 
 import enforceBemUsage from './rules/enforce-bem-usage';
+import noDeprecatedSldsClasses from './rules/v9/no-deprecated-slds-classes';
 import noDeprecatedClassesSlds2 from './rules/no-deprecated-classes-slds2';
 import modalCloseButtonIssue from './rules/modal-close-button-issue';
 import noSldsClassOverrides from './rules/v9/no-slds-class-overrides';
@@ -17,7 +18,6 @@ import noSldsPrivateVar from './rules/v9/no-slds-private-var';
 import noHardcodedValuesSlds1 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds1';
 import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds2';
 
-
 import htmlParser from "@html-eslint/parser";
 import cssPlugin from "@eslint/css";
 
@@ -26,6 +26,7 @@ import ruleConfigs from '../eslint.rules.json';
 
 const rules = {
   "enforce-bem-usage": enforceBemUsage,
+  "no-deprecated-slds-classes": noDeprecatedSldsClasses,
   "no-deprecated-classes-slds2": noDeprecatedClassesSlds2,
   "modal-close-button-issue": modalCloseButtonIssue,
   "no-slds-class-overrides": noSldsClassOverrides,

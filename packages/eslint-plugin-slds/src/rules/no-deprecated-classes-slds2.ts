@@ -2,7 +2,7 @@ import { Rule } from 'eslint';
 import { findAttr, isAttributesEmpty } from "../utils/node";
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../config/rule-messages';
-import noDeprecatedSldsClassesCss from './v9/no-deprecated-slds-classes';
+import { createCssVisitor } from './v9/no-deprecated-slds-classes';
 
 const deprecatedClasses = metadata.deprecatedClasses;
 const ruleConfig = ruleMessages['no-deprecated-classes-slds2'];
@@ -80,7 +80,7 @@ const noDeprecatedClassesSlds2 = {
       // In ESLint v9 with @eslint/css, we should have CSS AST support
       try {
         // Use CSS implementation (ESLint v9 with @eslint/css)
-        return noDeprecatedSldsClassesCss.create(context);
+        return createCssVisitor(context);
       } catch (error) {
         // If CSS implementation fails, likely ESLint v8 without CSS support
         // Return empty visitor to avoid errors
