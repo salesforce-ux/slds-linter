@@ -11,7 +11,8 @@
     "@salesforce-ux/slds/enforce-component-hook-naming-convention": "error",
     "@salesforce-ux/slds/no-slds-private-var": "warn",
     "@salesforce-ux/slds/no-hardcoded-values-slds2": "warn",
-    "@salesforce-ux/slds/reduce-annotations": "warn"
+    "@salesforce-ux/slds/reduce-annotations": "warn",
+    "@salesforce-ux/slds/no-slds-var-on-wrong-property": "warn"
   },
   "html": { 
     "@salesforce-ux/slds/enforce-bem-usage": "error",
