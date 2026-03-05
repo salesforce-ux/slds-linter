@@ -1,0 +1,12 @@
+<aura:component>
+    <div class="slds-card slds-card--narrow">
+        <div class="slds-card__header slds-grid">
+            <h2 class="slds-text-heading--small">Component Header</h2>
+        </div>
+        <div class="slds-card__body">
+            <button class="slds-button slds-button--neutral">
+                Click Me
+            </button>
+        </div>
+    </div>
+</aura:component>

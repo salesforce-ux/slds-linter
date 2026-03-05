@@ -1,0 +1,20 @@
+<apex:page showHeader="false" standardStylesheets="false"></apex:page>
+    <apex:slds />
+    
+    <button class="slds-button slds-button--brand">
+        Old BEM Button
+    </button>
+
+    <apex:outputPanel styleClass="slds-m-around--large">
+        Margin Panel
+    </apex:outputPanel>
+
+    <style>
+        .custom-box {
+            background-color: var(--lwc-colorBackgroundAlt);
+            color: #333; 
+        }
+    </style>
+
+    <div class="custom-box">Test Box</div>
+</apex:page>

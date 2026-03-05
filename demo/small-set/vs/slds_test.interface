@@ -1,0 +1,6 @@
+<aura:interface>
+    <aura:attribute name="title" type="String" />
+    <div class="slds-box slds-theme--default">
+        <span class="slds-badge slds-badge--lightest">Interface Badge</span>
+    </div>
+</aura:interface>
