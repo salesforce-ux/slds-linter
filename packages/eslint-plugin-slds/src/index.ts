@@ -77,7 +77,7 @@ const cssConfigArray = [baseCssConfigWithPlugin];
 const htmlConfigArray = [
   // HTML/Component config
   {
-    files: ["**/*.html", "**/*.cmp"],
+    files: ["**/*.html", "**/*.cmp", "**/*.component", "**/*.app", "**/*.page", "**/*.interface"],
     languageOptions: {
       parser: htmlParser,
       ecmaVersion: 2021,

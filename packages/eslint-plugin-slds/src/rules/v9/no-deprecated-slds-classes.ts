@@ -49,10 +49,10 @@ export default {
     },
     messages,
     deprecated: {
-      message: "This CSS-only rule is deprecated. Use the hybrid 'no-deprecated-classes-slds2' rule instead, which handles both HTML and CSS.",
+      message: "Starting with SLDS Linter 1.2.0, the 'no-deprecated-slds-classes' rule is deprecated. To continue linting HTML and CSS files, use the 'no-deprecated-classes-slds2' rule.",
       replacedBy: [
         {
-          message: "Use 'no-deprecated-classes-slds2' which supports both HTML and CSS files.",
+          message: "To lint your HTML and CSS files, update your configuration to use the 'no-deprecated-classes-slds2' rule.",
           plugin: {
             name: "@salesforce-ux/eslint-plugin-slds",
           },
