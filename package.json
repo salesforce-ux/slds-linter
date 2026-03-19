@@ -61,5 +61,8 @@
   "homepage": "https://github.com/salesforce-ux/slds-linter#slds-linter",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
+  },
+  "resolutions": {
+    "flatted": "^3.4.0"
   }
 }
