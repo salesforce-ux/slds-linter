@@ -34,13 +34,7 @@ export class ConfigLoader {
     try {
       // Resolve to absolute path first
       const absolutePath = resolve(configPath);
-      
-      // Skip special processing for bundled configs (part of CLI package)
-      if (absolutePath.includes('eslint-plugin-slds') && absolutePath.includes('eslint.config.mjs')) {
-        Logger.debug('Using bundled config as-is');
-        return absolutePath;
-      }
-      
+
       // Check if dependencies already installed in user's workspace
       const userConfigUrl = pathToFileURL(absolutePath).href;
       const pluginInstalled = this.isPackageInstalled('@salesforce-ux/eslint-plugin-slds', userConfigUrl);
