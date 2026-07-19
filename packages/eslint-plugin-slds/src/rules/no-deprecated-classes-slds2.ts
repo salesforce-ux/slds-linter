@@ -1,10 +1,17 @@
 import { Rule } from 'eslint';
 import { findAttr, isAttributesEmpty } from "../utils/node";
-import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../config/rule-messages';
 import { createCssVisitor } from './v9/no-deprecated-slds-classes';
+import { isDeprecatedClassName } from '../utils/class-checks';
+import {
+  isJsxLikeFile,
+  mergeVisitors,
+  reportRange,
+  createClassNameVisitor,
+  createCssInJsVisitor,
+  type JsxClass,
+} from '../utils/jsx';
 
-const deprecatedClasses = metadata.deprecatedClasses;
 const ruleConfig = ruleMessages['no-deprecated-classes-slds2'];
 const { type, description, url, messages } = ruleConfig;
 
@@ -23,7 +30,7 @@ const noDeprecatedClassesSlds2Html = {
       if (classAttr && classAttr.value) {
         const classNames = classAttr.value.value.split(/\s+/);
         classNames.forEach((className) => {
-          if (className && deprecatedClasses.includes(className)) {
+          if (className && isDeprecatedClassName(className)) {
             // Find the exact location of the problematic class name
             const classNameStart = classAttr.value.value.indexOf(className) + 7; // 7 here is for `class= "`
             const classNameEnd = classNameStart + className.length;
@@ -57,7 +64,30 @@ const noDeprecatedClassesSlds2Html = {
   },
 };
 
-// Create a hybrid rule that works for both HTML and CSS
+/**
+ * JSX/React implementation. Checks className tokens and CSS-in-JS class
+ * selectors for classes not available in SLDS 2.
+ */
+const noDeprecatedClassesSlds2Jsx = {
+  create(context) {
+    const onClass = (info: JsxClass) => {
+      const { className, start, end } = info;
+      if (isDeprecatedClassName(className)) {
+        reportRange(context, start, end, {
+          messageId: 'deprecatedClass',
+          data: { className },
+        });
+      }
+    };
+
+    return mergeVisitors(
+      createClassNameVisitor(context, onClass),
+      createCssInJsVisitor(context, () => {}, onClass)
+    );
+  },
+};
+
+// Create a hybrid rule that works for HTML, CSS, and JSX
 const noDeprecatedClassesSlds2 = {
   meta: {
     type,
@@ -74,20 +104,15 @@ const noDeprecatedClassesSlds2 = {
   create(context) {
     const filename = context.filename || context.getFilename();
 
-    // Check if we're in a CSS context
     if (filename.endsWith('.css') || filename.endsWith('.scss')) {
-      // Try to detect if we have CSS support
-      // In ESLint v9 with @eslint/css, we should have CSS AST support
       try {
-        // Use CSS implementation (ESLint v9 with @eslint/css)
         return createCssVisitor(context);
       } catch (error) {
-        // If CSS implementation fails, likely ESLint v8 without CSS support
-        // Return empty visitor to avoid errors
         return {};
       }
+    } else if (isJsxLikeFile(filename)) {
+      return noDeprecatedClassesSlds2Jsx.create(context);
     } else {
-      // Use HTML implementation (compatible with both ESLint v8 and v9)
       return noDeprecatedClassesSlds2Html.create(context);
     }
   },

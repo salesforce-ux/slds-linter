@@ -19,6 +19,7 @@ import noHardcodedValuesSlds1 from './rules/v9/no-hardcoded-values/no-hardcoded-
 import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds2';
 
 import htmlParser from "@html-eslint/parser";
+import * as tsParser from "@typescript-eslint/parser";
 import cssPlugin from "@eslint/css";
 
 // Import rule configurations based on persona
@@ -90,11 +91,34 @@ const htmlConfigArray = [
   }
 ];
 
+// JSX/TSX config for React (className, inline styles, CSS-in-JS)
+const jsxConfigArray = [
+  {
+    files: ["**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"],
+    languageOptions: {
+      parser: tsParser,
+      ecmaVersion: 2021,
+      sourceType: "module",
+      parserOptions: {
+        ecmaFeatures: { jsx: true }
+      }
+    },
+    plugins: {
+      "@salesforce-ux/slds": plugin
+    },
+    rules: (ruleConfigs as any).jsx,
+    settings: {
+      sldsRules: { ...(ruleConfigs as any).jsx }
+    }
+  }
+];
+
 Object.assign(plugin.configs, {
   // Flat config for ESLint v9+
   "flat/recommended-css": cssConfigArray,
   "flat/recommended-html": htmlConfigArray,
-  "flat/recommended": [...cssConfigArray, ...htmlConfigArray],
+  "flat/recommended-jsx": jsxConfigArray,
+  "flat/recommended": [...cssConfigArray, ...htmlConfigArray, ...jsxConfigArray],
   // legacy config for ESLint v8-
   recommended: {
     plugins: ["@salesforce-ux/slds"],

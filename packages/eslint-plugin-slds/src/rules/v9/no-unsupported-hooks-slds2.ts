@@ -1,6 +1,14 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages';
+import { forEachNamespacedVariable, type CssVariableInfo } from '../../utils/css-utils';
+import type { PositionInfo } from '../../utils/hardcoded-shared-utils';
+import {
+  isJsxLikeFile,
+  reportRange,
+  createDeclarationVisitor,
+  type JsxDeclaration,
+} from '../../utils/jsx';
 
 const ruleConfig = ruleMessages['no-unsupported-hooks-slds2'];
 const { type, description, url, messages } = ruleConfig;
@@ -23,6 +31,39 @@ export default {
   },
   
   create(context) {
+    const filename = context.filename || context.getFilename();
+
+    // JSX/React: inline style objects and CSS-in-JS declarations.
+    if (isJsxLikeFile(filename)) {
+      return createDeclarationVisitor(context, (decl: JsxDeclaration) => {
+        const property = decl.property;
+        if (property && /^--s(lds|ds)-/.test(property) && !shouldIgnoreDetection(property) && decl.propertyStart !== null && decl.propertyEnd !== null) {
+          reportRange(context, decl.propertyStart, decl.propertyEnd, {
+            messageId: 'deprecated',
+            data: { token: property },
+          });
+        }
+
+        if (decl.valueText && decl.valueStart !== null) {
+          forEachNamespacedVariable(decl.valueText, (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => {
+            const tokenName = variableInfo.name;
+            if (shouldIgnoreDetection(tokenName)) {
+              return;
+            }
+            const varCallStart = positionInfo.start?.offset || 0;
+            const varCallText = decl.valueText.substring(varCallStart, positionInfo.end?.offset ?? decl.valueText.length);
+            const tokenIdx = varCallText.indexOf(tokenName);
+            const tokenStart = decl.valueStart! + varCallStart + (tokenIdx >= 0 ? tokenIdx : 0);
+            const tokenEnd = tokenStart + tokenName.length;
+            reportRange(context, tokenStart, tokenEnd, {
+              messageId: 'deprecated',
+              data: { token: tokenName },
+            });
+          });
+        }
+      });
+    }
+
     function reportDeprecatedHook(node, token: string) {
       context.report({
         node,

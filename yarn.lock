@@ -1283,12 +1283,13 @@ __metadata:
     "@types/eslint": "npm:^8.56.0"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^20.11.19"
+    "@typescript-eslint/parser": "npm:^8.36.0"
     chroma-js: "npm:^3.1.2"
     jest: "npm:^29.7.0"
     ts-jest: "npm:^29.2.5"
     yaml: "npm:^2.8.1"
   peerDependencies:
-    eslint: ^8.0.0 || ^9.0.0
+    eslint: ^8.57.0 || ^9.0.0
   peerDependenciesMeta:
     eslint:
       optional: false

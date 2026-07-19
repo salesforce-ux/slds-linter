@@ -1,6 +1,14 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages';
+import { forEachLwcVariable, type CssVariableInfo } from '../../utils/css-utils';
+import type { PositionInfo } from '../../utils/hardcoded-shared-utils';
+import {
+  isJsxLikeFile,
+  reportRange,
+  createDeclarationVisitor,
+  type JsxDeclaration,
+} from '../../utils/jsx';
 
 const ruleConfig = ruleMessages['no-sldshook-fallback-for-lwctoken'];
 const { type, description, url, messages } = ruleConfig;
@@ -37,6 +45,40 @@ export default {
   },
   
   create(context) {
+    const filename = context.filename || context.getFilename();
+
+    // JSX/React: inline style objects and CSS-in-JS declarations.
+    if (isJsxLikeFile(filename)) {
+      return createDeclarationVisitor(context, (decl: JsxDeclaration) => {
+        if (!decl.valueText || decl.valueStart === null) {
+          return;
+        }
+        forEachLwcVariable(decl.valueText, (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => {
+          const lwcToken = variableInfo.name;
+          if (!variableInfo.hasFallback) {
+            return;
+          }
+          const varCallStart = positionInfo.start?.offset || 0;
+          const varCallText = decl.valueText.substring(varCallStart, positionInfo.end?.offset ?? decl.valueText.length);
+          // Extract the SLDS token used as fallback: var(--lwc-x, var(--slds-y))
+          const fallbackMatch = varCallText.match(/,\s*var\(\s*(--s(?:lds|ds)-[\w-]+)/);
+          if (!fallbackMatch) {
+            return;
+          }
+          const sldsToken = fallbackMatch[1];
+          if (hasUnsupportedFallback(lwcToken, sldsToken)) {
+            const tokenIdx = varCallText.indexOf(lwcToken);
+            const tokenStart = decl.valueStart! + varCallStart + (tokenIdx >= 0 ? tokenIdx : 0);
+            const tokenEnd = tokenStart + lwcToken.length;
+            reportRange(context, tokenStart, tokenEnd, {
+              messageId: 'unsupportedFallback',
+              data: { lwcToken, sldsToken },
+            });
+          }
+        });
+      });
+    }
+
     return {
       // Handle LWC tokens inside var() functions: var(--lwc-*, ...)
       "Function[name='var'] Identifier[name=/^--lwc-/]"(node) {

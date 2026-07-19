@@ -7,6 +7,13 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages';
+import { isSldsClass } from '../../utils/class-checks';
+import {
+  isJsxLikeFile,
+  reportRange,
+  createCssInJsVisitor,
+  type JsxClass,
+} from '../../utils/jsx';
 
 const ruleConfig = ruleMessages['no-slds-class-overrides'];
 
@@ -29,6 +36,21 @@ export default {
   },
   
   create(context) {
+    const filename = context.filename || context.getFilename();
+
+    // JSX/React: only CSS-in-JS selectors express class overrides.
+    if (isJsxLikeFile(filename)) {
+      const onClass = (info: JsxClass) => {
+        if (info.isLastInSelector && isSldsClass(info.className)) {
+          reportRange(context, info.start, info.end, {
+            messageId: 'sldsClassOverride',
+            data: { className: info.className },
+          });
+        }
+      };
+      return createCssInJsVisitor(context, () => {}, onClass);
+    }
+
     return {
       // For no-slds-class-overrides: Only flags classes at selector end
       "SelectorList Selector"(node) {
