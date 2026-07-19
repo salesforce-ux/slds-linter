@@ -23,7 +23,7 @@ describe('Unified plugin export', () => {
 
   it('should export a flat (v9+) config', () => {
     expect(plugin.configs['flat/recommended']).toBeDefined();
-    expect(plugin.configs['flat/recommended']).toHaveLength(2);
+    expect(plugin.configs['flat/recommended']).toHaveLength(3);
     
     // Test CSS config (first element)
     const cssConfig = plugin.configs['flat/recommended'][0];
@@ -36,6 +36,22 @@ describe('Unified plugin export', () => {
     expect(htmlConfig.plugins['@salesforce-ux/slds']).toBe(plugin);
     expect(htmlConfig.files).toContain('**/*.html');
     expect(htmlConfig.rules['@salesforce-ux/slds/enforce-bem-usage']).toBe('error');
+
+    // Test JSX config (third element)
+    const jsxConfig = plugin.configs['flat/recommended'][2];
+    expect(jsxConfig.plugins['@salesforce-ux/slds']).toBe(plugin);
+    expect(jsxConfig.files).toContain('**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}');
+    expect(jsxConfig.languageOptions.parser).toBeDefined();
+    expect(jsxConfig.rules['@salesforce-ux/slds/no-hardcoded-values-slds2']).toBe('warn');
+  });
+
+  it('should export a flat JSX config', () => {
+    expect(plugin.configs['flat/recommended-jsx']).toBeDefined();
+    expect(plugin.configs['flat/recommended-jsx']).toHaveLength(1);
+    const jsxConfig = plugin.configs['flat/recommended-jsx'][0];
+    expect(jsxConfig.plugins['@salesforce-ux/slds']).toBe(plugin);
+    expect(jsxConfig.files).toContain('**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}');
+    expect(jsxConfig.languageOptions.parser).toBeDefined();
   });
 
   it('should export separate flat CSS and HTML configs', () => {

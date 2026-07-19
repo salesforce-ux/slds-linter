@@ -16,4 +16,14 @@ export const ComponentFilePatterns: FilePattern = {
     '**/dist/**',
     '**/build/**'
   ]
+};
+
+export const FrameworkFilePatterns: FilePattern = {
+  // React (and other JS/TS framework) files: className, inline styles, CSS-in-JS
+  extensions:['js', 'jsx', 'ts', 'tsx', 'mjs', 'cjs', 'mts', 'cts'],
+  exclude: [
+    '**/node_modules/**',
+    '**/dist/**',
+    '**/build/**'
+  ]
 }; 

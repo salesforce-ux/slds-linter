@@ -1,6 +1,14 @@
 import { Rule } from 'eslint';
 import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages';
+import { forEachNamespacedVariable, type CssVariableInfo } from '../../utils/css-utils';
+import type { PositionInfo } from '../../utils/hardcoded-shared-utils';
+import {
+  isJsxLikeFile,
+  reportRange,
+  createDeclarationVisitor,
+  type JsxDeclaration,
+} from '../../utils/jsx';
 
 const ruleConfig = ruleMessages['enforce-component-hook-naming-convention'];
 const { type, description, url, messages } = ruleConfig;
@@ -30,6 +38,47 @@ export default {
   },
   
   create(context) {
+    const filename = context.filename || context.getFilename();
+
+    // JSX/React: inline style objects and CSS-in-JS declarations.
+    if (isJsxLikeFile(filename)) {
+      return createDeclarationVisitor(context, (decl: JsxDeclaration) => {
+        const property = decl.property;
+        if (property && !shouldIgnoreDetection(property) && decl.propertyStart !== null && decl.propertyEnd !== null) {
+          const suggestedMatch = slds1DeprecatedComponentHooks[property];
+          reportRange(context, decl.propertyStart, decl.propertyEnd, {
+            messageId: 'replace',
+            data: { oldValue: property, suggestedMatch },
+            fix: decl.propertyMappable
+              ? (fixer) => fixer.replaceTextRange([decl.propertyStart!, decl.propertyEnd!], suggestedMatch)
+              : undefined,
+          });
+        }
+
+        if (decl.valueText && decl.valueStart !== null) {
+          forEachNamespacedVariable(decl.valueText, (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => {
+            const tokenName = variableInfo.name;
+            if (shouldIgnoreDetection(tokenName)) {
+              return;
+            }
+            const suggestedMatch = slds1DeprecatedComponentHooks[tokenName];
+            const varCallStart = positionInfo.start?.offset || 0;
+            const varCallText = decl.valueText.substring(varCallStart, positionInfo.end?.offset ?? decl.valueText.length);
+            const tokenIdx = varCallText.indexOf(tokenName);
+            const tokenStart = decl.valueStart! + varCallStart + (tokenIdx >= 0 ? tokenIdx : 0);
+            const tokenEnd = tokenStart + tokenName.length;
+            reportRange(context, tokenStart, tokenEnd, {
+              messageId: 'replace',
+              data: { oldValue: tokenName, suggestedMatch },
+              fix: decl.valueMappable
+                ? (fixer) => fixer.replaceTextRange([tokenStart, tokenEnd], suggestedMatch)
+                : undefined,
+            });
+          });
+        }
+      });
+    }
+
     return {
       /*
        * Handle component hooks in CSS declarations

@@ -69,6 +69,40 @@ export default defineConfig([
 ]);
 ```
 
+#### React (JSX/TSX) Configuration
+
+The recommended flat config (`@salesforce-ux/slds/recommended`) already includes a JSX/TSX layer that lints `**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}` using `@typescript-eslint/parser`. It covers:
+
+- `className` / `class` — string literals, template literals, and the `clsx`/`classnames`/`cx` helpers (string args and object keys).
+- Inline `style={{ ... }}` objects — property keys (`--slds-`/`--lwc-` custom properties) and string values (hooks, `var()`, and hardcoded values). Numeric values (e.g. `padding: 16`) are intentionally **not** evaluated: a JS number literal cannot be safely rewritten into a `var()`/hook string, so they are skipped rather than reported. Wrap the value in a string (`padding: '16px'`) to have it checked.
+- CSS-in-JS — `styled.*`, `styled(Component)`, `css`, `createGlobalStyle`, `keyframes`, and `injectGlobal` tagged templates. Class selectors and declarations inside the template are checked. To protect consumer source, a declaration value or selector whose span crosses a `${...}` interpolation is skipped entirely (neither reported nor auto-fixed), because the substituted placeholder length differs from the real expression and any derived edit could land on the wrong text.
+
+> **Behavioral change:** as of this version, `@salesforce-ux/slds/recommended` lints your `.js`/`.jsx`/`.ts`/`.tsx` files in addition to CSS and markup. Rules only fire on `className`/`class`, `clsx`/`classnames`/`cx` calls, inline `style` objects, and `styled`/`css` tagged templates, so ordinary application logic is untouched — but you may see new findings in React code. To keep the previous CSS + markup-only behavior, compose the granular configs instead of `flat/recommended`:
+>
+> ```javascript
+> // CSS + markup only (no React)
+> export default defineConfig([
+>   ...sldsPlugin.configs['flat/recommended-css'],
+>   ...sldsPlugin.configs['flat/recommended-html'],
+> ]);
+> ```
+
+To lint only React files, extend the standalone JSX config:
+
+```javascript
+// eslint.config.mjs
+import { defineConfig } from 'eslint/config';
+import sldsPlugin from '@salesforce-ux/eslint-plugin-slds';
+
+export default defineConfig([
+  ...sldsPlugin.configs['flat/recommended-jsx']
+]);
+```
+
+Separate `flat/recommended-css`, `flat/recommended-html`, and `flat/recommended-jsx` configs are also exported for granular control.
+
+> **Vue and Angular:** support is designed and specified with up-front tests, and is planned for a future release. Angular external `*.component.html`/`*.component.css` files already lint via the HTML and CSS rule paths.
+
 ## Migrate to the Latest Version
 
 By default, the latest version of the plugin supports legacy and flat config systems.

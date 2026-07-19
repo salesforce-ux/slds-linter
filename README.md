@@ -12,6 +12,9 @@ SLDS Linter is a custom-built linting solution based on open-source [ESLint](htt
 
 - Lightning web components: HTML and Cascading Style Sheet (CSS) files
 - Aura components: Component (CMP) and CSS files
+- React components: `.jsx`, `.tsx`, `.js`, and `.ts` files — including `className` (string, template literal, and `clsx`/`classnames` helpers), inline `style={{ ... }}` objects (including `--slds-`/`--lwc-` custom properties), and CSS-in-JS (`styled-components`/`emotion`) tagged templates.
+
+> Vue (`.vue`) and Angular support is designed and covered by up-front tests, and is planned for a future release. Angular external `*.component.html`/`*.component.css` files already lint today via the HTML and CSS rule paths.
 
 Run SLDS Linter in a terminal window or in Visual Studio (VS) Code. We recommend running in VS Code.
 
@@ -159,6 +162,14 @@ Linting all `.html` and `.cmp` files:
 
 ```shell
 npx @salesforce-ux/slds-linter lint "**/*.{html,cmp}"
+```
+
+### Example - lint React files
+
+Recursively linting all React files in the `src` directory (`className`, inline styles, and CSS-in-JS):
+
+```shell
+npx @salesforce-ux/slds-linter lint "src/**/*.{jsx,tsx}"
 ```
 
 

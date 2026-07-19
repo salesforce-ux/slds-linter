@@ -3,6 +3,12 @@ import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../../config/rule-messages';
 import { formatSuggestionHooks, forEachLwcVariable, type CssVariableInfo } from '../../utils/css-utils';
 import type { PositionInfo } from '../../utils/hardcoded-shared-utils';
+import {
+  isJsxLikeFile,
+  reportRange,
+  createDeclarationVisitor,
+  type JsxDeclaration,
+} from '../../utils/jsx';
 
 const ruleConfig = ruleMessages['lwc-token-to-slds-hook'];
 const { type, description, url, messages } = ruleConfig;
@@ -85,6 +91,71 @@ export default {
   },
   
   create(context) {
+    const filename = context.filename || context.getFilename();
+
+    // JSX/React: check inline style objects and CSS-in-JS declarations.
+    if (isJsxLikeFile(filename)) {
+      return createDeclarationVisitor(context, (decl: JsxDeclaration) => {
+        // Property side: --lwc-* custom property keys
+        const property = decl.property;
+        if (property && property.startsWith('--lwc-') && decl.propertyStart !== null && decl.propertyEnd !== null) {
+          if (!shouldIgnoreDetection(property)) {
+            const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(property);
+            const { messageId, data } = getReportMessage(property, replacementCategory, recommendation);
+            const canFix = hasRecommendation && replacementCategory === ReplacementCategory.SLDS_TOKEN && decl.propertyMappable;
+            reportRange(context, decl.propertyStart, decl.propertyEnd, {
+              messageId,
+              data,
+              fix: canFix
+                ? (fixer) => fixer.replaceTextRange([decl.propertyStart!, decl.propertyEnd!], recommendation as string)
+                : undefined,
+            });
+          }
+        }
+
+        // Value side: var(--lwc-*) usage
+        if (decl.valueText && decl.valueStart !== null) {
+          forEachLwcVariable(decl.valueText, (variableInfo: CssVariableInfo, positionInfo: PositionInfo) => {
+            const { name: lwcToken, hasFallback } = variableInfo;
+            if (shouldIgnoreDetection(lwcToken)) {
+              return;
+            }
+            const { hasRecommendation, recommendation, replacementCategory } = getRecommendation(lwcToken);
+            const { messageId, data } = getReportMessage(lwcToken, replacementCategory, recommendation);
+
+            let suggestedMatch: string | null = null;
+            if (hasRecommendation) {
+              if (replacementCategory === ReplacementCategory.SLDS_TOKEN) {
+                let fallbackValue: string | null = null;
+                if (hasFallback && positionInfo.start?.offset !== undefined && positionInfo.end?.offset !== undefined) {
+                  const varCallText = decl.valueText.substring(positionInfo.start.offset, positionInfo.end.offset);
+                  const commaIndex = varCallText.indexOf(',');
+                  if (commaIndex !== -1) {
+                    fallbackValue = varCallText.substring(commaIndex + 1, varCallText.length - 1).trim();
+                  }
+                }
+                const originalVarCall = fallbackValue ? `var(${lwcToken}, ${fallbackValue})` : `var(${lwcToken})`;
+                suggestedMatch = `var(${recommendation}, ${originalVarCall})`;
+              } else if (replacementCategory === ReplacementCategory.RAW_VALUE) {
+                suggestedMatch = recommendation as string;
+              }
+            }
+
+            const varStart = decl.valueStart! + (positionInfo.start?.offset || 0);
+            const varEnd = decl.valueStart! + (positionInfo.end?.offset ?? decl.valueText.length);
+            const canFix = suggestedMatch !== null && decl.valueMappable;
+            reportRange(context, varStart, varEnd, {
+              messageId,
+              data,
+              fix: canFix
+                ? (fixer) => fixer.replaceTextRange([varStart, varEnd], suggestedMatch as string)
+                : undefined,
+            });
+          });
+        }
+      });
+    }
+
     function reportAndFix(
       node: any,
       suggestedMatch: string | null,

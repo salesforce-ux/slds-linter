@@ -1,25 +1,19 @@
 import { Rule } from 'eslint';
 import { findAttr, isAttributesEmpty } from "../utils/node";
-import metadata from '@salesforce-ux/sds-metadata';
 import ruleMessages from '../config/rule-messages';
 import enforceBemUsageCss from './v9/enforce-bem-usage';
+import { getBemReplacement, isBemMappedDeprecated } from '../utils/class-checks';
+import {
+  isJsxLikeFile,
+  mergeVisitors,
+  reportRange,
+  createClassNameVisitor,
+  createCssInJsVisitor,
+  type JsxClass,
+} from '../utils/jsx';
 
-const bemMapping = metadata.bemNaming;
-const deprecatedClasses = metadata.deprecatedClasses;
 const ruleConfig = ruleMessages['enforce-bem-usage'];
 const { type, description, url, messages } = ruleConfig;
-/**
- * Checks if a given className or its BEM mapped equivalent is deprecated.
- * 
- * This function checks whether the provided className is included in the
- * `deprecatedClasses` list or if the BEM mapped class is deprecated.
- * 
- * @param className - The class name to check for deprecation.
- * @returns A boolean indicating whether the className or its mapped version is deprecated.
- */
-const isDeprecatedClass = (className : string) => {
-  return (deprecatedClasses.includes(className) || deprecatedClasses.includes(bemMapping[className]))
-}
 
 const enforceBemUsageHtml = {
   create(context) {  
@@ -32,7 +26,8 @@ const enforceBemUsageHtml = {
       if (classAttr && classAttr.value) {
         const classNames = classAttr.value.value.split(/\s+/);
         classNames.forEach((className) => {
-          if (className && className in bemMapping && !isDeprecatedClass(className)) {
+          const newValue = getBemReplacement(className);
+          if (className && newValue && !isBemMappedDeprecated(className)) {
             // Find the exact location of the problematic class name
             const classNameStart = classAttr.value.value.indexOf(className) + 7; // 7 here is for `class= "`
             const classNameEnd = classNameStart + className.length;
@@ -47,8 +42,6 @@ const enforceBemUsageHtml = {
               column: classAttr.loc.start.column + classNameEnd,
             };
 
-            // Check whether a fixed class is available
-            const newValue = bemMapping[className];
             context.report({
               node,
               loc: { start: startLoc, end: endLoc },
@@ -58,17 +51,14 @@ const enforceBemUsageHtml = {
                 newValue
               },
               fix(fixer) {
-                if (newValue) {
-                  const newClassValue = classAttr.value.value.replace(
-                    className,
-                    newValue
-                  );
-                  return fixer.replaceTextRange(
-                    [classAttr.value.range[0], classAttr.value.range[1]],
-                    `${newClassValue}`
-                  );
-                }
-                return null; // Ensure a return value even if no fix is applied
+                const newClassValue = classAttr.value.value.replace(
+                  className,
+                  newValue
+                );
+                return fixer.replaceTextRange(
+                  [classAttr.value.range[0], classAttr.value.range[1]],
+                  `${newClassValue}`
+                );
               },
             });
           }
@@ -82,9 +72,33 @@ const enforceBemUsageHtml = {
   },
 };
 
+/**
+ * JSX/React implementation. Checks className tokens (string, template literal,
+ * clsx/classnames) and CSS-in-JS class selectors for retired BEM syntax.
+ */
+const enforceBemUsageJsx = {
+  create(context) {
+    const onClass = (info: JsxClass) => {
+      const { className, start, end, mappable } = info;
+      const newValue = getBemReplacement(className);
+      if (!newValue || isBemMappedDeprecated(className)) {
+        return;
+      }
+      reportRange(context, start, end, {
+        messageId: 'bemDoubleDash',
+        data: { actual: className, newValue },
+        fix: mappable ? (fixer) => fixer.replaceTextRange([start, end], newValue) : undefined,
+      });
+    };
 
+    return mergeVisitors(
+      createClassNameVisitor(context, onClass),
+      createCssInJsVisitor(context, () => {}, onClass)
+    );
+  },
+};
 
-// Create a hybrid rule that works for both HTML and CSS
+// Create a hybrid rule that works for HTML, CSS, and JSX
 const enforceBemUsage = {
   meta: {
     type,
@@ -99,21 +113,16 @@ const enforceBemUsage = {
 
   create(context) {
     const filename = context.filename || context.getFilename();
-    
-    // Check if we're in a CSS context
+
     if (filename.endsWith('.css') || filename.endsWith('.scss')) {
-      // Try to detect if we have CSS support
-      // In ESLint v9 with @eslint/css, we should have CSS AST support
       try {
-        // Use CSS implementation (ESLint v9 with @eslint/css)
         return enforceBemUsageCss.create(context);
       } catch (error) {
-        // If CSS implementation fails, likely ESLint v8 without CSS support
-        // Return empty visitor to avoid errors
         return {};
       }
+    } else if (isJsxLikeFile(filename)) {
+      return enforceBemUsageJsx.create(context);
     } else {
-      // Use HTML implementation (compatible with both ESLint v8 and v9)
       return enforceBemUsageHtml.create(context);
     }
   },

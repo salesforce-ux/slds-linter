@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 import { FileScanner } from '../services/file-scanner';
 import { LintRunner } from '../services/lint-runner';
-import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
+import { StyleFilePatterns, ComponentFilePatterns, FrameworkFilePatterns } from '../services/file-patterns';
 import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
 import { DEFAULT_ESLINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
 import { LintResult, LintConfig, ReportConfig } from '../types';
@@ -24,29 +24,36 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
       configEslint: DEFAULT_ESLINT_CONFIG_PATH,
     });
     
-    // Scan directory for style files (CSS, SCSS, etc.)
-    const {filesCount: styleFilesCount, batches: styleFiles} = await FileScanner.scanFiles(normalizedConfig.directory, {
-      patterns: StyleFilePatterns,
-      batchSize: 100,
-    });
-    
-    // Scan directory for component files (HTML, etc.)
-    const {filesCount: componentFilesCount, batches: componentFiles} = await FileScanner.scanFiles(normalizedConfig.directory, {
-      patterns: ComponentFilePatterns,
-      batchSize: 100,
-    });
-    
+    // Scan the directory ONCE and partition results per file category to avoid
+    // walking the tree three times (style, component, framework).
+    const grouped = await FileScanner.scanFilesGrouped(
+      normalizedConfig.directory,
+      [
+        { name: 'style', patterns: StyleFilePatterns },
+        { name: 'component', patterns: ComponentFilePatterns },
+        { name: 'framework', patterns: FrameworkFilePatterns },
+      ],
+      { batchSize: 100 }
+    );
+
+    const { filesCount: styleFilesCount, batches: styleFiles } = grouped.style;
+    const { filesCount: componentFilesCount, batches: componentFiles } = grouped.component;
+    const { filesCount: frameworkFilesCount, batches: frameworkFiles } = grouped.framework;
+
     if(styleFilesCount>0){
       Logger.info(`Total style files: ${styleFilesCount}`);
     }
     if(componentFilesCount>0){
       Logger.info(`Total component files: ${componentFilesCount}`);
     }
+    if(frameworkFilesCount>0){
+      Logger.info(`Total framework files: ${frameworkFilesCount}`);
+    }
     
     const { fix, configEslint } = normalizedConfig;
     
     // Run ESLint on all files
-    return await LintRunner.runLinting([...styleFiles, ...componentFiles], {
+    return await LintRunner.runLinting([...styleFiles, ...componentFiles, ...frameworkFiles], {
       fix,
       configPath: configEslint,
     });

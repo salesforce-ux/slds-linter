@@ -6,10 +6,16 @@ import {
   handleFontDeclaration,
   handleBoxShadowDeclaration
 } from './handlers/index';
-import { colorProperties, densificationProperties, fontProperties, toSelector } from '../../../utils/property-matcher';
+import { colorProperties, densificationProperties, fontProperties, matchesCssProperty, toSelector } from '../../../utils/property-matcher';
 import { isRuleEnabled } from '../../../utils/rule-utils';
 import type { RuleConfig, HandlerContext, RuleOptions } from '../../../types';
 import { ruleOptionsSchema } from './ruleOptionsSchema';
+import {
+  isJsxLikeFile,
+  createDeclarationVisitor,
+  synthesizeDeclarationForHandlers,
+  type JsxDeclaration,
+} from '../../../utils/jsx';
 
 
 
@@ -57,6 +63,41 @@ export function defineNoHardcodedValueRule(config: RuleConfig & { ruleName?: str
         sourceCode: context.sourceCode,
         options: ruleOptions
       };
+
+      // JSX/React: inline style objects and CSS-in-JS declarations reuse the
+      // same value handlers via a synthesized declaration node.
+      const filename = context.filename || context.getFilename();
+      if (isJsxLikeFile(filename)) {
+        return createDeclarationVisitor(context, (decl: JsxDeclaration) => {
+          const synthesized = synthesizeDeclarationForHandlers(context, decl);
+          if (!synthesized) {
+            return;
+          }
+          const { node, proxiedContext } = synthesized;
+          const declHandlerContext: HandlerContext = {
+            valueToStylinghook: config.valueToStylinghook,
+            context: proxiedContext,
+            sourceCode: proxiedContext.sourceCode,
+            options: ruleOptions,
+          };
+          const cssProperty = (decl.property || '').toLowerCase();
+          if (!cssProperty || cssProperty.startsWith('--')) {
+            return;
+          }
+          if (matchesCssProperty(colorProperties, cssProperty)) {
+            handleColorDeclaration(node, declHandlerContext);
+          }
+          if (matchesCssProperty(densificationProperties, cssProperty)) {
+            handleDensityDeclaration(node, declHandlerContext);
+          }
+          if (fontProperties.includes(cssProperty)) {
+            handleFontDeclaration(node, declHandlerContext);
+          }
+          if (cssProperty === 'box-shadow') {
+            handleBoxShadowDeclaration(node, declHandlerContext);
+          }
+        });
+      }
       
       const colorOnlySelector = toSelector(colorProperties);
       const densityOnlySelector = toSelector(densificationProperties);
