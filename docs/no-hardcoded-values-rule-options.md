@@ -5,7 +5,7 @@
 The `no-hardcoded-values-slds2` ESLint rule provides flexible configuration options to control when and how hardcoded CSS values are reported. This document covers two key options:
 
 1. **`reportNumericValue`** - Control when numeric values are reported
-2. **`deterministicOnly`** - Restrict color autofix to deterministic hook matches only
+2. **`preferPaletteHook`** - Prefer palette hooks for color auto-fixes
 
 These options work alongside the **`customMapping`** feature (documented separately) to provide comprehensive control over the linting behavior.
 
@@ -14,7 +14,7 @@ These options work alongside the **`customMapping`** feature (documented separat
 ## Table of Contents
 
 1. [reportNumericValue Option](#reportnumericvalue-option)
-2. [deterministicOnly Option](#deterministiconly-option)
+2. [preferPaletteHook Option](#preferpalettehook-option)
 3. [Combined Usage Examples](#combined-usage-examples)
 4. [Migration Guide](#migration-guide)
 
@@ -71,7 +71,7 @@ The `reportNumericValue` option controls **when** the linter reports hardcoded n
   "rules": {
     "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
       "reportNumericValue": "hasReplacement",
-      "deterministicOnly": true,
+      "preferPaletteHook": true,
       "customMapping": {
         // ... custom mappings
       }
@@ -418,20 +418,19 @@ Custom mapping can make more values "have replacements":
 
 ---
 
-# `deterministicOnly` Option
+# `preferPaletteHook` Option
 
-## What is `deterministicOnly`?
+## What is `preferPaletteHook`?
 
-The `deterministicOnly` option restricts color autofix to **deterministic** hook matches only. With context extraction (`@salesforce-ux/context-extractor`), hook selection is handled by `classifyIssue()`, which classifies each issue into one of four tiers:
+The `preferPaletteHook` option controls **which hook** is used for auto-fixing when multiple color hooks match a hardcoded color value. When enabled, the linter prefers **palette hooks** (e.g., `--slds-g-color-palette-neutral-100`) over **theme hooks** (e.g., `--slds-g-color-neutral-base-100`).
 
-| Tier | Meaning |
-|------|---------|
-| **deterministic** | Context unambiguously resolves to a single hook category |
-| **semi-deterministic** | Multiple competing categories exist but a reasonable default can be picked |
-| **llm** | Hooks exist but context alone cannot resolve; would need LLM assistance |
-| **no-hooks** | No candidate hooks at all |
+### Background
 
-When `deterministicOnly` is enabled, `semi-deterministic` results are reported as suggestion-only instead of producing an autofix.
+In SLDS, many colors have multiple hook representations:
+- **Theme Hooks**: Semantic, context-aware (e.g., `--slds-g-color-neutral-base-100`)
+- **Palette Hooks**: Direct color references (e.g., `--slds-g-color-palette-neutral-100`)
+
+When both exist for the same color, this option lets you choose which to prefer for auto-fix.
 
 ---
 
@@ -441,13 +440,13 @@ When `deterministicOnly` is enabled, `semi-deterministic` results are reported a
 
 | Value | Behavior |
 |-------|----------|
-| `false` | Both `deterministic` and `semi-deterministic` produce autofix **(default)** |
-| `true` | Only `deterministic` produces autofix; `semi-deterministic` becomes suggestion-only |
+| `false` | Use first matched hook (default behavior) |
+| `true` | Prefer palette hooks when multiple matches exist |
 
 ### Default Value
 
 ```javascript
-false  // Both tiers produce autofix (backward-compatible)
+false  // Use first matched hook
 ```
 
 ---
@@ -458,7 +457,7 @@ false  // Both tiers produce autofix (backward-compatible)
 {
   "rules": {
     "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
-      "deterministicOnly": true
+      "preferPaletteHook": true
     }]
   }
 }
@@ -477,28 +476,30 @@ false  // Both tiers produce autofix (backward-compatible)
                  │
                  ▼
 ┌─────────────────────────────────────┐
-│  classifyIssue() returns tier       │
+│  Find matching hooks from metadata  │
 └────────────────┬────────────────────┘
                  │
-        ┌────────┴──────────┐
-        │ Which tier?       │
-        └──┬─────┬─────┬────┘
-           │     │     │
-    deterministic│  semi-deterministic
-           │     │     │
-           ▼     │     ▼
-      ┌────────┐ │ ┌──────────────────────────┐
-      │Autofix │ │ │deterministicOnly?         │
-      └────────┘ │ └──────┬───────────────────┘
-                 │  false │     │ true
-           llm / │       │     │
-         no-hooks│       ▼     ▼
-           │     │ ┌────────┐ ┌──────────────┐
-           ▼     │ │Autofix │ │Suggestion    │
-      ┌────────┐ │ └────────┘ │only          │
-      │Suggest │ │            └──────────────┘
-      │only    │ │
-      └────────┘ │
+                 ▼
+┌─────────────────────────────────────┐
+│  Multiple hooks found?              │
+└────────┬───────────────────┬────────┘
+         │ No (1 hook)       │ Yes (2+ hooks)
+         │                   │
+         ▼                   ▼
+    ┌─────────┐       ┌──────────────┐
+    │ Use it  │       │ Check option │
+    └─────────┘       └──────┬───────┘
+                             │
+                    ┌────────┴────────┐
+                    │ preferPaletteHook? │
+                    └────────┬────────┘
+                         Yes │     │ No
+                             │     │
+                             ▼     ▼
+                      ┌─────────┐ ┌──────────┐
+                      │ Palette │ │ First    │
+                      │ hook    │ │ hook     │
+                      └─────────┘ └──────────┘
 ```
 
 ### Implementation Details
@@ -506,85 +507,36 @@ false  // Both tiers produce autofix (backward-compatible)
 From `colorHandler.ts`:
 
 ```typescript
-const { deterministicOnly: settingsDeterministicOnly } =
-  (context?.context?.settings ?? {}) as Partial<ContextSettings>;
-const allowSemiDeterministic =
-  !(settingsDeterministicOnly ?? context.options?.deterministicOnly);
+let paletteHook = null;
 
-const classification = classifyIssue(issueWithContext, closestHooks);
-if (
-  classification?.tier === "deterministic" ||
-  (allowSemiDeterministic && classification?.tier === "semi-deterministic")
-) {
-  // produce autofix
+// Apply preferPaletteHook filter if enabled
+if (context.options?.preferPaletteHook && closestHooks.length > 1) {
+  paletteHook = closestHooks.filter(hook => 
+    hook.includes('-palette-')
+  )[0];
+}
+
+if (paletteHook) {
+  replacement = `var(${paletteHook}, ${colorValue})`;
+} else if (closestHooks.length === 1) {
+  replacement = `var(${closestHooks[0]}, ${colorValue})`;
 }
 ```
 
-The CLI (`context.settings`) takes precedence over the rule option, with a final fallback to `false`.
+**Key Point:** Only affects auto-fix when multiple hooks exist. Doesn't change which violations are reported.
 
 ---
 
 ## Usage Examples
 
-### Example 1: Default Behavior (deterministicOnly: false)
+### Example 1: Default Behavior (preferPaletteHook: false)
 
 **Configuration:**
 ```javascript
 {
-  "deterministicOnly": false  // or omit (default)
+  "preferPaletteHook": false  // or omit (default)
 }
 ```
-
-**CSS Input:**
-```css
-.example {
-  background-color: #ffffff;
-}
-```
-
-**Classification:** `semi-deterministic` with `selectedHook: --slds-g-color-surface-1`
-
-**Auto-fixed Output:**
-```css
-.example {
-  background-color: var(--slds-g-color-surface-1, #ffffff);
-}
-```
-
-**Result:** Semi-deterministic tier is autofixed
-
----
-
-### Example 2: Restrict to Deterministic Only (deterministicOnly: true)
-
-**Configuration:**
-```javascript
-{
-  "deterministicOnly": true
-}
-```
-
-**CSS Input:**
-```css
-.example {
-  background-color: #ffffff;
-}
-```
-
-**Classification:** `semi-deterministic` with `selectedHook: --slds-g-color-surface-1`
-
-**Linter Output:**
-```
-Warning: Hardcoded color #ffffff. Suggestions: --slds-g-color-surface-1, --slds-g-color-surface-2
-```
-
-**Result:** Semi-deterministic tier becomes suggestion-only (no auto-fix applied)
-
----
-
-### Example 3: Deterministic Always Auto-fixes
-
-Regardless of the `deterministicOnly` setting, `deterministic` classifications always produce autofix:
 
 **CSS Input:**
 ```css
@@ -593,55 +545,145 @@ Regardless of the `deterministicOnly` setting, `deterministic` classifications a
 }
 ```
 
-**Classification:** `deterministic` with `selectedHook: --slds-g-color-neutral-base-100`
+**Available Hooks (from metadata):**
+1. `--slds-g-color-neutral-base-100` (theme hook - first)
+2. `--slds-g-color-palette-neutral-100` (palette hook)
 
-**Auto-fixed Output (both settings):**
+**Auto-fixed Output:**
 ```css
 .example {
   color: var(--slds-g-color-neutral-base-100, #ffffff);
 }
 ```
 
+**Result:** Uses first hook (theme hook)
+
 ---
 
-## CLI Usage
+### Example 2: Prefer Palette Hooks (preferPaletteHook: true)
 
-The same option is available as a CLI flag:
-
-```bash
-# Default: both tiers autofixed
-npx @salesforce-ux/slds-linter lint ./src --fix
-
-# Restrict to deterministic only
-npx @salesforce-ux/slds-linter lint ./src --fix --deterministic-only
+**Configuration:**
+```javascript
+{
+  "preferPaletteHook": true
+}
 ```
 
-The CLI flag takes precedence over the ESLint config file setting.
+**CSS Input:**
+```css
+.example {
+  color: #ffffff;
+}
+```
+
+**Available Hooks (from metadata):**
+1. `--slds-g-color-neutral-base-100` (theme hook)
+2. `--slds-g-color-palette-neutral-100` (palette hook)
+
+**Auto-fixed Output:**
+```css
+.example {
+  color: var(--slds-g-color-palette-neutral-100, #ffffff);
+}
+```
+
+**Result:** Uses palette hook (filtered by `-palette-` string)
+
+---
+
+### Example 3: Single Hook (Option Has No Effect)
+
+**CSS Input:**
+```css
+.example {
+  color: #0070d2;
+}
+```
+
+**Available Hooks:**
+1. `--slds-g-color-brand-base-70` (only one hook)
+
+**Auto-fixed Output (both settings produce same result):**
+```css
+.example {
+  color: var(--slds-g-color-brand-base-70, #0070d2);
+}
+```
+
+**Result:** When only one hook exists, the option has no effect
+
+---
+
+### Example 4: No Palette Hook Available
+
+**Configuration:**
+```javascript
+{
+  "preferPaletteHook": true
+}
+```
+
+**CSS Input:**
+```css
+.example {
+  color: #0070d2;
+}
+```
+
+**Available Hooks (hypothetical):**
+1. `--slds-g-color-brand-base-70` (theme hook)
+2. `--slds-g-color-brand-secondary` (theme hook)
+
+**Auto-fixed Output:**
+```css
+.example {
+  color: var(--slds-g-color-brand-base-70, #0070d2);
+}
+```
+
+**Result:** Falls back to first hook when no palette hook exists
 
 ---
 
 ## When to Use Each Setting
 
-### Use `deterministicOnly: false` (Default) When:
+### Use `preferPaletteHook: false` (Default) When:
 
-✅ **You want maximum autofix coverage**
-- More values are auto-replaced with hooks
-- Faster migration path
+✅ **You prefer semantic, theme-based hooks**
+- Better for components that should adapt to themes
+- More context-aware color usage
 
-✅ **You trust the context-aware heuristics**
-- Semi-deterministic picks a reasonable default from competing categories
+✅ **You want predictable behavior**
+- Always uses first hook from metadata
+- Consistent with previous versions
 
 ---
 
-### Use `deterministicOnly: true` When:
+### Use `preferPaletteHook: true` When:
 
-✅ **You want higher confidence in autofixes**
-- Only unambiguous classifications are auto-applied
-- Reduces risk of incorrect hook selection
+✅ **You prefer direct color references**
+- More explicit about which color is being used
+- Easier to understand exact color value
 
-✅ **Your team reviews semi-deterministic suggestions manually**
-- Suggestions are still reported for human review
-- Better for critical UI components
+✅ **Your design system emphasizes palettes**
+- Team guidelines prefer palette hooks
+- Better alignment with design tokens
+
+✅ **You want color consistency**
+- Palette hooks represent specific color values
+- Less ambiguity than theme-based hooks
+
+---
+
+## Comparison Table
+
+| Aspect | Theme Hooks (false) | Palette Hooks (true) |
+|--------|---------------------|----------------------|
+| **Semantic** | ✅ High (e.g., "neutral-base") | ❌ Lower (e.g., "neutral-100") |
+| **Explicit Color** | ❌ Context-dependent | ✅ Direct color reference |
+| **Theming Support** | ✅ Better for themes | ⚠️ Fixed color values |
+| **Readability** | ✅ Purpose-clear | ⚠️ Number-based |
+| **Consistency** | ⚠️ May vary by context | ✅ Always same color |
 
 ---
 
@@ -649,21 +691,28 @@ The CLI flag takes precedence over the ESLint config file setting.
 
 ### Combine with Custom Mapping
 
-Custom mapping takes precedence over classification-based autofix:
+Custom mapping takes precedence over `preferPaletteHook`:
 
 ```javascript
 {
-  "deterministicOnly": true,
+  "preferPaletteHook": true,
   "customMapping": {
-    "--my-surface-color": {
-      "properties": ["background-color"],
+    "--my-white": {
+      "properties": ["color", "background-color"],
       "values": ["#fff", "white"]
     }
   }
 }
 ```
 
-**Result:** Custom-mapped values are always autofixed, regardless of `deterministicOnly`.
+**CSS Input:**
+```css
+.example {
+  color: #fff;
+}
+```
+
+**Result:** Uses `--my-white` (custom mapping overrides preferPaletteHook)
 
 ---
 
@@ -673,8 +722,8 @@ These options work independently:
 
 ```javascript
 {
-  "reportNumericValue": "hasReplacement",     // Affects numeric values
-  "deterministicOnly": true                   // Affects color autofix tier
+  "reportNumericValue": "hasReplacement",  // Affects numeric values
+  "preferPaletteHook": true                // Affects color auto-fix
 }
 ```
 
@@ -682,7 +731,7 @@ These options work independently:
 ```css
 .example {
   padding: 16px;        /* Affected by reportNumericValue */
-  color: #fff;          /* Affected by deterministicOnly */
+  color: #fff;          /* Affected by preferPaletteHook */
 }
 ```
 
@@ -696,8 +745,10 @@ These options work independently:
 {
   "rules": {
     "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
-      "reportNumericValue": "hasReplacement",
+      "reportNumericValue": "hasReplacement",  // Only actionable violations
+      "preferPaletteHook": true,               // Use palette hooks
       "customMapping": {
+        // Add team-specific hooks
         "--team-spacing-5": {
           "properties": ["padding", "margin"],
           "values": ["5px"]
@@ -710,35 +761,19 @@ These options work independently:
 
 **Benefits:**
 - ✅ Reduces noise (only reports fixable items)
-- ✅ Both deterministic and semi-deterministic tiers autofixed (default)
+- ✅ Consistent color approach (palette hooks)
 - ✅ Team customization (custom mappings)
 
 ---
 
-## Example 2: High-Confidence Autofix Only
+## Example 2: Strict Mode (Maximum Coverage)
 
 ```javascript
 {
   "rules": {
     "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
-      "reportNumericValue": "hasReplacement",
-      "deterministicOnly": true
-    }]
-  }
-}
-```
-
-**Use Case:** Only autofix when the hook is unambiguously determined; review semi-deterministic suggestions manually.
-
----
-
-## Example 3: Strict Mode (Maximum Coverage)
-
-```javascript
-{
-  "rules": {
-    "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
-      "reportNumericValue": "always"
+      "reportNumericValue": "always",
+      "preferPaletteHook": false
     }]
   }
 }
@@ -748,13 +783,14 @@ These options work independently:
 
 ---
 
-## Example 4: Colors Only
+## Example 3: Colors Only
 
 ```javascript
 {
   "rules": {
     "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
-      "reportNumericValue": "never"
+      "reportNumericValue": "never",
+      "preferPaletteHook": true
     }]
   }
 }
@@ -789,9 +825,9 @@ Based on your findings:
 { "reportNumericValue": "hasReplacement" }
 ```
 
-**Want only high-confidence autofixes?**
+**Prefer palette hooks?**
 ```javascript
-{ "deterministicOnly": true }
+{ "preferPaletteHook": true }
 ```
 
 **Need custom hooks?**
@@ -815,7 +851,7 @@ Update your ESLint config:
   "rules": {
     "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
       "reportNumericValue": "hasReplacement",
-      "deterministicOnly": true
+      "preferPaletteHook": true
     }]
   }
 }
@@ -844,7 +880,7 @@ npx @salesforce-ux/slds-linter@internal lint path/to/css --fix --config-eslint e
 ## ✅ Do
 
 - **Start with `hasReplacement`** for existing codebases
-- **Use `deterministicOnly: true`** when you need higher confidence in autofixes
+- **Use `preferPaletteHook: true`** for color consistency
 - **Document your choices** in team guidelines
 - **Run auto-fix** to quickly address violations
 - **Combine with customMapping** for complete coverage
@@ -852,6 +888,7 @@ npx @salesforce-ux/slds-linter@internal lint path/to/css --fix --config-eslint e
 ## ❌ Don't
 
 - **Don't use `always` without team buy-in** (can be overwhelming)
+- **Don't switch `preferPaletteHook` mid-project** (causes inconsistency)
 - **Don't ignore violations** - address them systematically
 - **Don't forget fallback values** in var() expressions
 
@@ -889,9 +926,9 @@ npx @salesforce-ux/slds-linter@internal lint path/to/css --fix --config-eslint e
 ## Issue: Auto-fix Not Applied
 
 **Check:**
-1. Is the classification `semi-deterministic`? → Set `deterministicOnly: false` (or omit, it's the default) to enable auto-fix for this tier
-2. Multiple hooks with no context extraction? → Only single-candidate hooks auto-fix
-3. Use custom mapping for guaranteed single hook
+1. Multiple hooks exist? → Will show suggestions instead of auto-fix
+2. Use `preferPaletteHook: true` to enable auto-fix
+3. Or use custom mapping for guaranteed single hook
 
 ---
 
@@ -904,12 +941,12 @@ npx @salesforce-ux/slds-linter@internal lint path/to/css --fix --config-eslint e
 - **Recommended**: `'hasReplacement'` for SLDS 260 compliance
 - **Affects**: Numeric values (spacing, sizing, fonts)
 
-## deterministicOnly
+## preferPaletteHook
 
-- **Purpose**: Restrict color autofix to deterministic hook matches only
-- **Values**: `false` (default, both tiers) or `true` (deterministic only)
-- **CLI Flag**: `--deterministic-only`
-- **Affects**: Color values classified by context extraction
+- **Purpose**: Choose which hook for color auto-fix
+- **Values**: `true` (palette) or `false` (first/theme)
+- **Recommended**: `true` for color consistency
+- **Affects**: Color values with multiple hooks
 
 ## Together
 
@@ -920,6 +957,7 @@ These options provide fine-grained control over linting behavior, enabling teams
 ## Related Documentation
 
 - [Custom Mapping](./no-hardcoded-values-custom-mapping.md) - Pre-configure hook replacements
+- [Custom Config](./custom-config.md) - Complete ESLint configuration guide
 
 ---
 

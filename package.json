@@ -8,8 +8,9 @@
     "packages/eslint-plugin-react-slds",
     "packages/cli"
   ],
+  "packageManager": "yarn@4.2.2",
   "engines": {
-    "node": "^22.13.0 || >=24.0.0"
+    "node": "24.x"
   },
   "scripts": {
     "postinstall": "node -e \"try{require('child_process').execSync('husky install',{stdio:'inherit'})}catch(e){console.log('husky install skipped')}\"",
@@ -17,7 +18,6 @@
     "test": "yarn workspaces foreach -At --jobs 1 run test",
     "build": "yarn workspaces foreach -At  --jobs 1 run build",
     "release": "node scripts/release.js",
-    "update:version": "node scripts/update-workspace-version.js",
     "coverage": "yarn test --coverage && yarn gen:coverage-summary",
     "gen:coverage-summary": "node scripts/consolidate-coverage.js",
     "gen:sarif": "npx slds-linter report \"demo/**\"",
@@ -60,5 +60,7 @@
     "url": "https://github.com/salesforce-ux/slds-linter/issues"
   },
   "homepage": "https://github.com/salesforce-ux/slds-linter#slds-linter",
-  "packageManager": "yarn@4.10.3"
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
 }
