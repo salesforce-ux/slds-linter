@@ -5,11 +5,11 @@
   "type": "module",
   "workspaces": [
     "packages/eslint-plugin-slds",
+    "packages/eslint-plugin-react-slds",
     "packages/cli"
   ],
-  "packageManager": "yarn@4.2.2",
   "engines": {
-    "node": "24.x"
+    "node": "^22.13.0 || >=24.0.0"
   },
   "scripts": {
     "postinstall": "node -e \"try{require('child_process').execSync('husky install',{stdio:'inherit'})}catch(e){console.log('husky install skipped')}\"",
@@ -17,6 +17,7 @@
     "test": "yarn workspaces foreach -At --jobs 1 run test",
     "build": "yarn workspaces foreach -At  --jobs 1 run build",
     "release": "node scripts/release.js",
+    "update:version": "node scripts/update-workspace-version.js",
     "coverage": "yarn test --coverage && yarn gen:coverage-summary",
     "gen:coverage-summary": "node scripts/consolidate-coverage.js",
     "gen:sarif": "npx slds-linter report \"demo/**\"",
@@ -26,17 +27,17 @@
   },
   "devDependencies": {
     "@inquirer/input": "^4.1.7",
+    "@inquirer/prompts": "^7.0.0",
     "@inquirer/select": "^4.0.10",
     "@listr2/prompt-adapter-inquirer": "^2.0.18",
-    "@types/eslint": "^8.0.0",
     "@types/node": "^20.11.19",
     "clean-pkg-json": "^1.2.0",
     "conventional-commits-parser": "^3.0.0",
     "esbuild": "^0.25.0",
     "esbuild-plugin-conditional-replace": "^0.1.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
+    "eslint": "^10.9.1",
     "finalhandler": "^2.1.0",
-    "glob": "^11.0.1",
     "gulp": "^5.0.0",
     "gulp-clean-dir": "^1.0.2",
     "gulp-execa": "^8.0.0",
@@ -59,7 +60,5 @@
     "url": "https://github.com/salesforce-ux/slds-linter/issues"
   },
   "homepage": "https://github.com/salesforce-ux/slds-linter#slds-linter",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  }
+  "packageManager": "yarn@4.10.3"
 }

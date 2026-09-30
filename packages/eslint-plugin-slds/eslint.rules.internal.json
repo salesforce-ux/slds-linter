@@ -14,7 +14,6 @@
     "@salesforce-ux/slds/no-slds-private-var": "warn",
     "@salesforce-ux/slds/no-hardcoded-values-slds2": ["warn", {
       "reportNumericValue": "hasReplacement",
-      "preferPaletteHook": true,
       "customMapping":{
         "--slds-g-font-line-height-4":{
           "properties": ["line-height"],
@@ -30,6 +29,7 @@
         }
       }
     }],
+    "@salesforce-ux/slds/no-invalid-hook-property-usage": "warn",
     "@salesforce-ux/slds/reduce-annotations": "warn"
   },
   "html": {

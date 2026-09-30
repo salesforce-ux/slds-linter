@@ -60,7 +60,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'varWithoutFallback',
-        type: 'Declaration',
         data: {
           cssVar: '--slds-g-color-border-base-1',
           recommendation: '#c9c9c9'
@@ -88,7 +87,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
       errors: [
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-color-border-base-1',
             recommendation: '#c9c9c9'
@@ -96,7 +94,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
         },
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-color-border-base-2',
             recommendation: '#aeaeae'
@@ -104,7 +101,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
         },
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-color-border-base-3',
             recommendation: '#939393'
@@ -112,7 +108,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
         },
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-spacing-4',
             recommendation: '1rem'
@@ -120,7 +115,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
         },
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-font-scale-2',
             recommendation: '1rem'
@@ -136,7 +130,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'varWithoutFallback',
-        type: 'Declaration',
         data: {
           cssVar: '--slds-g-color-border-base-1',
           recommendation: '#c9c9c9'
@@ -151,7 +144,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'varWithoutFallback',
-        type: 'Declaration',
         data: {
           cssVar: '--slds-g-spacing-4',
           recommendation: '1rem'
@@ -171,7 +163,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
       errors: [
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-color-border-base-1',
             recommendation: '#c9c9c9'
@@ -179,7 +170,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
         },
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-spacing-4',
             recommendation: '1rem'
@@ -187,7 +177,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
         },
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-spacing-4',
             recommendation: '1rem'
@@ -211,7 +200,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'varWithoutFallback',
-        type: 'Declaration',
         data: {
           cssVar: '--slds-g-color-border-base-1',
           recommendation: '#c9c9c9'
@@ -230,7 +218,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'varWithoutFallback',
-        type: 'Declaration',
         data: {
           cssVar: '--slds-g-color-border-base-1',
           recommendation: '#c9c9c9'
@@ -250,7 +237,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
       errors: [
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-color-border-base-1',
             recommendation: '#c9c9c9'
@@ -258,7 +244,6 @@ ruleTester.run('no-slds-var-without-fallback', rule, {
         },
         {
           messageId: 'varWithoutFallback',
-          type: 'Declaration',
           data: {
             cssVar: '--slds-g-color-surface-1',
             recommendation: '#ffffff'

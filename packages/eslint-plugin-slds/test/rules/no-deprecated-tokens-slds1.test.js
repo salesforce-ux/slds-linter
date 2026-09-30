@@ -54,7 +54,6 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
-        type: 'Identifier'
       }]
     },
     
@@ -65,7 +64,6 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
-        type: 'Identifier'
       }]
     },
 
@@ -83,11 +81,9 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       errors: [
         {
           messageId: 'deprecatedToken',
-          type: 'Identifier'
         },
         {
-          messageId: 'deprecatedToken', 
-          type: 'Identifier'
+          messageId: 'deprecatedToken',
         }
       ]
     },
@@ -105,7 +101,6 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
-        type: 'Identifier'
       }]
     },
 
@@ -120,7 +115,6 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
-        type: 'Identifier'
       }]
     },
 
@@ -130,23 +124,21 @@ ruleTester.run('no-deprecated-tokens-slds1', rule, {
         color: token(brandPrimary); 
       }`,
       output: `.example { 
-        color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary, #1b96ff)); 
+        color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary)); 
       }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
-        type: 'Identifier'
       }]
     },
 
     // Shorthand 't' function with SLDS mapping
     {
       code: `.example { color: t(brandPrimary); }`,
-      output: `.example { color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary, #1b96ff)); }`,
+      output: `.example { color: var(--slds-g-color-accent-1, var(--lwc-brandPrimary)); }`,
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedToken',
-        type: 'Identifier'
       }]
     }
   ]

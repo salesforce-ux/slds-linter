@@ -3,52 +3,26 @@ import input from "@inquirer/input";
 import select from "@inquirer/select";
 import { ListrInquirerPromptAdapter } from "@listr2/prompt-adapter-inquirer";
 import { execSync, exec } from "child_process";
-import { promises as fs } from "fs";
 import path from "path";
-import semver from "semver";
-import { fileURLToPath } from "url";
 import chalk from "chalk";
 import { generateReleaseNotes } from "./generate-release-notes.js";
 import { verifyTarballs } from "./verify-tarballs.js";
+import {
+  getRepoRoot,
+  getWorkspaceInfo,
+  validateSemverVersion,
+  syncWorkspaceVersion,
+} from "./workspace-versions.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT_DIR = path.resolve(__dirname, "..");
+const ROOT_DIR = getRepoRoot();
 const isDryRun = process.argv.includes("--dry-run") || false; // Skips publishing npm, git operations
 const skipCheck = process.argv.includes("--skip-check") || false; // Skips checking working directory git status
 const skipNpmPublish = process.argv.includes("--skip-npm-publish") || false; // Skips npm publish
 
-async function getWorkspaceInfo() {
+async function checkExistingTag(version, targetPersona) {
+  const remote = targetPersona === "external" ? "origin" : "internal";
   try {
-    const output = execSync("yarn workspaces list --json").toString();
-    // Convert array-style output from workspaces list to object-style output like workspaces info
-    const workspacesArray = output.trim().split('\n').slice(1).map(line => JSON.parse(line));
-    
-    // Format as an object that matches the original format expected by the rest of the script
-    return workspacesArray.reduce((acc, workspace) => {
-      acc[workspace.name] = {
-        location: workspace.location,
-        workspaceDependencies: [],
-        mismatchedWorkspaceDependencies: []
-      };
-      return acc;
-    }, {});
-  } catch (error) {
-    throw new Error(`Failed to parse workspace info: ${error.message}`);
-  }
-}
-
-async function validateVersion(version) {
-  if (!semver.valid(version)) {
-    throw new Error(
-      "Invalid version format. Please use semver format (e.g., 1.0.0)"
-    );
-  }
-  return true;
-}
-
-async function checkExistingTag(version) {
-  try {
-    return execSync(`git tag -l "${version}"`, { stdio: "pipe" })
+    return execSync(`git tag -l "${version}" ${remote}`, { stdio: "pipe" })
       .toString()
       .trim();
   } catch (error) {
@@ -56,55 +30,29 @@ async function checkExistingTag(version) {
   }
 }
 
-async function incrementPreReleaseVersion(baseVersion, type) {
+async function incrementPreReleaseVersion(baseVersion, type, targetPersona) {
   let version = baseVersion;
   let increment = 0;
   
 
-  while (await checkExistingTag(`${version}-${type}.${increment}`)) {
+  while (await checkExistingTag(`${version}-${type}.${increment}`, targetPersona)) {
     increment++;
   }
 
   return `${version}-${type}.${increment}`;
 }
 
-async function updatePackageVersions(version, workspaceInfo) {
-  for (const [pkgName, info] of Object.entries(workspaceInfo)) {
-    const pkgPath = path.join(ROOT_DIR, info.location, "package.json");
-    const pkg = JSON.parse(await fs.readFile(pkgPath, "utf8"));
-
-    // Update package version
-    pkg.version = version;
-
-    // Update workspace dependencies
-    for (const dep of ["dependencies", "devDependencies", "peerDependencies"]) {
-      if (!pkg[dep]) continue;
-
-      for (const [depName, depVersion] of Object.entries(pkg[dep])) {
-        if (workspaceInfo[depName]) {
-          pkg[dep][depName] = version;
-        }
-      }
-    }
-
-    await fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-  }
-  // Install dependencies to update the yarn.lock file
-  execSync(`yarn install`, {
-    stdio: 'inherit'
-  });
-}
-
-async function gitOperations(version) {
+async function gitOperations(version, targetPersona) {
   const currentBranch = execSync("git rev-parse --abbrev-ref HEAD")
     .toString()
     .trim();
-  const releaseBranch = `release/${version}`;
+  const releaseBranch = `release/${targetPersona}/${version}`;
+  const remote = targetPersona === "external" ? "origin" : "internal";
 
   execSync(`git checkout -b ${releaseBranch}`);
   execSync("git add .");
-  execSync(`git commit -m "Release ${version}"`);
-  execSync(`git push origin ${releaseBranch}`);
+  execSync(`git commit -m "chore: release ${version}"`);
+  execSync(`git push ${remote} ${releaseBranch}`);
   
   return {
     currentBranch,
@@ -112,7 +60,13 @@ async function gitOperations(version) {
   }
 }
 
-async function createPR(version, { currentBranch, releaseBranch }) {
+async function createPR(version, { currentBranch, releaseBranch, targetPersona }) {
+
+  if(targetPersona !== "external") {
+    console.log(chalk.yellow("Skipping PR creation for internal release"));
+    return;
+  }
+
   // Create PR from release branch to current branch
   execSync(`git stash`);
 
@@ -149,57 +103,49 @@ async function generateTarballs(workspaceInfo) {
 async function publishPackages(tarballs, version, releaseType, targetPersona) {
   const tag = releaseType === "final" ? "latest" : releaseType;
   // all internal packages are published to the internal tag
-  // CA distribution gets special ca- prefix for npm tags
   let personaTag;
   if (targetPersona === "external") {
     personaTag = tag;
-  } else if (targetPersona === "ca") {
-    personaTag = `ca-${tag}`;
   } else {
     personaTag = `internal${tag==="latest" ? "" : `-${tag}`}`;
   }
-  let sldsLinterTarball = "";
 
   for (const { pkgName, tarball, pkgPath } of tarballs) {
-    if (pkgName === "@salesforce-ux/slds-linter") {
-      sldsLinterTarball = tarball;
-      console.log(chalk.blue(`Using pre-generated tarball: ${sldsLinterTarball}`));
-    }
     execSync(
       `cd ${pkgPath} && NPM_TOKEN=${process.env.NPM_TOKEN} npm publish --tag ${personaTag} --access public ${isDryRun || skipNpmPublish ? "--dry-run" : ""}`
     );
     console.log(chalk.green(`Published ${pkgName}@${version}`));
   }
-
-  return sldsLinterTarball;
 }
 
-async function createTag(version) {
+async function createTag(version, targetPersona) {
   // skip if tag already exists
-  if (execSync(`git tag -l "${version}"`, { stdio: "pipe" }).toString().trim()) {
-    console.log(chalk.yellow(`Tag ${version} already exists, skipping tag creation`));
+  const remote = targetPersona === "external" ? "origin" : "internal";
+  if(checkExistingTag(version, targetPersona)) {
+    console.log(chalk.yellow(`Tag ${version} on ${remote} already exists, skipping tag creation`));
     return;
   }
-  execSync(`git tag ${version} && git push origin ${version}`);
-  console.log(chalk.green(`Created tag: ${version}`));
+  execSync(`git tag ${version} && git push ${remote} ${version}`);
+  console.log(chalk.green(`Created tag: ${version} on ${remote}`));
 }
 
-async function createGitHubRelease(version, tarballPath, releaseType) {
-  
-  if (releaseType !== "final") {
-    console.log(chalk.yellow("Skipping GitHub release for pre-release"));
+async function createGitHubRelease({ finalVersion, sldsLinterTarball, releaseType, targetPersona }) {
+  const isExternal = targetPersona === "external";
+  const remote = isExternal ? "origin" : "internal";
+  if (releaseType !== "final" && isExternal) {
+    console.log(chalk.yellow("Skipping GitHub release for pre-release external release"));
     return;
   }
 
-  const previousVersion = execSync("git describe --tags --abbrev=0")
+  const previousVersion = execSync(`git describe --tags --abbrev=0 ${remote}`)
     .toString()
     .trim();
-  const releaseNotes = await generateReleaseNotes(version, previousVersion);
+  const releaseNotes = await generateReleaseNotes(finalVersion, previousVersion);
   const releaseSuffix = releaseType !== "final" ? " --prerelease" : "";
   execSync(
-    `gh release create ${version} ${tarballPath} --title "${version}" --notes "${releaseNotes}"${releaseSuffix}`
+    `gh release create ${finalVersion} ${sldsLinterTarball} --title "${finalVersion}" --notes "${releaseNotes}"${releaseSuffix}`
   );
-  console.log(chalk.green(`Created GitHub release: ${version}`));
+  console.log(chalk.green(`Created GitHub release: ${finalVersion}`));
 }
 
 async function checkWorkingDirectory() {
@@ -268,8 +214,7 @@ async function main() {
               message: "Select target persona:",
               choices: [
                 { name: "Internal", value: "internal" },
-                { name: "External", value: "external" },
-                { name: "External CA Distribution", value: "ca" },  
+                { name: "External", value: "external" }
               ],
               default: "internal",
             });
@@ -286,7 +231,7 @@ async function main() {
             const prompt = task.prompt(ListrInquirerPromptAdapter);
             const version = await prompt.run(input, {
               message: "Enter the version number (e.g., 1.0.0):",
-              validate: validateVersion,
+              validate: validateSemverVersion,
               required: true,
             });
 
@@ -315,14 +260,15 @@ async function main() {
         {
           title: "Handle version generation",
           task: async (ctx) => {
-            // CA distribution gets -ca suffix to avoid version conflicts with external releases
+            // Internal releases get -internal suffix to avoid version conflicts with external releases
             const suffix = ctx.targetPersona === "external" ? "" : `-${ctx.targetPersona}`;
             const version = ctx.version + suffix;
             ctx.finalVersion = version;
             if (ctx.releaseType !== "final") {
               ctx.finalVersion = await incrementPreReleaseVersion(
                 version,
-                ctx.releaseType
+                ctx.releaseType,
+                ctx.targetPersona
               );
             }
           },
@@ -330,14 +276,18 @@ async function main() {
         {
           title: "Update all package versions",
           task: async (ctx) => {
-            await updatePackageVersions(ctx.finalVersion, ctx.workspaceInfo);
+            await syncWorkspaceVersion(
+              ctx.finalVersion,
+              ctx.workspaceInfo,
+              ROOT_DIR
+            );
           },
         },
         {
           title: "Git operations",
           skip: () => isDryRun,
           task: async (ctx) => {
-            const { currentBranch, releaseBranch } = await gitOperations(ctx.finalVersion);
+            const { currentBranch, releaseBranch } = await gitOperations(ctx.finalVersion, ctx.targetPersona);
             ctx.currentBranch = currentBranch;
             ctx.releaseBranch = releaseBranch;
           },
@@ -347,7 +297,7 @@ async function main() {
           task: async (ctx) => {
             const envVar = ["CLI_BUILD_MODE=release"];
             // CA distribution is treated as external for build purposes
-            if(ctx.targetPersona !== "external" && ctx.targetPersona !== "ca") {
+            if(ctx.targetPersona !== "external") {
               envVar.push(`TARGET_PERSONA=${ctx.targetPersona}`);
             }           
             execSync(`${envVar.join(" ")} yarn build`, {
@@ -359,6 +309,7 @@ async function main() {
           title: "Generate tarballs",
           task: async (ctx) => {
             ctx.tarballs = await generateTarballs(ctx.workspaceInfo);
+            ctx.sldsLinterTarball = ctx.tarballs.find(tarball => tarball.pkgName === "@salesforce-ux/slds-linter").tarball;
           },
         },
         {
@@ -369,50 +320,47 @@ async function main() {
         },
         {
           title: "Publish packages",
+          skip: (ctx) => ctx.targetPersona !== "external",
           task: async (ctx) => {
-            ctx.sldsLinterTarball = await publishPackages(
+            await publishPackages(
               ctx.tarballs,
               ctx.finalVersion,
               ctx.releaseType,
               ctx.targetPersona
-            );            
+            );
           },
         },
         {
           title: "Create PR",
-          skip: (ctx) => isDryRun || !ctx.sldsLinterTarball,
+          skip: (ctx) => isDryRun || ctx.targetPersona !== "external",
           task: async (ctx) => {
             await createPR(ctx.finalVersion, ctx);
           },
         },
         {
           title: "Create tag",
-          skip: () => isDryRun || !ctx.sldsLinterTarball,
+          skip: () => isDryRun || ctx.targetPersona !== "external",
           task: async (ctx) => {
-            await createTag(ctx.finalVersion);
+            await createTag(ctx.finalVersion, ctx.targetPersona);
           },
         },
         {
           title: "Create GitHub release",
-          skip: (ctx) => isDryRun || ctx.releaseType !== "final" || !ctx.sldsLinterTarball || (ctx.targetPersona !== "external" && ctx.targetPersona !== "ca"),
+          skip: (ctx) => isDryRun || ctx.releaseType !== "final" || !ctx.sldsLinterTarball || ctx.targetPersona !== "external",
           task: async (ctx) => {
-            await createGitHubRelease(
-              ctx.finalVersion,
-              ctx.sldsLinterTarball,
-              ctx.releaseType
-            );
+            await createGitHubRelease(ctx);
           },
         },
         {
           title: "Comment on included PRs",
-          skip: () => isDryRun,
+          skip: () => isDryRun || ctx.targetPersona !== "external",
           task: async () => {
             return exec("node scripts/comment-release-prs.js");
           },
         },
         {
           title: "Perform post-release checks",
-          skip: () => skipCheck,
+          skip: () => skipCheck || ctx.targetPersona !== "external",
           task: async () => {
             await resetWorkingDirectory();
           },

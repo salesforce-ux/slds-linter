@@ -4,8 +4,8 @@ ESLint plugin provides custom linting rules specifically built for Salesforce Li
 
 ## Requirements
 
-- **Node.js**: 18.18.0 or higher
-- **ESLint**: 8.0.0 or 9.0.0+
+- **Node.js**: 18.18.0 or later for ESLint 9; ^20.19.0, ^22.13.0, or >=24 for ESLint 10
+- **ESLint**: 9.22.x or 10.x
 
 ## Install
 
@@ -15,17 +15,7 @@ npm install @salesforce-ux/eslint-plugin-slds --save-dev
 
 ## Configure
 
-### ESLint v8 (Legacy Config)
-
-```javascript
-// .eslintrc.js
-module.exports = {
-  plugins: ['@salesforce-ux/slds'],
-  extends: ['plugin:@salesforce-ux/slds/recommended']
-};
-```
-
-### ESLint v9+ (Flat Config)
+### ESLint 9.22+ and 10 (Flat Config)
 
 #### Basic Configuration
 
@@ -39,7 +29,7 @@ module.exports = defineConfig([
     plugins: {
       '@salesforce-ux/slds': sldsPlugin
     },
-    extends: ['@salesforce-ux/slds/recommended']
+    extends: ['@salesforce-ux/slds/flat/recommended']
   }
 ]);
 ```
@@ -64,14 +54,14 @@ export default defineConfig([
       css: css,
       ...sldsCssPlugin()
     },
-    extends: ['@salesforce-ux/slds/recommended', 'css/recommended']
+    extends: ['@salesforce-ux/slds/flat/recommended', 'css/recommended']
   }
 ]);
 ```
 
 ## Migrate to the Latest Version
 
-By default, the latest version of the plugin supports legacy and flat config systems.
+ESLint 8 is no longer supported. ESLint 9.22+ and 10 consumers must use flat configuration through `flat/recommended`, `flat/recommended-css`, or `flat/recommended-html`.
 
 ## Supported Rules
 

@@ -47,7 +47,7 @@ export function defineNoHardcodedValueRule(config: RuleConfig & { ruleName?: str
       const ruleOptions: RuleOptions = {
         reportNumericValue: options.reportNumericValue || 'always',
         customMapping: options.customMapping || {},
-        preferPaletteHook: options.preferPaletteHook || false
+        deterministicOnly: options.deterministicOnly || false
       };
 
       // Create handler context

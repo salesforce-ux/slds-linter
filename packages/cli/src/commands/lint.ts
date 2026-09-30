@@ -22,6 +22,7 @@ export function registerLintCommand(program: Command): void {
     .option('--fix', 'Automatically fix problems')
     .option('--config-eslint <path>', 'Path to eslint config file')
     .option('--editor <editor>', 'Editor to open files with (e.g., vscode, atom, sublime). Auto-detects if not specified')
+    .option('--deterministic-only', 'Restrict color autofix to deterministic hook matches only')
     .action(async (directory:string, options: CliOptions) => {
       const startTime = Date.now();
       try {

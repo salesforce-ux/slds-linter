@@ -1,6 +1,6 @@
 /**
  * JSON Schema for no-hardcoded-values rule options
- * Defines validation rules for reportNumericValue, customMapping, and preferPaletteHook
+ * Defines validation rules for reportNumericValue, customMapping, and deterministicOnly
  */
 export const ruleOptionsSchema = [
   {
@@ -28,7 +28,7 @@ export const ruleOptionsSchema = [
           required: ['properties', 'values']
         }
       },
-      preferPaletteHook: {
+      deterministicOnly: {
         type: 'boolean',
         default: false
       }

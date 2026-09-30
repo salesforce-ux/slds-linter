@@ -15,12 +15,6 @@ describe('Unified plugin export', () => {
     expect(plugin.rules['modal-close-button-issue']).toBe(modalCloseButtonIssueRule);
   });
 
-  it('should export a legacy (v8) config', () => {
-    expect(plugin.configs.recommended).toBeDefined();
-    expect(plugin.configs.recommended.plugins).toContain('@salesforce-ux/slds');
-    expect(plugin.configs.recommended.rules['@salesforce-ux/slds/enforce-bem-usage']).toBe('error');
-  });
-
   it('should export a flat (v9+) config', () => {
     expect(plugin.configs['flat/recommended']).toBeDefined();
     expect(plugin.configs['flat/recommended']).toHaveLength(2);
@@ -55,4 +49,4 @@ describe('Unified plugin export', () => {
     expect(htmlConfig.files).toContain('**/*.html');
     expect(htmlConfig.rules['@salesforce-ux/slds/enforce-bem-usage']).toBe('error');
   });
-}); 
+});

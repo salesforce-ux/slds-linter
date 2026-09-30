@@ -3,7 +3,10 @@ const {
   convertToHex,
   isValidColor,
   extractColorValue,
-} = require('../../build/utils/color-lib-utils');
+  classifyColorFamily,
+  hasAlphaChannel,
+  transparentPercentage,
+} = require('../../src/utils/color-lib-utils');
 
 // Minimal shape for ValueToStylingHooksMapping used by findClosestColorHook
 const supportedColors = {
@@ -119,10 +122,23 @@ describe('color-lib-utils', () => {
       expect(result).toContain('--slds-bg-color');
     });
 
-    it('includes wildcard (*) property hooks for any CSS property', () => {
+    it('excludes reference group wildcard hooks when same-family semantic groups exist', () => {
       const result = findClosestColorHook('#ff0000', supportedColors, 'color');
-      // --slds-universal-color has '*' property, should be included
-      expect(result).toContain('--slds-universal-color');
+      // --slds-universal-color is in the reference group — excluded when theme has same-family hooks
+      expect(result).not.toContain('--slds-universal-color');
+      expect(result).toContain('--slds-text-color');
+    });
+
+    it('includes wildcard (*) property hooks when no same-family groups exist', () => {
+      // Neutral input: no family promotion, reference group hooks are included via fallback
+      const neutralColors = {
+        '#808080': [
+          { name: '--slds-ref-color', properties: ['*'], group: 'reference' },
+          { name: '--slds-surface-color', properties: ['color'], group: 'surface' },
+        ],
+      };
+      const result = findClosestColorHook('#7f7f7f', neutralColors, 'color');
+      expect(result).toContain('--slds-ref-color');
     });
 
     it('orders by group priority based on CSS property type', () => {
@@ -131,16 +147,192 @@ describe('color-lib-utils', () => {
       expect(result[0]).toBe('--slds-border-color');
     });
 
-    it('limits results to 5 hooks maximum', () => {
+    it('limits results to 3 per group and total to group count', () => {
       const manyColors = {
-        '#ff0000': Array.from({ length: 10 }, (_, i) => ({
-          name: `--slds-hook-${i}`,
-          properties: ['color'],
-          group: 'theme',
-        })),
+        '#ff0000': [
+          ...Array.from({ length: 5 }, (_, i) => ({
+            name: `--slds-surface-${i}`,
+            properties: ['color'],
+            group: 'surface',
+          })),
+          ...Array.from({ length: 5 }, (_, i) => ({
+            name: `--slds-feedback-${i}`,
+            properties: ['color'],
+            group: 'feedback',
+          })),
+          ...Array.from({ length: 5 }, (_, i) => ({
+            name: `--slds-theme-${i}`,
+            properties: ['color'],
+            group: 'theme',
+          })),
+        ],
       };
       const result = findClosestColorHook('#ff0000', manyColors, 'color');
+      // color order has 5 groups: surface, accent, feedback, theme, reference
+      // max results = group count = 5
       expect(result.length).toBeLessThanOrEqual(5);
+      // At most 3 from any single group
+      expect(result.filter(h => h.includes('surface')).length).toBeLessThanOrEqual(3);
+      expect(result.filter(h => h.includes('feedback')).length).toBeLessThanOrEqual(3);
+      expect(result.filter(h => h.includes('theme')).length).toBeLessThanOrEqual(3);
+    });
+
+    it('includes hooks from multiple groups for diverse suggestions', () => {
+      const diverseColors = {
+        '#ff0000': [
+          { name: '--slds-theme-color', properties: ['color'], group: 'theme' },
+          { name: '--slds-feedback-color', properties: ['color'], group: 'feedback' },
+          { name: '--slds-reference-color', properties: ['*'], group: 'reference' },
+        ],
+        '#ff0202': [
+          { name: '--slds-surface-color', properties: ['color'], group: 'surface' },
+        ],
+      };
+      const result = findClosestColorHook('#ff0000', diverseColors, 'color');
+      // Should include hooks from surface, theme, feedback — not just nearest distance
+      expect(result).toContain('--slds-theme-color');
+      expect(result).toContain('--slds-surface-color');
+      expect(result).toContain('--slds-feedback-color');
+    });
+
+    it('excludes different-family groups when same-family groups exist', () => {
+      // Green input: only feedback (green) hooks should appear; surface (grey) hooks excluded
+      const greenColors = {
+        '#808080': [
+          { name: '--slds-surface-container-1', properties: ['background-color'], group: 'surface' },
+          { name: '--slds-surface-container-2', properties: ['background-color'], group: 'surface' },
+        ],
+        '#4bca81': [
+          { name: '--slds-success-container-1', properties: ['background-color'], group: 'feedback' },
+        ],
+        '#3dbb72': [
+          { name: '--slds-success-base-70', properties: ['background-color'], group: 'feedback' },
+        ],
+      };
+      const result = findClosestColorHook('#4bca81', greenColors, 'background-color');
+      // Feedback group has green hooks matching the green input
+      expect(result.length).toBeGreaterThan(0);
+      expect(result).toContain('--slds-success-container-1');
+      expect(result).toContain('--slds-success-base-70');
+      // Surface (grey/neutral) hooks should be completely excluded
+      expect(result.filter(h => h.includes('surface'))).toEqual([]);
+    });
+
+    it('does not promote groups for neutral input colors', () => {
+      // Grey input: no family promotion, standard group order applies
+      const greyColors = {
+        '#808080': [
+          { name: '--slds-surface-1', properties: ['background-color'], group: 'surface' },
+        ],
+        '#777777': [
+          { name: '--slds-theme-neutral', properties: ['background-color'], group: 'theme' },
+        ],
+      };
+      const result = findClosestColorHook('#888888', greyColors, 'background-color');
+      // Surface should still come first for background (default group order, no promotion)
+      if (result.length > 1) {
+        const surfaceIdx = result.findIndex(h => h.includes('surface'));
+        const themeIdx = result.findIndex(h => h.includes('theme'));
+        if (surfaceIdx !== -1 && themeIdx !== -1) {
+          expect(surfaceIdx).toBeLessThan(themeIdx);
+        }
+      }
+    });
+  });
+
+  describe('hasAlphaChannel', () => {
+    it('returns true for rgba with alpha < 1', () => {
+      expect(hasAlphaChannel('rgba(181, 54, 45, 0.7)')).toBe(true);
+    });
+
+    it('returns true for hsla with alpha < 1', () => {
+      expect(hasAlphaChannel('hsla(240, 75%, 60%, 0.9)')).toBe(true);
+    });
+
+    it('returns true for 8-digit hex with alpha', () => {
+      expect(hasAlphaChannel('#ff000080')).toBe(true);
+    });
+
+    it('returns false for opaque hex color', () => {
+      expect(hasAlphaChannel('#ff0000')).toBe(false);
+    });
+
+    it('returns false for opaque rgb color', () => {
+      expect(hasAlphaChannel('rgb(255, 0, 0)')).toBe(false);
+    });
+
+    it('returns false for rgba with alpha = 1', () => {
+      expect(hasAlphaChannel('rgba(255, 0, 0, 1)')).toBe(false);
+    });
+
+    it('returns false for invalid color', () => {
+      expect(hasAlphaChannel('not-a-color')).toBe(false);
+    });
+  });
+
+  describe('transparentPercentage', () => {
+    it('returns 30 for alpha 0.7', () => {
+      expect(transparentPercentage('rgba(181, 54, 45, 0.7)')).toBeCloseTo(30);
+    });
+
+    it('returns 10 for alpha 0.9', () => {
+      expect(transparentPercentage('hsla(240, 75%, 60%, 0.9)')).toBeCloseTo(10);
+    });
+
+    it('returns 50 for alpha 0.5', () => {
+      expect(transparentPercentage('rgba(0, 0, 0, 0.5)')).toBeCloseTo(50);
+    });
+
+    it('returns 0 for fully opaque color', () => {
+      expect(transparentPercentage('#ff0000')).toBeCloseTo(0);
+    });
+
+    it('handles 8-digit hex with ~50% alpha', () => {
+      expect(transparentPercentage('#ff000080')).toBeCloseTo(49.8, 0);
+    });
+  });
+
+  describe('classifyColorFamily', () => {
+    it('classifies pure red', () => {
+      expect(classifyColorFamily('#ff0000')).toBe('red');
+    });
+
+    it('classifies green', () => {
+      expect(classifyColorFamily('#4bca81')).toBe('green');
+      expect(classifyColorFamily('#00ff00')).toBe('green');
+    });
+
+    it('classifies blue', () => {
+      expect(classifyColorFamily('#0000ff')).toBe('blue');
+    });
+
+    it('classifies orange', () => {
+      expect(classifyColorFamily('#ff8c00')).toBe('orange');
+    });
+
+    it('classifies grey/neutral for low saturation', () => {
+      expect(classifyColorFamily('#808080')).toBe('neutral');
+      expect(classifyColorFamily('#cccccc')).toBe('neutral');
+    });
+
+    it('classifies near-black as neutral', () => {
+      expect(classifyColorFamily('#0a0a0a')).toBe('neutral');
+    });
+
+    it('classifies near-white as neutral', () => {
+      expect(classifyColorFamily('#f8f8f8')).toBe('neutral');
+    });
+
+    it('classifies purple', () => {
+      expect(classifyColorFamily('#8b00ff')).toBe('purple');
+    });
+
+    it('classifies cyan', () => {
+      expect(classifyColorFamily('#00ced1')).toBe('cyan');
+    });
+
+    it('classifies yellow', () => {
+      expect(classifyColorFamily('#ffd700')).toBe('yellow');
     });
   });
 });

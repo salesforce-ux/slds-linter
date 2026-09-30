@@ -6,6 +6,6 @@ export default defineConfig([
     plugins: {
       ...sldsCssPlugin()
     },
-    extends: ["@salesforce-ux/slds/recommended"]
+    extends: ["@salesforce-ux/slds/flat/recommended"]
   },
 ]);

@@ -15,6 +15,7 @@ export interface ReplacementInfo {
   displayValue: string;       // Just the hook: --hook
   hasHook: boolean;
   isNumeric?: boolean;        // Whether this is a numeric (dimension) value
+  usageContext?:string; // context extracted
 }
 
 /**
@@ -90,7 +91,7 @@ export function handleShorthandAutoFix(
     }
 
   // Report each individual value
-  sortedReplacements.forEach(({ start, end, replacement, displayValue, hasHook, isNumeric }) => {
+  sortedReplacements.forEach(({ start, end, replacement, displayValue, hasHook, isNumeric, usageContext }) => {
     const originalValue = valueText.substring(start, end);
     
     // Check if we should skip reporting based on reportNumericValue option
@@ -134,7 +135,8 @@ export function handleShorthandAutoFix(
         messageId: 'hardcodedValue',
         data: {
           oldValue: originalValue,
-          newValue: displayValue
+          newValue: displayValue,
+          usageContext: usageContext||''
         },
         fix
       });
@@ -144,7 +146,8 @@ export function handleShorthandAutoFix(
         node: reportNode,
         messageId: 'noReplacement',
         data: {
-          oldValue: originalValue
+          oldValue: originalValue,
+          usageContext: usageContext||''
         }
       });
     }
