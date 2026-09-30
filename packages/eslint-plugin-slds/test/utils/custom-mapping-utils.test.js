@@ -1,4 +1,4 @@
-const { getCustomMapping } = require('../../build/utils/custom-mapping-utils');
+const { getCustomMapping } = require('../../src/utils/custom-mapping-utils');
 
 describe('custom-mapping-utils', () => {
   describe('getCustomMapping', () => {

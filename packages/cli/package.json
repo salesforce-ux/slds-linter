@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/slds-linter",
-  "version": "1.2.1",
+  "version": "1.3.0-internal-beta.8",
   "description": "SLDS Linter CLI tool for linting styles and components",
   "keywords": [
     "lightning design system linter",
@@ -25,7 +25,8 @@
   },
   "files": [
     "build/**",
-    "README.md"
+    "README.md",
+    "slds.config.mjs"
   ],
   "bin": "build/index.js",
   "scripts": {
@@ -36,20 +37,25 @@
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
-    "@salesforce-ux/eslint-plugin-slds": "1.2.1",
-    "@typescript-eslint/eslint-plugin": "^8.36.0",
-    "@typescript-eslint/parser": "^8.36.0",
+    "@salesforce-ux/context-extractor": "^1.1.0",
+    "@salesforce-ux/eslint-plugin-react-slds": "1.0.0-alpha.0",
+    "@salesforce-ux/eslint-plugin-slds": "1.3.0-internal-beta.8",
+    "@typescript-eslint/eslint-plugin": "^8.69.0",
+    "@typescript-eslint/parser": "^8.69.0",
     "chalk": "^4.1.2",
     "cli-progress": "^3.12.0",
     "commander": "^13.1.0",
-    "eslint": "^9.0.0",
+    "eslint": "^10.9.1",
     "export-to-csv": "^1.4.0",
     "globby": "^14.1.0",
     "import-meta-resolve": "^4.1.0",
     "json-stream-stringify": "^3.1.6",
     "node-sarif-builder": "^3.2.0",
     "ora": "^5.4.1",
-    "semver": "^7.7.1"
+    "piscina": "^5.1.4",
+    "semver": "^7.7.1",
+    "supports-hyperlinks": "^4.4.0",
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@types/cli-progress": "^3",
@@ -59,7 +65,7 @@
     "yaml": "^2.8.1"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": "^22.13.0 || >=24.0.0"
   },
   "license": "ISC",
   "repository": {
@@ -71,6 +77,6 @@
   },
   "homepage": "https://github.com/salesforce-ux/slds-linter/tree/main/packages/cli#slds-linter",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "tag": "internal"
   }
 }

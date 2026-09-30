@@ -25,6 +25,9 @@ const jestConfig: JestConfigWithTsJest = {
     "lcov",
     "json-summary"
   ],
+  moduleNameMapper: {
+    '^@salesforce-ux/context-extractor$': '<rootDir>/tests/__mocks__/context-extractor.ts',
+  },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'yml', 'yaml'],
   roots: ['<rootDir>'],
   testEnvironment: 'node',

@@ -53,7 +53,7 @@ ruleTester.run("slds-modal-button-issue", rule, {
     // ❌ Scenario 1: Remove slds-button_icon-inverse from a modal close button
     {
       code: `<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"></button>`,
-      errors: [{ messageId: "removeClass", type: "Tag" }],
+      errors: [{ messageId: "removeClass" }],
       output: `<button class="slds-button slds-button_icon slds-modal__close"></button>`,
     },
 

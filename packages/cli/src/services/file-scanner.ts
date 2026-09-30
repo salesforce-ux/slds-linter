@@ -2,7 +2,7 @@ import path from 'path';
 import { promises as fs } from "fs";
 import {globby, isDynamicPattern} from 'globby';
 import { Logger } from "../utils/logger";
-import { ScanOptions, ScanResult } from "../types";
+import { ScanOptions } from "../types";
 
 export class FileScanner {
   static DEFAULT_BATCH_SIZE = 100;
@@ -16,7 +16,7 @@ export class FileScanner {
   static async scanFiles(
     directory: string,
     options: ScanOptions
-  ): Promise<ScanResult> {
+  ): Promise<string[]> {
     try {
       Logger.debug(`Scanning directory: ${directory}`);
 
@@ -72,17 +72,10 @@ export class FileScanner {
       // Validate files exist and are readable
       const validFiles = await this.validateFiles(allFiles);
 
-      // Split into batches
-      const batchSize = options.batchSize || this.DEFAULT_BATCH_SIZE;
-      const batches = this.createBatches(validFiles, batchSize);
-
       Logger.debug(
-        `Found ${validFiles.length} files, split into ${batches.length} batches`
+        `Found ${validFiles.length} files`
       );
-      return {
-        filesCount: validFiles.length,
-        batches
-      };
+      return validFiles;
     } catch (error: any) {
       Logger.error(`Failed to scan files: ${error.message}`);
       throw error;

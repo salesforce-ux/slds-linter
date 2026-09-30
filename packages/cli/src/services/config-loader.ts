@@ -2,7 +2,8 @@ import { readFile, writeFile } from 'fs/promises';
 import { createRequire } from 'module';
 import { join, resolve } from 'path';
 import { tmpdir, platform } from 'os';
-import { pathToFileURL } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { resolvePath } from '../utils/nodeVersionUtil';
 import { Logger } from '../utils/logger';
 
 /**
@@ -35,19 +36,23 @@ export class ConfigLoader {
       // Resolve to absolute path first
       const absolutePath = resolve(configPath);
       
-      // Skip special processing for bundled configs (part of CLI package)
-      if (absolutePath.includes('eslint-plugin-slds') && absolutePath.includes('eslint.config.mjs')) {
+      // Bundled configs resolve dependencies from their own package location.
+      if (absolutePath === fileURLToPath(new URL('../../slds.config.mjs', import.meta.url))) {
         Logger.debug('Using bundled config as-is');
         return absolutePath;
       }
       
       // Check if dependencies already installed in user's workspace
       const userConfigUrl = pathToFileURL(absolutePath).href;
+      const configContent = await readFile(absolutePath, 'utf-8');
       const pluginInstalled = this.isPackageInstalled('@salesforce-ux/eslint-plugin-slds', userConfigUrl);
+      const usesReactPlugin = configContent.includes('@salesforce-ux/eslint-plugin-react-slds');
+      const reactPluginInstalled = !usesReactPlugin ||
+        this.isPackageInstalled('@salesforce-ux/eslint-plugin-react-slds', userConfigUrl);
       const eslintInstalled = this.isPackageInstalled('eslint', userConfigUrl);
       const cssPluginInstalled = this.isPackageInstalled('@eslint/css', userConfigUrl);
       
-      if (pluginInstalled && eslintInstalled && cssPluginInstalled) {
+      if (pluginInstalled && reactPluginInstalled && eslintInstalled && cssPluginInstalled) {
         Logger.debug('Dependencies already installed, using config as-is');
         // On Windows, convert to file:// URL directly
         return platform() === 'win32' ? userConfigUrl : absolutePath;
@@ -56,11 +61,13 @@ export class ConfigLoader {
       // Dependencies not installed - rewrite to use CLI's bundled versions
       Logger.debug('Dependencies not installed, rewriting imports');
       
-      const configContent = await readFile(absolutePath, 'utf-8');
       const require = createRequire(import.meta.url);
       
       // Get CLI's bundled paths
       const pluginPath = require.resolve('@salesforce-ux/eslint-plugin-slds');
+      const reactPluginPath = usesReactPlugin
+        ? resolvePath('@salesforce-ux/eslint-plugin-react-slds', import.meta)
+        : '';
       const eslintConfigPath = require.resolve('eslint/config');
       
       // Resolve @eslint/css and convert to ESM path for .mjs imports
@@ -73,6 +80,9 @@ export class ConfigLoader {
       const pluginImport = platform() === 'win32' 
         ? pathToFileURL(pluginPath).href 
         : pluginPath;
+      const reactPluginImport = platform() === 'win32' && reactPluginPath
+        ? pathToFileURL(reactPluginPath).href
+        : reactPluginPath;
       const eslintConfigImport = platform() === 'win32'
         ? pathToFileURL(eslintConfigPath).href
         : eslintConfigPath;
@@ -85,6 +95,18 @@ export class ConfigLoader {
         .replace(
           /import\s+(\w+)\s+from\s+['"]@salesforce-ux\/eslint-plugin-slds['"]/g,
           `import $1 from '${pluginImport}'`
+        )
+        .replace(
+          /import\s+({[^}]+})\s+from\s+['"]@salesforce-ux\/eslint-plugin-slds['"]/g,
+          `import $1 from '${pluginImport}'`
+        )
+        .replace(
+          /import\s+(\w+)\s+from\s+['"]@salesforce-ux\/eslint-plugin-react-slds['"]/g,
+          `import $1 from '${reactPluginImport}'`
+        )
+        .replace(
+          /import\s+({[^}]+})\s+from\s+['"]@salesforce-ux\/eslint-plugin-react-slds['"]/g,
+          `import $1 from '${reactPluginImport}'`
         )
         .replace(
           /import\s+({[^}]+})\s+from\s+['"]eslint\/config['"]/g,
@@ -109,4 +131,3 @@ export class ConfigLoader {
     }
   }
 }
-

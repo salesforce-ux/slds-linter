@@ -98,22 +98,22 @@ const enforceBemUsage = {
   },
 
   create(context) {
-    const filename = context.filename || context.getFilename();
+    const filename = context.filename;
     
     // Check if we're in a CSS context
     if (filename.endsWith('.css') || filename.endsWith('.scss')) {
       // Try to detect if we have CSS support
-      // In ESLint v9 with @eslint/css, we should have CSS AST support
+      // In ESLint 9+ with @eslint/css, we should have CSS AST support
       try {
-        // Use CSS implementation (ESLint v9 with @eslint/css)
+        // Use CSS implementation (ESLint 9+ with @eslint/css)
         return enforceBemUsageCss.create(context);
       } catch (error) {
-        // If CSS implementation fails, likely ESLint v8 without CSS support
+        // Gracefully skip CSS files when CSS language support is unavailable
         // Return empty visitor to avoid errors
         return {};
       }
     } else {
-      // Use HTML implementation (compatible with both ESLint v8 and v9)
+      // Use the HTML implementation
       return enforceBemUsageHtml.create(context);
     }
   },

@@ -30,9 +30,11 @@ export interface RuleOptions {
   customMapping?: CustomHookMapping;
   
   /**
-   * Prefer palette hooks when multiple replacements are available
+   * When true, only deterministic classifications produce an autofix;
+   * semi-deterministic results become suggestion-only.
+   * Defaults to false (both tiers produce autofix).
    */
-  preferPaletteHook?: boolean;
+  deterministicOnly?: boolean;
 }
 
 /**
@@ -64,3 +66,16 @@ export interface RuleConfig {
  * Handler function signature for CSS declarations
  */
 export type DeclarationHandler = (node: any, context: HandlerContext) => void;
+
+
+/**
+ * Shared references from CLI to plugin via settings
+ */
+export interface ContextSettings {
+  contextIndex: {
+    getIssue(filePath: string, line: number, column: number): any;
+  };
+  classifyIssue: (issue: any, closestHooks: string[]) => any;
+  serializeIssueContext: (issue: any) => string;
+  deterministicOnly?: boolean;
+}

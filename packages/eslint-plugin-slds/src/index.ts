@@ -1,4 +1,4 @@
-// Unified ESLint plugin config for both v8 (legacy) and v9+ (flat)
+// Unified ESLint plugin config for ESLint 9 and 10
 
 import enforceBemUsage from './rules/enforce-bem-usage';
 import noDeprecatedSldsClasses from './rules/v9/no-deprecated-slds-classes';
@@ -17,6 +17,7 @@ import reduceAnnotations from './rules/v9/reduce-annotations';
 import noSldsPrivateVar from './rules/v9/no-slds-private-var';
 import noHardcodedValuesSlds1 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds1';
 import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds2';
+import noInvalidHookPropertyUsage from './rules/v9/no-invalid-hook-property-usage';
 
 import htmlParser from "@html-eslint/parser";
 import cssPlugin from "@eslint/css";
@@ -41,6 +42,7 @@ const rules = {
   "no-slds-private-var": noSldsPrivateVar,
   "no-hardcoded-values-slds1": noHardcodedValuesSlds1,
   "no-hardcoded-values-slds2": noHardcodedValuesSlds2,
+  "no-invalid-hook-property-usage": noInvalidHookPropertyUsage,
   "reduce-annotations": reduceAnnotations
 };
 
@@ -91,20 +93,10 @@ const htmlConfigArray = [
 ];
 
 Object.assign(plugin.configs, {
-  // Flat config for ESLint v9+
+  // Flat config for ESLint 9+
   "flat/recommended-css": cssConfigArray,
   "flat/recommended-html": htmlConfigArray,
-  "flat/recommended": [...cssConfigArray, ...htmlConfigArray],
-  // legacy config for ESLint v8-
-  recommended: {
-    plugins: ["@salesforce-ux/slds"],
-    rules: ruleConfigs.html,
-    parser: htmlParser,
-    parserOptions: {
-      ecmaVersion: 2021,
-      sourceType: "module"
-    }
-  }
+  "flat/recommended": [...cssConfigArray, ...htmlConfigArray]
 });
 
 function sldsCssPlugin() {

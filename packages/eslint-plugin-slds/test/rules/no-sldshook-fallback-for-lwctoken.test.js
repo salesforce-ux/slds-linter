@@ -61,7 +61,6 @@ ruleTester.run('no-sldshook-fallback-for-lwctoken', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'unsupportedFallback',
-        type: 'Identifier',
         data: {
           lwcToken: '--lwc-color-background-1',
           sldsToken: '--slds-g-color-border-1'
@@ -75,7 +74,6 @@ ruleTester.run('no-sldshook-fallback-for-lwctoken', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'unsupportedFallback',
-        type: 'Identifier',
         data: {
           lwcToken: '--lwc-color-background-1',
           sldsToken: '--slds-g-color-border-1'
@@ -93,7 +91,6 @@ ruleTester.run('no-sldshook-fallback-for-lwctoken', rule, {
       errors: [
         {
           messageId: 'unsupportedFallback',
-          type: 'Identifier',
           data: {
             lwcToken: '--lwc-color-background-1',
             sldsToken: '--slds-g-color-border-1'
@@ -101,7 +98,6 @@ ruleTester.run('no-sldshook-fallback-for-lwctoken', rule, {
         },
         {
           messageId: 'unsupportedFallback',
-          type: 'Identifier', 
           data: {
             lwcToken: '--lwc-color-background-2',
             sldsToken: '--slds-g-color-border-2'
@@ -116,7 +112,6 @@ ruleTester.run('no-sldshook-fallback-for-lwctoken', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'unsupportedFallback',
-        type: 'Identifier',
         data: {
           lwcToken: '--lwc-color-background-1',
           sldsToken: '--slds-g-color-border-1'
@@ -134,7 +129,6 @@ ruleTester.run('no-sldshook-fallback-for-lwctoken', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'unsupportedFallback',
-        type: 'Identifier',
         data: {
           lwcToken: '--lwc-color-background-1',
           sldsToken: '--slds-g-color-border-1'
@@ -148,7 +142,6 @@ ruleTester.run('no-sldshook-fallback-for-lwctoken', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'unsupportedFallback',
-        type: 'Identifier',
         data: {
           lwcToken: '--lwc-color-background-1',
           sldsToken: '--sds-g-color-border-1'
@@ -162,7 +155,6 @@ ruleTester.run('no-sldshook-fallback-for-lwctoken', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'unsupportedFallback',
-        type: 'Identifier',
         data: {
           lwcToken: '--lwc-spacing-4',
           sldsToken: '--slds-g-spacing-4'
