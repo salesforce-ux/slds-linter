@@ -8,6 +8,7 @@
     "packages/eslint-plugin-react-slds",
     "packages/cli"
   ],
+  "packageManager": "yarn@4.2.2",
   "engines": {
     "node": "24.x"
   },
@@ -37,6 +38,7 @@
     "esbuild-plugin-file-path-extensions": "^2.1.4",
     "eslint": "^10.9.1",
     "finalhandler": "^2.1.0",
+    "glob": "^11.0.1",
     "gulp": "^5.0.0",
     "gulp-clean-dir": "^1.0.2",
     "gulp-execa": "^8.0.0",
@@ -58,5 +60,8 @@
   "bugs": {
     "url": "https://github.com/salesforce-ux/slds-linter/issues"
   },
-  "homepage": "https://github.com/salesforce-ux/slds-linter#slds-linter"
+  "homepage": "https://github.com/salesforce-ux/slds-linter#slds-linter",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
 }
