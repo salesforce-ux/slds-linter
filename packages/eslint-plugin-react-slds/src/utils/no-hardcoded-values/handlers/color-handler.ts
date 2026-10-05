@@ -16,8 +16,9 @@ export function handleColorDeclaration(input: AnalyzeHardcodedValueInput, suppor
     else if (node.type === 'Function' && ['rgb', 'rgba', 'hsl', 'hsla'].includes(node.name)) value = generate(node);
     return !value || value === 'transparent' || !chroma.valid(value) ? null : value;
   }).flatMap(({value: color, start, end}) => {
+    const opaqueFallbackHex = chroma(color).hex('rgb');
     const customHook = getCustomMapping(input.property, color, input.options?.customMapping);
-    let hooks = customHook ? [customHook] : findClosestColorHook(chroma(color).hex('rgb'), supported, resolveColorPropertyToMatch(input.property));
+    let hooks = customHook ? [customHook] : findClosestColorHook(opaqueFallbackHex, supported, resolveColorPropertyToMatch(input.property));
     let replacement = input.value.slice(start, end);
     let usageContext: string | null = null;
     if (!customHook && typeof input.settings?.contextIndex?.getIssue === 'function' && input.source) {
@@ -31,20 +32,20 @@ export function handleColorDeclaration(input: AnalyzeHardcodedValueInput, suppor
         const classification = typeof input.settings.classifyIssue === 'function' ? input.settings.classifyIssue(issue, hooks) : null;
         const deterministicOnly = input.settings.deterministicOnly ?? input.options?.deterministicOnly;
         const canFix = classification?.tier === 'deterministic' || (!deterministicOnly && classification?.tier === 'semi-deterministic');
-        if (classification?.selectedHook && canFix) replacement = createReplacementString(color, classification.selectedHook);
+        if (classification?.selectedHook && canFix) replacement = createReplacementString(color, opaqueFallbackHex, classification.selectedHook);
         if (classification?.matchingHooks?.length) hooks = classification.matchingHooks;
       }
     }
-    if (replacement === input.value.slice(start, end) && hooks.length === 1) replacement = createReplacementString(color, hooks[0]);
+    if (replacement === input.value.slice(start, end) && hooks.length === 1) replacement = createReplacementString(color, opaqueFallbackHex, hooks[0]);
     return [{start, end, replacement, displayValue: hooks.length ? formatSuggestionHooks(hooks) : input.value.slice(start, end),
       hasHook: hooks.length > 0, usageContext}];
   });
 }
 
-function createReplacementString(color: string, hook: string): string {
-  const variable = `var(${hook}, ${color})`;
+function createReplacementString(color: string, opaqueFallbackHex: string, hook: string): string {
   const alpha = chroma(color).alpha();
-  return alpha === 1 ? variable : `color-mix(in oklab, ${variable}, transparent ${Math.round((1 - alpha) * 100)}%)`;
+  if (alpha !== 1) return `color-mix(in oklab, var(${hook}, ${opaqueFallbackHex}), transparent ${Math.round((1 - alpha) * 100)}%)`;
+  return `var(${hook}, ${color})`;
 }
 
 function findClosestColorHook(color: string, supported: ValueToStylingHooksMapping, property: string): string[] {

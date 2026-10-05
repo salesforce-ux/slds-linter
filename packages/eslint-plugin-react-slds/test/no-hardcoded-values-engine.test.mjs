@@ -20,15 +20,18 @@ describe('React-local no-hardcoded-values analysis engine', () => {
     ]);
   });
 
-  it('preserves alpha in a color-mix fallback', () => {
+  it.each([
+    ['rgba(181, 54, 45, 0.7)', '#b5362d', 30],
+    ['hsla(240, 75%, 60%, 0.9)', '#4c4ce6', 10],
+    ['#b5362db3', '#b5362d', 30],
+  ])('uses an opaque hex fallback for %s', (color, hex, percentage) => {
     expect(analyzeHardcodedValue({
       property: 'color',
-      value: 'rgba(181, 54, 45, 0.7)',
-      options: {customMapping: customMapping('--custom-red', ['color'], ['rgba(181,54,45,0.7)'])},
+      value: color,
+      options: {customMapping: customMapping('--custom-color', ['color'], [color.replace(/\s+/gu, '')])},
     })).toEqual([
       expect.objectContaining({
-        range: [0, 22],
-        replacement: 'color-mix(in oklab, var(--custom-red, rgba(181,54,45,0.7)), transparent 30%)',
+        replacement: `color-mix(in oklab, var(--custom-color, ${hex}), transparent ${percentage}%)`,
       }),
     ]);
   });
