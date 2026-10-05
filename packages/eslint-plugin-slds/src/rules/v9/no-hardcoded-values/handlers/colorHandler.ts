@@ -1,4 +1,4 @@
-import { findClosestColorHook, convertToHex, isValidColor, hasAlphaChannel, transparentPercentage } from '../../../../utils/color-lib-utils';
+import { findClosestColorHook, convertToHex, isValidColor, hasAlphaChannel, transparentPercentage, opaqueColorFallback } from '../../../../utils/color-lib-utils';
 import { resolveColorPropertyToMatch } from '../../../../utils/property-matcher';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
 import { getCustomMapping } from '../../../../utils/custom-mapping-utils';
@@ -131,11 +131,7 @@ function createColorReplacement(
 
 function createReplacementString(colorValue: string, hook:string){
   if(hasAlphaChannel(colorValue)){
-    const opaqueColor = /^(rgba|hsla)\(/i.test(colorValue)
-      ? colorValue.replace(/,\s*[^,()]+\)$/, ')')
-      : /^#[\da-f]{8}$/i.test(colorValue)
-        ? colorValue.slice(0, 7)
-        : convertToHex(colorValue);
+    const opaqueColor = opaqueColorFallback(colorValue);
     const tp = transparentPercentage(colorValue);
     return `color-mix(in oklab, var(${hook}, ${opaqueColor}), transparent ${tp}%)`;
   }

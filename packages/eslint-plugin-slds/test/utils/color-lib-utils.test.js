@@ -6,6 +6,7 @@ const {
   classifyColorFamily,
   hasAlphaChannel,
   transparentPercentage,
+  opaqueColorFallback,
 } = require('../../src/utils/color-lib-utils');
 
 // Minimal shape for ValueToStylingHooksMapping used by findClosestColorHook
@@ -267,6 +268,18 @@ describe('color-lib-utils', () => {
 
     it('returns false for invalid color', () => {
       expect(hasAlphaChannel('not-a-color')).toBe(false);
+    });
+  });
+
+  describe('opaqueColorFallback', () => {
+    it.each([
+      ['rgba(181,54,45,0.7)', 'rgba(181,54,45)'],
+      ['hsla(240,75%,60%,0.9)', 'rgba(76,76,230)'],
+      ['#b5362db3', '#b5362d'],
+      ['#f008', '#ff0000'],
+      ['rgb(181 54 45 / 70%)', 'rgba(181,54,45)'],
+    ])('converts %s to opaque fallback %s', (input, expected) => {
+      expect(opaqueColorFallback(input)).toBe(expected);
     });
   });
 

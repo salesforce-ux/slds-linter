@@ -341,7 +341,7 @@ ruleTester.run('no-hardcoded-values-slds2 (colorHandler context & deterministicO
       errors: [{
         messageId: 'hardcodedValue'
       }],
-      output: `.example { color: color-mix(in oklab, var(--slds-g-color-brand-base-50, hsla(240,75%,60%)), transparent 10%); }`
+      output: `.example { color: color-mix(in oklab, var(--slds-g-color-brand-base-50, rgba(76,76,230)), transparent 10%); }`
     },
     {
       code: `.example { color: #b5362db3; }`,
