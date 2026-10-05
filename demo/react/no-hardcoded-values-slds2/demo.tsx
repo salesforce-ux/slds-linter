@@ -12,6 +12,11 @@ export function InlineHardcodedValueDemo() {
   return <div style={styles}>Inline values</div>;
 }
 
+// When a hook is selected, color-mix supplies alpha and the var fallback stays opaque.
+export function AlphaColorFallbackDemo() {
+  return <div style={{color: 'rgba(181, 54, 45, 0.7)'}}>Alpha color</div>;
+}
+
 // Partial inline support: static template fragments are reported without unsafe fixes.
 export function MixedInlineValueDemo() {
   return <div style={{color: `#001639 ${tone} #001639`}}>Mixed inline value</div>;
