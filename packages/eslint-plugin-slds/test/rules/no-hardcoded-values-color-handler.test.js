@@ -243,7 +243,7 @@ ruleTester.run('no-hardcoded-values-slds2 (colorHandler context & deterministicO
       errors: [{
         messageId: 'hardcodedValue'
       }],
-      output: `.example { color: color-mix(in oklab, var(--slds-g-color-palette-red-40, rgba(181,54,45)), transparent 30%); }`
+      output: `.example { color: color-mix(in oklab, var(--slds-g-color-palette-red-40, #b5362d), transparent 30%); }`
     },
 
     // Alpha channel: semi-deterministic with deterministicOnly omitted (default allows auto-fix)
@@ -266,7 +266,7 @@ ruleTester.run('no-hardcoded-values-slds2 (colorHandler context & deterministicO
       errors: [{
         messageId: 'hardcodedValue'
       }],
-      output: `.example { background-color: color-mix(in oklab, var(--slds-g-color-neutral-base-1, rgba(0,0,0)), transparent 50%); }`
+      output: `.example { background-color: color-mix(in oklab, var(--slds-g-color-neutral-base-1, #000000), transparent 50%); }`
     },
 
     // Alpha channel: deterministicOnly true blocks semi-deterministic context-based fix,
@@ -293,7 +293,7 @@ ruleTester.run('no-hardcoded-values-slds2 (colorHandler context & deterministicO
       errors: [{
         messageId: 'hardcodedValue'
       }],
-      output: `.example { background-color: color-mix(in oklab, var(--slds-g-color-neutral-base-1, rgba(0,0,0)), transparent 50%); }`
+      output: `.example { background-color: color-mix(in oklab, var(--slds-g-color-neutral-base-1, #000000), transparent 50%); }`
     },
 
     // Alpha channel: deterministicOnly true with multiple hooks prevents auto-fix
@@ -341,7 +341,7 @@ ruleTester.run('no-hardcoded-values-slds2 (colorHandler context & deterministicO
       errors: [{
         messageId: 'hardcodedValue'
       }],
-      output: `.example { color: color-mix(in oklab, var(--slds-g-color-brand-base-50, rgba(76,76,230)), transparent 10%); }`
+      output: `.example { color: color-mix(in oklab, var(--slds-g-color-brand-base-50, #4c4ce6), transparent 10%); }`
     },
     {
       code: `.example { color: #b5362db3; }`,

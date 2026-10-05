@@ -1,4 +1,4 @@
-import { findClosestColorHook, convertToHex, isValidColor, hasAlphaChannel, transparentPercentage, opaqueColorFallback } from '../../../../utils/color-lib-utils';
+import { findClosestColorHook, convertToHex, isValidColor, hasAlphaChannel, transparentPercentage } from '../../../../utils/color-lib-utils';
 import { resolveColorPropertyToMatch } from '../../../../utils/property-matcher';
 import { formatSuggestionHooks } from '../../../../utils/css-utils';
 import { getCustomMapping } from '../../../../utils/custom-mapping-utils';
@@ -92,7 +92,7 @@ function createColorReplacement(
         const canAutoFix = classification?.tier === "deterministic" || (allowSemiDeterministic && classification?.tier === "semi-deterministic");
         const {selectedHook, matchingHooks} = classification;
         if(selectedHook && canAutoFix){
-          replacement = createReplacementString(colorValue, selectedHook) ?? originalValue;
+          replacement = createReplacementString(colorValue, hexValue, selectedHook);
         }
         if(matchingHooks?.length>0){
           closestHooks = matchingHooks
@@ -103,7 +103,7 @@ function createColorReplacement(
 
   // If no context was available, auto-fix only when there is exactly one candidate hook
   if(replacement === originalValue && closestHooks.length === 1){
-    replacement = createReplacementString(colorValue, closestHooks[0]) ?? originalValue;
+    replacement = createReplacementString(colorValue, hexValue, closestHooks[0]);
   }
   
   if (closestHooks.length > 0) {
@@ -129,12 +129,10 @@ function createColorReplacement(
   }
 }
 
-function createReplacementString(colorValue: string, hook:string){
+function createReplacementString(colorValue: string, opaqueHex: string, hook:string){
   if(hasAlphaChannel(colorValue)){
-    const opaqueColor = opaqueColorFallback(colorValue);
-    if (opaqueColor === null) return null;
     const tp = transparentPercentage(colorValue);
-    return `color-mix(in oklab, var(${hook}, ${opaqueColor}), transparent ${tp}%)`;
+    return `color-mix(in oklab, var(${hook}, ${opaqueHex}), transparent ${tp}%)`;
   }
   return `var(${hook}, ${colorValue})`;
 }

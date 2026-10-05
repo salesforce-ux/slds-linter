@@ -40,18 +40,6 @@ export const hasAlphaChannel = (color: string): boolean => {
   }
 }
 
-export const opaqueColorFallback = (color: string): string | null => {
-  if (color.startsWith('#')) {
-    return convertToHex(color);
-  }
-  try {
-    const [red, green, blue] = chroma(color).rgb();
-    return `rgba(${red},${green},${blue})`;
-  } catch {
-    return null;
-  }
-};
-
 /**
  * Computes the transparent percentage for use in a CSS `color-mix()` replacement
  * of a hardcoded color with an alpha channel.
