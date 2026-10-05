@@ -281,6 +281,10 @@ describe('color-lib-utils', () => {
     ])('converts %s to opaque fallback %s', (input, expected) => {
       expect(opaqueColorFallback(input)).toBe(expected);
     });
+
+    it('rejects invalid hash-prefixed colors instead of returning null', () => {
+      expect(() => opaqueColorFallback('#not-a-color')).toThrow();
+    });
   });
 
   describe('transparentPercentage', () => {

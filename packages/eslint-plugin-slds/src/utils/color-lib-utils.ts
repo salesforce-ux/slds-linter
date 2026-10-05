@@ -42,7 +42,11 @@ export const hasAlphaChannel = (color: string): boolean => {
 
 export const opaqueColorFallback = (color: string): string => {
   if (color.startsWith('#')) {
-    return convertToHex(color)!;
+    const hex = convertToHex(color);
+    if (hex === null) {
+      throw new Error(`Invalid color: ${color}`);
+    }
+    return hex;
   }
   const [red, green, blue] = chroma(color).rgb();
   return `rgba(${red},${green},${blue})`;
