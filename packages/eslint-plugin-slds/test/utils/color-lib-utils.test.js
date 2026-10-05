@@ -282,8 +282,9 @@ describe('color-lib-utils', () => {
       expect(opaqueColorFallback(input)).toBe(expected);
     });
 
-    it('rejects invalid hash-prefixed colors instead of returning null', () => {
-      expect(() => opaqueColorFallback('#not-a-color')).toThrow();
+    it('returns null for invalid colors', () => {
+      expect(opaqueColorFallback('#not-a-color')).toBeNull();
+      expect(opaqueColorFallback('not-a-color')).toBeNull();
     });
   });
 

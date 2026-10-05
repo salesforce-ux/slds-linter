@@ -92,7 +92,7 @@ function createColorReplacement(
         const canAutoFix = classification?.tier === "deterministic" || (allowSemiDeterministic && classification?.tier === "semi-deterministic");
         const {selectedHook, matchingHooks} = classification;
         if(selectedHook && canAutoFix){
-          replacement = createReplacementString(colorValue, selectedHook);
+          replacement = createReplacementString(colorValue, selectedHook) ?? originalValue;
         }
         if(matchingHooks?.length>0){
           closestHooks = matchingHooks
@@ -103,7 +103,7 @@ function createColorReplacement(
 
   // If no context was available, auto-fix only when there is exactly one candidate hook
   if(replacement === originalValue && closestHooks.length === 1){
-    replacement = createReplacementString(colorValue, closestHooks[0]);
+    replacement = createReplacementString(colorValue, closestHooks[0]) ?? originalValue;
   }
   
   if (closestHooks.length > 0) {
@@ -132,6 +132,7 @@ function createColorReplacement(
 function createReplacementString(colorValue: string, hook:string){
   if(hasAlphaChannel(colorValue)){
     const opaqueColor = opaqueColorFallback(colorValue);
+    if (opaqueColor === null) return null;
     const tp = transparentPercentage(colorValue);
     return `color-mix(in oklab, var(${hook}, ${opaqueColor}), transparent ${tp}%)`;
   }

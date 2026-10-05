@@ -40,16 +40,16 @@ export const hasAlphaChannel = (color: string): boolean => {
   }
 }
 
-export const opaqueColorFallback = (color: string): string => {
+export const opaqueColorFallback = (color: string): string | null => {
   if (color.startsWith('#')) {
-    const hex = convertToHex(color);
-    if (hex === null) {
-      throw new Error(`Invalid color: ${color}`);
-    }
-    return hex;
+    return convertToHex(color);
   }
-  const [red, green, blue] = chroma(color).rgb();
-  return `rgba(${red},${green},${blue})`;
+  try {
+    const [red, green, blue] = chroma(color).rgb();
+    return `rgba(${red},${green},${blue})`;
+  } catch {
+    return null;
+  }
 };
 
 /**
