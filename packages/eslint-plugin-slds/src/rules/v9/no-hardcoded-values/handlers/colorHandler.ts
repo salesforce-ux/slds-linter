@@ -129,10 +129,10 @@ function createColorReplacement(
   }
 }
 
-function createReplacementString(colorValue: string, opaqueHex: string, hook:string){
+function createReplacementString(colorValue: string, opaqueFallbackHex: string, hook:string){
   if(hasAlphaChannel(colorValue)){
     const tp = transparentPercentage(colorValue);
-    return `color-mix(in oklab, var(${hook}, ${opaqueHex}), transparent ${tp}%)`;
+    return `color-mix(in oklab, var(${hook}, ${opaqueFallbackHex}), transparent ${tp}%)`;
   }
   return `var(${hook}, ${colorValue})`;
 }
