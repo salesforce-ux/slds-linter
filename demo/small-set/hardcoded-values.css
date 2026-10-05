@@ -162,6 +162,11 @@
 	color: #05628a;
 }
 
+/* Autofix fallback should be opaque; color-mix supplies the 30% transparency. */
+.alpha-color-fallback {
+  color: rgba(181, 54, 45, 0.7);
+}
+
 .test-line-heights {
   /* Should suggest --slds-g-font-lineheight-2 */
   line-height: 1.25;

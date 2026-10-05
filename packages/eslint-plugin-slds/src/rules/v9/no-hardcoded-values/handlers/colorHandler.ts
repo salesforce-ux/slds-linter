@@ -130,10 +130,14 @@ function createColorReplacement(
 }
 
 function createReplacementString(colorValue: string, hook:string){
-  let replacement: string= `var(${hook}, ${colorValue})`;
   if(hasAlphaChannel(colorValue)){
+    const opaqueColor = /^(rgba|hsla)\(/i.test(colorValue)
+      ? colorValue.replace(/,\s*[^,()]+\)$/, ')')
+      : /^#[\da-f]{8}$/i.test(colorValue)
+        ? colorValue.slice(0, 7)
+        : convertToHex(colorValue);
     const tp = transparentPercentage(colorValue);
-    replacement = `color-mix(in oklab, ${replacement}, transparent ${tp}%)`;
+    return `color-mix(in oklab, var(${hook}, ${opaqueColor}), transparent ${tp}%)`;
   }
-  return replacement;
+  return `var(${hook}, ${colorValue})`;
 }
