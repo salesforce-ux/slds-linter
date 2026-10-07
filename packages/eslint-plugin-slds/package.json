@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/eslint-plugin-slds",
-  "version": "1.3.0-internal-beta.8",
+  "version": "1.2.1",
   "main": "build/index.js",
   "exports": {
     ".": {
@@ -39,7 +39,7 @@
     "@eslint/css-tree": "^3.6.5",
     "@html-eslint/eslint-plugin": "^0.34.0",
     "@html-eslint/parser": "^0.34.0",
-    "@salesforce-ux/sds-metadata": "2.0.0",
+    "@salesforce-ux/sds-metadata": "^1.2.1",
     "chroma-js": "^3.1.2"
   },
   "peerDependencies": {
@@ -69,6 +69,6 @@
   },
   "homepage": "https://github.com/salesforce-ux/slds-linter#slds-linter",
   "publishConfig": {
-    "tag": "internal"
+    "registry": "https://registry.npmjs.org"
   }
 }

@@ -75,13 +75,10 @@ const compileTs = async () => {
       conditionalReplacePlugin({
         filter: /\.ts$/,
         replacements: [
-          /*
-          Starting from 2.0.0-beta.2, sds-metadata is published with single entry point.
-          So, we don't need to import it from /next
           {
             search: /from\s+['"]@salesforce-ux\/sds-metadata['"]/g,
             replace: "from '@salesforce-ux/sds-metadata/next'"
-          },*/
+          },
           {
             search: /import\s+ruleConfigs\s+from\s+['"]\.\.\/eslint\.rules\.json['"]/g,
             replace: "import ruleConfigs from '../eslint.rules.internal.json'"
