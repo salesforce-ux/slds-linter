@@ -1,48 +1,48 @@
-# `@salesforce-ux/eslint-plugin-react-slds`
+# @salesforce-ux/eslint-plugin-react-slds
 
-Alpha ESLint plugin for applying SLDS rules to React applications.
+## Overview
 
-The `@salesforce-ux/slds-linter` CLI bundles this plugin and automatically scans
-JSX and TSX files. Install this package directly only when configuring ESLint
-without the CLI.
+ The `eslint-plugin-react-slds` plugin analyzes React applications against Salesforce Lightning Design System 2 (SLDS 2) rules and provides suggestions to better align your React code with SLDS 2 guidelines. It can also apply the suggestions in bulk across your repository and automatically fix your code.
 
-The plugin checks static `class` and `className` values and inline style objects in
-JSX and TSX, with partial styled-components support for selectors and declarations.
-Its optional `recommended-css` configuration imports the standalone CSS and SCSS
-rules from `@salesforce-ux/eslint-plugin-slds`.
+The plugin checks static ``` class` `` and `` `className` `` values and inline style objects in JSX and TSX files, with partial support for CSS selectors and property declarations in styled-components.
 
-## Requirements
+## Prerequisites
 
-- Node.js 22 or newer
-- ESLint 10
+* Install [Node.js](https://nodejs.org/) v22.0.0 or later.  
+  We recommend using the latest [Active Long Term Support](https://nodejs.org/en/about/previous-releases) (LTS) version of Node.js.  
+* Install [ESLint](https://eslint.org/) v10.0.0 or later.
 
-## Usage
+## Install
 
-```js
-import reactSldsPlugin from '@salesforce-ux/eslint-plugin-react-slds';
+The `eslint-plugin-react-slds` plugin is part of the SLDS Linter CLI package. Install SLDS Linter to install the `eslint-plugin-react-slds` plugin along with it. 
 
-export default [
-  ...reactSldsPlugin.configs.recommended,
-  ...reactSldsPlugin.configs['recommended-css'],
-];
-```
+`npx @salesforce-ux/slds-linter lint`
 
-The `recommended` configuration targets only `**/*.{jsx,tsx}`. The external
-build enables `enforce-bem-usage`, `no-deprecated-classes-slds2`,
-`no-slds-class-overrides`, `lwc-token-to-slds-hook`,
-`enforce-sds-to-slds-hooks`, `no-sldshook-fallback-for-lwctoken`,
-`no-slds-var-without-fallback`, `no-unsupported-hooks-slds2`,
-`no-slds-namespace-for-custom-hooks`, `enforce-component-hook-naming-convention`,
-`no-slds-private-var`, and `no-hardcoded-values-slds2`.
+To view the `.eslint.config.mjs` configuration file and disable specific rules in the file, emit the configuration file.
 
-The optional `recommended-css` configuration targets `**/*.{css,scss}` and
-reuses the CSS configuration from `@salesforce-ux/eslint-plugin-slds`. Both
-configurations are file-scoped, so they can share the `@salesforce-ux/slds`
-namespace without replacing each other's rules.
+`npx @salesforce-ux/slds-linter  emit`
 
-The plugin uses the existing `@salesforce-ux/slds/*` rule IDs so diagnostics
-remain consistent across SLDS linting packages.
+## Configure
 
-The default build uses the external rule set in `eslint.rules.json`. Internal
-builds set `TARGET_PERSONA=internal` to use `eslint.rules.internal.json`, which
-adds internal-only rules and options to the same `recommended` configuration.
+When you configure ESLint without the SLDS Linter CLI, install the `eslint-plugin-react-slds` plugin directly and import it to your ESLint configuration file. 
+
+`npm install --save-dev @salesforce-ux/eslint-plugin-react-slds`
+
+## Supported Rules
+
+For detailed information about the rules, see [SLDS Linter Rules](https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html).
+
+| Rule | Description | Severity Level | Autofix | Supported File Types |
+| :---- | :---- | :---- | :---- | :---- |
+| enforce-bem-usage | Identifies instances that use the double-dash (`--`) syntax for block-element-modifier (BEM) in classes. | Error | Yes | JSX, TSX, CSS |
+| no-deprecated-classes-slds2 | Identifies classes that aren't available in SLDS 2. | Error in JSX and TSX files, Warning in CSS files | - | JSX, TSX, CSS |
+| enforce-component-hook-naming-convention | Identifies `--slds-c` component-level styling hooks that use a deprecated naming convention. | Error | Yes | JSX, TSX, CSS |
+| lwc-token-to-slds-hook | Identifies deprecated `--lwc` tokens in your code and recommends suitable `--slds` styling hooks. For more information, see [lightningdesignsystem.com](http://lightningdesignsystem.com). | Error | Yes | JSX, TSX, CSS |
+| enforce-sds-to-slds-hooks | Identifies Salesforce Design System (SDS) styling hooks that must be replaced with the suggested SLDS 2 styling hooks. | Warning | Yes | JSX, TSX, CSS |
+| no-hardcoded-values-slds2 | Identifies static or hard-coded values that must be replaced with SLDS 2 styling hooks. | Warning | Yes | JSX, TSX, CSS |
+| no-slds-class-overrides | Identifies existing class names that must be replaced with new custom CSS classes, instead of overriding SLDS selectors. | Warning | - | JSX, TSX, CSS |
+| no-slds-private-var | Identifies SLDS styling hooks that are reserved only for internal Salesforce use. | Warning | Yes | JSX, TSX, CSS |
+| no-unsupported-hooks-slds2 | Identifies styling hooks that aren't present in SLDS 2.  | Warning | - | JSX, TSX, CSS |
+| no-slds-var-without-fallback | Identifies SLDS styling hooks that are specified without fallback values and recommends suitable fallback values based on the SLDS metadata. The fallback values are used in Salesforce environments where styling hooks are unavailable. | Warning | Yes | JSX, TSX, CSS |
+| no-slds-namespace-for-custom-hooks | Identifies custom styling hooks that use the `--slds` or `--sds` namespaces, which are reserved for SLDS styling hooks. | Warning | - | JSX, TSX, CSS |
+| no-sldshook-fallback-for-lwctoken | Identifies instances where `--slds` styling hooks are provided as fallback values for `--lwc` tokens. | Warning | - | JSX, TSX, CSS |
