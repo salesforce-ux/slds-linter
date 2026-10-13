@@ -38,7 +38,7 @@
     "@eslint-react/kit": "5.18.6",
     "@eslint/css-tree": "^3.6.5",
     "@salesforce-ux/eslint-plugin-slds": "1.2.1",
-    "@salesforce-ux/sds-metadata": "^1.2.1",
+    "@salesforce-ux/sds-metadata": "^2.264.1",
     "@typescript-eslint/parser": "^8.67.0",
     "@typescript-eslint/utils": "^8.67.0",
     "chroma-js": "^3.2.0",

@@ -1732,7 +1732,7 @@ __metadata:
     "@eslint-react/kit": "npm:5.18.6"
     "@eslint/css-tree": "npm:^3.6.5"
     "@salesforce-ux/eslint-plugin-slds": "npm:1.2.1"
-    "@salesforce-ux/sds-metadata": "npm:^1.2.1"
+    "@salesforce-ux/sds-metadata": "npm:^2.264.1"
     "@types/chroma-js": "npm:^2.4.4"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^20.11.19"
@@ -1760,7 +1760,7 @@ __metadata:
     "@eslint/css-tree": "npm:^3.6.5"
     "@html-eslint/eslint-plugin": "npm:^0.34.0"
     "@html-eslint/parser": "npm:^0.34.0"
-    "@salesforce-ux/sds-metadata": "npm:^1.2.1"
+    "@salesforce-ux/sds-metadata": "npm:^2.264.1"
     "@types/chroma-js": "npm:^2.4.4"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^20.11.19"
@@ -1778,10 +1778,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/sds-metadata@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "@salesforce-ux/sds-metadata@npm:1.2.1"
-  checksum: 10c0/526f5e3e95d711f7ed12d79c879064a589a64b2d3951fb80aaebb26bb260a3a212ae2be2f12a4fd9330919940ba79165783f94dfc3536600744be629567230ef
+"@salesforce-ux/sds-metadata@npm:^2.264.1":
+  version: 2.264.1
+  resolution: "@salesforce-ux/sds-metadata@npm:2.264.1"
+  checksum: 10c0/ededbd5b9963cbfd27fcb6eeb45f15d5dae042c7d5dbedeb3980276a6877d232eac0f0166efb0152cef23b3b69882457827c73e7a19eccb130d5274627355be0
   languageName: node
   linkType: hard
 
