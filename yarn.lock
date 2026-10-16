@@ -1721,7 +1721,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salesforce-ux/eslint-plugin-react-slds@npm:1.0.0-alpha.0, @salesforce-ux/eslint-plugin-react-slds@workspace:packages/eslint-plugin-react-slds":
+"@salesforce-ux/eslint-plugin-react-slds@npm:1.0.0-beta.0, @salesforce-ux/eslint-plugin-react-slds@workspace:packages/eslint-plugin-react-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/eslint-plugin-react-slds@workspace:packages/eslint-plugin-react-slds"
   dependencies:
@@ -1786,7 +1786,7 @@ __metadata:
   resolution: "@salesforce-ux/slds-linter@workspace:packages/cli"
   dependencies:
     "@salesforce-ux/context-extractor": "npm:^1.2.0"
-    "@salesforce-ux/eslint-plugin-react-slds": "npm:1.0.0-alpha.0"
+    "@salesforce-ux/eslint-plugin-react-slds": "npm:1.0.0-beta.0"
     "@salesforce-ux/eslint-plugin-slds": "npm:1.2.1"
     "@types/cli-progress": "npm:^3"
     "@types/jest": "npm:^29.5.14"

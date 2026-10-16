@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@salesforce-ux/context-extractor": "^1.2.0",
-    "@salesforce-ux/eslint-plugin-react-slds": "1.0.0-alpha.0",
+    "@salesforce-ux/eslint-plugin-react-slds": "1.0.0-beta.0",
     "@salesforce-ux/eslint-plugin-slds": "1.2.1",
     "@typescript-eslint/eslint-plugin": "^8.69.0",
     "@typescript-eslint/parser": "^8.69.0",
