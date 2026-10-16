@@ -1707,21 +1707,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salesforce-ux/context-extractor@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@salesforce-ux/context-extractor@npm:1.1.0"
+"@salesforce-ux/context-extractor@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@salesforce-ux/context-extractor@npm:1.2.0"
   dependencies:
     "@eslint/css-tree": "npm:^3.6.5"
-    chalk: "npm:^4.1.2"
     cheerio: "npm:^1.1.2"
     chroma-js: "npm:^3.2.0"
-    cli-progress: "npm:^3.12.0"
     css-what: "npm:^6.0.1"
     domhandler: "npm:^5.0.3"
-    globby: "npm:^14.1.0"
     html-element-registry: "npm:^1.0.0"
-    piscina: "npm:^5.1.4"
-  checksum: 10c0/4ce11f9c631bd9cb925914ddc0a9aaacd285dd47289034d7c09db744f0c461183ce83e15e4dea3708a68a3ce0ec8082f671b9bec1c3b294e49d0003eef045f1a
+  checksum: 10c0/f0a4ed17c7f7a15104c4bde5035da5b6bfa3ebf64897b877f20b889bdce35ec047b6c0a4973906c7d2a3218787b97f961277b008568b576a11558655303eb808
   languageName: node
   linkType: hard
 
@@ -1789,7 +1785,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/slds-linter@workspace:packages/cli"
   dependencies:
-    "@salesforce-ux/context-extractor": "npm:^1.1.0"
+    "@salesforce-ux/context-extractor": "npm:^1.2.0"
     "@salesforce-ux/eslint-plugin-react-slds": "npm:1.0.0-alpha.0"
     "@salesforce-ux/eslint-plugin-slds": "npm:1.2.1"
     "@types/cli-progress": "npm:^3"
