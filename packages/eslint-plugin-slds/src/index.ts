@@ -17,7 +17,6 @@ import reduceAnnotations from './rules/v9/reduce-annotations';
 import noSldsPrivateVar from './rules/v9/no-slds-private-var';
 import noHardcodedValuesSlds1 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds1';
 import noHardcodedValuesSlds2 from './rules/v9/no-hardcoded-values/no-hardcoded-values-slds2';
-import noInvalidHookPropertyUsage from './rules/v9/no-invalid-hook-property-usage';
 
 import htmlParser from "@html-eslint/parser";
 import cssPlugin from "@eslint/css";
@@ -42,7 +41,6 @@ const rules = {
   "no-slds-private-var": noSldsPrivateVar,
   "no-hardcoded-values-slds1": noHardcodedValuesSlds1,
   "no-hardcoded-values-slds2": noHardcodedValuesSlds2,
-  "no-invalid-hook-property-usage": noInvalidHookPropertyUsage,
   "reduce-annotations": reduceAnnotations
 };
 

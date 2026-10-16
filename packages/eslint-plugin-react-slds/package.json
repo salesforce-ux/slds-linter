@@ -1,6 +1,6 @@
 {
   "name": "@salesforce-ux/eslint-plugin-react-slds",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-beta.0",
   "type": "module",
   "main": "build/index.mjs",
   "module": "build/index.mjs",
@@ -68,6 +68,6 @@
   },
   "homepage": "https://github.com/salesforce-ux/slds-linter#slds-linter",
   "publishConfig": {
-    "tag": "alpha"
+    "tag": "beta"
   }
 }

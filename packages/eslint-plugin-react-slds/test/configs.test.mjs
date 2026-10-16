@@ -18,10 +18,10 @@ describe('plugin configs', () => {
     const cssRules = plugin.configs['recommended-css'][0].rules;
 
     if (process.env.TARGET_PERSONA === 'internal') {
-      expect(cssRules['@salesforce-ux/slds/no-invalid-hook-property-usage']).toBe('warn');
+      expect(cssRules['@salesforce-ux/slds/no-deprecated-tokens-slds1']).toBe('error');
     } else {
       expect(cssRules).not.toHaveProperty(
-        '@salesforce-ux/slds/no-invalid-hook-property-usage',
+        '@salesforce-ux/slds/no-deprecated-tokens-slds1',
       );
     }
   });

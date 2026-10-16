@@ -31,7 +31,6 @@
           }
         }
       }
-    ],
-    "@salesforce-ux/slds/no-invalid-hook-property-usage": "warn"
+    ]
   }
 }
