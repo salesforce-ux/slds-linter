@@ -607,9 +607,7 @@ Potential future additions to custom mapping:
 This enhancement works alongside other `no-hardcoded-values-slds2` options:
 
 - **`reportNumericValue`**: Control when numeric values are reported
-- **`preferPaletteHook`**: Prefer palette hooks over theme hooks
-
-See the main [custom-config.md](./custom-config.md) for complete configuration options.
+- **`deterministicOnly`**: Restrict color autofix to deterministic hook matches only
 
 ---
 
