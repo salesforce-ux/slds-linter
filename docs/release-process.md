@@ -48,15 +48,26 @@ yarn release
 
 - `--dry-run`: Skips publishing to npm and git operations
 - `--skip-check`: Skips checking working directory git status
+- `--skip-npm-publish`: Runs `npm publish --dry-run` instead of publishing
 
-#### Release Types
+#### Release Versions
 
-When running the release script, you'll be prompted to:
-1. Enter a version number (must follow semver format, e.g., 1.0.0)
-2. Select a release type:
-   - Final: Standard release (must be from `main` branch)
-   - Alpha: Pre-release version (can be from `dev` or feature branches)
-   - Beta: Pre-release version (can be from `dev` or feature branches)
+The script doesn't prompt for versions. Before running it, set the version and npm tag for each package in `release-versions.json` at the repository root:
+
+```json
+{
+  "packages": {
+    "@salesforce-ux/eslint-plugin-slds": { "version": "2.0.0", "tag": "latest" },
+    "@salesforce-ux/eslint-plugin-react-slds": { "version": "1.0.0-beta.1", "tag": "beta" },
+    "@salesforce-ux/slds-linter": { "version": "2.0.0", "tag": "latest" }
+  }
+}
+```
+
+- Every workspace package needs an entry with a valid semver `version` and an npm `tag`.
+- Each package is published with its own version and tag. Workspace dependencies are pinned to the versions in this file.
+- The `@salesforce-ux/slds-linter` version names the release branch (`release/<version>`), the git tag, and the GitHub release.
+- A GitHub release is created only when the `@salesforce-ux/slds-linter` version isn't a pre-release (e.g., `2.0.0`, not `2.0.0-beta.0`).
 
 > **Important**: 
 > - Final releases must always be created from the `main` branch
