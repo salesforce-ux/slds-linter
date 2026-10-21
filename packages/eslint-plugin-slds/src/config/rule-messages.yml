@@ -133,3 +133,10 @@ reduce-annotations:
   type: "problem"
   messages:
     removeAnnotation: "Remove this annotation and update the code to SLDS best practices. For help, file an issue at https://github.com/salesforce-ux/slds-linter/"
+
+no-invalid-hook-property-usage:
+  description: "Ensure SLDS styling hooks are used only with their intended CSS properties."
+  url: "https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-invalid-hook-property-usage"
+  type: "problem"
+  messages:
+    invalidProperty: "The '{{hook}}' styling hook isn't intended for the '{{property}}' CSS property. Use it only with: {{allowedProperties}}."

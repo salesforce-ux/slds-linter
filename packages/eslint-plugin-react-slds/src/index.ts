@@ -11,6 +11,7 @@ import noSldsNamespaceForCustomHooks from './rules/no-slds-namespace-for-custom-
 import enforceComponentHookNamingConvention from './rules/enforce-component-hook-naming-convention';
 import noSldsPrivateVar from './rules/no-slds-private-var';
 import noHardcodedValuesSlds2 from './rules/no-hardcoded-values-slds2';
+import noInvalidHookPropertyUsage from './rules/no-invalid-hook-property-usage';
 import foundationPlugin from '@salesforce-ux/eslint-plugin-slds';
 import tsParser from '@typescript-eslint/parser';
 import type { Linter, Rule } from "eslint";
@@ -30,6 +31,7 @@ const rules = {
   "enforce-component-hook-naming-convention": enforceComponentHookNamingConvention,
   "no-slds-private-var": noSldsPrivateVar,
   "no-hardcoded-values-slds2": noHardcodedValuesSlds2,
+  "no-invalid-hook-property-usage": noInvalidHookPropertyUsage,
 };
 
 type ReactSldsPlugin = {
