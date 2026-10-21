@@ -17,6 +17,7 @@ export function registerReportCommand(program: Command): void {
     .addOption(new Option('-d, --directory <path>', 'Target directory to scan (defaults to current directory). Support glob patterns').hideHelp())    
     .option('-o, --output <path>', 'Output directory for reports (defaults to current directory)')
     .option('--config-eslint <path>', 'Path to eslint config file')
+    .option('--deterministic-only', 'Restrict color autofix to deterministic hook matches only')
     .addOption(new Option('--format <type>', 'Output format').choices(['sarif', 'csv']).default('sarif'))
     .action(async (directory: string, options: CliOptions) => {
       const spinner = ora('Starting report generation...');

@@ -37,8 +37,7 @@ describe('FileScanner branch coverage', () => {
     });
 
     expect(globby).toHaveBeenCalledWith('file.css', expect.objectContaining({ onlyFiles: true }));
-    expect(out.filesCount).toBe(1);
-    expect(out.batches).toHaveLength(1);
+    expect(out).toHaveLength(1);
   });
 
   it('handles absolute single file path (has extension) and uses absolute cwd', async () => {
@@ -70,7 +69,7 @@ describe('FileScanner branch coverage', () => {
 
     // pattern should be basename and cwd should be dirname (absolute)
     expect(globby).toHaveBeenCalledWith('abs-file.css', expect.objectContaining({ cwd: process.cwd() }));
-    expect(out.filesCount).toBe(1);
+    expect(out).toHaveLength(1);
   });
 
   it('handles dynamic glob pattern with no directory portion (lastDirectoryIndex === -1)', async () => {
@@ -99,7 +98,7 @@ describe('FileScanner branch coverage', () => {
       gitignore: false,
     });
 
-    expect(out.filesCount).toBe(1);
+    expect(out).toHaveLength(1);
   });
 
   it('handles dynamic glob pattern with directory portion (lastDirectoryIndex !== -1) and relative basePath', async () => {
@@ -130,7 +129,7 @@ describe('FileScanner branch coverage', () => {
 
     // cwd should be process.cwd()/rel
     expect(globby).toHaveBeenCalledWith('**/*.css', expect.objectContaining({ cwd: path.join(process.cwd(), 'rel') }));
-    expect(out.filesCount).toBe(1);
+    expect(out).toHaveLength(1);
   });
 
   it('handles dynamic glob pattern with directory portion and absolute basePath', async () => {
@@ -160,10 +159,10 @@ describe('FileScanner branch coverage', () => {
     });
 
     expect(globby).toHaveBeenCalledWith('**/*.css', expect.objectContaining({ cwd: '/abs' }));
-    expect(out.filesCount).toBe(1);
+    expect(out).toHaveLength(1);
   });
 
-  it('skips inaccessible files and still returns batches', async () => {
+  it('skips inaccessible files and returns only accessible files', async () => {
     const globby = jest
       .fn<(...args: any[]) => Promise<string[]>>()
       .mockResolvedValue([
@@ -200,8 +199,7 @@ describe('FileScanner branch coverage', () => {
       batchSize: 1,
     });
 
-    expect(out.filesCount).toBe(1);
-    expect(out.batches).toHaveLength(1);
+    expect(out).toHaveLength(1);
     expect(warning).toHaveBeenCalled();
   });
 

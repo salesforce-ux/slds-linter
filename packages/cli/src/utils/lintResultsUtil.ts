@@ -1,6 +1,7 @@
 // src/utils/lintResultsUtil.ts
 
 import path from 'path';
+import supportsHyperlinks from 'supports-hyperlinks';
 import { createClickableLineCol } from './editorLinkUtil';
 import { Logger } from '../utils/logger';
 import { Colors } from './colors';
@@ -116,17 +117,16 @@ export function printLintResults(results: LintResult[], options?: PrintOptions):
       }
       
       // Create clickable line:column link
-      const lineCol = msg.line && msg.column ? `${msg.line}:${msg.column}` : '-';
-      const clickableLineCol = msg.line && msg.column 
-        ? createClickableLineCol(lineCol, absolutePath, msg.line, msg.column, options?.editor)
-        : lineCol;
-      
+      let lineCol = msg.line && msg.column ? `${msg.line}:${msg.column}` : '-';
+      if (supportsHyperlinks.stdout && lineCol !== '-') {
+        lineCol = createClickableLineCol(lineCol, absolutePath, msg.line, msg.column, options?.editor);
+      }
       const severityText = isError ? Colors.error('error') : Colors.warning('warning');
       // Replace newlines and multiple spaces to prevent layout issues
       const message = parseText(msg.message);
       const ruleId = msg.ruleId ? Colors.lowEmphasis(replaceNamespaceinRules(msg.ruleId)) : '';
       
-      tableData.push([clickableLineCol, severityText, message, ruleId]);
+      tableData.push([lineCol, severityText, message, ruleId]);
     });
 
     // Print with simple formatting (no table library to avoid ANSI width issues)

@@ -66,7 +66,6 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector'
       }]
     },
     {
@@ -74,7 +73,6 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector'
       }]
     },
     {
@@ -82,7 +80,6 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector'
       }]
     },
     {
@@ -90,7 +87,6 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector'
       }]
     },
     {
@@ -98,7 +94,6 @@ ruleTester.run('no-slds-class-overrides', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'sldsClassOverride',
-        type: 'ClassSelector'
       }]
     },
           {
@@ -107,7 +102,6 @@ ruleTester.run('no-slds-class-overrides', rule, {
       errors: [
         {
           messageId: 'sldsClassOverride',
-          type: 'ClassSelector'
         }
       ]
     },
@@ -120,11 +114,9 @@ ruleTester.run('no-slds-class-overrides', rule, {
       errors: [
         {
           messageId: 'sldsClassOverride',
-          type: 'ClassSelector'
         },
         {
           messageId: 'sldsClassOverride',
-          type: 'ClassSelector'
         }
       ]
     },

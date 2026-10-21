@@ -4,6 +4,7 @@ export interface BaseConfig {
   directory?: string;
   files?: string[];
   configEslint?: string;
+  deterministicOnly?: boolean;
 }
 
 /**
@@ -44,6 +45,7 @@ export interface WorkerConfig {
   configPath?: string;
   fix?: boolean;
   cwd?: string;
+  deterministicOnly?: boolean;
 }
 
 export interface LintRunnerOptions extends WorkerConfig {
@@ -86,10 +88,6 @@ export interface ScanOptions {
   gitignore?: boolean;
 }
 
-export interface ScanResult {
-  filesCount: number;
-  batches: string[][];
-}
 
 export interface PrintOptions {
   editor?: string;

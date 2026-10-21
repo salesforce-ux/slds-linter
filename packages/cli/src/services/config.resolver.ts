@@ -1,7 +1,9 @@
 import { resolvePath } from '../utils/nodeVersionUtil';
+import { fileURLToPath } from 'url';
 import ruleMessages from '@salesforce-ux/eslint-plugin-slds/rule-messages';
 
-export const DEFAULT_ESLINT_CONFIG_PATH = resolvePath('@salesforce-ux/eslint-plugin-slds/config', import.meta);
+export const DEFAULT_ESLINT_CONFIG_PATH = fileURLToPath(new URL('../../slds.config.mjs', import.meta.url));
+export const EMIT_ESLINT_CONFIG_PATH = resolvePath('@salesforce-ux/eslint-plugin-slds/config', import.meta);
 export const ESLINT_VERSION = process.env.ESLINT_VERSION;
 export const LINTER_CLI_VERSION = process.env.CLI_VERSION;
 

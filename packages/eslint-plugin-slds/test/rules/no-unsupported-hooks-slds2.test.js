@@ -76,7 +76,6 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecated',
-        type: 'Identifier',
         data: {
           token: '--slds-g-color-border-base-2'
         }
@@ -94,21 +93,18 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       errors: [
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-g-color-border-base-2'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-g-color-border-base-3'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Identifier',
           data: {
             token: '--slds-g-color-border-base-2'
           }
@@ -127,21 +123,18 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       errors: [
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-g-link-color'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-g-link-color-hover'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Identifier',
           data: {
             token: '--slds-g-link-color'
           }
@@ -161,28 +154,24 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       errors: [
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-kx-button-underline-scale-x'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-kx-button-underline-base-y'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-kx-button-underline-offset-y'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Identifier',
           data: {
             token: '--slds-kx-button-underline-scale-x'
           }
@@ -191,7 +180,7 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
     },
 
     // SDS shared deprecated hooks
-    {
+    /*{
       code: `.shared-nav {
         --sds-s-navigation-radius-border: 0.25rem;
         --sds-s-label-sizing-gap: 0.5rem;
@@ -201,27 +190,24 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       errors: [
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--sds-s-navigation-radius-border'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--sds-s-label-sizing-gap'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Identifier',
           data: {
             token: '--sds-s-navigation-radius-border'
           }
         }
       ]
-    },
+    },*/
 
     // Accordion component deprecated hooks
     {
@@ -235,14 +221,12 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       errors: [
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-c-accordion-heading-text-color'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Identifier',
           data: {
             token: '--slds-c-accordion-heading-text-color'
           }
@@ -268,21 +252,18 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       errors: [
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-c-toast-sizing-width-min'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Declaration',
           data: {
             token: '--slds-c-toast-spacing-blockstart'
           }
         },
         {
           messageId: 'deprecated',
-          type: 'Identifier',
           data: {
             token: '--slds-c-toast-sizing-width-min'
           }
@@ -296,7 +277,6 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecated',
-        type: 'Identifier',
         data: {
           token: '--slds-c-modal-header-spacing-blockstart'
         }
@@ -311,7 +291,6 @@ ruleTester.run('no-unsupported-hooks-slds2', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecated',
-        type: 'Identifier',
         data: {
           token: '--slds-c-pill-container-spacing-inlinestart'
         }

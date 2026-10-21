@@ -1,7 +1,8 @@
 import { Readable } from 'stream';
+import path from 'path';
 import { FileScanner } from '../services/file-scanner';
 import { LintRunner } from '../services/lint-runner';
-import { StyleFilePatterns, ComponentFilePatterns } from '../services/file-patterns';
+import { StyleFilePatterns, ComponentFilePatterns, ReactFilePatterns } from '../services/file-patterns';
 import { ReportGenerator, CsvReportGenerator } from '../services/report-generator';
 import { DEFAULT_ESLINT_CONFIG_PATH, LINTER_CLI_VERSION } from '../services/config.resolver';
 import { LintResult, LintConfig, ReportConfig } from '../types';
@@ -24,31 +25,55 @@ export async function lint(config: LintConfig): Promise<LintResult[]> {
       configEslint: DEFAULT_ESLINT_CONFIG_PATH,
     });
     
-    // Scan directory for style files (CSS, SCSS, etc.)
-    const {filesCount: styleFilesCount, batches: styleFiles} = await FileScanner.scanFiles(normalizedConfig.directory, {
-      patterns: StyleFilePatterns,
-      batchSize: 100,
+    const files = await FileScanner.scanFiles(normalizedConfig.directory, {
+      patterns: {
+        extensions: [
+          ...StyleFilePatterns.extensions,
+          ...ComponentFilePatterns.extensions,
+          ...ReactFilePatterns.extensions,
+        ],
+        exclude: [...new Set([
+          ...StyleFilePatterns.exclude ?? [],
+          ...ComponentFilePatterns.exclude ?? [],
+          ...ReactFilePatterns.exclude ?? [],
+        ])],
+      },
     });
-    
-    // Scan directory for component files (HTML, etc.)
-    const {filesCount: componentFilesCount, batches: componentFiles} = await FileScanner.scanFiles(normalizedConfig.directory, {
-      patterns: ComponentFilePatterns,
-      batchSize: 100,
-    });
-    
-    if(styleFilesCount>0){
-      Logger.info(`Total style files: ${styleFilesCount}`);
+    const styleExtensions = new Set(StyleFilePatterns.extensions);
+    const componentExtensions = new Set(ComponentFilePatterns.extensions);
+    const reactExtensions = new Set(ReactFilePatterns.extensions);
+    const styleFiles: string[] = [];
+    const componentFiles: string[] = [];
+    const reactFiles: string[] = [];
+
+    for (const file of files) {
+      const extension = path.extname(file).substring(1);
+      if (styleExtensions.has(extension)) {
+        styleFiles.push(file);
+      } else if (componentExtensions.has(extension)) {
+        componentFiles.push(file);
+      } else if (reactExtensions.has(extension)) {
+        reactFiles.push(file);
+      }
     }
-    if(componentFilesCount>0){
-      Logger.info(`Total component files: ${componentFilesCount}`);
+    
+    if(styleFiles.length>0){
+      Logger.info(`Total style files: ${styleFiles.length}`);
+    }
+    if(componentFiles.length>0){
+      Logger.info(`Total component files: ${componentFiles.length}`);
+    }
+    if(reactFiles.length>0){
+      Logger.info(`Total React files: ${reactFiles.length}`);
     }
     
-    const { fix, configEslint } = normalizedConfig;
+    const { fix, configEslint, deterministicOnly } = normalizedConfig;
     
-    // Run ESLint on all files
-    return await LintRunner.runLinting([...styleFiles, ...componentFiles], {
+    // Run ESLint on all files using Piscina worker pool
+    return await LintRunner.runLinting([...styleFiles, ...componentFiles, ...reactFiles], {
       fix,
       configPath: configEslint,
+      deterministicOnly,
     });
     
   } catch (error: any) {
@@ -129,17 +154,15 @@ export async function lintFiles(files: string[], config: LintConfig): Promise<Li
       configEslint: DEFAULT_ESLINT_CONFIG_PATH,
     });
 
-    const batches = FileScanner.createBatches(files, FileScanner.DEFAULT_BATCH_SIZE);
     Logger.debug(
-      `Found ${files.length} files, split into ${batches.length} batches`
+      `Found ${files.length} files`
     );
     
-    // Run ESLint on all files
-    const results = await LintRunner.runLinting(batches, {
+    const results = await LintRunner.runLinting(files, {
       fix: normalizedConfig.fix,
       configPath: normalizedConfig.configEslint,
-      // when linting files, use the directory of the files as the working directory
-      cwd: normalizedConfig.directory
+      cwd: normalizedConfig.directory,
+      deterministicOnly: normalizedConfig.deterministicOnly,
     });
 
     return results;
@@ -151,5 +174,13 @@ export async function lintFiles(files: string[], config: LintConfig): Promise<Li
   }
 }
 
+
+/**
+ * Destroy the shared worker pool. Call after all linting is complete
+ * to release resources.
+ */
+export async function destroy(): Promise<void> {
+  await LintRunner.destroy();
+}
 
 export type { LintResult, LintResultEntry, LintConfig, ReportConfig, ExitCode, WorkerResult, SarifResultEntry } from '../types'; 

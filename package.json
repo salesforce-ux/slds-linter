@@ -5,6 +5,7 @@
   "type": "module",
   "workspaces": [
     "packages/eslint-plugin-slds",
+    "packages/eslint-plugin-react-slds",
     "packages/cli"
   ],
   "packageManager": "yarn@4.2.2",
@@ -26,15 +27,16 @@
   },
   "devDependencies": {
     "@inquirer/input": "^4.1.7",
+    "@inquirer/prompts": "^7.0.0",
     "@inquirer/select": "^4.0.10",
     "@listr2/prompt-adapter-inquirer": "^2.0.18",
-    "@types/eslint": "^8.0.0",
     "@types/node": "^20.11.19",
     "clean-pkg-json": "^1.2.0",
     "conventional-commits-parser": "^3.0.0",
     "esbuild": "^0.25.0",
     "esbuild-plugin-conditional-replace": "^0.1.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
+    "eslint": "^10.9.1",
     "finalhandler": "^2.1.0",
     "glob": "^11.0.1",
     "gulp": "^5.0.0",

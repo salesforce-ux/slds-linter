@@ -4,7 +4,7 @@ import { dirname } from 'path';
 import {resolve} from 'import-meta-resolve'; // This package is a ponyfill for import.meta.resolve Node 16-20
 import { Logger } from './logger'; // Ensure this path is correct
 
-export const REQUIRED_NODE_VERSION = ">=18.18.0";
+export const REQUIRED_NODE_VERSION = "^22.13.0 || >=24.0.0";
 
 /**
  * Checks if the current Node.js version meets the required version.
@@ -20,12 +20,10 @@ export function checkNodeVersion(requiredVersion) {
  */
 export function validateNodeVersion() {
   if (!checkNodeVersion(REQUIRED_NODE_VERSION)) {
-    if(checkNodeVersion("<18.4.x")){
-      Logger.warning(
-        `SLDS Linter CLI works best with Node.js version v18.4.0 or later. 
-        We recommend using the latest [Active LTS](https://nodejs.org/en/about/previous-releases) version of Node.js.`
-      );
-    }
+    Logger.warning(
+      `SLDS Linter CLI works best with the latest [Active LTS](https://nodejs.org/en/about/previous-releases) ` +
+      `version of Node.js.`
+    );
   }
 }
 

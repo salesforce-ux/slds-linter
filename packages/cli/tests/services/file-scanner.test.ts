@@ -1,7 +1,7 @@
 import path from 'path';
 import { ScanOptions } from '../../src/types';
 import { FileScanner } from '../../src/services/file-scanner';
-import { StyleFilePatterns } from '../../src/services/file-patterns';
+import { ReactFilePatterns, StyleFilePatterns } from '../../src/services/file-patterns';
 import {mkdir, writeFile, rm} from "fs/promises";
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -28,20 +28,17 @@ describe('FileScanner', () => {
     await rm(testDir, { recursive: true });
   });
 
-  it('should scan and batch files correctly', async () => {
+  it('should scan files and return flat file list', async () => {
     const options: ScanOptions = {
       patterns: StyleFilePatterns,
-      batchSize: 1,
       gitignore: false
     };
 
-    const { batches } = await FileScanner.scanFiles(testDir, options);
+    const files = await FileScanner.scanFiles(testDir, options);
     
-    expect(batches).toHaveLength(2);
-    expect(batches[0]).toHaveLength(1);
-    expect(batches[1]).toHaveLength(1);
-    expect(batches[0][0]).toMatch(/test\.(css|scss)$/);
-    expect(batches[1][0]).toMatch(/test\.(css|scss)$/);
+    expect(files).toHaveLength(2);
+    expect(files[0]).toMatch(/test\.(css|scss)$/);
+    expect(files[1]).toMatch(/test\.(css|scss)$/);
   });
 
   it('should handle invalid files gracefully', async () => {
@@ -53,7 +50,12 @@ describe('FileScanner', () => {
       gitignore: false
     };
 
-    const { batches } = await FileScanner.scanFiles(testDir, options);
-    expect(batches).toHaveLength(0);
+    const files = await FileScanner.scanFiles(testDir, options);
+    expect(files).toHaveLength(0);
   });
-}); 
+
+  it('defines React file patterns for JSX and TSX only', () => {
+    expect(ReactFilePatterns.extensions).toEqual(['jsx', 'tsx']);
+    expect(ReactFilePatterns.exclude).toEqual(StyleFilePatterns.exclude);
+  });
+});

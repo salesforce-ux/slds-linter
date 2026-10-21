@@ -90,7 +90,6 @@ ruleTester.run('no-deprecated-slds-classes', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedClass',
-        type: 'ClassSelector'
       }]
     },
     // Complex selector with deprecated class
@@ -99,7 +98,6 @@ ruleTester.run('no-deprecated-slds-classes', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedClass',
-        type: 'ClassSelector'
       }]
     },
     // Deprecated class with pseudo-selector
@@ -108,7 +106,6 @@ ruleTester.run('no-deprecated-slds-classes', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedClass',
-        type: 'ClassSelector'
       }]
     },
     // Multiple deprecated classes in same file
@@ -121,7 +118,6 @@ ruleTester.run('no-deprecated-slds-classes', rule, {
       errors: [
         {
           messageId: 'deprecatedClass',
-          type: 'ClassSelector'
         }
         // Note: Only testing with one known deprecated class from the spec file
         // Additional deprecated classes would need to be verified from metadata
@@ -133,7 +129,6 @@ ruleTester.run('no-deprecated-slds-classes', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'deprecatedClass',
-        type: 'ClassSelector'
       }]
     }
   ]

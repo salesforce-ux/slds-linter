@@ -1,0 +1,16 @@
+.card-outline {
+    border: #c9c9c9;
+}
+
+.card-outline .divider {
+    border-bottom-color: #dddbda;
+}
+
+.dark-card {
+    background-color: #181818;
+    border: #444444;
+}
+
+.dark-card .dark-divider {
+    border-bottom-color: #5c5c5c;
+}

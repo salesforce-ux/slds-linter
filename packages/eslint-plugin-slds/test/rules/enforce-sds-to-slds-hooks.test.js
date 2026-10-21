@@ -63,7 +63,6 @@ ruleTester.run('enforce-sds-to-slds-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replaceSdsWithSlds',
-        type: 'Identifier',
         data: {
           oldValue: '--sds-g-color-palette-blue-10',
           suggestedMatch: '--slds-g-color-palette-blue-10'
@@ -78,7 +77,6 @@ ruleTester.run('enforce-sds-to-slds-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replaceSdsWithSlds',
-        type: 'Declaration',
         data: {
           oldValue: '--sds-g-spacing-1',
           suggestedMatch: '--slds-g-spacing-1'
@@ -100,11 +98,9 @@ ruleTester.run('enforce-sds-to-slds-hooks', rule, {
       errors: [
         {
           messageId: 'replaceSdsWithSlds',
-          type: 'Identifier'
         },
         {
           messageId: 'replaceSdsWithSlds',
-          type: 'Identifier'
         }
       ]
     },
@@ -123,11 +119,9 @@ ruleTester.run('enforce-sds-to-slds-hooks', rule, {
       errors: [
         {
           messageId: 'replaceSdsWithSlds',
-          type: 'Declaration'
         },
         {
           messageId: 'replaceSdsWithSlds',
-          type: 'Declaration'
         }
       ]
     },
@@ -139,7 +133,6 @@ ruleTester.run('enforce-sds-to-slds-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replaceSdsWithSlds',
-        type: 'Identifier'
       }]
     },
 
@@ -154,7 +147,6 @@ ruleTester.run('enforce-sds-to-slds-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replaceSdsWithSlds',
-        type: 'Identifier'
       }]
     },
 
@@ -173,7 +165,6 @@ ruleTester.run('enforce-sds-to-slds-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replaceSdsWithSlds',
-        type: 'Identifier'
       }]
     }
   ]

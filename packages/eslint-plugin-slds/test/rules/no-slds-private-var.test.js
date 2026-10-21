@@ -57,7 +57,6 @@ ruleTester.run('no-slds-private-var', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'privateVar',
-        type: 'Declaration'
       }]
     },
     
@@ -68,7 +67,6 @@ ruleTester.run('no-slds-private-var', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'privateVar',
-        type: 'Declaration'
       }]
     },
 
@@ -94,11 +92,9 @@ ruleTester.run('no-slds-private-var', rule, {
       errors: [
         {
           messageId: 'privateVar',
-          type: 'Declaration'
         },
         {
           messageId: 'privateVar',
-          type: 'Declaration'
         }
       ]
     },
@@ -110,7 +106,6 @@ ruleTester.run('no-slds-private-var', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'privateVar',
-        type: 'Declaration'
       }]
     },
 
@@ -129,7 +124,6 @@ ruleTester.run('no-slds-private-var', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'privateVar',
-        type: 'Declaration'
       }]
     },
 
@@ -140,7 +134,6 @@ ruleTester.run('no-slds-private-var', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'privateVar',
-        type: 'Declaration'
       }]
     },
   ]

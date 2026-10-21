@@ -68,7 +68,6 @@ ruleTester.run('enforce-bem-usage-css', rule, {
       output: `.slds-action-overflow_touch { font-size: 24px; }`,
       errors: [{
         messageId: 'bemDoubleDash',
-        type: 'ClassSelector'
       }]
     },
     {
@@ -78,11 +77,9 @@ ruleTester.run('enforce-bem-usage-css', rule, {
       errors: [
         {
           messageId: 'bemDoubleDash',
-          type: 'ClassSelector'
         },
         {
           messageId: 'bemDoubleDash',
-          type: 'ClassSelector'
         }
       ]
     },
@@ -92,7 +89,6 @@ ruleTester.run('enforce-bem-usage-css', rule, {
       output: `.slds-action-overflow_touch:last-of-type { border-bottom: none; }`,
       errors: [{
         messageId: 'bemDoubleDash',
-        type: 'ClassSelector'
       }]
     },
     {
@@ -101,7 +97,6 @@ ruleTester.run('enforce-bem-usage-css', rule, {
       output: `div.slds-alert_error { border-bottom: none; }`,
       errors: [{
         messageId: 'bemDoubleDash',
-        type: 'ClassSelector'
       }]
     },
     {
@@ -110,7 +105,6 @@ ruleTester.run('enforce-bem-usage-css', rule, {
       output: `.slds-alert_warning div { border-bottom: none; }`,
       errors: [{
         messageId: 'bemDoubleDash',
-        type: 'ClassSelector'
       }]
     },
     {
@@ -119,7 +113,6 @@ ruleTester.run('enforce-bem-usage-css', rule, {
       output: `.slds-action-overflow_touch > div { border-bottom: none; }`,
       errors: [{
         messageId: 'bemDoubleDash',
-        type: 'ClassSelector'
       }]
     },
     {
@@ -137,15 +130,12 @@ ruleTester.run('enforce-bem-usage-css', rule, {
       errors: [
         {
           messageId: 'bemDoubleDash',
-          type: 'ClassSelector'
         },
         {
           messageId: 'bemDoubleDash',
-          type: 'ClassSelector'
         },
         {
           messageId: 'bemDoubleDash',
-          type: 'ClassSelector'
         }
       ]
     }

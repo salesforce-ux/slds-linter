@@ -82,7 +82,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Declaration',
         data: {
           token: '--slds-my-own-token',
           tokenWithoutNamespace: 'my-own-token'
@@ -97,7 +96,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Declaration',
         data: {
           token: '--slds-custom-color',
           tokenWithoutNamespace: 'custom-color'
@@ -112,7 +110,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Declaration',
         data: {
           token: '--sds-my-custom-hook',
           tokenWithoutNamespace: 'my-custom-hook'
@@ -127,7 +124,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Declaration',
         data: {
           token: '--sds-my-background',
           tokenWithoutNamespace: 'my-background'
@@ -147,7 +143,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       errors: [
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-custom-prop1',
             tokenWithoutNamespace: 'custom-prop1'
@@ -155,7 +150,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-custom-prop2',
             tokenWithoutNamespace: 'custom-prop2'
@@ -163,7 +157,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-custom-color',
             tokenWithoutNamespace: 'custom-color'
@@ -185,7 +178,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       errors: [
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-invalid-custom',
             tokenWithoutNamespace: 'invalid-custom'
@@ -193,7 +185,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-my-custom-bg',
             tokenWithoutNamespace: 'my-custom-bg'
@@ -209,7 +200,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Declaration',
         data: {
           token: '--slds-hover-color',
           tokenWithoutNamespace: 'hover-color'
@@ -226,7 +216,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Declaration',
         data: {
           token: '--slds-my-offset',
           tokenWithoutNamespace: 'my-offset'
@@ -242,7 +231,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       errors: [
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-spacing',
             tokenWithoutNamespace: 'spacing'
@@ -250,7 +238,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-spacing',
             tokenWithoutNamespace: 'spacing'
@@ -258,7 +245,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-spacing',
             tokenWithoutNamespace: 'spacing'
@@ -266,7 +252,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-spacing',
             tokenWithoutNamespace: 'spacing'
@@ -282,7 +267,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'customHookNamespace',
-        type: 'Declaration',
         data: {
           token: '--slds-my-custom-color',
           tokenWithoutNamespace: 'my-custom-color'
@@ -298,7 +282,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
       errors: [
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-custom-one',
             tokenWithoutNamespace: 'custom-one'
@@ -306,7 +289,6 @@ ruleTester.run('no-slds-namespace-for-custom-hooks', rule, {
         },
         {
           messageId: 'customHookNamespace',
-          type: 'Declaration',
           data: {
             token: '--slds-custom-two',
             tokenWithoutNamespace: 'custom-two'

@@ -75,7 +75,6 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replace',
-        type: 'Declaration',
         data: {
           oldValue: '--slds-c-accordion-color-border',
           suggestedMatch: '--slds-c-accordion-section-color-border'
@@ -94,7 +93,6 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replace',
-        type: 'Identifier',
         data: {
           oldValue: '--slds-c-accordion-color-border',
           suggestedMatch: '--slds-c-accordion-section-color-border'
@@ -120,7 +118,6 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
       errors: [
         {
           messageId: 'replace',
-          type: 'Declaration',
           data: {
             oldValue: '--slds-c-accordion-color-border',
             suggestedMatch: '--slds-c-accordion-section-color-border'
@@ -128,7 +125,6 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
         },
         {
           messageId: 'replace',
-          type: 'Identifier',
           data: {
             oldValue: '--slds-c-accordion-color-border',
             suggestedMatch: '--slds-c-accordion-section-color-border'
@@ -150,7 +146,6 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replace',
-        type: 'Identifier',
         data: {
           oldValue: '--slds-c-accordion-color-border',
           suggestedMatch: '--slds-c-accordion-section-color-border'
@@ -169,7 +164,6 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replace',
-        type: 'Identifier',
         data: {
           oldValue: '--slds-c-accordion-color-border',
           suggestedMatch: '--slds-c-accordion-section-color-border'
@@ -188,7 +182,6 @@ ruleTester.run('enforce-component-hook-naming-convention', rule, {
       filename: 'test.css',
       errors: [{
         messageId: 'replace',
-        type: 'Identifier',
         data: {
           oldValue: '--slds-c-accordion-color-border',
           suggestedMatch: '--slds-c-accordion-section-color-border'

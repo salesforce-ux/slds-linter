@@ -8,10 +8,11 @@ For detailed information about SLDS Linter, see the [SLDS Linter developer guide
 
 ## Features
 
-SLDS Linter is a custom-built linting solution based on open-source [ESLint](https://eslint.org/) projects. It supports linting for both types of Lightning components. 
+SLDS Linter is a custom-built linting solution based on open-source [ESLint](https://eslint.org/) projects. It supports Lightning components and React applications.
 
 - Lightning web components: HTML and Cascading Style Sheet (CSS) files
 - Aura components: Component (CMP) and CSS files
+- React applications: JSX and TSX files
 
 Run SLDS Linter in a terminal window or in Visual Studio (VS) Code. We recommend running in VS Code.
 
@@ -24,7 +25,7 @@ Follow these steps to integrate SLDS Linter into your project.
 - Install [VS Code](https://code.visualstudio.com/)
 - Install the [SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=MS-SarifVSCode.sarif-viewer) VS Code extension. With this extension, you can view SLDS Linter violation reports.
 - Install [Node.js](https://nodejs.org/)
-  - The minimum supported version is **v18.4.0**
+  - Supported versions are **v22.13.0 or later in Node 22** and **v24 or later**.
   - We recommend using the latest [Active LTS](https://nodejs.org/en/about/previous-releases) version of Node.js.  
 
 ## Install SLDS Linter
@@ -69,7 +70,7 @@ In your project root directory, follow these instructions.
 5. Open the generated `.sarif` report file.
 6. Make a note of how many components SLDS Linter has identified that you must update.
 7. (Optional) To automatically fix validation errors in bulk, run the `lint` command with the `fix` option, `npx @salesforce-ux/slds-linter lint --fix`.
-8. (Optional) To emit the configuration files used by `slds-linter`, run `npx @salesforce-ux/slds-linter emit` in your component source directory. Note that this command defaults to current working directory. These configuration files are discovered by your VS Code ESLint extension to display squiggly lines in HTML, CSS and CMP files when opened in your code editor.  
+8. (Optional) To emit the configuration files used by `slds-linter`, run `npx @salesforce-ux/slds-linter emit` in your component source directory. Note that this command defaults to current working directory. If `eslint.config.mjs` exists, it is backed up as `eslint.config.backup.mjs`. These configuration files are discovered by your VS Code ESLint extension to display squiggly lines in HTML, CSS and CMP files when opened in your code editor.
 
 
 ### Troubleshoot SARIF Viewer Navigation
@@ -85,7 +86,7 @@ If the SARIF viewer doesn’t automatically go to the line of code when you clic
 
 Use these commands to run SLDS Linter rules. Review the output violations and fix any issues to uplift your code to SLDS best practices.
 
-- `npx @salesforce-ux/slds-linter lint`. Runs ESLint rules on HTML, CSS, and CMP files.
+- `npx @salesforce-ux/slds-linter lint`. Runs ESLint rules on HTML, CSS, CMP, JSX, and TSX files.
 - `npx @salesforce-ux/slds-linter report`. Generates a SARIF report for static analysis.
 - `npx @salesforce-ux/slds-linter emit`. Emits the configuration files used by `slds-linter`. Defaults to current directory. 
 
@@ -98,6 +99,7 @@ These options are available on SLDS Linter commands.
 | `--fix`                  | Automatically fix problems                                                   | `lint`         |
 | `--config-eslint <path>` | Path to eslint config file                    | `lint`, `report`|
 | `--editor <editor>`      | Editor to open files with (e.g., vscode, atom, sublime). Defaults to vscode | `lint` |
+| `--deterministic-only` | Restrict color autofix to deterministic hook matches only. By default, both deterministic and semi-deterministic tiers are autofixed. | `lint`, `report` |
 
 To view help for these options, add `--help` to each command. For example, run `npx @salesforce-ux/slds-linter lint --help` to see which options you can use with `lint`.
 

@@ -16,4 +16,13 @@ export const ComponentFilePatterns: FilePattern = {
     '**/dist/**',
     '**/build/**'
   ]
-}; 
+};
+
+export const ReactFilePatterns: FilePattern = {
+  extensions: ['jsx', 'tsx'],
+  exclude: [
+    '**/node_modules/**',
+    '**/dist/**',
+    '**/build/**'
+  ]
+};

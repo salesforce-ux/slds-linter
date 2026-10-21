@@ -1,4 +1,4 @@
-// Unified ESLint plugin config for both v8 (legacy) and v9+ (flat)
+// Unified ESLint plugin config for ESLint 9 and 10
 
 import enforceBemUsage from './rules/enforce-bem-usage';
 import noDeprecatedSldsClasses from './rules/v9/no-deprecated-slds-classes';
@@ -91,20 +91,10 @@ const htmlConfigArray = [
 ];
 
 Object.assign(plugin.configs, {
-  // Flat config for ESLint v9+
+  // Flat config for ESLint 9+
   "flat/recommended-css": cssConfigArray,
   "flat/recommended-html": htmlConfigArray,
-  "flat/recommended": [...cssConfigArray, ...htmlConfigArray],
-  // legacy config for ESLint v8-
-  recommended: {
-    plugins: ["@salesforce-ux/slds"],
-    rules: ruleConfigs.html,
-    parser: htmlParser,
-    parserOptions: {
-      ecmaVersion: 2021,
-      sourceType: "module"
-    }
-  }
+  "flat/recommended": [...cssConfigArray, ...htmlConfigArray]
 });
 
 function sldsCssPlugin() {

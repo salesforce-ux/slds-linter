@@ -3,6 +3,7 @@
  */
 
 import { jest } from '@jest/globals';
+import path from 'path';
 import { Readable } from 'stream';
 
 describe('Executor functions', () => {
@@ -11,11 +12,21 @@ describe('Executor functions', () => {
   });
 
   describe('lint', () => {
-    it('scans style + component files, logs counts, and runs linting with combined batches', async () => {
+    it('scans style, component, and React files and runs linting with combined files', async () => {
+      const styleFile = path.resolve('a.css');
+      const secondStyleFile = path.resolve('b.scss');
+      const componentFile = path.resolve('c.html');
+      const reactFile = path.resolve('d.jsx');
+      const secondReactFile = path.resolve('e.tsx');
       const scanFiles = jest
-        .fn<(...args: any[]) => Promise<any>>()
-        .mockResolvedValueOnce({ filesCount: 2, batches: [['a.css'], ['b.css']] })
-        .mockResolvedValueOnce({ filesCount: 1, batches: [['c.html']] });
+        .fn<(...args: any[]) => Promise<string[]>>()
+        .mockResolvedValue([
+          reactFile,
+          styleFile,
+          componentFile,
+          secondStyleFile,
+          secondReactFile,
+        ]);
 
       const runLinting = jest
         .fn<(...args: any[]) => Promise<any[]>>()
@@ -53,25 +64,35 @@ describe('Executor functions', () => {
 
       const { lint } = await import('../../src/executor');
 
-      const results = await lint({ directory: './src', fix: true } as any);
+      const results = await lint({ directory: './src', fix: true, deterministicOnly: true } as any);
 
       expect(results).toEqual([{ filePath: 'a.css', messages: [] }]);
-      expect(scanFiles).toHaveBeenCalledTimes(2);
+      expect(scanFiles).toHaveBeenCalledTimes(1);
+      expect(scanFiles).toHaveBeenCalledWith('./src', {
+        patterns: {
+          extensions: [
+            'css', 'scss', 'less', 'sass',
+            'html', 'cmp', 'component', 'app', 'page', 'interface',
+            'jsx', 'tsx',
+          ],
+          exclude: ['**/node_modules/**', '**/dist/**', '**/build/**'],
+        },
+      });
       expect(info).toHaveBeenCalledWith('Total style files: 2');
       expect(info).toHaveBeenCalledWith('Total component files: 1');
+      expect(info).toHaveBeenCalledWith('Total React files: 2');
       expect(runLinting).toHaveBeenCalledWith(
-        [['a.css'], ['b.css'], ['c.html']],
-        { fix: true, configPath: '/abs/default-eslint.mjs' }
+        [styleFile, secondStyleFile, componentFile, reactFile, secondReactFile],
+        { fix: true, configPath: '/abs/default-eslint.mjs', deterministicOnly: true }
       );
       expect(debug).toHaveBeenCalled();
       expect(error).not.toHaveBeenCalled();
     });
 
-    it('does not log counts when both file counts are zero', async () => {
+    it('does not log counts when all file counts are zero', async () => {
       const scanFiles = jest
         .fn<(...args: any[]) => Promise<any>>()
-        .mockResolvedValueOnce({ filesCount: 0, batches: [] })
-        .mockResolvedValueOnce({ filesCount: 0, batches: [] });
+        .mockResolvedValue([]);
 
       const runLinting = jest
         .fn<(...args: any[]) => Promise<any[]>>()
@@ -107,6 +128,7 @@ describe('Executor functions', () => {
 
       const { lint } = await import('../../src/executor');
       await lint({ directory: './src', fix: false } as any);
+      expect(scanFiles).toHaveBeenCalledTimes(1);
       expect(info).not.toHaveBeenCalled();
       expect(runLinting).toHaveBeenCalledWith([], { fix: false, configPath: '/abs/default-eslint.mjs' });
     });
@@ -144,13 +166,13 @@ describe('Executor functions', () => {
       const { lint } = await import('../../src/executor');
 
       await expect(lint({ directory: './src' } as any)).rejects.toThrow('Linting failed: scan failed');
+      expect(scanFiles).toHaveBeenCalledTimes(1);
       expect(error).toHaveBeenCalledWith('Linting failed: scan failed');
     });
   });
 
   describe('lintFiles', () => {
-    it('batches file list and runs linting with cwd from normalized config', async () => {
-      const createBatches = jest.fn().mockReturnValue([['a.css', 'b.css'], ['c.html']]);
+    it('passes flat file list to runLinting with cwd from normalized config', async () => {
       const runLinting = jest
         .fn<(...args: any[]) => Promise<any[]>>()
         .mockResolvedValue([{ filePath: 'a.css', messages: [] }]);
@@ -159,7 +181,7 @@ describe('Executor functions', () => {
       const error = jest.fn();
 
       await jest.unstable_mockModule('../../src/services/file-scanner', () => ({
-        FileScanner: { createBatches, DEFAULT_BATCH_SIZE: 2 },
+        FileScanner: { createBatches: jest.fn(), DEFAULT_BATCH_SIZE: 2 },
       }));
 
       await jest.unstable_mockModule('../../src/services/lint-runner', () => ({
@@ -192,21 +214,19 @@ describe('Executor functions', () => {
       );
 
       expect(results).toEqual([{ filePath: 'a.css', messages: [] }]);
-      expect(createBatches).toHaveBeenCalledWith(['a.css', 'b.css', 'c.html'], 2);
-      expect(runLinting).toHaveBeenCalledWith([
-        ['a.css', 'b.css'],
-        ['c.html'],
-      ], {
-        fix: true,
-        configPath: '/abs/default-eslint.mjs',
-        cwd: '/tmp/project',
-      });
+      expect(runLinting).toHaveBeenCalledWith(
+        ['a.css', 'b.css', 'c.html'],
+        {
+          fix: true,
+          configPath: '/abs/default-eslint.mjs',
+          cwd: '/tmp/project',
+        }
+      );
       expect(debug).toHaveBeenCalled();
       expect(error).not.toHaveBeenCalled();
     });
 
     it('wraps errors with context and logs', async () => {
-      const createBatches = jest.fn().mockReturnValue([['a.css']]);
       const runLinting = jest
         .fn<(...args: any[]) => Promise<any[]>>()
         .mockRejectedValue(new Error('lint failed'));
@@ -214,7 +234,7 @@ describe('Executor functions', () => {
       const error = jest.fn();
 
       await jest.unstable_mockModule('../../src/services/file-scanner', () => ({
-        FileScanner: { createBatches, DEFAULT_BATCH_SIZE: 100 },
+        FileScanner: { createBatches: jest.fn(), DEFAULT_BATCH_SIZE: 100 },
       }));
 
       await jest.unstable_mockModule('../../src/services/lint-runner', () => ({
@@ -254,8 +274,7 @@ describe('Executor functions', () => {
 
       const scanFiles = jest
         .fn<(...args: any[]) => Promise<any>>()
-        .mockResolvedValueOnce({ filesCount: 0, batches: [] })
-        .mockResolvedValueOnce({ filesCount: 0, batches: [] });
+        .mockResolvedValue([]);
 
       const runLinting = jest
         .fn<(...args: any[]) => Promise<any[]>>()
@@ -300,7 +319,7 @@ describe('Executor functions', () => {
 
       const out = await report({ directory: './src' } as any);
       expect(out).toBe(sarifStream);
-      expect(scanFiles).toHaveBeenCalledTimes(2);
+      expect(scanFiles).toHaveBeenCalledTimes(1);
       expect(runLinting).toHaveBeenCalledWith([], { fix: undefined, configPath: '/abs/default-eslint.mjs' });
       expect(generateSarifReportStream).toHaveBeenCalledWith([], { toolName: 'slds-linter', toolVersion: '9.9.9' });
     });

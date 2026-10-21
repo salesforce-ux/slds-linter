@@ -1,8 +1,0 @@
-{
-    "name": "demo-slds-linter",
-    "dependencies": {
-        "@salesforce-ux/slds-liter":"*",
-        "@salesforce-ux/stylelint-plugin-slds":"*",
-        "@salesforce-ux/eslint-plugin-slds":"*"
-    }
-}

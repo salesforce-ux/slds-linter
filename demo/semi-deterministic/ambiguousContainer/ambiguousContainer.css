@@ -1,0 +1,16 @@
+.page-wrapper {
+    background-color: #ffffff;
+}
+
+.page-wrapper .content-area {
+    background-color: #f3f3f3;
+}
+
+.page-wrapper .sidebar {
+    background-color: #f3f2f2;
+}
+
+.page-wrapper .nested-panel {
+    background-color: #ffffff;
+    border: #dddbda;
+}

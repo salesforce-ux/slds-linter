@@ -1,8 +1,21 @@
 import { jest } from '@jest/globals';
+import semver from 'semver';
 
 describe('nodeVersionUtil', () => {
   beforeEach(() => {
     jest.resetModules();
+  });
+
+  it('matches the Node.js versions supported by the CLI dependencies', async () => {
+    const { REQUIRED_NODE_VERSION } = await import('../../src/utils/nodeVersionUtil');
+
+    expect(REQUIRED_NODE_VERSION).toBe('^22.13.0 || >=24.0.0');
+    expect(semver.satisfies('20.18.3', REQUIRED_NODE_VERSION)).toBe(false);
+    expect(semver.satisfies('20.19.0', REQUIRED_NODE_VERSION)).toBe(false);
+    expect(semver.satisfies('22.12.0', REQUIRED_NODE_VERSION)).toBe(false);
+    expect(semver.satisfies('22.13.0', REQUIRED_NODE_VERSION)).toBe(true);
+    expect(semver.satisfies('23.11.0', REQUIRED_NODE_VERSION)).toBe(false);
+    expect(semver.satisfies('24.0.0', REQUIRED_NODE_VERSION)).toBe(true);
   });
 
   it('checkNodeVersion delegates to semver.satisfies', async () => {
@@ -15,15 +28,9 @@ describe('nodeVersionUtil', () => {
     expect(mod.checkNodeVersion('>=1.0.0')).toBe(true);
   });
 
-  it('validateNodeVersion warns only for very old versions branch', async () => {
+  it('validateNodeVersion warns for unsupported versions', async () => {
     const warning = jest.fn();
-
-    // First satisfies: required version check -> false.
-    // Second satisfies: "<18.4.x" -> true.
-    const satisfies = jest
-      .fn()
-      .mockImplementationOnce(() => false)
-      .mockImplementationOnce(() => true);
+    const satisfies = jest.fn(() => false);
 
     await jest.unstable_mockModule('semver', () => ({
       satisfies,
@@ -37,7 +44,8 @@ describe('nodeVersionUtil', () => {
     const { validateNodeVersion } = await import('../../src/utils/nodeVersionUtil');
 
     validateNodeVersion();
-    expect(warning).toHaveBeenCalled();
+    expect(satisfies).toHaveBeenCalledWith(process.version, '^22.13.0 || >=24.0.0');
+    expect(warning).toHaveBeenCalledWith(expect.stringContaining('works best with the latest [Active LTS]'));
   });
 
   it('resolveDirName uses importMeta.dirname if present, else derives from url', async () => {

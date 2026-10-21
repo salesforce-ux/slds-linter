@@ -1,19 +1,11 @@
 import { jest } from '@jest/globals';
 
-describe('ESLintWorker', () => {
-  const originalExit = process.exit;
-  const originalConsoleError = console.error;
-
+describe('ESLint Worker (Piscina)', () => {
   beforeEach(() => {
     jest.resetModules();
   });
 
-  afterEach(() => {
-    process.exit = originalExit;
-    console.error = originalConsoleError;
-  });
-
-  it('constructs ESLint with configPath/fix and returns lint result; applies fixes when requested', async () => {
+  it('lints a file and returns result; applies fixes when requested', async () => {
     const lintFiles = jest.fn(async () => [{ output: 'fixed', rulesMeta: {}, messages: [] }]);
     const outputFixes = jest.fn(async () => undefined);
     const ESLintCtor = jest.fn(() => ({ lintFiles }));
@@ -22,20 +14,12 @@ describe('ESLintWorker', () => {
       ESLint: Object.assign(ESLintCtor, { outputFixes }),
     }));
 
-    await jest.unstable_mockModule('worker_threads', () => ({
-      isMainThread: true,
-      parentPort: undefined,
-      workerData: {
-        files: ['a.css'],
-        config: { configPath: '/abs/eslint.config.mjs', fix: true },
-      },
-    }));
+    const { default: lint } = await import('../../src/workers/eslint.worker');
 
-    const { ESLintWorker } = await import('../../src/workers/eslint.worker');
-
-    const worker = new ESLintWorker();
-
-    const out = await (worker as any).processFile('a.css');
+    const out = await lint({
+      filePath: 'a.css',
+      config: { configPath: '/abs/eslint.config.mjs', fix: true },
+    });
 
     expect(ESLintCtor).toHaveBeenCalledWith({
       overrideConfigFile: '/abs/eslint.config.mjs',
@@ -56,19 +40,12 @@ describe('ESLintWorker', () => {
       ESLint: Object.assign(ESLintCtor, { outputFixes }),
     }));
 
-    await jest.unstable_mockModule('worker_threads', () => ({
-      isMainThread: true,
-      parentPort: undefined,
-      workerData: {
-        files: ['a.css'],
-        config: { configPath: '/abs/eslint.config.mjs', fix: false },
-      },
-    }));
+    const { default: lint } = await import('../../src/workers/eslint.worker');
 
-    const { ESLintWorker } = await import('../../src/workers/eslint.worker');
-
-    const worker = new ESLintWorker();
-    await (worker as any).processFile('a.css');
+    await lint({
+      filePath: 'a.css',
+      config: { configPath: '/abs/eslint.config.mjs', fix: false },
+    });
 
     expect(outputFixes).not.toHaveBeenCalled();
   });
@@ -84,24 +61,17 @@ describe('ESLintWorker', () => {
       ESLint: Object.assign(ESLintCtor, { outputFixes }),
     }));
 
-    await jest.unstable_mockModule('worker_threads', () => ({
-      isMainThread: true,
-      parentPort: undefined,
-      workerData: {
-        files: ['a.css'],
-        config: { configPath: '/abs/eslint.config.mjs', fix: true },
-      },
-    }));
+    const { default: lint } = await import('../../src/workers/eslint.worker');
 
-    const { ESLintWorker } = await import('../../src/workers/eslint.worker');
-
-    const worker = new ESLintWorker();
-    const out = await (worker as any).processFile('a.css');
+    const out = await lint({
+      filePath: 'a.css',
+      config: { configPath: '/abs/eslint.config.mjs', fix: true },
+    });
 
     expect(out).toEqual({ filePath: 'a.css', error: 'lint fail' });
   });
 
-  it('auto-runs in worker thread and triggers catch handler when process() rejects', async () => {
+  it('caches ESLint instance across calls with same config', async () => {
     const lintFiles = jest.fn(async () => [{ output: undefined, rulesMeta: {}, messages: [] }]);
     const outputFixes = jest.fn(async () => undefined);
     const ESLintCtor = jest.fn(() => ({ lintFiles }));
@@ -110,27 +80,38 @@ describe('ESLintWorker', () => {
       ESLint: Object.assign(ESLintCtor, { outputFixes }),
     }));
 
-    // Make the BaseWorker.process() reject by throwing from process.exit(0) in finally.
-    process.exit = jest.fn((code?: any) => {
-      if (code === 0) throw new Error('exit0');
-      return undefined as any;
-    }) as any;
+    const { default: lint } = await import('../../src/workers/eslint.worker');
 
-    console.error = jest.fn();
+    const config = { configPath: '/abs/eslint.config.mjs', fix: false };
 
-    await jest.unstable_mockModule('worker_threads', () => ({
-      isMainThread: false,
-      parentPort: { postMessage: jest.fn() },
-      workerData: {
-        files: ['a.css'],
-        config: { configPath: '/abs/eslint.config.mjs', fix: false },
-      },
+    await lint({ filePath: 'a.css', config });
+    await lint({ filePath: 'b.css', config });
+
+    // ESLint should only be constructed once since config is the same
+    expect(ESLintCtor).toHaveBeenCalledTimes(1);
+    expect(lintFiles).toHaveBeenCalledTimes(2);
+  });
+
+  it('includes cwd in ESLint options when provided', async () => {
+    const lintFiles = jest.fn(async () => [{ output: undefined, rulesMeta: {}, messages: [] }]);
+    const outputFixes = jest.fn(async () => undefined);
+    const ESLintCtor = jest.fn(() => ({ lintFiles }));
+
+    await jest.unstable_mockModule('eslint', () => ({
+      ESLint: Object.assign(ESLintCtor, { outputFixes }),
     }));
 
-    // Importing should execute the auto-run block.
-    await import('../../src/workers/eslint.worker');
+    const { default: lint } = await import('../../src/workers/eslint.worker');
 
-    expect(console.error).toHaveBeenCalledWith('Worker failed:', expect.any(Error));
-    expect(process.exit).toHaveBeenCalledWith(1);
+    await lint({
+      filePath: 'a.css',
+      config: { configPath: '/abs/eslint.config.mjs', fix: false, cwd: '/tmp/project' },
+    });
+
+    expect(ESLintCtor).toHaveBeenCalledWith({
+      overrideConfigFile: '/abs/eslint.config.mjs',
+      fix: false,
+      cwd: '/tmp/project',
+    });
   });
 });
