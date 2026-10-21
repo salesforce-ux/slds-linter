@@ -29,6 +29,7 @@
         }
       }
     }],
+    "@salesforce-ux/slds/no-invalid-hook-property-usage": "warn",
     "@salesforce-ux/slds/reduce-annotations": "warn"
   },
   "html": {

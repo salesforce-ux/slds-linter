@@ -210,11 +210,15 @@ describe('no-sldshook-fallback-for-lwctoken', () => {
   it('keeps the fallback diagnostic observable after the LWC migration autofix', async () => {
     const code = `const View = () => <div style={{color: 'var(--lwc-brandDark, var(--slds-g-color-border-1))'}} />;`;
     const first = await lintRecommended(code);
-    expect(first.messages.map(message => message.ruleId)).toEqual([
+    const expectedRuleIds = [
       '@salesforce-ux/slds/lwc-token-to-slds-hook',
       ruleId,
       '@salesforce-ux/slds/no-slds-var-without-fallback',
-    ]);
+    ];
+    if (process.env.TARGET_PERSONA === 'internal') {
+      expectedRuleIds.push('@salesforce-ux/slds/no-invalid-hook-property-usage');
+    }
+    expect(first.messages.map(message => message.ruleId)).toEqual(expectedRuleIds);
 
     const fixed = await lintRecommended(code, true);
     expect(fixed.output).toContain('var(--slds-g-color-accent-dark-1, var(--lwc-brandDark, var(--slds-g-color-border-1, #e5e5e5)))');
