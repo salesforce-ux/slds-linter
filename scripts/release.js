@@ -1,5 +1,5 @@
 import { Listr } from "listr2";
-import { execSync, exec } from "child_process";
+import { execSync, execFileSync, exec } from "child_process";
 import { promises as fs } from "fs";
 import path from "path";
 import semver from "semver";
@@ -152,9 +152,10 @@ async function publishPackages(tarballs, releases) {
       sldsLinterTarball = tarball;
       console.log(chalk.blue(`Using pre-generated tarball: ${sldsLinterTarball}`));
     }
-    execSync(
-      `cd ${pkgPath} && NPM_TOKEN=${process.env.NPM_TOKEN} npm publish --tag ${tag} --access public ${isDryRun || skipNpmPublish ? "--dry-run" : ""}`
-    );
+    // Args array (no shell) so values from release-versions.json can't inject commands
+    const publishArgs = ["publish", "--tag", tag, "--access", "public"];
+    if (isDryRun || skipNpmPublish) publishArgs.push("--dry-run");
+    execFileSync("npm", publishArgs, { cwd: pkgPath, stdio: "pipe" });
     const action = isDryRun || skipNpmPublish ? "Dry-run published" : "Published";
     console.log(chalk.green(`${action} ${pkgName}@${version} (tag: ${tag})`));
   }
@@ -183,9 +184,11 @@ async function createGitHubRelease(version, tarballPath) {
     .toString()
     .trim();
   const releaseNotes = await generateReleaseNotes(version, previousVersion);
-  execSync(
-    `gh release create ${version} ${tarballPath} --title "${version}" --notes "${releaseNotes}"`
-  );
+  execFileSync("gh", [
+    "release", "create", version, tarballPath,
+    "--title", version,
+    "--notes", releaseNotes,
+  ]);
   console.log(chalk.green(`Created GitHub release: ${version}`));
 }
 
