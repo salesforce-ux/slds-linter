@@ -8,7 +8,8 @@ import { globby, isDynamicPattern } from "globby";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
 
-export async function verifyTarballs(tarballs, expectedVersion) {
+// expectedVersions maps each package name to the version its tarball must contain
+export async function verifyTarballs(tarballs, expectedVersions) {
   console.log(chalk.yellow("Verifying tarballs..."));
   
   for (const { pkgName, tarball, pkgPath } of tarballs) {
@@ -32,6 +33,7 @@ export async function verifyTarballs(tarballs, expectedVersion) {
       }
       
       const pkg = JSON.parse(await fs.readFile(extractedPackageJson, "utf8"));
+      const expectedVersion = expectedVersions[pkgName];
       if (pkg.version !== expectedVersion) {
         throw new Error(`Version mismatch in ${pkgName}: expected ${expectedVersion}, got ${pkg.version}`);
       }

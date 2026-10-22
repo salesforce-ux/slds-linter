@@ -1,8 +1,5 @@
 import { Listr } from "listr2";
-import input from "@inquirer/input";
-import select from "@inquirer/select";
-import { ListrInquirerPromptAdapter } from "@listr2/prompt-adapter-inquirer";
-import { execSync, exec } from "child_process";
+import { execSync, execFileSync, exec } from "child_process";
 import { promises as fs } from "fs";
 import path from "path";
 import semver from "semver";
@@ -13,6 +10,8 @@ import { verifyTarballs } from "./verify-tarballs.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
+const RELEASE_VERSIONS_FILE = path.join(ROOT_DIR, "release-versions.json");
+const CLI_PACKAGE = "@salesforce-ux/slds-linter";
 const isDryRun = process.argv.includes("--dry-run") || false; // Skips publishing npm, git operations
 const skipCheck = process.argv.includes("--skip-check") || false; // Skips checking working directory git status
 const skipNpmPublish = process.argv.includes("--skip-npm-publish") || false; // Skips npm publish
@@ -37,52 +36,50 @@ async function getWorkspaceInfo() {
   }
 }
 
-async function validateVersion(version) {
-  if (!semver.valid(version)) {
-    throw new Error(
-      "Invalid version format. Please use semver format (e.g., 1.0.0)"
-    );
-  }
-  return true;
-}
-
-async function checkExistingTag(version) {
+// Reads the fixed { version, tag } for every workspace package from release-versions.json
+async function loadReleaseVersions(workspaceInfo) {
+  let config;
   try {
-    return execSync(`git tag -l "${version}"`, { stdio: "pipe" })
-      .toString()
-      .trim();
+    config = JSON.parse(await fs.readFile(RELEASE_VERSIONS_FILE, "utf8"));
   } catch (error) {
-    return false;
-  }
-}
-
-async function incrementPreReleaseVersion(baseVersion, type) {
-  let version = baseVersion;
-  let increment = 0;
-  
-
-  while (await checkExistingTag(`${version}-${type}.${increment}`)) {
-    increment++;
+    throw new Error(`Failed to read ${path.basename(RELEASE_VERSIONS_FILE)}: ${error.message}`);
   }
 
-  return `${version}-${type}.${increment}`;
+  const releases = config.packages || {};
+  for (const pkgName of Object.keys(workspaceInfo)) {
+    const release = releases[pkgName];
+    if (!release) {
+      throw new Error(`Missing release entry for ${pkgName} in release-versions.json`);
+    }
+    if (!semver.valid(release.version)) {
+      throw new Error(`Invalid version "${release.version}" for ${pkgName}. Please use semver format (e.g., 1.0.0)`);
+    }
+    if (typeof release.tag !== "string" || !release.tag.trim()) {
+      throw new Error(`Missing npm tag for ${pkgName} in release-versions.json`);
+    }
+  }
+  if (!releases[CLI_PACKAGE]) {
+    throw new Error(`Missing release entry for ${CLI_PACKAGE} in release-versions.json`);
+  }
+
+  return releases;
 }
 
-async function updatePackageVersions(version, workspaceInfo) {
+async function updatePackageVersions(releases, workspaceInfo) {
   for (const [pkgName, info] of Object.entries(workspaceInfo)) {
     const pkgPath = path.join(ROOT_DIR, info.location, "package.json");
     const pkg = JSON.parse(await fs.readFile(pkgPath, "utf8"));
 
     // Update package version
-    pkg.version = version;
+    pkg.version = releases[pkgName].version;
 
-    // Update workspace dependencies
+    // Pin workspace dependencies to their release versions
     for (const dep of ["dependencies", "devDependencies", "peerDependencies"]) {
       if (!pkg[dep]) continue;
 
-      for (const [depName, depVersion] of Object.entries(pkg[dep])) {
+      for (const depName of Object.keys(pkg[dep])) {
         if (workspaceInfo[depName]) {
-          pkg[dep][depName] = version;
+          pkg[dep][depName] = releases[depName].version;
         }
       }
     }
@@ -146,29 +143,21 @@ async function generateTarballs(workspaceInfo) {
   return tarballs;
 }
 
-async function publishPackages(tarballs, version, releaseType, targetPersona) {
-  const tag = releaseType === "final" ? "latest" : releaseType;
-  // all internal packages are published to the internal tag
-  // CA distribution gets special ca- prefix for npm tags
-  let personaTag;
-  if (targetPersona === "external") {
-    personaTag = tag;
-  } else if (targetPersona === "ca") {
-    personaTag = `ca-${tag}`;
-  } else {
-    personaTag = `internal${tag==="latest" ? "" : `-${tag}`}`;
-  }
+async function publishPackages(tarballs, releases) {
   let sldsLinterTarball = "";
 
   for (const { pkgName, tarball, pkgPath } of tarballs) {
-    if (pkgName === "@salesforce-ux/slds-linter") {
+    const { version, tag } = releases[pkgName];
+    if (pkgName === CLI_PACKAGE) {
       sldsLinterTarball = tarball;
       console.log(chalk.blue(`Using pre-generated tarball: ${sldsLinterTarball}`));
     }
-    execSync(
-      `cd ${pkgPath} && NPM_TOKEN=${process.env.NPM_TOKEN} npm publish --tag ${personaTag} --access public ${isDryRun || skipNpmPublish ? "--dry-run" : ""}`
-    );
-    console.log(chalk.green(`Published ${pkgName}@${version}`));
+    // Args array (no shell) so values from release-versions.json can't inject commands
+    const publishArgs = ["publish", "--tag", tag, "--access", "public"];
+    if (isDryRun || skipNpmPublish) publishArgs.push("--dry-run");
+    execFileSync("npm", publishArgs, { cwd: pkgPath, stdio: "pipe" });
+    const action = isDryRun || skipNpmPublish ? "Dry-run published" : "Published";
+    console.log(chalk.green(`${action} ${pkgName}@${version} (tag: ${tag})`));
   }
 
   return sldsLinterTarball;
@@ -184,9 +173,9 @@ async function createTag(version) {
   console.log(chalk.green(`Created tag: ${version}`));
 }
 
-async function createGitHubRelease(version, tarballPath, releaseType) {
-  
-  if (releaseType !== "final") {
+async function createGitHubRelease(version, tarballPath) {
+
+  if (semver.prerelease(version)) {
     console.log(chalk.yellow("Skipping GitHub release for pre-release"));
     return;
   }
@@ -195,10 +184,11 @@ async function createGitHubRelease(version, tarballPath, releaseType) {
     .toString()
     .trim();
   const releaseNotes = await generateReleaseNotes(version, previousVersion);
-  const releaseSuffix = releaseType !== "final" ? " --prerelease" : "";
-  execSync(
-    `gh release create ${version} ${tarballPath} --title "${version}" --notes "${releaseNotes}"${releaseSuffix}`
-  );
+  execFileSync("gh", [
+    "release", "create", version, tarballPath,
+    "--title", version,
+    "--notes", releaseNotes,
+  ]);
   console.log(chalk.green(`Created GitHub release: ${version}`));
 }
 
@@ -261,76 +251,21 @@ async function main() {
           },
         },
         {
-          title:"Prompt for target persona",
+          title: "Read release versions",
           task: async (ctx, task) => {
-            const prompt = task.prompt(ListrInquirerPromptAdapter);
-            const targetPersona = await prompt.run(select, {
-              message: "Select target persona:",
-              choices: [
-                { name: "Internal", value: "internal" },
-                { name: "External", value: "external" },
-                { name: "External CA Distribution", value: "ca" },  
-              ],
-              default: "internal",
-            });
-
-            if (!targetPersona) {
-              throw new Error("Input valid target persona. Skipping release.");
-            }
-            ctx.targetPersona = targetPersona;
+            ctx.releases = await loadReleaseVersions(ctx.workspaceInfo);
+            // The CLI version identifies the release (branch, git tag, GitHub release)
+            ctx.finalVersion = ctx.releases[CLI_PACKAGE].version;
+            task.output = Object.keys(ctx.workspaceInfo)
+              .map((pkgName) => `${pkgName}@${ctx.releases[pkgName].version} (tag: ${ctx.releases[pkgName].tag})`)
+              .join("\n");
           },
-        },
-        {
-          title: "Prompt for version and release type",
-          task: async (ctx, task) => {
-            const prompt = task.prompt(ListrInquirerPromptAdapter);
-            const version = await prompt.run(input, {
-              message: "Enter the version number (e.g., 1.0.0):",
-              validate: validateVersion,
-              required: true,
-            });
-
-            if (!version) {
-              throw new Error("Input valid version. Skipping release.");
-            }
-
-            const releaseType = await prompt.run(select, {
-                message: "Select release type:",
-                choices: [
-                  { name: "Final", value: "final" },
-                  { name: "Alpha", value: "alpha" },
-                  { name: "Beta", value: "beta" },
-                ],
-                default: "final",
-              });
-
-            if (!releaseType) {
-              throw new Error("Input valid release type. Skipping release.");
-            }
-
-            ctx.version = version;
-            ctx.releaseType = releaseType;
-          },
-        },
-        {
-          title: "Handle version generation",
-          task: async (ctx) => {
-            // CA distribution gets -ca suffix to avoid version conflicts with external releases
-            const suffix = ctx.targetPersona === "external" ? "" : `-${ctx.targetPersona}`;
-            const version = ctx.version + suffix;
-            ctx.finalVersion = version;
-            if (ctx.releaseType !== "final") {
-              ctx.finalVersion = await incrementPreReleaseVersion(
-                version,
-                ctx.releaseType
-              );
-            }
-          },
+          rendererOptions: { persistentOutput: true },
         },
         {
           title: "Update all package versions",
           task: async (ctx) => {
-            await updatePackageVersions(ctx.finalVersion, ctx.workspaceInfo);
+            await updatePackageVersions(ctx.releases, ctx.workspaceInfo);
           },
         },
         {
@@ -344,13 +279,8 @@ async function main() {
         },
         {
           title: "Building workspace",
-          task: async (ctx) => {
-            const envVar = ["CLI_BUILD_MODE=release"];
-            // CA distribution is treated as external for build purposes
-            if(ctx.targetPersona !== "external" && ctx.targetPersona !== "ca") {
-              envVar.push(`TARGET_PERSONA=${ctx.targetPersona}`);
-            }           
-            execSync(`${envVar.join(" ")} yarn build`, {
+          task: async () => {
+            execSync("CLI_BUILD_MODE=release yarn build", {
               stdio: 'inherit'
             });
           },
@@ -364,18 +294,16 @@ async function main() {
         {
           title: "Verify tarballs",
           task: async (ctx) => {
-            await verifyTarballs(ctx.tarballs, ctx.finalVersion);
+            const expectedVersions = Object.fromEntries(
+              Object.entries(ctx.releases).map(([pkgName, { version }]) => [pkgName, version])
+            );
+            await verifyTarballs(ctx.tarballs, expectedVersions);
           },
         },
         {
           title: "Publish packages",
           task: async (ctx) => {
-            ctx.sldsLinterTarball = await publishPackages(
-              ctx.tarballs,
-              ctx.finalVersion,
-              ctx.releaseType,
-              ctx.targetPersona
-            );            
+            ctx.sldsLinterTarball = await publishPackages(ctx.tarballs, ctx.releases);
           },
         },
         {
@@ -394,13 +322,9 @@ async function main() {
         },
         {
           title: "Create GitHub release",
-          skip: (ctx) => isDryRun || ctx.releaseType !== "final" || !ctx.sldsLinterTarball || (ctx.targetPersona !== "external" && ctx.targetPersona !== "ca"),
+          skip: (ctx) => isDryRun || !!semver.prerelease(ctx.finalVersion) || !ctx.sldsLinterTarball,
           task: async (ctx) => {
-            await createGitHubRelease(
-              ctx.finalVersion,
-              ctx.sldsLinterTarball,
-              ctx.releaseType
-            );
+            await createGitHubRelease(ctx.finalVersion, ctx.sldsLinterTarball);
           },
         },
         {

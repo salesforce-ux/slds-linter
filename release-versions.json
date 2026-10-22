@@ -1,0 +1,16 @@
+{
+  "packages": {
+    "@salesforce-ux/eslint-plugin-slds": {
+      "version": "2.0.0",
+      "tag": "latest"
+    },
+    "@salesforce-ux/eslint-plugin-react-slds": {
+      "version": "1.0.0-beta.1",
+      "tag": "beta"
+    },
+    "@salesforce-ux/slds-linter": {
+      "version": "2.0.0",
+      "tag": "latest"
+    }
+  }
+}
