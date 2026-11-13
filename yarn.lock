@@ -1721,13 +1721,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salesforce-ux/eslint-plugin-react-slds@npm:1.0.0-beta.0, @salesforce-ux/eslint-plugin-react-slds@workspace:packages/eslint-plugin-react-slds":
+"@salesforce-ux/eslint-plugin-react-slds@npm:1.0.0-beta.1, @salesforce-ux/eslint-plugin-react-slds@workspace:packages/eslint-plugin-react-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/eslint-plugin-react-slds@workspace:packages/eslint-plugin-react-slds"
   dependencies:
     "@eslint-react/kit": "npm:5.18.6"
     "@eslint/css-tree": "npm:^3.6.5"
-    "@salesforce-ux/eslint-plugin-slds": "npm:1.2.1"
+    "@salesforce-ux/eslint-plugin-slds": "npm:2.0.0"
     "@salesforce-ux/sds-metadata": "npm:^2.264.1"
     "@types/chroma-js": "npm:^2.4.4"
     "@types/jest": "npm:^29.5.14"
@@ -1748,7 +1748,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@salesforce-ux/eslint-plugin-slds@npm:1.2.1, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
+"@salesforce-ux/eslint-plugin-slds@npm:2.0.0, @salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds":
   version: 0.0.0-use.local
   resolution: "@salesforce-ux/eslint-plugin-slds@workspace:packages/eslint-plugin-slds"
   dependencies:
@@ -1786,8 +1786,8 @@ __metadata:
   resolution: "@salesforce-ux/slds-linter@workspace:packages/cli"
   dependencies:
     "@salesforce-ux/context-extractor": "npm:^1.2.0"
-    "@salesforce-ux/eslint-plugin-react-slds": "npm:1.0.0-beta.0"
-    "@salesforce-ux/eslint-plugin-slds": "npm:1.2.1"
+    "@salesforce-ux/eslint-plugin-react-slds": "npm:1.0.0-beta.1"
+    "@salesforce-ux/eslint-plugin-slds": "npm:2.0.0"
     "@types/cli-progress": "npm:^3"
     "@types/jest": "npm:^29.5.14"
     "@typescript-eslint/eslint-plugin": "npm:^8.69.0"
